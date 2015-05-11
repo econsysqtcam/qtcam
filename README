@@ -1,0 +1,52 @@
+Qtcam - Qt Quick Based Camera Application
+
+Copyright © 2015 e-con Systems India Pvt. Limited
+All rights reserved.
+
+
+Application Features:
+*********************
+1. Emulated support for still pin capture in linux.
+2. Video capture controls/filters(like brightness or other available options) to enable adjustments in preview.
+3. Still Capture properties tab to change the capture image save location.
+4. Supported file formats for taking the still capture are RAW, JPG, PNG, BMP.
+5. Still capture pin tab to find the support color space and resolution for still.
+6. Video renderer tab to view the total frames played and average FPS.
+7. Video capture pin tab to find the support color space and resolution for preview. 
+8. Special extension tabs for e-con cameras.
+9. Supports Video recording through YUV, MJPEG, H264, VP8 encoders and MKV, AVI containers.
+10. Keyboard Navigations.
+11. Tool tips throughout the application.
+
+INSTALL:
+********
+Please look into the INSTALL file for more details
+
+Licenese:
+*********
+Qtcam is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Qtcam is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Qtcam. If not, see <http://www.gnu.org/licenses/>.
+
+TODOS:
+******
+1. Support needs to be extended for all uvc camera.
+2. Display all the available codecs from the system.
+3. Option to enable the preview to be scaled as per the screen.  
+4. Optimize the CPU usage - v4lconvert library is consuming the high cpu usage.
+5. Enhance the application by sending the captured data over the network.
+6. Add support for audio recording.
+
+Known Issues/Bugs:
+******************
+1. If there is a drop in frame rates during video recording, then the actual video playback time and recording time is different.
+2. In see3cam50 still capture is sometime gets distorted due to the extra exposure from camera.
