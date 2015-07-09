@@ -48,7 +48,6 @@ public:
    int encodeImage(const QImage &);
    bool isOk();
 
-
 protected:
       unsigned Width,Height;
       unsigned Bitrate;
@@ -60,7 +59,7 @@ protected:
       AVFormatContext *pFormatCtx;
       AVOutputFormat *pOutputFormat;
       AVCodecContext *pCodecCtx;
-      AVStream *pVideoStream,*pAudioStream;
+      AVStream *pVideoStream;
       AVCodec *pCodec;
 
       // Frame data
@@ -99,12 +98,6 @@ protected:
       bool convertImage(const QImage &img);
       bool convertImage_sws(const QImage &img);
 
-
-
 };
-
-
-
-
 #endif // VideoEncoder_H
 

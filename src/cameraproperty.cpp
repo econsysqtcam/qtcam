@@ -79,7 +79,7 @@ void Cameraproperty::checkforDevice() {
     }
     emit logHandle(QtDebugMsg,"Camera devices Connected to System: "+ availableCam.join(", "));
     uvccam.findEconDevice(&availableCam,"video4linux");
-    emit logHandle(QtDebugMsg,"E-Con Camera devices Connected to System: "+availableCam.join(", "));
+    //emit logHandle(QtDebugMsg,"E-Con Camera devices Connected to System: "+availableCam.join(", "));
     availableCam.prepend("----Select camera Device----");
     modelCam.setStringList(availableCam);
     uvccam.findEconDevice(&availableCam,"hidraw");

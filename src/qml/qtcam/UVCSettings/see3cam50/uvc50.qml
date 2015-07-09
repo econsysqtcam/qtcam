@@ -337,14 +337,14 @@ Item {
                 }
             }
             onClicked: {
-                see3camctrl.setFlashControlState(checked,"See3CAMCU50")
+                see3camctrl.setFlashControlState(checked,"See3Camar0130")
             }
             Keys.onReturnPressed: {
                 if(checked)
                     checked = false
                 else
                     checked = true
-                see3camctrl.setFlashControlState(checked,"See3CAMCU50")
+                see3camctrl.setFlashControlState(checked,"See3Camar0130")
             }
         }
         CheckBox {

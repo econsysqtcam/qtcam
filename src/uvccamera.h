@@ -52,6 +52,8 @@
 
 #define CAMERA_CONTROL_80	0x60
 #define CAMERA_CONTROL_50	0x64
+#define CAMERA_CONTROL_51	0x65
+#define CAMERA_CONTROL_AR0130	0x68
 #define GET_FOCUS_MODE		0x01
 #define SET_FOCUS_MODE		0x02
 #define GET_FOCUS_POSITION	0x03
@@ -127,6 +129,32 @@
 #define MANUFACTURER_NAME_MAX		64		// Example: e-con Systems
 #define PRODUCT_NAME_MAX			128		// Example: e-con's 1MP Monochrome Camera
 #define HID_LIST_MAX				32
+
+/* SEE3CAM_CU130 */
+
+#define CAMERA_CONTROL_CU130	0x69
+#define GET_SCENE_MODE		0x01
+#define SET_SCENE_MODE		0x02
+#define GET_SPECIAL_EFFECT	0x03
+#define SET_SPECIAL_EFFECT	0x04
+
+#define GET_FAIL		0x00
+#define GET_SUCCESS		0x01
+
+/* SEE3CAM_CU51 */
+
+#define GET_EXPOSURE_VALUE	0x01
+#define SET_EXPOSURE_VALUE	0x02
+#define TRIGGER_STILL_CAPTURE	0x03
+#define GET_TORCH_LEVEL_51	0x04
+#define SET_TORCH_LEVEL_51	0x05
+
+#define EXP_FAIL		0x00
+#define EXP_SUCCESS		0x01
+
+#define TRIGGER_FAIL		0x00
+#define TRIGGER_SUCCESS		0x01
+
 
 
 class uvccamera: public QObject
@@ -306,11 +334,12 @@ signals:
 public:
 
     /**
-     * @brief The camGpioPin enum are used to set/read value for gpio Pin (OUT1,OUT2,IN1,IN2,IN3) of the camera.
+     * @brief The camGpioPin enum are used to set/read value for gpio Pin (OUT1,OUT2,OUT3,IN1,IN2,IN3) of the camera.
      */
     enum  camGpioPin{
     OUT1 = 24,
     OUT2 = 20,
+    OUT3 = 21,
     IN1 = 19,
     IN2 = 22,
     IN3 = 33

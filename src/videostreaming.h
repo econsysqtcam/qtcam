@@ -55,7 +55,8 @@ public:
     QString fileName;
 
     static QStringListModel resolution;
-    static QStringListModel outputFormat;
+    static QStringListModel stillOutputFormat;
+    static QStringListModel videoOutputFormat;
     static QStringListModel fpsList;
 
     void setFrame(unsigned char *data);
@@ -151,6 +152,7 @@ private:
     bool getInterval(struct v4l2_fract &interval);
 
     int findMax(QList<int> *llist);
+    void freeBuffers(unsigned char *srcBuffer,unsigned char *destBuffer,unsigned char *copyBuffer);
 
 public slots:
     /**
@@ -214,9 +216,15 @@ public slots:
     void displayOutputFormat();
 
     /**
-     * @brief Emulate the available resolution supported by the camera.
+     * @brief Emulate the available resolution for still capturing supported by the camera.
      */
-    void displayResolution();
+    void displayStillResolution();
+
+
+    /**
+     * @brief Emulate the available resolution for video streaming supported by the camera.
+     */
+    void displayVideoResolution();
 
     /**
      * @brief To set the camera device node number to setDevice() function
@@ -308,10 +316,10 @@ signals:
     void logCriticalHandle(QString _text);
     void titleTextChanged(QString _title,QString _text);
     void newControlAdded(QString ctrlName,QString ctrlType,QString ctrlID,QString ctrlMinValue= "0", QString ctrlMaxValue = "0",QString ctrlDefaultValue="0", QString ctrlHardwareDefault="0");
-    void deviceUnplugged(QString _title,QString _text);
-    void framesPlayed(unsigned frame);
+    void deviceUnplugged(QString _title,QString _text);    
     void averageFPS(unsigned fps);
-    void defaultFrameSize(unsigned int outputIndexValue);
+    void defaultStillFrameSize(unsigned int outputIndexValue);
+    void defaultFrameSize(unsigned int outputIndexValue, unsigned int  defaultWidth, unsigned int defaultHeight);
     void defaultOutputFormat(unsigned int formatIndexValue);
     void defaultFrameInterval(unsigned int frameInterval);
     void captureSaveTime(QString saveTime);

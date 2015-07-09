@@ -196,7 +196,6 @@ int VideoEncoder::encodeImage(const QImage &img)
 {
     if(!isOk())
         return -1;
-
     convertImage_sws(img);     // SWS conversion
 
     int got_packet = 0;

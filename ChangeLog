@@ -1,3 +1,14 @@
+Qtcam Application-4.0.1
+-------------------------------
+* Added support for all uvc cameras.
+* switching of resolution is removed when still and video format, resolution are same to make faster.
+* Video capture filter is renamed to Image Quality Settings.
+* Video capture pin and Video Capture properties tabs are combined into Video Capture Settings tab.
+* Still capture pin and still capture properties tabs are combined into Still Capture Settings tab.
+* Qtcam logo is changed.
+* Preview color format is displayed in status bar.
+
+
 Qtcam Application-1.7.0
 ------------------------------
 *Initial public release

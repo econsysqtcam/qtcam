@@ -24,7 +24,10 @@ SOURCES += main.cpp \
     seecam_11cug.cpp \
     seecam_cu80.cpp \
     seecam_cu50.cpp \
-    videoencoder.cpp
+    seecam_ar0130.cpp \
+    videoencoder.cpp \
+    seecam_cu51.cpp \
+    see3cam_cu130.cpp
 
 # Installation path
 # target.path =
@@ -46,15 +49,23 @@ HEADERS += \
     seecam_11cug.h \
     seecam_cu80.h \
     seecam_cu50.h \
-    videoencoder.h
+    seecam_ar0130.h \
+    videoencoder.h \
+    seecam_cu51.h \
+    see3cam_cu130.h
+    
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
-                $$PWD/include
+                $$PWD/avpackage/include \
+                $$PWD/udevpackage/include
 
-LIBS += -lv4l2 -lv4lconvert \                
-        -ludev \
-        -L$$PWD/lib -lavutil -lavcodec -lavformat -lswscale -lavresample
-
+LIBS += -lv4l2 -lv4lconvert \
+        -L$$PWD/avpackage/lib/ -lavutil \
+        -L$$PWD/avpackage/lib/ -lavcodec \
+        -L$$PWD/avpackage/lib/ -lavformat \
+        -L$$PWD/avpackage/lib/ -lswscale \
+        -L$$PWD/avpackage/lib/ -lavresample \
+        -L$$PWD/udevpackage/lib -ludev
 
 QMAKE_CFLAGS_THREAD = -D__STDC_CONSTANT_MACROS      #For Ubuntu 12.04 compilation
 QMAKE_CXXFLAGS_THREAD = -D__STDC_CONSTANT_MACROS    #For Ubuntu 12.04 compilation

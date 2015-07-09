@@ -196,7 +196,6 @@ void See3CAM_CU130::setSceneMode(const See3CAM_CU130::sceneModes &sceneMode)
             return void();
         }
     }
-
 }
 
 void See3CAM_CU130::setEffectMode(const See3CAM_CU130::specialEffects &specialEffect)
@@ -229,7 +228,6 @@ void See3CAM_CU130::setEffectMode(const See3CAM_CU130::specialEffects &specialEf
 
         /* Read the Status code from the device */
         start = uvc.getTickCount();
-
 
         while(timeout)
         {

@@ -29,7 +29,8 @@
 #include <fcntl.h>
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 QStringListModel Videostreaming::resolution;
-QStringListModel Videostreaming::outputFormat;
+QStringListModel Videostreaming::stillOutputFormat;
+QStringListModel Videostreaming::videoOutputFormat;
 QStringListModel Videostreaming::fpsList;
 int Videostreaming::deviceNumber;
 QString Videostreaming::camDeviceName;
@@ -95,11 +96,14 @@ void Videostreaming::updateFrame(QImage img) {
 
 void Videostreaming::capFrame()
 {
+    //qDebug()<<"in capFrame"<<m_capNotifier->isEnabled();
     __u32 buftype = m_buftype;
     v4l2_plane planes[VIDEO_MAX_PLANES];
     v4l2_buffer buf;
+    unsigned char *tempSrcBuffer = NULL, *tempDestBuffer = NULL, *copyDestBuffer = NULL;
     int err = 0;
     bool again;
+
     //temp.fmt.pix.pixelformat = V4L2_PIX_FMT_Y16;  // cu51
     unsigned char *displaybuf = NULL;
     memset(planes, 0, sizeof(planes));
@@ -123,9 +127,31 @@ void Videostreaming::capFrame()
         return;
     }
 
-    err = v4lconvert_convert(m_convertData, &m_capSrcFormat, &m_capDestFormat,
-                             (unsigned char *)m_buffers[buf.index].start[0], buf.bytesused,
-            m_capImage->bits(), m_capDestFormat.fmt.pix.sizeimage);
+    if (camDeviceName == "e-con's CX3 RDK with M\nT9P031" || camDeviceName == "See3CAM_12CUNIR" || camDeviceName == "See3CAM_CU51")
+    {
+        tempSrcBuffer = (unsigned char *)malloc(width * height * 2);
+        tempDestBuffer = (unsigned char *)malloc(width * height << 1);
+        copyDestBuffer = tempDestBuffer;
+
+        memcpy(tempSrcBuffer, m_buffers[buf.index].start[0], buf.bytesused);
+
+        for(int l=0; l<(width*height*2); l=l+2)
+        {
+            *tempDestBuffer++ = (((tempSrcBuffer[l] & 0xF0) >> 4) | (tempSrcBuffer[l+1] & 0x0F) << 4);
+            *tempDestBuffer++ = 0x80;
+        }
+        m_capSrcFormat.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
+        err = v4lconvert_convert(m_convertData, &m_capSrcFormat, &m_capDestFormat,
+                                 (unsigned char *)copyDestBuffer, buf.bytesused,
+                                 m_capImage->bits(), m_capDestFormat.fmt.pix.sizeimage);
+
+    }
+    else
+    {
+        err = v4lconvert_convert(m_convertData, &m_capSrcFormat, &m_capDestFormat,
+                                 (unsigned char *)m_buffers[buf.index].start[0], buf.bytesused,
+                m_capImage->bits(), m_capDestFormat.fmt.pix.sizeimage);
+   }
 
     if (err != -1) {
         displaybuf = m_capImage->bits();
@@ -153,12 +179,19 @@ void Videostreaming::capFrame()
     }
     free(asil);
     delete qq;
+    int tmpRet;
     if(m_frame > 1 && m_snapShot) {
         bool tmpValue;
         if(formatType == "raw") {
             QFile file(filename);
             if(file.open(QIODevice::WriteOnly)) {
-                int tmpRet = file.write((const char*)m_buffers[buf.index].start[0],buf.bytesused);
+                if (camDeviceName == "e-con's CX3 RDK with M\nT9P031" || camDeviceName == "See3CAM_12CUNIR" || camDeviceName == "See3CAM_CU51"){
+                    tmpRet = file.write((const char*)copyDestBuffer, buf.bytesused);
+                }
+                else{
+                    tmpRet = file.write((const char*)m_buffers[buf.index].start[0], buf.bytesused);
+                }
+
                 if(tmpRet != -1) {
                     tmpValue = true;
                 } else {
@@ -170,40 +203,69 @@ void Videostreaming::capFrame()
             }
         }
         else {
-            QImage *qImage2 = new QImage(displaybuf, width, height,QImage::Format_RGB888);
-            bool tmpRet = qImage2->save(filename);
+          QImage qImage2(displaybuf, width, height,QImage::Format_RGB888);
+            bool tmpRet;
+            QImageWriter writer(filename);
+            if(!writer.write(qImage2))
+            {
+                emit logCriticalHandle("Error while saving image:"+writer.errorString());
+                tmpRet = false;
+            }
+            else
+            {
+                tmpRet = true;
+            }
             tmpValue = tmpRet;
-            delete qImage2;
         }
         if(triggerShot) {
             captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
             makeSnapShot = false;
             m_snapShot = false;
-            if(tmpValue)
-                formatSaveSuccess(true);
-            else
-                formatSaveSuccess(false);
+            formatSaveSuccess(tmpValue);
 
         } else {
-            captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
-            stopCapture();
+           captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
             makeSnapShot = false;
-            vidCapFormatChanged(lastFormat);
-            setResoultion(lastPreviewSize);
-            startAgain();
             m_snapShot = false;
-            if(tmpValue)
-                formatSaveSuccess(true);
-            else
-                formatSaveSuccess(false);
-            return void();
-
+            if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
+            {
+                if(tempSrcBuffer || copyDestBuffer)
+                {
+                    freeBuffers(tempSrcBuffer,tempDestBuffer,copyDestBuffer);
+                }
+                stopCapture();
+                vidCapFormatChanged(lastFormat);
+                setResoultion(lastPreviewSize);
+                startAgain();
+                formatSaveSuccess(tmpValue);
+                return void();
+            }
+            else{
+                formatSaveSuccess(tmpValue);
+            }
         }
     }
     getFrameRates();
+    if(tempSrcBuffer || copyDestBuffer)
+        freeBuffers(tempSrcBuffer,tempDestBuffer,copyDestBuffer);
     qbuf(buf);
 }
+void Videostreaming::freeBuffers(unsigned char *srcBuffer, unsigned char *destBuffer, unsigned char *copyBuffer)
+{
 
+    if(srcBuffer)
+    {
+        free(srcBuffer);
+        srcBuffer = NULL;
+    }
+
+    if(copyBuffer)
+    {
+        free(copyBuffer);
+        copyBuffer = NULL;
+        destBuffer = NULL;
+    }
+}
 void Videostreaming::getFrameRates() {
     struct timeval tv, res;
     if (m_frame == 0)
@@ -215,7 +277,7 @@ void Videostreaming::getFrameRates() {
         m_lastFrame = m_frame;
         m_tv = tv;
     }
-    emit framesPlayed(++m_frame);
+    ++m_frame;
     emit averageFPS(m_fps);
 }
 
@@ -311,6 +373,8 @@ int Videostreaming::findMax(QList<int> *list) {
     return array[index_of_min];
 }
 
+
+
 void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
 
     captureTime.start();
@@ -353,11 +417,15 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     }
     makeSnapShot = true;
     triggerShot = false;
-    stopCapture();
-    vidCapFormatChanged(stillOutFormat);
-    setResoultion(stillSize);
     formatType = imgFormatType;
-    startAgain();
+
+    if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
+    {
+        stopCapture();
+        vidCapFormatChanged(stillOutFormat);
+        setResoultion(stillSize);
+        startAgain();
+    }
 }
 
 void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
@@ -400,26 +468,24 @@ bool Videostreaming::getInterval(struct v4l2_fract &interval)
 
 void Videostreaming::displayFrame() {
     emit logDebugHandle("Start Previewing");
-    m_frame = m_lastFrame = m_fps = 0;
-    emit framesPlayed(m_frame);
+    m_frame = m_lastFrame = m_fps = 0;    
     emit averageFPS(m_fps);
 
     __u32 buftype = m_buftype;
-
     g_fmt_cap(buftype, m_capSrcFormat);
-    if (try_fmt(m_capSrcFormat)) {
-        if(!s_fmt(m_capSrcFormat)) {
-            emit titleTextChanged("Error", "Device or Resource is busy");
-            emit logCriticalHandle("Device or Resource is busy");
-            if (fd() >= 0) {
-                v4lconvert_destroy(m_convertData);
-                close();
-            }
-            return void();
+    // if (try_fmt(m_capSrcFormat)) {
+    if(!s_fmt(m_capSrcFormat)) {
+        emit titleTextChanged("Error", "Device or Resource is busy");
+        emit logCriticalHandle("Device or Resource is busy");
+        if (fd() >= 0) {
+            v4lconvert_destroy(m_convertData);
+            close();
         }
-    } else {
         return void();
     }
+    //} else {
+    //return void();
+    //}
 
     if (getInterval(interval))
         set_interval(buftype, interval);
@@ -428,21 +494,28 @@ void Videostreaming::displayFrame() {
 
     m_capDestFormat = m_capSrcFormat;
     m_capDestFormat.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB24;
+
     //m_capDestFormat.fmt.pix.sizeimage = (m_capDestFormat.fmt.pix.width * m_capDestFormat.fmt.pix.height * 3);
     v4l2_format copy = m_capSrcFormat;
     v4lconvert_try_format(m_convertData, &m_capDestFormat, &m_capSrcFormat);
     // v4lconvert_try_format sometimes modifies the source format if it thinks
     // that there is a better format available. Restore our selected source
     // format since we do not want that happening.
+
     m_capSrcFormat = copy;
+    m_capDestFormat.fmt.pix.width  = m_capSrcFormat.fmt.pix.width;
+    m_capDestFormat.fmt.pix.height = m_capSrcFormat.fmt.pix.height;
     width = m_capDestFormat.fmt.pix.width;
     height = m_capDestFormat.fmt.pix.height;
     pixfmt = m_capDestFormat.fmt.pix.pixelformat;
+    m_capDestFormat.fmt.pix.sizeimage = width*height*3;
 
     m_capImage = new QImage(width, height, QImage::Format_RGB888);
+
     if(camDeviceName == "e-con's 1MP Bayer RGB \nCamera") {
         m_capSrcFormat.fmt.pix.pixelformat = V4L2_PIX_FMT_SGRBG8;
     }
+
     if (startCapture()) {
         sprintf(header,"P6\n%d %d 255\n",width,height);
         m_capNotifier = new QSocketNotifier(fd(), QSocketNotifier::Read);
@@ -521,15 +594,14 @@ void Videostreaming::setResoultion(QString resolution)
     fmt.fmt.pix.height = height;
     m_width = width;
     m_height = height;
-    if (try_fmt(fmt)) {
-        s_fmt(fmt);
-    }
+    try_fmt(fmt);
+    s_fmt(fmt);
 }
 
-void Videostreaming::displayResolution() {
+void Videostreaming::displayStillResolution() {
     g_fmt_cap(V4L2_BUF_TYPE_VIDEO_CAPTURE, fmt);
 
-    QStringList dispRes;
+    QStringList dispStillRes;
 
     m_pixelformat = fmt.fmt.pix.pixelformat;
     m_width       = fmt.fmt.pix.width;
@@ -542,14 +614,46 @@ void Videostreaming::displayResolution() {
     if (ok && frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
         do {
             indexCount++;
-            dispRes.append(QString("%1x%2").arg(frmsize.discrete.width).arg(frmsize.discrete.height));
+            dispStillRes.append(QString("%1x%2").arg(frmsize.discrete.width).arg(frmsize.discrete.height));
+            if (frmsize.discrete.width == m_width && frmsize.discrete.height == m_height) {                
+                emit defaultStillFrameSize(indexCount);
+            }
+        } while (enum_framesizes(frmsize));
+    }    
+    stillOutputFormat.setStringList(dispStillRes);
+    emit logDebugHandle("Supported still Resolution: " +dispStillRes.join(", "));
+}
+
+void Videostreaming::displayVideoResolution() {
+    g_fmt_cap(V4L2_BUF_TYPE_VIDEO_CAPTURE, fmt);
+
+    QStringList dispVideoRes;
+
+    m_pixelformat = fmt.fmt.pix.pixelformat;
+    m_width       = fmt.fmt.pix.width;
+    m_height      = fmt.fmt.pix.height;
+
+    unsigned int indexCount = -1;
+    unsigned int defaultWidth;
+    unsigned int defaultHeight;
+
+    v4l2_frmsizeenum frmsize;
+    bool ok = false;
+    ok = enum_framesizes(frmsize, m_pixelformat);
+    if (ok && frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
+        do {
+            indexCount++;
+            dispVideoRes.append(QString("%1x%2").arg(frmsize.discrete.width).arg(frmsize.discrete.height));
             if (frmsize.discrete.width == m_width && frmsize.discrete.height == m_height) {
-                emit defaultFrameSize(indexCount);
+                defaultWidth = m_width;
+                defaultHeight = m_height;
+                emit defaultFrameSize(indexCount, defaultWidth, defaultHeight);                
             }
         } while (enum_framesizes(frmsize));
     }
-    outputFormat.setStringList(dispRes);
-    emit logDebugHandle("Supported Resolution: " +dispRes.join(", "));
+
+    videoOutputFormat.setStringList(dispVideoRes);    
+    emit logDebugHandle("Supported video Resolution: " +dispVideoRes.join(", "));
 }
 
 void Videostreaming::vidCapFormatChanged(QString idx)
@@ -559,11 +663,8 @@ void Videostreaming::vidCapFormatChanged(QString idx)
     v4l2_format fmt;
     g_fmt_cap(m_buftype, fmt);
     fmt.fmt.pix.pixelformat = desc.pixelformat;
-    if (try_fmt(fmt))
-        s_fmt(fmt);
-    else {
-        return void();
-    }
+    try_fmt(fmt);
+    s_fmt(fmt);
     if(!makeSnapShot)
         updateVidOutFormat();
 }
@@ -620,6 +721,11 @@ void Videostreaming::updateFrameInterval(QString pixelFormat, QString frameSize)
     height = tempResList.value(1).toInt();
     QStringList tempPixFmt = pixelFormat.split(' ');
     QString pixFmtValue = tempPixFmt.value(0);
+
+    /* Actual Format of "Y16" is "Y16 " [Y16 with space]. So append space char */
+    if (0 == QString::compare(pixFmtValue, "Y16")){
+        pixFmtValue.append(" ");
+    }
     ok = enum_frameintervals(frmival,pixFormat.value(pixFmtValue).toInt(), width, height);
     m_has_interval = ok && frmival.type == V4L2_FRMIVAL_TYPE_DISCRETE;
     QStringList availableFPS;
