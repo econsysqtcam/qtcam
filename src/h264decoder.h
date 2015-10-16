@@ -26,9 +26,9 @@
                                               (LIBAVCODEC_VERSION_MAJOR == major && \
                                                LIBAVCODEC_VERSION_MINOR >= minor))
 
-#if !LIBAVCODEC_VER_AT_LEAST(54,25)
-    #define AV_CODEC_ID_H264 CODEC_ID_H264
-#endif
+//#if !LIBAVCODEC_VER_AT_LEAST(54,25)
+//    #define AV_CODEC_ID_H264 CODEC_ID_H264
+//#endif
 
 extern "C" {
 #include "libavcodec/avcodec.h"
