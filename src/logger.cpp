@@ -69,7 +69,7 @@ void logger::logFileCreation() {
         dt += "\n********************************************************************************";
         ts << dt << "\n" << flush;
     }
-    QSettings *releaseSettings = new QSettings("qml/qtcam/about/release.ini",QSettings::IniFormat);
+    QSettings *releaseSettings = new QSettings("/usr/share/qml/qtcam/about/release.ini",QSettings::IniFormat);
     releaseSettings->beginGroup("release");
     DEBUG = releaseSettings->value("logDebugEnable").toBool();
     WARNING = releaseSettings->value("logWarningEnable").toBool();

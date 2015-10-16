@@ -22,7 +22,7 @@
 
 AboutPage::AboutPage()
 {
-    version = new QSettings("qml/qtcam/about/release.ini",QSettings::IniFormat);
+    version = new QSettings("/usr/share/qml/qtcam/about/release.ini",QSettings::IniFormat);
     version->beginGroup("release");
     appName = version->value("applicationname").toString();
     appVerNumber = version->value("version").toString();
@@ -45,7 +45,7 @@ QString AboutPage::getApplicationVersionNumber() {
 }
 
 QByteArray AboutPage::getCopyRight() {
-    copyRightFile = new QFile("qml/qtcam/about/copyright.txt");
+    copyRightFile = new QFile("/usr/share/qml/qtcam/about/copyright.txt");
     if(copyRightFile->open(QIODevice::ReadOnly)){
         copyRight = copyRightFile->readAll();
         copyRightFile->close();
