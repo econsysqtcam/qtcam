@@ -23,7 +23,7 @@
 
 #define PRODUCTID "2560"
 QStringListModel Cameraproperty::modelCam;
-
+bool Cameraproperty::saveLog;
 
 Cameraproperty::Cameraproperty()
 {
@@ -31,6 +31,10 @@ Cameraproperty::Cameraproperty()
     connect(this,SIGNAL(setCamName(QString)),&vidStr,SLOT(getCameraName(QString)));
     connect(this,SIGNAL(logHandle(QtMsgType,QString)),this,SLOT(logWriter(QtMsgType,QString)));
     connect(&uvccam,SIGNAL(logHandle(QtMsgType,QString)),this,SLOT(logWriter(QtMsgType,QString)));
+}
+
+Cameraproperty::Cameraproperty(bool enableLog) {
+	saveLog	= enableLog;
 }
 
 Cameraproperty::~Cameraproperty() {
@@ -70,16 +74,14 @@ void Cameraproperty::checkforDevice() {
                     return void();
                 }
             } else {
-                qDebug()<<qTempStr<<" Device opening failed"<<qDevCount;
-
+                emit logHandle(QtCriticalMsg, qTempStr+"Device opening failed"+qDevCount);
             }
         }
     } else {
         emit logHandle(QtCriticalMsg,"/sys/class/video4linux/ path is Not available");
     }
     emit logHandle(QtDebugMsg,"Camera devices Connected to System: "+ availableCam.join(", "));
-    uvccam.findEconDevice(&availableCam,"video4linux");
-    //emit logHandle(QtDebugMsg,"E-Con Camera devices Connected to System: "+availableCam.join(", "));
+    uvccam.findEconDevice(&availableCam,"video4linux");    
     availableCam.prepend("----Select camera Device----");
     modelCam.setStringList(availableCam);
     uvccam.findEconDevice(&availableCam,"hidraw");
@@ -103,9 +105,11 @@ void Cameraproperty::setCurrentDevice(QString deviceIndex,QString deviceName) {
     }
 }
 
-void Cameraproperty::createLogger() {
-    log.close();
-    log.logFileCreation();
+void Cameraproperty::createLogger() {    
+    if (saveLog){
+		log.close();
+    	log.logFileCreation();
+    }
 }
 
 void Cameraproperty::logWriter(QtMsgType msgType,QString tmpStr) {

@@ -36,8 +36,19 @@
 #include <QMutex>
 #include <QList>
 #include <QStandardPaths>
+#include <turbojpeg.h>
 #include "v4l2-api.h"
 #include "videoencoder.h"
+#include "h264decoder.h"
+
+#if !LIBAVCODEC_VER_AT_LEAST(54,25)
+    #define AV_CODEC_ID_NONE CODEC_ID_NONE
+    #define AV_CODEC_ID_MJPEG CODEC_ID_MJPEG
+    #define AV_CODEC_ID_RAWVIDEO CODEC_ID_RAWVIDEO
+    #define AV_CODEC_ID_H264 CODEC_ID_H264
+    #define AV_CODEC_ID_VP8 CODEC_ID_VP8
+#endif
+
 
 class Videostreaming : public QQuickPaintedItem, public v4l2
 {
@@ -57,12 +68,22 @@ public:
     static QStringListModel resolution;
     static QStringListModel stillOutputFormat;
     static QStringListModel videoOutputFormat;
-    static QStringListModel fpsList;
+    static QStringListModel fpsList;    
 
     void setFrame(unsigned char *data);
     void displayFrame();
     bool setBuffer(unsigned char *buf, unsigned size);
 
+    /* cu130 camera - MPEG high frame rate */
+    int jpegDecode(unsigned char **pic, unsigned char *buf, unsigned long bytesUsed);
+    int decomp(unsigned char **jpegbuf,
+                                unsigned long *jpegsize, unsigned char *dstbuf, int w, int h,
+                                int jpegqual, int tilew, int tileh,unsigned char **pic);
+    double getTimeInSecs(void);
+    void freeBuffer(unsigned char *ptr);
+
+    /* cu40 IR image capture */
+    bool extractIRImage(unsigned short int *srcBuffer, unsigned char *irBuffer);
 
     bool findNativeFormat(__u32 format, QImage::Format &dstFmt);
     bool startCapture();
@@ -74,6 +95,16 @@ public:
     QString lastFormat;
 
     VideoEncoder  *videoEncoder;
+    H264Decoder *h264Decode;
+
+    /* Jpeg decode */
+    int doyuv;
+    int dotile;
+    int pf;
+    int yuvpad;
+    int warmup;
+    int flags;
+    tjscalingfactor sf;
 
 private:
 
@@ -115,12 +146,13 @@ private:
     struct v4l2_fract interval;
     struct v4l2_format m_capSrcFormat;
     struct v4l2_format m_capDestFormat;
+
     struct v4lconvert_data *m_convertData;
     struct buffer *m_buffers;
 
     QImage snapShotImage;
     QPixmap qStaticImage;
-    QImage *m_capImage;
+    QImage *m_capImage;    
     QPixmap qImage;
 
     QString ctrlName, ctrlType, ctrlID, ctrlMaxValue, ctrlMinValue,ctrlDefaultValue;
@@ -135,7 +167,6 @@ private:
 
     unsigned char *m_data;
     unsigned char *m_frameData;
-
 
     unsigned char *m_buf;
     unsigned m_size;
@@ -315,6 +346,7 @@ signals:
     void logDebugHandle(QString _text);
     void logCriticalHandle(QString _text);
     void titleTextChanged(QString _title,QString _text);
+    void enableCaptureAndRecord();
     void newControlAdded(QString ctrlName,QString ctrlType,QString ctrlID,QString ctrlMinValue= "0", QString ctrlMaxValue = "0",QString ctrlDefaultValue="0", QString ctrlHardwareDefault="0");
     void deviceUnplugged(QString _title,QString _text);    
     void averageFPS(unsigned fps);

@@ -254,8 +254,7 @@ Item {
             activeFocusOnPress: true
             style: econRadioButtonStyle
             onClicked:{
-               see3camctrl.setTorchControlState(1,"See3CAM_CU51")
-                console.log("on btn called setTorchControlState passed status:",radioOn.checked)
+               see3camctrl.setTorchControlState(1,"See3CAM_CU51")                
             }
         }
         RadioButton {
@@ -266,8 +265,7 @@ Item {
             activeFocusOnPress: true
             style: econRadioButtonStyle
             onClicked: {
-                see3camctrl.setTorchControlState(0,"See3CAM_CU51")
-                console.log("off btn called setTorchControlState:",radioOn.checked)
+                see3camctrl.setTorchControlState(0,"See3CAM_CU51")                
 
             }
         }
@@ -388,15 +386,12 @@ Item {
                 radioOff.checked = true;
             }
         }
-        onSendExposure: {
-            console.log("xposureValue",xposureValue,xposureValue.toString())
+        onSendExposure: {            
             exposurevalue.text = xposureValue.toString()
         }
         onTriggerModeCapture:
-        {
-                console.log("in TriggerModeCapture")
+        {                
                 root.seeCamCu51triggerModeCapture()
-
         }
 
 

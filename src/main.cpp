@@ -19,8 +19,8 @@
  */
 
 #include <QtWidgets/QApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlComponent>
+//#include <QQmlApplicationEngine>
+//#include <QQmlComponent>
 #include <QDateTime>
 #include <QtWidgets/QWidget>
 #include <QIcon>
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_10CUG_Bayer>("econ.camera.see3cam10Bayer", 1, 0, "See3Cam10Bayer");
     qmlRegisterType<See3CAM_10CUG_Mono>("econ.camera.see3cam10Mono", 1, 0, "See3Cam10Mono");
     qmlRegisterType<See3CAM_80>("econ.camera.see3cam80", 1, 0, "See3Cam80");
-    qmlRegisterType<See3CAM_CU50>("econ.camera.see3cam50", 1, 0, "See3Cam50");
+    qmlRegisterType<See3CAM_CU50>("econ.camera.see3cam50", 1, 0, "See3Cam50");    
 	qmlRegisterType<See3CAM_CU130>("econ.camera.see3cam130", 1, 0, "See3Cam130");
     qmlRegisterType<See3CAM_CU51>("econ.camera.see3cam51", 1, 0, "See3Cam51");
     qmlRegisterType<See3CAM_Control>("econ.camera.see3camControl", 1, 0, "See3CamCtrl");
@@ -71,6 +71,17 @@ int main(int argc, char *argv[])
     //Create a object for Camera property
     Cameraproperty camProperty;    
 
+    if(argc > 1){
+		if(strcmp(argv[1],"-l") == 0 || strcmp(argv[1],"--log") == 0){         
+			Cameraproperty camPropertyParam(true);
+        	}
+        else{
+            qDebug()<<"Usage: qtcam [OPTION]";
+            qDebug()<<"-l, --log    to create log in a directory\n";
+            return -1;
+        }
+    }
+
     viewer.rootContext()->setContextProperty("camModels", &camProperty.modelCam);
 
     Videostreaming vs;
@@ -80,7 +91,6 @@ int main(int argc, char *argv[])
     viewer.rootContext()->setContextProperty("fpsAvailable", &vs.fpsList);
     viewer.rootContext()->setContextProperty("SystemPictureFolder",QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).first());
     viewer.rootContext()->setContextProperty("SystemVideoFolder",QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first());
-
 
     viewer.setMainQmlFile(QStringLiteral("qml/qtcam/videocapturefilter_QML/videocapturefilter_qml.qml"));
     QObject *rootObject = dynamic_cast<QObject*>(viewer.rootObject());

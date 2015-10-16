@@ -327,7 +327,7 @@ bool v4l2::s_fmt(v4l2_format &fmt)
 		fmt.fmt.pix_mp.plane_fmt[1].bytesperline = 0;
 	} else {
 		fmt.fmt.pix.bytesperline = 0;
-	}
+	}    
 	return ioctl("Set Capture Format", VIDIOC_S_FMT, &fmt);
 }
 

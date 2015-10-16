@@ -1,3 +1,12 @@
+Qtcam Application-7.0.1
+-----------------------
+* Added support for logitech C920 Webcam Pro camera
+* Added support for logitech C525 Webcam camera
+* Added support for logitech C310 HD Webcam  camera
+* Added support for logitech C615 HD Webcam  camera
+* Added support for LifeCam HD-3000
+* Added support LifeCam Cinema HD
+
 Qtcam Application-4.0.1
 -------------------------------
 * Added support for all uvc cameras.

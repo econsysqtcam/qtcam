@@ -69,8 +69,6 @@ void See3CAM_80::getFocusPosition() {
     if (ret < 0) {
         perror("write");
         return void();
-    } else {
-        printf("%s(): write() wrote %d bytes\n", __func__, ret);
     }
     /* Read the position code from the device */
     start = uvc.getTickCount();
@@ -80,8 +78,7 @@ void See3CAM_80::getFocusPosition() {
         ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
         if (ret < 0) {
             //perror("read");
-        } else {
-            printf("%s(): read %d bytes:\n", __func__,ret);
+        } else {            
             if((g_in_packet_buf[0] == CAMERA_CONTROL_80)&&
                     (g_in_packet_buf[1]==GET_FOCUS_POSITION)) {
                 MSB = (g_in_packet_buf[2]);
@@ -94,8 +91,7 @@ void See3CAM_80::getFocusPosition() {
         }
         end = uvc.getTickCount();
         if(end - start > TIMEOUT)
-        {
-            printf("%s(): Timeout occurred\n", __func__);
+        {            
             timeout = false;
             return void();
         }
@@ -125,8 +121,6 @@ void See3CAM_80::getFocusMode() {
     if (ret < 0) {
         perror("write");
         return void();
-    } else {
-        printf("%s(): write() wrote %d bytes\n", __func__, ret);
     }
     /* Read the Status code from the device */
     start = uvc.getTickCount();
@@ -136,8 +130,7 @@ void See3CAM_80::getFocusMode() {
         ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
         if (ret < 0) {
             //perror("read");
-        } else {
-            printf("%s(): read %d bytes:\n", __func__,ret);
+        } else {            
             if((g_in_packet_buf[0] == CAMERA_CONTROL_80)&&
                     (g_in_packet_buf[1]==GET_FOCUS_MODE)) {
                 emit focusModeValue(g_in_packet_buf[2]);
@@ -145,8 +138,7 @@ void See3CAM_80::getFocusMode() {
             }
         }
         end = uvc.getTickCount();
-        if(end - start > TIMEOUT) {
-            printf("%s(): Timeout occurred\n", __func__);
+        if(end - start > TIMEOUT) {            
             timeout = false;
             return void();
         }
@@ -179,8 +171,6 @@ void See3CAM_80::setFocusMode(camFocusmode focusMode)
     if (ret < 0) {
         perror("write");
         return void();
-    } else {
-        printf("%s(): write() wrote %d bytes\n", __func__, ret);
     }
 
     /* Read the Status code from the device */
@@ -191,8 +181,7 @@ void See3CAM_80::setFocusMode(camFocusmode focusMode)
         ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
         if (ret < 0) {
             //perror("read");
-        } else {
-            printf("%s(): read %d bytes:\n", __func__,ret);
+        } else {            
             if((g_in_packet_buf[0] == CAMERA_CONTROL_80)&&
                     (g_in_packet_buf[1]==SET_FOCUS_MODE)&&
                     (g_in_packet_buf[2]==focusMode)) {
@@ -203,7 +192,6 @@ void See3CAM_80::setFocusMode(camFocusmode focusMode)
         end = uvc.getTickCount();
         if(end - start > TIMEOUT)
         {
-            printf("%s(): Timeout occurred\n", __func__);
             timeout = false;
             return void();
         }
@@ -236,7 +224,5 @@ void See3CAM_80::setFocusPosition(int focusPosition)
     if (ret < 0) {
         perror("write");
         return void();
-    } else {
-        printf("%s(): write() wrote %d bytes\n", __func__, ret);
     }
 }

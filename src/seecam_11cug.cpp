@@ -39,7 +39,6 @@ void See3CAM_11CUG::setCroppedVGAMode()
     ret = enableCroppedVGAMode(&cropped_vga_status);
     if(!ret)
     {
-        printf("Unable to switch to cropped VGA Mode");
         emit deviceStatus("Failure", "Unable to switch to cropped VGA Mode");
         return void();
     }
@@ -47,24 +46,19 @@ void See3CAM_11CUG::setCroppedVGAMode()
     {
         switch(cropped_vga_status)
         {
-        case 1 :
-            printf("Cropped VGA mode set successfully\n");
+        case 1 :            
             emit deviceStatus("Success","Cropped VGA mode set successfully");
             break;
-        case 2 :
-            printf("The current resolution is not 640x480, please switch to 640x480 before using the Cropping and Binning modes");
+        case 2 :            
             emit deviceStatus("Failure","The current resolution is not 640x480, please switch to 640x480 before using the Cropping and Binning modes");
             break;
-        case 3 :
-            printf("Device is already in Cropped VGA mode");
+        case 3 :            
             emit deviceStatus("Failure","Device is already in Cropped VGA mode");
             break;
-        case 4 :
-            printf("Failed to set Cropped VGA mode");
+        case 4 :            
             emit deviceStatus("Failure","Failed to set Cropped VGA mode");
             break;
-        default :
-            printf("Unknown %d\n ",cropped_vga_status);
+        default :            
             emit deviceStatus("Failure","Unknown error");
 
         }
@@ -93,8 +87,6 @@ bool See3CAM_11CUG::enableCroppedVGAMode(u_int8_t *VGAStatus)
     if (ret < 0) {
         perror("write");
         return false;
-    } else {
-        printf("%s(): write() wrote %d bytes\n", __func__, ret);
     }
     start = uvc.getTickCount();
     while(timeout)
@@ -103,8 +95,7 @@ bool See3CAM_11CUG::enableCroppedVGAMode(u_int8_t *VGAStatus)
         ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
         if (ret < 0) {
             //perror("read");
-        } else {
-            printf("%s(): read %d bytes:\n", __func__,ret);
+        } else {     
             if(g_in_packet_buf[0] == ENABLE_CROPPED_VGA_MODE) {
                 *VGAStatus = g_in_packet_buf[1];
                 timeout = false;
@@ -112,8 +103,7 @@ bool See3CAM_11CUG::enableCroppedVGAMode(u_int8_t *VGAStatus)
         }
         end = uvc.getTickCount();
         if(end - start > TIMEOUT)
-        {
-            printf("%s(): Timeout occurred\n", __func__);
+        {            
             timeout = false;
             return false;
         }
@@ -144,8 +134,6 @@ bool See3CAM_11CUG::enableBinnedVGAMode(u_int8_t *VGAStatus)
     if (ret < 0) {
         perror("write");
         return false;
-    } else {
-        printf("%s(): write() wrote %d bytes\n", __func__, ret);
     }
     start = uvc.getTickCount();
     while(timeout)
@@ -154,8 +142,7 @@ bool See3CAM_11CUG::enableBinnedVGAMode(u_int8_t *VGAStatus)
         ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
         if (ret < 0) {
             //perror("read");
-        } else {
-            printf("%s(): read %d bytes:\n", __func__,ret);
+        } else {        
             if(g_in_packet_buf[0] == ENABLE_BINNED_VGA_MODE) {
                 *VGAStatus = g_in_packet_buf[1];
                 timeout = false;
@@ -164,7 +151,6 @@ bool See3CAM_11CUG::enableBinnedVGAMode(u_int8_t *VGAStatus)
         end = uvc.getTickCount();
         if(end - start > TIMEOUT)
         {
-            printf("%s(): Timeout occurred\n", __func__);
             timeout = false;
             return false;
         }
@@ -180,7 +166,6 @@ void See3CAM_11CUG::setBinnedVGAMode()
     ret = enableBinnedVGAMode(&binned_vga_status);
     if(ret == false)
     {
-        printf("Unable to switch to binned VGA Mode");
         emit deviceStatus("Failure","Unable to switch to binned VGA Mode");
         return void();
     }
@@ -200,10 +185,8 @@ void See3CAM_11CUG::setBinnedVGAMode()
         case 4 :
             emit deviceStatus("Failure","Failed to set Binned VGA mode");
             break;
-        default :
-            printf("Unknown %d \n",binned_vga_status);
+        default :            
             emit deviceStatus("Failure","Unknown error");
-
         }
     }
 }
@@ -237,8 +220,6 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
             if (ret < 0) {
                 perror("write");
                 return false;
-            } else {
-                printf("%s(): write() wrote %d bytes\n", __func__, ret);
             }
             start = uvc.getTickCount();
             while(timeout)
@@ -247,8 +228,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
                 ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
                 if (ret < 0) {
                     //perror("read");
-                } else {
-                    printf("%s(): read %d bytes:\n", __func__,ret);
+                } else {                    
                     if(g_in_packet_buf[0] == WHITE_BAL_CONTROL  &&
                             g_in_packet_buf[1] == SET_WB_GAIN &&
                             g_in_packet_buf[2] == rgbColor &&
@@ -262,8 +242,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
                 }
                 end = uvc.getTickCount();
                 if(end - start > TIMEOUT)
-                {
-                    printf("%s(): Timeout occurred\n", __func__);
+                {         
                     timeout = false;
                     return false;
                 }
@@ -307,8 +286,6 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
             if (ret < 0) {
                 perror("write");
                 emit deviceStatus("Failure",tr("Unable to get whitebalance values"));
-            } else {
-                printf("%s(): write() wrote %d bytes\n", __func__, ret);
             }
             start = uvc.getTickCount();
             while(timeout)
@@ -317,8 +294,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
                 ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
                 if (ret < 0) {
                     //perror("read");
-                } else {
-                    printf("%s(): read %d bytes:\n", __func__,ret);
+                } else {                    
                     if(g_in_packet_buf[0] == WHITE_BAL_CONTROL  &&
                             g_in_packet_buf[1] == GET_WB_GAIN &&
                             g_in_packet_buf[2] == rgbColor ) {
@@ -332,8 +308,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
                 }
                 end = uvc.getTickCount();
                 if(end - start > TIMEOUT)
-                {
-                    printf("%s(): Timeout occurred\n", __func__);
+                {         
                     timeout = false;
                     emit deviceStatus("Failure",tr("Unable to get whitebalance values"));
                 }
@@ -369,8 +344,6 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
         if (ret < 0) {
             perror("write");
             return false;
-        } else {
-            printf("%s(): write() wrote %d bytes\n", __func__, ret);
         }
         start = uvc.getTickCount();
         while(timeout)
@@ -379,8 +352,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
             ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
             if (ret < 0) {
                 //perror("read");
-            } else {
-                printf("%s(): read %d bytes:\n", __func__,ret);
+            } else {                
                 if(g_in_packet_buf[0] == WHITE_BAL_CONTROL  &&
                         g_in_packet_buf[1] == SET_WB_DEFAULTS ) {
                     if(g_in_packet_buf[6] == WB_FAIL)
@@ -397,8 +369,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
             }
             end = uvc.getTickCount();
             if(end - start > TIMEOUT)
-            {
-                printf("%s(): Timeout occurred\n", __func__);
+            {                
                 timeout = false;
                 return false;
             }
@@ -431,8 +402,6 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
         if (ret < 0) {
             perror("write");
             return false;
-        } else {
-            printf("%s(): write() wrote %d bytes\n", __func__, ret);
         }
         start = uvc.getTickCount();
         while(timeout)
@@ -441,8 +410,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
             ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
             if (ret < 0) {
                 //perror("read");
-            } else {
-                printf("%s(): read %d bytes:\n", __func__,ret);
+            } else {                
                 if(g_in_packet_buf[0] == WHITE_BAL_CONTROL  &&
                         g_in_packet_buf[1] == SET_WB_MODE &&
                         g_in_packet_buf[2] == rgbMode ) {
@@ -455,8 +423,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
             }
             end = uvc.getTickCount();
             if(end - start > TIMEOUT)
-            {
-                printf("%s(): Timeout occurred\n", __func__);
+            {                
                 timeout = false;
                 return false;
             }
@@ -491,8 +458,6 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
         if (ret < 0) {
             perror("write");
             return false;
-        } else {
-            printf("%s(): write() wrote %d bytes\n", __func__, ret);
         }
         start = uvc.getTickCount();
         while(timeout)
@@ -501,8 +466,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
             ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
             if (ret < 0) {
                 //perror("read");
-            } else {
-                printf("%s(): read %d bytes:\n", __func__,ret);
+            } else {                
                 if(g_in_packet_buf[0] == WHITE_BAL_CONTROL  &&
                         g_in_packet_buf[1] == GET_WB_MODE ) {
                     if(g_in_packet_buf[3] == WB_FAIL)
@@ -516,8 +480,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
             }
             end = uvc.getTickCount();
             if(end - start > TIMEOUT)
-            {
-                printf("%s(): Timeout occurred\n", __func__);
+            {                
                 timeout = false;
                 return false;
             }

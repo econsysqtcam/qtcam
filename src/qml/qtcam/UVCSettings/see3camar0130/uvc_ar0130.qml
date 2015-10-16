@@ -198,35 +198,6 @@ Item {
         }
     }
 
-    Row {
-        x: 111
-        y: 474
-        spacing: 25
-        ExclusiveGroup { id: groupFlashar0130 }
-        RadioButton {
-            exclusiveGroup: groupFlashar0130
-            id: radioOn
-            checked: false
-            text: "On"
-            activeFocusOnPress: true
-            style: econRadioButtonStyle
-            onClicked:{
-               see3camctrl.setFlashControlState(1,"See3CAM_12CUNIR")
-            }            
-        }
-        RadioButton {
-            exclusiveGroup: groupFlashar0130
-            id: radioOff
-            checked: false
-            text: "Off"
-            activeFocusOnPress: true
-            style: econRadioButtonStyle
-            onClicked: {
-                see3camctrl.setFlashControlState(0,"See3CAM_12CUNIR")
-            }           
-        }
-    }
-
     Text {
         id: gpo_level
         text: "GPO Level :"
@@ -289,6 +260,36 @@ Item {
         y: 356.5
         opacity: 0.50196078431373
     }
+
+    Row {
+        x: 111
+        y: 474
+        spacing: 25
+        ExclusiveGroup { id: groupFlashar0130 }
+        RadioButton {
+            exclusiveGroup: groupFlashar0130
+            id: radioOn
+            checked: false
+            text: "On"
+            activeFocusOnPress: true
+            style: econRadioButtonStyle
+            onClicked:{
+               see3camctrl.setFlashControlState(1,"See3CAM_12CUNIR")
+            }            
+        }
+        RadioButton {
+            exclusiveGroup: groupFlashar0130
+            id: radioOff
+            checked: false
+            text: "Off"
+            activeFocusOnPress: true
+            style: econRadioButtonStyle
+            onClicked: {
+                see3camctrl.setFlashControlState(0,"See3CAM_12CUNIR")
+            }           
+        }
+    }
+
 
     Text {
         id: other_optionsAR0130

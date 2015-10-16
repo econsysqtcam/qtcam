@@ -164,9 +164,14 @@ You can build your application in two ways
 
 
 4. Deployment
-
+4.1 StandAlone
 	Qtcam is a standalone application.  So the application setup creation can be installer, debian package, a tar file, etc..  E-Con releases the application setup as a installer, built using the qt installer framework, please look into the qt installer framework documentation to create the setup.
 http://doc.qt.io/qtinstallerframework/ .
+
+4.2 Launchpad
+$ sudo apt-add-repository ppa:qtcam/trusty
+$ sudo apt-get update
+$ sudo apt-get install qtcam
 
 4.1. Installing and Running
 

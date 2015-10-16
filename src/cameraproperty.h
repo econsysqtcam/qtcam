@@ -47,6 +47,7 @@ class Cameraproperty : public QObject, public v4l2
     Q_OBJECT
 public:
     Cameraproperty();
+    Cameraproperty(bool enableLog);
     ~Cameraproperty();
     QStringList availableCam;
 
@@ -56,6 +57,7 @@ public:
     void checkforEconDevice(QStringList*);
 
     static QStringListModel modelCam;
+    static bool saveLog;
 
 private:
     QDir qDir;

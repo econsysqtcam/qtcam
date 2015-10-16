@@ -27,10 +27,12 @@ SOURCES += main.cpp \
     seecam_ar0130.cpp \
     videoencoder.cpp \
     seecam_cu51.cpp \
-    see3cam_cu130.cpp
+    see3cam_cu130.cpp \
+    h264decoder.cpp
 
 # Installation path
 # target.path =
+target.path = /usr/
 
 # Please do not modify the following two lines. Required for deployment.
 include(qtquick2applicationviewer/qtquick2applicationviewer.pri)
@@ -52,20 +54,24 @@ HEADERS += \
     seecam_ar0130.h \
     videoencoder.h \
     seecam_cu51.h \
-    see3cam_cu130.h
-    
+    see3cam_cu130.h \
+    h264decoder.h
+
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
-                $$PWD/avpackage/include \
-                $$PWD/udevpackage/include
+                /usr/include
+
+
 
 LIBS += -lv4l2 -lv4lconvert \
-        -L$$PWD/avpackage/lib/ -lavutil \
-        -L$$PWD/avpackage/lib/ -lavcodec \
-        -L$$PWD/avpackage/lib/ -lavformat \
-        -L$$PWD/avpackage/lib/ -lswscale \
-        -L$$PWD/avpackage/lib/ -lavresample \
-        -L$$PWD/udevpackage/lib -ludev
+        -lavutil \
+        -lavcodec \
+        -lavformat \
+        -lswscale \
+        -lavresample \
+        -ludev \
+        -L/usr/lib/ -lturbojpeg
+
 
 QMAKE_CFLAGS_THREAD = -D__STDC_CONSTANT_MACROS      #For Ubuntu 12.04 compilation
 QMAKE_CXXFLAGS_THREAD = -D__STDC_CONSTANT_MACROS    #For Ubuntu 12.04 compilation

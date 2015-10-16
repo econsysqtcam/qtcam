@@ -39,7 +39,7 @@ VideoEncoder::~VideoEncoder()
     closeFile();
 }
 
-bool VideoEncoder::createFile(QString fileName,AVCodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitrate)
+bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitrate)
 {
     // If we had an open video, close it.
     closeFile();
@@ -48,23 +48,21 @@ bool VideoEncoder::createFile(QString fileName,AVCodecID encodeType, unsigned wi
     Height=height;
     Bitrate=bitrate;
 
+#if 0
     if(!isSizeValid())
-    {
-        printf("Invalid size\n");
+    {        
         return false;
     }
-
+#endif
     pOutputFormat = av_guess_format(NULL, fileName.toStdString().c_str(), NULL);
-    if (!pOutputFormat) {
-        printf("Could not deduce output format from file extension: using MPEG.\n");
+    if (!pOutputFormat) {        
         pOutputFormat = av_guess_format("mpeg", NULL, NULL);
     }
 
-    pOutputFormat->video_codec = (AVCodecID)encodeType;
+    pOutputFormat->video_codec = (CodecID)encodeType;
     pFormatCtx= avformat_alloc_context();
     if(!pFormatCtx)
-    {
-        printf("Error allocating format context\n");
+    {        
         return false;
     }
     pFormatCtx->oformat = pOutputFormat;
@@ -73,19 +71,17 @@ bool VideoEncoder::createFile(QString fileName,AVCodecID encodeType, unsigned wi
 
     // find the video encoder
 
-    if(pOutputFormat->video_codec != AV_CODEC_ID_NONE) {
+    if(pOutputFormat->video_codec != CODEC_ID_NONE) {
         pCodec = avcodec_find_encoder(pOutputFormat->video_codec);
         if (!pCodec)
-        {
-            printf("codec not found\n");
+        {            
             return false;
         }
         // Add the video stream
 
-        pVideoStream = avformat_new_stream(pFormatCtx,pCodec);
+        pVideoStream = avformat_new_stream(pFormatCtx, pCodec);
         if(!pVideoStream )
-        {
-            printf("Could not allocate stream\n");
+        {            
             return false;
         }
 
@@ -97,9 +93,9 @@ bool VideoEncoder::createFile(QString fileName,AVCodecID encodeType, unsigned wi
 
         pCodecCtx->codec_id = pOutputFormat->video_codec;
 
-        if(encodeType == AV_CODEC_ID_RAWVIDEO)
+        if(encodeType == CODEC_ID_RAWVIDEO)
             pCodecCtx->pix_fmt =  PIX_FMT_YUYV422;//AV_PIX_FMT_YUV444P;//AV_PIX_FMT_YUV422P;//PIX_FMT_YUYV422;//PIX_FMT_YUV420P;
-        else if(encodeType == AV_CODEC_ID_MJPEG)
+        else if(encodeType == CODEC_ID_MJPEG)
             pCodecCtx->pix_fmt =  PIX_FMT_YUVJ420P;
         else {
             pCodecCtx->pix_fmt =  PIX_FMT_YUV420P;
@@ -113,39 +109,46 @@ bool VideoEncoder::createFile(QString fileName,AVCodecID encodeType, unsigned wi
         pCodecCtx->time_base.den = fpsDenominator;
         pCodecCtx->time_base.num = fpsNumerator;
         tempExtensionCheck = fileName.mid(fileName.length()-3);
-        if(pOutputFormat->video_codec == AV_CODEC_ID_H264 || pOutputFormat->video_codec == AV_CODEC_ID_VP8) {
+        if(pOutputFormat->video_codec == CODEC_ID_H264 || pOutputFormat->video_codec == CODEC_ID_VP8) {
             pCodecCtx->qmin = 15; // qmin = 10*
             pCodecCtx->qmax = 30; //qmax = 51 **
         }
-        // open the codec
-        if (avcodec_open2(pCodecCtx, pCodec,NULL) < 0)
-        {
-            printf("could not open codec\n");
+#if !LIBAVCODEC_VER_AT_LEAST(53,6)
+        /* set the output parameters (must be done even if no
+                parameters). */
+        if (av_set_parameters(pFormatCtx, NULL) < 0) {            
+            return false;
+        }
+#endif
+
+#if LIBAVCODEC_VER_AT_LEAST(53,6)
+        if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0)
+#else
+        if (avcodec_open(pCodecCtx, pCodec) < 0)
+#endif
+        {            
             return false;
         }
 
         //Allocate memory for output
         if(!initOutputBuf())
-        {
-            printf("Can't allocate memory for output bitstream\n");
+        {            
             return false;
         }
         // Allocate the YUV frame
         if(!initFrame())
-        {
-            printf("Can't init frame\n");
+        {            
             return false;
         }
     }
     if (!(pOutputFormat->flags & AVFMT_NOFILE)) {
         if (avio_open(&pFormatCtx->pb, fileName.toStdString().c_str(), AVIO_FLAG_WRITE) < 0) {
-            fprintf(stderr, "Could not open '%s'\n", fileName.toStdString().c_str());
+            fprintf(stderr, "Could not open '%s'\n", fileName.toStdString().c_str());            
             return 1;
         }
     }
     int ret = avformat_write_header(pFormatCtx,NULL);
     if(ret<0) {
-        printf("Unable to record video...");
         return false;
     }
     ok=true;
@@ -182,6 +185,7 @@ bool VideoEncoder::closeFile()
     // Free the stream
     av_free(pFormatCtx);
 
+
     initVars();
     return true;
 }
@@ -192,6 +196,7 @@ bool VideoEncoder::closeFile()
 
    The frame must be of the same size as specifie
 **/
+#if LIBAVCODEC_VER_AT_LEAST(54,01)
 int VideoEncoder::encodeImage(const QImage &img)
 {
     if(!isOk())
@@ -204,6 +209,7 @@ int VideoEncoder::encodeImage(const QImage &img)
     pkt.size = 0;
     av_init_packet(&pkt);
     pkt.pts = pkt.dts = ppicture->pts;
+
     /* encode the image */
     int ret = avcodec_encode_video2(pCodecCtx, &pkt, ppicture, &got_packet);
     if (ret < 0) {
@@ -212,7 +218,7 @@ int VideoEncoder::encodeImage(const QImage &img)
     }
     if (got_packet) {
         if (pCodecCtx->coded_frame->pts != AV_NOPTS_VALUE)
-            av_packet_rescale_ts(&pkt, pCodecCtx->time_base, pVideoStream->time_base);
+            pkt.pts= av_rescale_q(pCodecCtx->coded_frame->pts, pCodecCtx->time_base, pVideoStream->time_base);
         pkt.stream_index = pVideoStream->index;
         if((tempExtensionCheck) == "mkv") {
             i++;
@@ -228,7 +234,45 @@ int VideoEncoder::encodeImage(const QImage &img)
     }
     return out_size;
 }
+#else
+int VideoEncoder::encodeImage(const QImage &img)
+{
+    int out_size, ret;
 
+    if(!isOk())
+        return -1;
+
+    convertImage_sws(img);     // SWS conversion
+    /* encode the image */
+    out_size = avcodec_encode_video(pCodecCtx, outbuf, outbuf_size, ppicture);
+
+    if(out_size < 0){
+        fprintf(stderr, "Error encoding a video frame\n");
+        exit(1);
+    }
+    /* if zero size, it means the image was buffered */
+    if (out_size > 0) {
+       av_init_packet(&pkt);
+       if(pCodecCtx->coded_frame->pts != AV_NOPTS_VALUE)
+            pkt.pts= av_rescale_q(pCodecCtx->coded_frame->pts, pCodecCtx->time_base, pVideoStream->time_base);
+       if(pCodecCtx->coded_frame->key_frame)
+            pkt.flags |= AV_PKT_FLAG_KEY;
+       pkt.stream_index = pVideoStream->index;
+       pkt.data = outbuf;
+       pkt.size = out_size;
+       if((tempExtensionCheck) == "mkv"){
+           i++;
+           pkt.pts = (i*(1000/pCodecCtx->gop_size));
+           pkt.dts = pkt.pts;
+       }
+       /* write the compressed frame in the media file */
+       ret = av_write_frame(pFormatCtx, &pkt);
+       av_free_packet(&pkt);
+    } else {
+       ret = 0;
+    }
+}
+#endif
 
 void VideoEncoder::initVars()
 {
@@ -246,13 +290,13 @@ void VideoEncoder::initVars()
 }
 
 bool VideoEncoder::initCodec()
-{
+{    
     av_register_all();
     return true;
 }
 
 bool VideoEncoder::isSizeValid()
-{
+{    
     if(getWidth()%8)
         return false;
     if(getHeight()%8)
@@ -266,7 +310,7 @@ unsigned VideoEncoder::getWidth()
 }
 
 unsigned VideoEncoder::getHeight()
-{
+{    
     return Height;
 }
 
@@ -296,7 +340,11 @@ void VideoEncoder::freeOutputBuf()
 
 bool VideoEncoder::initFrame()
 {
+#if LIBAVCODEC_VER_AT_LEAST(53,34)
+    ppicture = avcodec_alloc_frame();
+#else
     ppicture = av_frame_alloc();
+#endif
     if(ppicture==0)
         return false;
 
@@ -331,21 +379,18 @@ bool VideoEncoder::convertImage_sws(const QImage &img)
 {
     // Check if the image matches the size
     if((unsigned)img.width()!=getWidth() || (unsigned)img.height()!=getHeight())
-    {
-        printf("Wrong image size!\n");
+    {        
         return false;
     }
     if(img.format()!=QImage::Format_RGB32 && img.format() != QImage::Format_ARGB32)
-    {
-        printf("Wrong image format\n");
+    {        
         return false;
     }
 
     img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),PIX_FMT_RGB32,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
     if (img_convert_ctx == NULL)
-    {
-        printf("Cannot initialize the conversion context\n");
+    {        
         return false;
     }
 

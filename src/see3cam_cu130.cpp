@@ -47,8 +47,6 @@ void See3CAM_CU130::getSceneMode()
         if (ret < 0) {
             perror("write");
             return void();
-        } else {
-            printf("%s(): write() wrote %d bytes\n", __func__, ret);
         }
 
         /* Read the Status code from the device */
@@ -60,8 +58,7 @@ void See3CAM_CU130::getSceneMode()
 
             if (ret < 0) {
                 //perror("read");
-            } else {
-                printf("%s(): read %d bytes:\n", __func__,ret);
+            } else {                
                 if (g_in_packet_buf[6] == GET_FAIL) {
                     return void();
                 } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU130 &&
@@ -74,8 +71,7 @@ void See3CAM_CU130::getSceneMode()
             }
             end = uvc.getTickCount();
             if(end - start > TIMEOUT)
-            {
-                printf("%s(): Timeout occurred\n", __func__);
+            {                
                 timeout = false;
                 return void();
             }
@@ -105,8 +101,6 @@ void See3CAM_CU130::getEffectMode()
         if (ret < 0) {
             perror("write");
             return void();
-        } else {
-            printf("%s(): write() wrote %d bytes\n", __func__, ret);
         }
 
         /* Read the Status code from the device */
@@ -118,8 +112,7 @@ void See3CAM_CU130::getEffectMode()
             ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
             if (ret < 0) {
                 //perror("read");
-            } else {
-                printf("%s(): read %d bytes:\n", __func__,ret);
+            } else {                
                 if (g_in_packet_buf[6]==GET_FAIL) {
                     return void();
                 } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU130 &&
@@ -132,8 +125,7 @@ void See3CAM_CU130::getEffectMode()
             }
             end = uvc.getTickCount();
             if(end - start > TIMEOUT)
-            {
-                printf("%s(): Timeout occurred\n", __func__);
+            {                
                 timeout = false;
                 return void();
             }
@@ -164,8 +156,6 @@ void See3CAM_CU130::setSceneMode(const See3CAM_CU130::sceneModes &sceneMode)
         if (ret < 0) {
             perror("write");
             return void();
-        } else {
-            printf("%s(): write() wrote %d bytes\n", __func__, ret);
         }
 
         /* Read the Status code from the device */
@@ -177,8 +167,7 @@ void See3CAM_CU130::setSceneMode(const See3CAM_CU130::sceneModes &sceneMode)
             ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
             if (ret < 0) {
                 //perror("read");
-            } else {
-                printf("%s(): read %d bytes:\n", __func__,ret);
+            } else {                
                 if (g_in_packet_buf[6]==SET_FAIL) {
                     return void();
                 } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU130 &&
@@ -190,12 +179,12 @@ void See3CAM_CU130::setSceneMode(const See3CAM_CU130::sceneModes &sceneMode)
         }
         end = uvc.getTickCount();
         if(end - start > TIMEOUT)
-        {
-            printf("%s(): Timeout occurred\n", __func__);
+        {            
             timeout = false;
             return void();
         }
     }
+
 }
 
 void See3CAM_CU130::setEffectMode(const See3CAM_CU130::specialEffects &specialEffect)
@@ -222,12 +211,11 @@ void See3CAM_CU130::setEffectMode(const See3CAM_CU130::specialEffects &specialEf
         if (ret < 0) {
             perror("write");
             return void();
-        } else {
-            printf("%s(): write() wrote %d bytes\n", __func__, ret);
         }
 
         /* Read the Status code from the device */
         start = uvc.getTickCount();
+
 
         while(timeout)
         {
@@ -235,8 +223,7 @@ void See3CAM_CU130::setEffectMode(const See3CAM_CU130::specialEffects &specialEf
             ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
             if (ret < 0) {
                 //perror("read");
-            } else {
-                printf("%s(): read %d bytes:\n", __func__,ret);
+            } else {                
                 if (g_in_packet_buf[6]==SET_FAIL) {
                     return void();
                 } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU130 &&
@@ -249,7 +236,6 @@ void See3CAM_CU130::setEffectMode(const See3CAM_CU130::specialEffects &specialEf
             end = uvc.getTickCount();
             if(end - start > TIMEOUT)
             {
-                printf("%s(): Timeout occurred\n", __func__);
                 timeout = false;
                 return void();
             }

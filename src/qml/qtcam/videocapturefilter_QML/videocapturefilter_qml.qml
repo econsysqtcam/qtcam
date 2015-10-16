@@ -48,18 +48,26 @@ Rectangle {
     property int tiltControlId
     property int zoomControlId
     property int hueControlId
+    property int ledModeControlId
     property int whiteBalanceControl_auto_Id
     property int whiteBalanceControlId
     property int gammaControlId
     property int sharpnessControlId
     property int gainControlId
     property int powerLineComboControlId
+    property int ledModeComboControlId
     property int exposureAutoControlId
     property int exposurecontrolId
+    property int exposureAutoPriorityControlId
     property int backLightCompensationId
+    property int rawBitsControlId
+    property int ledFreqControlId
+    property int focusLogitechControlId
     property int focusControlId
     property int focusControlAutoId
+    property int disableVideoControlId
     property bool powerLineComboEnable
+    property bool ledModeComboEnable
     property bool exposureComboEnable
     property bool keyEventFiltering
     property int seconds : 0
@@ -83,8 +91,12 @@ Rectangle {
     property bool sharpValueChangeProperty
     property bool gainValueChangeProperty
     property bool hueValueChangeProperty
+    property bool ledModeChangeProperty
     property bool exposureValueChangeProperty
     property bool bcklightValueChangeProperty
+    property bool rawBitsValueChangeProperty
+    property bool ledFreqValueChangeProperty
+    property bool focusLogitechValueChangeProperty
     property bool focusValueChangeProperty
     property bool setResolutionEnable
     property bool m_Snap : true
@@ -118,8 +130,7 @@ Rectangle {
     property variant aboutWindow
     property variant see3cam
 
-    onSeeCamCu51Capture: {
-        console.log("in onSeeCamCu51Capture",output_value.currentText.toString(), color_comp_box.currentIndex.toString())
+    onSeeCamCu51Capture: {        
         vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
         vidstreamproperty.makeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
     }
@@ -378,7 +389,22 @@ Rectangle {
         Videostreaming {
             id: vidstreamproperty
             focus: true
-            onTitleTextChanged: {
+//            onEnableCaptureAndRecord:{
+//                vidstreamproperty.enabled = true
+//                capture.enabled = true
+//                capture.opacity = 1
+//                record.enabled = true
+//                record.opacity = 1
+//                webcamKeyAccept = true
+//                keyEventFiltering = false
+//            }
+
+//            onTitleTextChanged: {
+//                messageDialog.title = _title.toString()
+//                messageDialog.text = _text.toString()
+//                messageDialog.visible = true
+//            }
+            onTitleTextChanged:{
                 vidstreamproperty.enabled = true
                 capture.enabled = true
                 capture.opacity = 1
@@ -897,10 +923,15 @@ Rectangle {
                         sharpValueChangeProperty = false
                         gainValueChangeProperty = false
                         hueValueChangeProperty = false
+                        ledModeChangeProperty = false
                         exposureValueChangeProperty = false
                         bcklightValueChangeProperty = false
+                        rawBitsValueChangeProperty = false
+                        ledFreqValueChangeProperty = false
+                        focusLogitechValueChangeProperty = false
                         focusValueChangeProperty = false
                         powerLineComboEnable = false
+                        ledModeComboEnable = false
                         exposureComboEnable =  false
                         setOpacityFalse()
                         vidstreamproperty.startAgain()                        
@@ -1039,7 +1070,7 @@ Rectangle {
                                     updateValueWhileDragging: false
                                     id: brightness_Slider
                                     opacity: enabled ? 1 : 0.1
-                                    width: 120
+                                    width: 110
                                     stepSize: 1
                                     style:econSliderStyle
                                     onValueChanged:  {
@@ -1050,7 +1081,7 @@ Rectangle {
                                     }
                                 }
                                 TextField {
-                                    id: brightness_value
+                                    id: brightness_value                                    
                                     text: brightness_Slider.value
                                     font.pixelSize: 10
                                     font.family: "Ubuntu"
@@ -1077,7 +1108,7 @@ Rectangle {
                                     activeFocusOnPress: true
                                     updateValueWhileDragging: false
                                     id: contrast_Slider
-                                    width: 120
+                                    width: 110
                                     stepSize: 1
                                     style:econSliderStyle
                                     opacity: enabled ? 1 : 0.1
@@ -1116,7 +1147,7 @@ Rectangle {
                                     activeFocusOnPress: true
                                     updateValueWhileDragging: false
                                     id: saturation_Slider
-                                    width: 120
+                                    width: 110
                                     stepSize: 1
                                     opacity: enabled ? 1 : 0.1
                                     style:econSliderStyle
@@ -1156,7 +1187,7 @@ Rectangle {
                                     updateValueWhileDragging: false
                                     id: pan_Slider
                                     opacity: enabled ? 1 : 0.1
-                                    width: 120
+                                    width: 110
                                     stepSize: 3600
                                     style:econSliderStyle
                                     onValueChanged:  {
@@ -1169,7 +1200,7 @@ Rectangle {
                                 TextField {
                                     id: pan_value
                                     text: pan_Slider.value
-                                    font.pixelSize: 8
+                                    font.pixelSize: 10
                                     font.family: "Ubuntu"
                                     smooth: true
                                     horizontalAlignment: TextInput.AlignHCenter
@@ -1195,7 +1226,7 @@ Rectangle {
                                     updateValueWhileDragging: false
                                     id: tilt_Slider
                                     opacity: enabled ? 1 : 0.1
-                                    width: 120
+                                    width: 110
                                     stepSize: 3600
                                     style:econSliderStyle
                                     onValueChanged:  {
@@ -1208,7 +1239,7 @@ Rectangle {
                                 TextField {
                                     id: tilt_value
                                     text: tilt_Slider.value
-                                    font.pixelSize: 8
+                                    font.pixelSize: 10
                                     font.family: "Ubuntu"
                                     smooth: true
                                     horizontalAlignment: TextInput.AlignHCenter
@@ -1234,7 +1265,7 @@ Rectangle {
                                     updateValueWhileDragging: false
                                     id: zoom_Slider
                                     opacity: enabled ? 1 : 0.1
-                                    width: 120
+                                    width: 110
                                     stepSize: 1
                                     style:econSliderStyle
                                     onValueChanged:  {
@@ -1292,15 +1323,11 @@ Rectangle {
                                                 vidstreamproperty.changeSettings(whiteBalanceControl_auto_Id,1)
                                                 white_balance_Slider.opacity = 0.1
                                                 white_balance_Slider.enabled = false
-                                                wb_value.opacity = 0
-                                                wb_value.enabled = false
                                             } else {
-                                                camproperty.logDebugWriter("White Balance set to Manual Mode")
+                                                camproperty.logDebugWriter("White Balance set to Manual Mode")                                                
                                                 vidstreamproperty.changeSettings(whiteBalanceControl_auto_Id,0)
                                                 white_balance_Slider.opacity = 1
                                                 white_balance_Slider.enabled = true
-                                                wb_value.opacity = 1
-                                                wb_value.enabled = true
                                             }
                                         }
                                     }
@@ -1310,7 +1337,7 @@ Rectangle {
                                     updateValueWhileDragging: false
                                     id: white_balance_Slider
                                     opacity: enabled ? 1 : 0.1
-                                    width: 120
+                                    width: 110
                                     stepSize: 1
                                     style:econSliderStyle
                                     onValueChanged: {
@@ -1320,8 +1347,6 @@ Rectangle {
                                                 vidstreamproperty.changeSettings(whiteBalanceControlId,value.toString())
                                             } else {
                                                 white_balance_Slider.enabled = false
-                                                wb_value.enabled = false
-                                                wb_value.opacity = 0
                                             }
                                         }
                                         wbValueChangeProperty = true
@@ -1335,7 +1360,9 @@ Rectangle {
                                     smooth: true
                                     horizontalAlignment: TextInput.AlignHCenter
                                     validator: IntValidator {bottom: white_balance_Slider.minimumValue; top: white_balance_Slider.maximumValue;}
-                                    opacity: 0
+                                    opacity: white_balance_Slider.enabled ? 1: 0
+                                    //opacity: autoSelect_wb.checked ? 0 : 1
+                                    enabled: autoSelect_wb.checked ? false : true
                                     style: econTextFieldStyle
                                     onTextChanged: {
                                         if(text != "")
@@ -1356,7 +1383,7 @@ Rectangle {
                                     activeFocusOnPress: true
                                     updateValueWhileDragging: false
                                     id: gamma_Slider
-                                    width: 120
+                                    width: 110
                                     stepSize: 1
                                     opacity: enabled ? 1 : 0.1
                                     style:econSliderStyle
@@ -1395,7 +1422,7 @@ Rectangle {
                                     activeFocusOnPress: true
                                     updateValueWhileDragging: false
                                     id: sharpness_Slider
-                                    width: 120
+                                    width: 110
                                     stepSize: 1
                                     opacity: enabled ? 1 : 0.1
                                     style:econSliderStyle
@@ -1434,7 +1461,7 @@ Rectangle {
                                     activeFocusOnPress: true
                                     updateValueWhileDragging: false
                                     id: gain_Slider
-                                    width: 120
+                                    width: 110
                                     stepSize: 1
                                     opacity: enabled ? 1 : 0.1
                                     style:econSliderStyle
@@ -1473,7 +1500,7 @@ Rectangle {
                                     activeFocusOnPress: true
                                     updateValueWhileDragging: false
                                     id: hue_Slider
-                                    width: 120
+                                    width: 110
                                     stepSize: 1
                                     opacity: enabled ? 1 : 0.1
                                     style:econSliderStyle
@@ -1499,6 +1526,51 @@ Rectangle {
                                             hue_Slider.value = hue_value.text
                                     }
                                 }
+//                                Text {
+//                                    id: ledModeText
+//                                    text: "LED1 Mode"
+//                                    font.pixelSize: 12
+//                                    font.family: "Ubuntu"
+//                                    color: "#ffffff"
+//                                    smooth: true
+//                                    opacity: 0.1
+//                                }
+//                                Slider {
+//                                    activeFocusOnPress: true
+//                                    updateValueWhileDragging: false
+//                                    id: ledModeSlider
+//                                    width: 110
+//                                    stepSize: 1
+//                                    opacity: enabled ? 1 : 0.1
+//                                    style:econSliderStyle
+//                                    onValueChanged: {
+//                                        if(ledModeChangeProperty) {
+//                                            camproperty.logDebugWriter("led mode changed to: "+ value.toString())
+//                                            vidstreamproperty.changeSettings(ledModeControlId,value.toString())
+//                                        }
+//                                    }
+//                                }
+//                                TextField {
+//                                    id: ledMode_value
+//                                    text: ledModeSlider.value
+//                                    validator: IntValidator {bottom: ledModeSlider.minimumValue; top: ledModeSlider.maximumValue;}
+//                                    font.pixelSize: 10
+//                                    font.family: "Ubuntu"
+//                                    horizontalAlignment: TextInput.AlignHCenter
+//                                    smooth: true
+//                                    opacity: 0
+//                                    style: econTextFieldStyle
+//                                    onTextChanged: {
+//                                        if(text != "")
+//                                            ledModeSlider.value = ledMode_value.text
+//                                    }
+//                                }
+
+//                                Image {
+//                                    source: "images/pline_dropdown.png"
+//                                    opacity: 0
+//                                    //Just for layout purpose
+//                                }
                                 Text {
                                     id: powerLine
                                     text: "PowerLine\nFrequency"
@@ -1517,9 +1589,9 @@ Rectangle {
                                     style: ComboBoxStyle {
                                         background: Image {
                                             id: deviceBox_powerLine
-                                            source: "images/plinefreq_box.png"
+                                            source: "images/plinefreq_box.png"                                            
                                             Rectangle {
-                                                width: deviceBox_powerLine.sourceSize.width - 22
+                                                width: deviceBox_powerLine.sourceSize.width - 20
                                                 height: deviceBox_powerLine.sourceSize.height + 3
                                                 color: "#222021"
                                                 border.color: "white"
@@ -1569,7 +1641,7 @@ Rectangle {
                                             id: deviceBox2
                                             source: "images/plinefreq_box.png"
                                             Rectangle {
-                                                width: deviceBox2.sourceSize.width - 22
+                                                width: deviceBox2.sourceSize.width - 20
                                                 height: deviceBox2.sourceSize.height + 3
                                                 color: "#222021"
                                                 border.color: "white"
@@ -1610,6 +1682,7 @@ Rectangle {
                                     source: "images/pline_dropdown.png"
                                     opacity: 0
                                 }
+
                                 Text {
                                     id: exposure_absolute
                                     text: "Exposure\n(Absolute)"
@@ -1623,12 +1696,12 @@ Rectangle {
                                     activeFocusOnPress: true
                                     updateValueWhileDragging: false
                                     id: exposure_Slider
-                                    width: 120
+                                    width: 110
                                     stepSize: 1
                                     opacity: enabled ? 1 : 0.1
                                     style:econSliderStyle
                                     onValueChanged: {
-                                        if((exposureCombo.currentText == "Manual Mode") || (device_box.currentText == "e-con's CX3 RDK with O\nV5680") || (device_box.currentText == "e-con's CX3 RDK with M\nT9P031")) {
+                                        if((exposureCombo.currentText == "Manual Mode") || (device_box.currentText == "e-con's CX3 RDK with O\nV5680") || (device_box.currentText == "e-con's CX3 RDK with M\nT9P031") || (device_box.currentText == "See3CAM_CU40")) {
                                             camproperty.logDebugWriter("Exposure Control settings changed to: "+ value.toString())
                                             vidstreamproperty.changeSettings(exposurecontrolId,value.toString())
                                         }
@@ -1650,6 +1723,40 @@ Rectangle {
                                             exposure_Slider.value = exposure_value.text
                                     }
                                 }
+                                Column {
+                                    spacing : 4
+                                    Text {
+                                        id: exposureAutoPriority
+                                        text: "Exposure,\nAuto\nPriority"
+                                        font.pixelSize: 12
+                                        font.family: "Ubuntu"
+                                        color: "#ffffff"
+                                        smooth: true
+                                        opacity: 0.1
+                                    }
+                                    CheckBox {
+                                        id: exposureAutoPriorityCheck
+                                        onCheckedChanged: {
+                                            if(checked) {                                                
+                                                camproperty.logDebugWriter("enable exposure auto priority")
+                                                vidstreamproperty.changeSettings(exposureAutoPriorityControlId,1)
+                                            } else {                                                
+                                                camproperty.logDebugWriter("disable exposure auto priority")
+                                                vidstreamproperty.changeSettings(exposureAutoPriorityControlId,0)
+                                            }
+                                        }
+                                    }
+                                }
+                                Image {
+                                    source: "images/pline_dropdown.png"
+                                    opacity: 0
+                                    //Just for layout purpose
+                                }
+                                Image {
+                                    source: "images/pline_dropdown.png"
+                                    opacity: 0
+                                    //Just for layout purpose
+                                }
                                 Text {
                                     id: backLightCompensation
                                     text: "BackLight\nCompen\n-sation"
@@ -1663,7 +1770,7 @@ Rectangle {
                                     activeFocusOnPress: true
                                     updateValueWhileDragging: false
                                     id: backLight_Slider
-                                    width: 120
+                                    width: 110
                                     stepSize: 1
                                     opacity: enabled ? 1 : 0.1
                                     style:econSliderStyle
@@ -1689,6 +1796,245 @@ Rectangle {
                                             backLight_Slider.value = backLight_value.text
                                     }
                                 }
+                                Text {
+                                    id: rawBits
+                                    text: "Raw bits\nper pixel"
+                                    font.pixelSize: 12
+                                    font.family: "Ubuntu"
+                                    color: "#ffffff"
+                                    smooth: true
+                                    opacity: 0.1
+                                }
+                                Slider {
+                                    activeFocusOnPress: true
+                                    updateValueWhileDragging: false
+                                    id: rawBitsSlider
+                                    width: 110
+                                    stepSize: 1
+                                    opacity: enabled ? 1 : 0.1
+                                    style:econSliderStyle
+                                    onValueChanged: {
+                                        if(rawBitsValueChangeProperty) {
+                                            camproperty.logDebugWriter("raw bits per pixel settings changed to: "+ value.toString())
+                                            vidstreamproperty.changeSettings(rawBitsControlId,value.toString())                                            
+                                        }
+                                    }
+                                }
+                                TextField {
+                                    id: rawBits_value
+                                    text: rawBitsSlider.value
+                                    validator: IntValidator {bottom: rawBitsSlider.minimumValue; top: rawBitsSlider.maximumValue;}
+                                    font.pixelSize: 10
+                                    font.family: "Ubuntu"
+                                    smooth: true
+                                    horizontalAlignment: TextInput.AlignHCenter
+                                    opacity: 0
+                                    style: econTextFieldStyle
+                                    onTextChanged: {
+                                        if(text != "")
+                                            rawBitsSlider.value = rawBits_value.text
+                                    }
+                                }
+                                Text {
+                                    id: ledModeText
+                                    text: "LED1 Mode"
+                                    font.pixelSize: 12
+                                    font.family: "Ubuntu"
+                                    color: "#ffffff"
+                                    smooth: true
+                                    opacity: 0.1
+                                }
+                                ComboBox
+                                {
+                                    id: ledModeCombo
+                                    opacity: 0
+                                    activeFocusOnPress: true
+                                    model: ListModel {
+                                        id: cbItemsledModes
+                                        ListElement { text: "Off"  }
+                                        ListElement { text: "On"  }
+                                        ListElement { text: "Blinking"  }
+                                        ListElement { text: "Auto"  }
+                                    }
+                                    style: ComboBoxStyle {
+                                        background: Image {
+                                            id: ledModeComboImage
+                                            source: "images/plinefreq_box.png"
+                                            Rectangle {
+                                                width: ledModeComboImage.sourceSize.width - 20
+                                                height: ledModeComboImage.sourceSize.height + 3
+                                                color: "#222021"
+                                                border.color: "white"
+                                                border.width: control.activeFocus ? 3 : 1
+                                                radius: control.activeFocus ? 5 : 0
+                                            }
+                                        }
+                                        label:  Text{
+                                            anchors.fill: parent
+                                            color: "#ffffff"
+                                            elide: Text.ElideRight
+                                            text: control.currentText
+                                            verticalAlignment: Text.AlignVCenter
+                                            maximumLineCount: 1
+                                            font.family: "Ubuntu"
+                                            font.pixelSize: 14
+                                        }
+                                    }
+                                    onCurrentIndexChanged: {
+                                        if(ledModeComboEnable) {                                            
+                                            vidstreamproperty.changeSettings(ledModeComboControlId,currentIndex.toString())
+                                        }
+                                    }
+                                }
+//                                Slider {
+//                                    activeFocusOnPress: true
+//                                    updateValueWhileDragging: false
+//                                    id: ledModeSlider
+//                                    width: 110
+//                                    stepSize: 1
+//                                    opacity: enabled ? 1 : 0.1
+//                                    style:econSliderStyle
+//                                    onValueChanged: {
+//                                        if(ledModeChangeProperty) {
+//                                            camproperty.logDebugWriter("led mode changed to: "+ value.toString())
+//                                            vidstreamproperty.changeSettings(ledModeControlId,value.toString())
+//                                        }
+//                                    }
+//                                }
+//                                TextField {
+//                                    id: ledMode_value
+//                                    text: ledModeSlider.value
+//                                    validator: IntValidator {bottom: ledModeSlider.minimumValue; top: ledModeSlider.maximumValue;}
+//                                    font.pixelSize: 10
+//                                    font.family: "Ubuntu"
+//                                    horizontalAlignment: TextInput.AlignHCenter
+//                                    smooth: true
+//                                    opacity: 0
+//                                    style: econTextFieldStyle
+//                                    onTextChanged: {
+//                                        if(text != "")
+//                                            ledModeSlider.value = ledMode_value.text
+//                                    }
+//                                }
+                                Image {
+                                    source: "images/pline_dropdown.png"
+                                    opacity: 0
+                                    //Just for layout purpose
+                                }
+
+                                Text {
+                                    id: ledFrequency
+                                    text: "LED1\nFrequency"
+                                    font.pixelSize: 12
+                                    font.family: "Ubuntu"
+                                    color: "#ffffff"
+                                    smooth: true
+                                    opacity: 0.1
+                                }
+                                Slider {
+                                    activeFocusOnPress: true
+                                    updateValueWhileDragging: false
+                                    id: ledFreqSlider
+                                    width: 110
+                                    stepSize: 1
+                                    opacity: enabled ? 1 : 0.1
+                                    style:econSliderStyle
+                                    onValueChanged: {
+                                        if(ledFreqValueChangeProperty) {
+                                            camproperty.logDebugWriter("led frequency settings changed to: "+ value.toString())
+                                            vidstreamproperty.changeSettings(ledFreqControlId,value.toString())
+                                        }
+                                    }
+                                }
+                                TextField {
+                                    id: ledFreq_value
+                                    text: ledFreqSlider.value
+                                    validator: IntValidator {bottom: ledFreqSlider.minimumValue; top: ledFreqSlider.maximumValue;}
+                                    font.pixelSize: 10
+                                    font.family: "Ubuntu"
+                                    smooth: true
+                                    horizontalAlignment: TextInput.AlignHCenter
+                                    opacity: 0
+                                    style: econTextFieldStyle
+                                    onTextChanged: {
+                                        if(text != "")
+                                            ledFreqSlider.value = ledFreq_value.text
+                                    }
+                                }
+                                Text {
+                                    id: focusLogitech
+                                    text: "Focus"
+                                    font.pixelSize: 12
+                                    font.family: "Ubuntu"
+                                    color: "#ffffff"
+                                    smooth: true
+                                    opacity: 0.1
+                                }
+                                Slider {
+                                    activeFocusOnPress: true
+                                    updateValueWhileDragging: false
+                                    id: focusLogitechSlider
+                                    width: 110
+                                    stepSize: 1
+                                    opacity: enabled ? 1 : 0.1
+                                    style:econSliderStyle
+                                    onValueChanged: {
+                                        if(focusLogitechValueChangeProperty) {
+                                            camproperty.logDebugWriter("focus settings for logitech camera changed to: "+ value.toString())
+                                            vidstreamproperty.changeSettings(focusLogitechControlId,value.toString())
+                                        }
+                                    }
+                                }
+                                TextField {
+                                    id: focusLogitech_value
+                                    text: focusLogitechSlider.value
+                                    validator: IntValidator {bottom: focusLogitechSlider.minimumValue; top: focusLogitechSlider.maximumValue;}
+                                    font.pixelSize: 10
+                                    font.family: "Ubuntu"
+                                    smooth: true
+                                    horizontalAlignment: TextInput.AlignHCenter
+                                    opacity: 0
+                                    style: econTextFieldStyle
+                                    onTextChanged: {
+                                        if(text != "")
+                                            focusLogitechSlider.value = focusLogitech_value.text
+                                    }
+                                }
+                                Column {
+                                    spacing : 4
+                                    Text {
+                                        id: disableVideoProcess
+                                        text: "Disable\nvideo\nProcessing"
+                                        font.pixelSize: 12
+                                        font.family: "Ubuntu"
+                                        color: "#ffffff"
+                                        smooth: true
+                                        opacity: 0.1
+                                    }
+                                    CheckBox {
+                                        id: disableVideoProcessCheck
+                                        onCheckedChanged: {
+                                            if(checked) {                                                
+                                                camproperty.logDebugWriter("Disable video processing")
+                                                vidstreamproperty.changeSettings(disableVideoControlId,1)
+                                            } else {                                                
+                                                camproperty.logDebugWriter("Enable video processing")
+                                                vidstreamproperty.changeSettings(disableVideoControlId,0)
+                                            }                                            
+                                        }
+                                    }
+                                }
+                                Image {
+                                    source: "images/pline_dropdown.png"
+                                    opacity: 0
+                                    //Just for layout purpose
+                                }
+                                Image {
+                                    source: "images/pline_dropdown.png"
+                                    opacity: 0
+                                    //Just for layout purpose
+                                }
+
                                 Column {
                                     spacing: 4
                                     Text {
@@ -1736,7 +2082,7 @@ Rectangle {
                                     activeFocusOnPress: true
                                     updateValueWhileDragging: false
                                     id: focus_Slider
-                                    width: 120
+                                    width: 110
                                     stepSize: 1
                                     style:econSliderStyle
                                     opacity: enabled ? 1 : 0.1
@@ -1770,11 +2116,14 @@ Rectangle {
                                             focus_Slider.value = focus_value.text
                                     }
                                 }
+
+
                                 Image {
                                     source: "images/pline_dropdown.png"
                                     opacity: 0
                                     //Just for layout purpose
                                 }
+
                                 Button {
                                     opacity: 1
                                     action: hardwareDefault
@@ -1791,6 +2140,7 @@ Rectangle {
                                             verticalAlignment: Image.AlignVCenter
                                             fillMode: Image.PreserveAspectFit
                                             source: "images/hardware_default_selected.png"
+                                            sourceSize.width: 110
                                         }
                                     }
                                 }
@@ -1811,7 +2161,7 @@ Rectangle {
                     }
                     Keys.onReturnPressed: {
                         videoControlFilter()
-                    }
+                    }                    
                 }
             }
 
@@ -1819,7 +2169,7 @@ Rectangle {
                 id: stillproperties //Still Capture settings
                 Button {
                     id: still_properties // still_capture_settings
-                    tooltip: "Still Capture Settings - \nAllows the user to set the image path and format(extension) \nfor photo capture"
+                    tooltip: "Still Capture Settings - \nAllows the user to set the image color space, image resolution,\nimage path, and image format(extension) for photo capture"
                     action: stillProperty
                     activeFocusOnPress : true
                     style: ButtonStyle {
@@ -1978,6 +2328,7 @@ Rectangle {
                             id: still_box
                             x: 0
                             y: 175
+                            width:230
                             opacity: 1
                             action: stillFileDialog
                             activeFocusOnPress : true
@@ -2099,7 +2450,7 @@ Rectangle {
                     opacity: 1
                     action: videoCap
                     activeFocusOnPress : true
-                    tooltip: "Video Capture Settings - \nAllows the user to set the format(extension), encoder and video path\nfor video recording"
+                    tooltip: "Video Capture Settings - \nAllows the user to set the frame rate, preview color space,\npreview resolution, the format(extension), encoder and video path\nfor video recording"
                     style: ButtonStyle {
                         background: Rectangle {
                             implicitWidth: 265
@@ -2186,7 +2537,7 @@ Rectangle {
                                         }
                                     }
                                     onCurrentIndexChanged: {
-                                        if(frameRateBox) {
+                                        if(frameRateBox) {                                            
                                             videoPinFrameInterval = currentIndex
                                             updateScenePreview(output_size_box_Video.currentText.toString(), color_comp_box_VideoPin.currentIndex.toString(),currentIndex)
                                         }
@@ -2310,12 +2661,12 @@ Rectangle {
                                             font.pixelSize: 14
                                         }
                                     }                                    
-                                    onCurrentIndexChanged: {
+                                    onCurrentIndexChanged: {                                        
                                         JS.videoCaptureResolution = output_size_box_Video.currentText.toString();
                                         if(outputSizeBox) {
-                                            //updateFPS(color_comp_box_VideoPin.currentText.toString(), currentText.toString())
+                                            updateFPS(color_comp_box_VideoPin.currentText.toString(), currentText.toString())
                                             updateScenePreview(output_size_box_Video.currentText.toString(), color_comp_box_VideoPin.currentIndex.toString(),frame_rate_box.currentIndex)
-                                        }
+                                        }                                        
                                     }
                                     Component.onCompleted: {
                                         outputSizeBox = true
@@ -2439,7 +2790,7 @@ Rectangle {
                                 Row {
                                     Button {
                                         id: video_box
-                                        width: 210
+                                        width: 230
                                         opacity: 1
                                         activeFocusOnPress: true
                                         action: videoLocation
@@ -2605,14 +2956,14 @@ Rectangle {
         Component {
             id: econTextFieldStyle
             TextFieldStyle {
-                textColor: "black"
+                textColor: "black"                
                 background: Rectangle {
                     radius: 2
-                    implicitWidth: 40
+                    implicitWidth: 50
                     implicitHeight: 20
                     border.color: "#333"
                     border.width: 2
-                    y: 1
+                    y: 1                    
                 }
             }
         }
@@ -2787,8 +3138,6 @@ Rectangle {
         hue_value.opacity = 0
         hue_value.enabled = false
         white_balance.opacity = 0.1
-        wb_value.opacity = 0
-        wb_value.enabled = false
         white_balance_Slider.enabled = false
         white_balance_Slider.minimumValue = -65536
         white_balance_Slider.maximumValue = 65536
@@ -2820,17 +3169,43 @@ Rectangle {
         powerLineCombo.model = menuitems
         exposureCombo.model = menuitems
         exposure_Slider.enabled = false
+        exposure_Slider.opacity = 0.1
         exposure_Slider.minimumValue = -65536
         exposure_Slider.maximumValue = 65536
         exposure_value.opacity = 0
         exposure_value.enabled = false
-        backLightCompensation.opacity = 0.1
+        exposureAutoPriority.opacity = 0.1
+        exposureAutoPriorityCheck.opacity = 0.1
+        exposureAutoPriorityCheck.enabled = false
+        backLightCompensation.opacity = 0.1        
         backLight_Slider.enabled = false
         backLight_Slider.minimumValue = -65536
         backLight_Slider.maximumValue = 65536
         backLight_value.opacity = 0
         backLight_value.enabled = false
+        rawBits.opacity = 0.1
+        rawBitsSlider.enabled = false
+        rawBitsSlider.minimumValue = 0
+        rawBitsSlider.maximumValue = 1
+        rawBits_value.opacity = 0
+        rawBits_value.enabled = false
+        ledModeText.opacity = 0.1
+        ledModeCombo.enabled = false
+        ledModeCombo.opacity = 0.1
+        ledFrequency.opacity = 0.1
+        ledFreqSlider.enabled = false
+        ledFreqSlider.minimumValue = -65536
+        ledFreqSlider.maximumValue = 65536
+        ledFreq_value.opacity = 0
+        ledFreq_value.enabled = false
+        focusLogitech.opacity = 0.1
+        focusLogitechSlider.enabled = false
+        focusLogitechSlider.minimumValue = -65536
+        focusLogitechSlider.maximumValue = 655336
+        focusLogitech_value.opacity = 0
+        focusLogitech_value.enabled = false
         focusauto.opacity = 0.1
+        focus_Slider.opacity = 0.1
         focus_Slider.enabled = false
         focus_Slider.minimumValue = -65536
         focus_Slider.maximumValue = 65536
@@ -2838,12 +3213,15 @@ Rectangle {
         focus_value.enabled = false
         autoSelect_focus.opacity = 0.1
         autoSelect_focus.enabled = false
+        disableVideoProcess.opacity = 0.1
+        disableVideoProcessCheck.opacity = 0.1
+        disableVideoProcessCheck.enabled = false
         autoSelect_wb.opacity = 0.1
         autoSelect_wb.enabled = false
     }
 
     function updateScenePreview(str, format, fps) {
-        m_Snap = false
+        m_Snap = false        
         if (!vidFormatChanged){            
             vidstreamproperty.width = str.toString().split("x")[0].toString()
             vidstreamproperty.height = str.toString().split("x")[1].toString()
@@ -2854,7 +3232,7 @@ Rectangle {
         if (!vidFormatChanged){
             vidstreamproperty.setResoultion(str)
         }
-        updateFPS(color_comp_box_VideoPin.currentText.toString(), output_size_box_Video.currentText.toString())
+        //updateFPS(color_comp_box_VideoPin.currentText.toString(), output_size_box_Video.currentText.toString())
         vidstreamproperty.frameIntervalChanged(fps)
         vidstreamproperty.startAgain()
     }
@@ -2886,7 +3264,7 @@ Rectangle {
         controlType = ctrlType;
         controlMinValue = ctrlMinValue
         controlMaxValue = ctrlMaxValue
-        controlDefaultValue = ctrlDefaultValue
+        controlDefaultValue = ctrlDefaultValue        
         switch(controlType) {
         case 0:
             break;
@@ -2955,10 +3333,16 @@ Rectangle {
                 hue_Slider.minimumValue = controlMinValue
                 hue_Slider.maximumValue = controlMaxValue
                 hue_Slider.value = controlDefaultValue
+            }else if(controlName === "LED1 Mode") {
+                //Turning V4L2_CTRL_TYPE_INTEGER to combobox
+                ledModeText.opacity = 1
+                ledModeComboControlId = ctrlID
+                ledModeComboEnable = true
+                ledModeCombo.enabled = true
+                ledModeCombo.opacity = 1
+                ledModeCombo.currentIndex = controlDefaultValue
             } else if(controlName === "White Balance Temperature") {
-                white_balance.opacity = 1
-                wb_value.opacity = 1
-                wb_value.enabled = true
+                white_balance.opacity = 1                
                 whiteBalanceControlId = ctrlID
                 white_balance_Slider.minimumValue = controlMinValue
                 white_balance_Slider.maximumValue = controlMaxValue
@@ -2992,7 +3376,7 @@ Rectangle {
                 sharpness_Slider.value = controlDefaultValue
             } else if(controlName === "Exposure (Absolute)") {
                 exposure_absolute.opacity = 1
-                if((device_box.currentText === "e-con's CX3 RDK with O\nV5680") || (device_box.currentText === "e-con's CX3 RDK with M\nT9P031")) {
+                if((device_box.currentText === "e-con's CX3 RDK with O\nV5680") || (device_box.currentText === "e-con's CX3 RDK with M\nT9P031") || (device_box.currentText === "See3CAM_CU40") ) {                    
                     exposure_Slider.opacity = 1
                     exposure_Slider.enabled = true
                     exposure_value.opacity = 1
@@ -3025,18 +3409,43 @@ Rectangle {
                 backLight_Slider.minimumValue = controlMinValue
                 backLight_Slider.maximumValue = controlMaxValue
                 backLight_Slider.value = controlDefaultValue
+            } else if(controlName === "Raw bits per pixel") {
+                rawBits.opacity = 1
+                rawBitsSlider.enabled = true
+                rawBits_value.opacity = 1
+                rawBits_value.enabled = true
+                rawBitsControlId = ctrlID
+                rawBitsSlider.minimumValue = controlMinValue
+                rawBitsSlider.maximumValue = controlMaxValue
+                rawBitsSlider.value = controlDefaultValue
+            } else if(controlName === "LED1 Frequency") {
+                ledFrequency.opacity = 1
+                ledFreqSlider.enabled = true
+                ledFreq_value.opacity = 1
+                ledFreq_value.enabled = true
+                ledFreqControlId = ctrlID
+                ledFreqSlider.minimumValue = controlMinValue
+                ledFreqSlider.maximumValue = controlMaxValue
+                ledFreqSlider.value = controlDefaultValue
+            } else if(controlName === "Focus") {
+                focusLogitech.opacity = 1
+                focusLogitechSlider.enabled = true
+                focusLogitech_value.opacity = 1
+                focusLogitech_value.enabled = true
+                focusLogitechSlider.minimumValue = controlMinValue
+                focusLogitechSlider.maximumValue = controlMaxValue
+                focusLogitechSlider.value = controlDefaultValue
+                focusLogitechControlId = ctrlID
             }
             break;
         case 2:
-            if(controlName == "White Balance Temperature, Auto") {
+            if(controlName == "White Balance Temperature, Auto") {                
                 autoSelect_wb.opacity = 1
                 autoSelect_wb.enabled = true
                 autoSelect_wb.checked = controlDefaultValue
                 whiteBalanceControl_auto_Id = ctrlID
                 if(!autoSelect_wb.checked) {
                     white_balance_Slider.enabled = true
-                    wb_value.opacity = 1
-                    wb_value.enabled = true
                 }
             } else if(controlName == "Focus, Auto") {
                 autoSelect_focus.opacity = 1
@@ -3044,11 +3453,25 @@ Rectangle {
                 autoSelect_focus.checked = controlDefaultValue
                 focusControlAutoId = ctrlID
                 if(!autoSelect_focus.checked) {
+                    focus_Slider.opacity = 1
                     focus_Slider.enabled = true
                     focus_value.opacity = 1
                     focus_value.enabled = true
                 }
+            } else if(controlName == "Exposure, Auto Priority") {
+                exposureAutoPriority.opacity = 1
+                exposureAutoPriorityCheck.opacity = 1
+                exposureAutoPriorityCheck.enabled = true
+                exposureAutoPriorityCheck.checked = controlDefaultValue
+                exposureAutoPriorityControlId = ctrlID
+            } else if(controlName == "Disable video processing") {
+                disableVideoProcess.opacity = 1
+                disableVideoProcessCheck.opacity = 1
+                disableVideoProcessCheck.enabled = true
+                disableVideoProcessCheck.checked = controlDefaultValue
+                disableVideoControlId = ctrlID
             }
+
             break;
         case 3:
             menuitems.push(controlName)
@@ -3062,7 +3485,8 @@ Rectangle {
                 powerLineComboControlId = ctrlID
                 powerLineComboEnable =  true
 
-            } else if(controlName === "Exposure, Auto") {
+            }
+            else if(controlName === "Exposure, Auto") {
                 menuitems.pop()
                 exposure_auto.opacity = 1
                 exposureCombo.opacity = 1
@@ -3073,13 +3497,13 @@ Rectangle {
                 exposureCombo.currentIndex = controlDefaultValue
                 if(exposureCombo.currentText == "Manual Mode"){
                     exposure_Slider.enabled = true
+                    exposure_Slider.opacity = 1
                     exposure_value.opacity = 1
                     exposure_value.enabled = true
                 }
             }
             break;
-        case 9:
-            console.log("inside case 9"+controlName)
+        case 9:            
             break;
         }
 
@@ -3146,6 +3570,21 @@ Rectangle {
            cbItemsImgFormat.insert(1, {text: "bmp" })
            cbItemsImgFormat.insert(2, {text: "jpg" })
            cbItemsImgFormat.insert(3, {text: "png" })
+        }else if(device_box.currentText == "See3CAM_CU40")
+        {
+           cbItemsImgFormat.clear();
+           cbItemsImgFormat.insert(0, {text: "jpg" })
+           cbItemsImgFormat.insert(1, {text: "bmp" })
+           cbItemsImgFormat.insert(2, {text: "raw" })
+           cbItemsImgFormat.insert(3, {text: "png" })
+           cbItemsImgFormat.insert(4, {text: "IR data(8bit BMP)" })
+        }else{
+           cbItemsImgFormat.clear();
+           cbItemsImgFormat.insert(0, {text: "jpg" })
+           cbItemsImgFormat.insert(1, {text: "bmp" })
+           cbItemsImgFormat.insert(2, {text: "raw" })
+           cbItemsImgFormat.insert(3, {text: "png" })
+           imageFormatCombo.currentIndex = 0;
         }
         cameraColumnLayout.visible = true
         stillchildProperty.visible = false
@@ -3259,6 +3698,7 @@ Rectangle {
         if(!video_capture_filter_Child.visible) {
             camproperty.logDebugWriter("Video Capture Filter Selected")
             brightValueChangeProperty = true
+            brightness_Slider.forceActiveFocus()
             contrastValueChangeProperty = true
             saturationValueChangeProperty = true
             panValueChangeProperty = true
@@ -3268,8 +3708,12 @@ Rectangle {
             sharpValueChangeProperty = true
             gainValueChangeProperty = true
             hueValueChangeProperty = true
+            ledModeChangeProperty = true
             exposureValueChangeProperty = true
             bcklightValueChangeProperty = true
+            rawBitsValueChangeProperty = true
+            ledFreqValueChangeProperty = true
+            focusLogitechValueChangeProperty = true
             focusValueChangeProperty = true
             controly = 30
             stillchildProperty.visible = false
@@ -3286,6 +3730,7 @@ Rectangle {
         if(!stillchildProperty.visible) {
             camproperty.logDebugWriter("Still Properties Selected")
             stillchildProperty.visible = true
+            color_comp_box.forceActiveFocus()
             video_capture_filter_Child.visible = false
             video_Capture_property_Child.visible = false
             controly =0
@@ -3302,6 +3747,7 @@ Rectangle {
             stillchildProperty.visible = false
             video_capture_filter_Child.visible = false
             video_Capture_property_Child.visible = true
+            frame_rate_box.forceActiveFocus()
             controly = 0
         } else {
             video_Capture_property_Child.visible = false
@@ -3379,6 +3825,8 @@ Rectangle {
                 see3cam = Qt.createComponent("../UVCSettings/see3cam51/uvc51.qml").createObject(root)
             } else if(device_box.currentText == "See3CAM_12CUNIR") {
                 see3cam = Qt.createComponent("../UVCSettings/see3camar0130/uvc_ar0130.qml").createObject(root)
+            } else if(device_box.currentText == "See3CAM_CU40") {
+                see3cam = Qt.createComponent("../UVCSettings/see3cam40/uvc40.qml").createObject(root)
             } else {
                 see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
             }
