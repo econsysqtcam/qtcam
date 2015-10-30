@@ -169,7 +169,13 @@ You can build your application in two ways
 http://doc.qt.io/qtinstallerframework/ .
 
 4.2 Launchpad
+4.2.1 Ubuntu 14
 $ sudo apt-add-repository ppa:qtcam/trusty
+$ sudo apt-get update
+$ sudo apt-get install qtcam
+
+4.2.2 Ubuntu 12
+$ sudo apt-add-repository ppa:qtcam/precise
 $ sudo apt-get update
 $ sudo apt-get install qtcam
 

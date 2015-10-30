@@ -68,7 +68,6 @@ LIBS += -lv4l2 -lv4lconvert \
         -lavcodec \
         -lavformat \
         -lswscale \
-        -lavresample \
         -ludev \
         -L/usr/lib/ -lturbojpeg
 
