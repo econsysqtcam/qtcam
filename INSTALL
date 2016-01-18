@@ -8,7 +8,7 @@
 Qtcam is a camera application to capture photos and record videos. It is developed based on v4l2 framework and integrated with the help of Qt framework. 
 
 	All the essential informations regarding building and deploying  process are unfolded:
-1. How to  build and verify the various deliverables, library dependencies.
+1. How to  install library dependencies.
 2. How to install and run the  software, and the system requirements. 
 
 In addition to that, we collected some other useful  information related to the build process such as a description of the project repository and the design of the build system.
@@ -59,7 +59,7 @@ In addition to that, we collected some other useful  information related to the 
 
 	The build process is designed  for linux machine.  User can download the source code of the application through git server.  
 
-	Dependency library source link is provided below, so that the user can download the source and configure as per this document.
+	Also user can install dependency library packages. Using Qt qmake tool, one can build the source.
 
 3.1. System Requirements
 
@@ -85,60 +85,14 @@ To configure Qt, If permission is not given for user set it by using chmod comma
 # chmod u+x  qt-opensource-linux-x64-5.2.1.run
 Then double click the downloaded binary and install it to your local system.
 
-3.2.2. Install OpenGL development library
-To install opengl development library type the following command in the console,  this opengl package is required to build the qt quick application.
+3.2.2. Run following command to install following list of dependency packages
+ In ubuntu 12,
+ $ sudo apt-get install libv4l-dev libgl1-mesa-dev libglu1-mesa-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libresample1-dev  libudev-dev libavcodec-extra-53 libjpeg-turbo8-dev libusb-1.0-0-dev
+ $ sudo apt-add-repository ppa:qtcam/precise
+ $ sudo apt-get install qt52base qt52declarative qt52-meta-full
 
-sudo apt-get install freeglut3-dev
-
-3.2.3. Install libvpx library
-To install libvpx library type the following command in the console,  this libvpx package is required to build av library with vpx support.
-
-sudo apt-get install libvpx-dev
-
-3.2.4. Install H264 library
-To install h264 library type the following command in the console,  this libx264 package is required to build av library with H264 support.
-
-sudo apt-get install libx264-dev
-
-3.2.5.  Install libav libraries
-Download the libav libraries package from the below link,
-https://libav.org/releases/libav-11.1.tar.gz
-
-Untar the package by the following command in console:
-tar zxvf  libav-11.1.tar.gz
-
-To configure libav package type the following command in the console,
-# cd libav-11.1
-# ./configure --disable-yasm --enable-shared --enable-libvpx --enable-libx264 --enable-gpl --prefix=OUTPUTDIRECTORY
-
-Include the OUTPUTDIRECTORY path(both library and include path respectively) in your .pro file.
-Note: OUTPUTDIRECTORY is a user defined directory, for example, /home/@user/myAVlibDirectory
-Then run the following commands from console:
-$  make
-$  make install
-
-3.2.7. Install udev library
-http://www.freedesktop.org/software/systemd/systemd-218.tar.xz
-
-Untar the package by the following command in console:
-tar xvf  systemd-218.tar.xz
-
-To configure udev package type the following command in the console,
-
-# cd systemd-218
-#./configure --enable-shared --prefix=OUTPUTDIRECTORY
-
-Include the OUTPUTDIRECTORY path(both library and include path respectively) in your .pro file.
-Note: 
-1. OUTPUTDIRECTORY is a user defined directory, for example, /home/@user/mySystemdlibDirectory
-2.  libudev.h is available under  OUTPUTDIRECTORY/include
-3.  libudev.so is availabe under OUTPUTDIRECTORY/lib
-
-Then run the following commands from console:
-$  make
-$  make install
-
-Once these configurations are done successfully, application dependency will be resolved.
+ In ubuntu 14,
+ $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra-54  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin 
 
 3.3 Build the application
 
@@ -160,13 +114,12 @@ You can build your application in two ways
 4.  make clean
 5.  make
 6.  Execute the application.
-7. sudo ./Qtcam
+    sudo ./Qtcam
 
 
 4. Deployment
 4.1 StandAlone
-	Qtcam is a standalone application.  So the application setup creation can be installer, debian package, a tar file, etc..  E-Con releases the application setup as a installer, built using the qt installer framework, please look into the qt installer framework documentation to create the setup.
-http://doc.qt.io/qtinstallerframework/ .
+	Qtcam is a standalone application.  So the application setup creation can be installer, debian package, a tar file, etc..  E-Con releases the application setup as a debian package in ubuntu launchpad. 
 
 4.2 Launchpad
 4.2.1 Ubuntu 14
@@ -179,15 +132,11 @@ $ sudo apt-add-repository ppa:qtcam/precise
 $ sudo apt-get update
 $ sudo apt-get install qtcam
 
-4.1. Installing and Running
-
-	A seperate installation manual is provided with screenshots.
-
 5. Future Directions
 
-1. Tested with five e-con cameras, supported needs to be extended to all v4l2 compactable uvc cameras.
+1. Tested with thirteen e-con cameras, supported needs to be extended to all v4l2 compactable uvc cameras.
 2. Enhance the application by sending the captured data over the network.
-3.  Recording should come along with  audio support also.
+3. Recording should come along with audio support also.
 
 6. Legal
 

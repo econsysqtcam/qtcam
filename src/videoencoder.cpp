@@ -214,7 +214,8 @@ int VideoEncoder::encodeImage(const QImage &img)
     int ret = avcodec_encode_video2(pCodecCtx, &pkt, ppicture, &got_packet);
     if (ret < 0) {
         fprintf(stderr, "Error encoding a video frame\n");
-        exit(1);
+	return -1;
+        //exit(1);
     }
     if (got_packet) {
         if (pCodecCtx->coded_frame->pts != AV_NOPTS_VALUE)
@@ -248,12 +249,13 @@ int VideoEncoder::encodeImage(const QImage &img)
 
     if(out_size < 0){
         fprintf(stderr, "Error encoding a video frame\n");
-        exit(1);
+	return -1;
+        //exit(1);	
     }
     /* if zero size, it means the image was buffered */
     if (out_size > 0) {
        av_init_packet(&pkt);
-       if(pCodecCtx->coded_frame->pts != AV_NOPTS_VALUE)
+       if(pCodecCtx->coded_frame->pts != (int64_t)AV_NOPTS_VALUE)
             pkt.pts= av_rescale_q(pCodecCtx->coded_frame->pts, pCodecCtx->time_base, pVideoStream->time_base);
        if(pCodecCtx->coded_frame->key_frame)
             pkt.flags |= AV_PKT_FLAG_KEY;
@@ -271,6 +273,9 @@ int VideoEncoder::encodeImage(const QImage &img)
     } else {
        ret = 0;
     }
+    //Added by Nithyesh
+    //No value was returned previously
+    return ret;
 }
 #endif
 

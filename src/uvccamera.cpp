@@ -26,6 +26,7 @@ QMap<QString, QString> uvccamera::serialNumberMap;
 QString uvccamera::hidNode;
 
 int uvccamera::hid_fd;
+libusb_device_handle *uvccamera::handle;
 
 uvccamera::uvccamera()
 {
@@ -41,7 +42,14 @@ unsigned int uvccamera::getTickCount()
     return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 }
 
-int uvccamera::findEconDevice(QStringList *econCamera,QString parameter)
+//Modified by Nithyesh
+/*
+ * Removed arg QStringList from function as it was unused.
+ * Previous fn signature was
+ * int uvccamera::findEconDevice(QStringList *econCamera,QString parameter)
+ */
+
+int uvccamera::findEconDevice(QString parameter)
 {
 
     //QStringList tempList = *econCamera;
@@ -57,7 +65,8 @@ int uvccamera::findEconDevice(QStringList *econCamera,QString parameter)
     udev = udev_new();
     if (!udev) {
         emit logHandle(QtCriticalMsg,"Can't create udev\n");
-        exit(1);
+	return -1;
+        //exit(1);
     }
 
     /* Create a list of the devices in the 'video4linux/hidraw' subsystem. */
@@ -94,7 +103,8 @@ int uvccamera::findEconDevice(QStringList *econCamera,QString parameter)
                     "usb_device");
         if (!pdev) {
             emit logHandle(QtCriticalMsg,"Unable to find parent usb device.");
-            exit(1);
+	    return -1;
+           // exit(1);
         }
 
         /* From here, we can call get_sysattr_value() for each file
@@ -136,6 +146,73 @@ int uvccamera::findEconDevice(QStringList *econCamera,QString parameter)
     return 1;
 }
 
+int uvccamera::initExtensionUnitAscella(){
+    int ret;
+
+    //Added by Nithyesh
+    ret = -1;
+    kernelDriverDetached = 0;
+    libusb_init(NULL);
+    libusb_set_debug(NULL, 3);
+
+    handle = libusb_open_device_with_vid_pid(NULL, ASCELLA_VID, ASCELLA_PID);
+
+    if(!handle) {
+        emit logHandle(QtCriticalMsg, "\nunable to open the device\n");
+    } else {
+        emit logHandle(QtDebugMsg, "Device accessed successfully\n");
+
+        if (libusb_kernel_driver_active(handle, 2))
+        {
+            ret = libusb_detach_kernel_driver(handle, 2);
+            if (ret == 0)
+            {
+                kernelDriverDetached = 1;
+                emit logHandle(QtDebugMsg, "driver detachment successful\n");
+            }
+        }
+
+        ret = libusb_claim_interface(handle, 2);
+        if(ret == 0){
+            emit logHandle(QtDebugMsg, "Interface Claimed successfully\n");
+        }
+        else{
+            emit logHandle(QtCriticalMsg, "error claiming interface\n");
+        }
+
+     }
+
+     return ret;
+
+}
+
+int uvccamera::closeAscellaDevice(){
+    int res;
+
+    res = libusb_release_interface(handle, 2);
+
+    if (0 != res)
+    {
+       emit logHandle(QtCriticalMsg, "Error releasing interface\n");
+    }
+
+    if (kernelDriverDetached)
+    {
+        libusb_attach_kernel_driver(handle, 2);
+        emit logHandle(QtDebugMsg, "Attaching libusb kernel driver\n");
+    }
+
+    if(handle)
+    {
+        libusb_close(handle);
+        emit logHandle(QtDebugMsg, "Closing libusb\n");
+    }
+
+    libusb_exit(NULL);
+    handle = NULL;
+
+    return res;
+}
 
 bool uvccamera::readFirmwareVersion(quint8 *pMajorVersion, quint8 *pMinorVersion1, quint16 *pMinorVersion2, quint16 *pMinorVersion3) {
 
@@ -214,7 +291,8 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
         return false;
     }
 
-    uint i;
+    //Commented by Nithyesh
+    //uint i;
     int ret, desc_size = 0;
     char buf[256];
     struct hidraw_devinfo info;
@@ -314,6 +392,12 @@ void uvccamera::getDeviceNodeName(QString hidDeviceNode) {
 void uvccamera::exitExtensionUnit() {
     close(hid_fd);
 }
+
+int uvccamera::exitExtensionUnitAscella(){
+    int ret = closeAscellaDevice();
+    return ret;
+}
+
 
 bool uvccamera::sendOSCode() {
 

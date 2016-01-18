@@ -133,7 +133,7 @@
 
     Component.onCompleted:
     {
-    
+
     }
     Grid {
     columns: 2

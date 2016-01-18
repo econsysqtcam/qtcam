@@ -16,6 +16,8 @@ var videoCaptureResolution
 var videoExtension
 var videoEncoder
 var cameraComboIndex
+var autoFocusChecked
+var autoExposureSelected
 
 function enableTriggerMode_10cugM() {
     triggerMode_M=1;

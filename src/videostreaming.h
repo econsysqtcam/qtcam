@@ -183,7 +183,7 @@ private:
     bool getInterval(struct v4l2_fract &interval);
 
     int findMax(QList<int> *llist);
-    void freeBuffers(unsigned char *srcBuffer,unsigned char *destBuffer,unsigned char *copyBuffer);
+    void freeBuffers(unsigned char *destBuffer,unsigned char *copyBuffer);
 
 public slots:
     /**

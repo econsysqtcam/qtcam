@@ -37,6 +37,7 @@
 #include "seecam_cu80.h"
 #include "see3cam_cu130.h"
 #include "seecam_ar0130.h"
+#include "ascella.h"
 #include "about.h"
 
 //*! \mainpage Qtcam - A econ's camera product
@@ -62,6 +63,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_CU50>("econ.camera.see3cam50", 1, 0, "See3Cam50");    
 	qmlRegisterType<See3CAM_CU130>("econ.camera.see3cam130", 1, 0, "See3Cam130");
     qmlRegisterType<See3CAM_CU51>("econ.camera.see3cam51", 1, 0, "See3Cam51");
+    qmlRegisterType<ASCELLA>("econ.camera.ascella", 1, 0, "Ascella");
     qmlRegisterType<See3CAM_Control>("econ.camera.see3camControl", 1, 0, "See3CamCtrl");
     qmlRegisterType<See3CAM_GPIOControl>("econ.camera.see3camGpioControl", 1, 0, "See3CamGpio");
     qmlRegisterType<AboutPage>("econ.camera.about", 1, 0, "AboutPage");
@@ -72,9 +74,9 @@ int main(int argc, char *argv[])
     Cameraproperty camProperty;    
 
     if(argc > 1){
-		if(strcmp(argv[1],"-l") == 0 || strcmp(argv[1],"--log") == 0){         
-			Cameraproperty camPropertyParam(true);
-        	}
+	if(strcmp(argv[1],"-l") == 0 || strcmp(argv[1],"--log") == 0){
+		Cameraproperty camPropertyParam(true);
+	}
         else{
             qDebug()<<"Usage: qtcam [OPTION]";
             qDebug()<<"-l, --log    to create log in a directory\n";

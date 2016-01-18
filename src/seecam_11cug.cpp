@@ -205,7 +205,12 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
 
     if((rgbColor == Red || rgbColor == Green || rgbColor == Blue))
     {
-        if(rgbValue >= 0 && rgbValue <= 255)
+        //Modified by Nithyesh
+        /*
+         * Changed if condition from if(rgbValue >= 0 && rgbValue <= 255) to if(rgbValue <= 255)
+         * as uint values will always be greater than or equal to 0.
+         */
+        if(rgbValue <= 255)
         {
             //Initialize the buffer
             memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
