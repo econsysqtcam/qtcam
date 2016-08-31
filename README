@@ -13,7 +13,7 @@ Application Features:
 6. Displayed Current Frame rate acheived. 
 7. Video Capture Settings tab to find the support color space and resolution for preview and to change video saving location,video encoder format,video record format. 
 8. Special extension tabs for e-con cameras.
-9. Supports Video recording through YUV, MJPEG, H264, VP8 encoders and MKV, AVI containers.
+9. Supports Video recording.
 10. Keyboard Navigations.
 11. Tool tips throughout the application.
 

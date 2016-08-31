@@ -92,7 +92,15 @@ Then double click the downloaded binary and install it to your local system.
  $ sudo apt-get install qt52base qt52declarative qt52-meta-full
 
  In ubuntu 14,
- $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra-54  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin 
+ $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra-54  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin
+
+ In ubuntu 15.10,
+ $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra-54  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin
+
+ In ubuntu 16.04,
+ $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra-54  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin
+
+ 
 
 3.3 Build the application
 
@@ -115,31 +123,33 @@ You can build your application in two ways
 5.  make
 6.  Execute the application.
     sudo ./Qtcam
-
+    note: please make sure the path used in application points to qml which is in top level src directory rather than /usr/share directory
 
 4. Deployment
-4.1 StandAlone
-	Qtcam is a standalone application.  So the application setup creation can be installer, debian package, a tar file, etc..  E-Con releases the application setup as a debian package in ubuntu launchpad. 
 
-4.2 Launchpad
-4.2.1 Ubuntu 14
+4.1 Launchpad
+4.1.1 Ubuntu 14
 $ sudo apt-add-repository ppa:qtcam/trusty
 $ sudo apt-get update
 $ sudo apt-get install qtcam
 
-4.2.2 Ubuntu 12
+4.1.2 Ubuntu 12
 $ sudo apt-add-repository ppa:qtcam/precise
 $ sudo apt-get update
 $ sudo apt-get install qtcam
 
-5. Future Directions
+4.1.3 Ubuntu 15.10
+$ sudo apt-add-repository ppa:qtcam/wily
+$ sudo apt-get update
+$ sudo apt-get install qtcam
 
-1. Tested with thirteen e-con cameras, supported needs to be extended to all v4l2 compactable uvc cameras.
-2. Enhance the application by sending the captured data over the network.
-3. Recording should come along with audio support also.
+4.1.2 Ubuntu 16.04
+$ sudo apt-add-repository ppa:qtcam/xenial
+$ sudo apt-get update
+$ sudo apt-get install qtcam
 
-6. Legal
+5. Legal
 
-6.1 Licensing
+5.1 Licensing
 	Please look into the LICENSE file available in the parent directory.
 
