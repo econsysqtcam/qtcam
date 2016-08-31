@@ -148,6 +148,11 @@ $ sudo apt-add-repository ppa:qtcam/xenial
 $ sudo apt-get update
 $ sudo apt-get install qtcam
 
+5. How to run the application
+   * By clicking Qtcam icon from Dash home
+   or 
+  *  By running command from  terminal,
+     $sudo qtcam
 5. Legal
 
 5.1 Licensing
