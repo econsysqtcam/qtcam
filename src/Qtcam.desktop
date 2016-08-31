@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Terminal=false
-Name[en_IN]=Qtcam
-Exec= gksu /usr/bin/qtcam
-Name=Qtcam
-Comment=Linux camera application
-Icon=/usr/share/qml/qtcam/icon/images/icon.jpg

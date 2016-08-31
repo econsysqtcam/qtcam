@@ -21,9 +21,9 @@
 
 #include <QPainter>
 #include "videoencoder.h"
+#include <QDebug>
 
 using namespace std;
-
 
 /**
   gop: maximal interval in frames between keyframes
@@ -39,7 +39,11 @@ VideoEncoder::~VideoEncoder()
     closeFile();
 }
 
+#if LIBAVCODEC_VER_AT_LEAST(54,25)
+bool VideoEncoder::createFile(QString fileName,AVCodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitrate)
+#else
 bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitrate)
+#endif
 {
     // If we had an open video, close it.
     closeFile();
@@ -50,19 +54,22 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
 
 #if 0
     if(!isSizeValid())
-    {        
+    {
         return false;
     }
 #endif
     pOutputFormat = av_guess_format(NULL, fileName.toStdString().c_str(), NULL);
-    if (!pOutputFormat) {        
+    if (!pOutputFormat) {
         pOutputFormat = av_guess_format("mpeg", NULL, NULL);
     }
-
+#if LIBAVCODEC_VER_AT_LEAST(54,25)
+    pOutputFormat->video_codec = (AVCodecID)encodeType;
+#else
     pOutputFormat->video_codec = (CodecID)encodeType;
+#endif
     pFormatCtx= avformat_alloc_context();
     if(!pFormatCtx)
-    {        
+    {
         return false;
     }
     pFormatCtx->oformat = pOutputFormat;
@@ -74,14 +81,14 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
     if(pOutputFormat->video_codec != CODEC_ID_NONE) {
         pCodec = avcodec_find_encoder(pOutputFormat->video_codec);
         if (!pCodec)
-        {            
+        {
             return false;
         }
         // Add the video stream
 
         pVideoStream = avformat_new_stream(pFormatCtx, pCodec);
         if(!pVideoStream )
-        {            
+        {
             return false;
         }
 
@@ -113,10 +120,22 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
             pCodecCtx->qmin = 15; // qmin = 10*
             pCodecCtx->qmax = 30; //qmax = 51 **
         }
+	qDebug()<<"pCodecCtx->flags"<<pCodecCtx->flags;
+	qDebug()<<"pCodecCtx->pixfmt"<<pCodecCtx->pix_fmt;
+	qDebug()<<"pcodecCtx->bitrate"<<pCodecCtx->bit_rate;
+	qDebug()<<"pCodecCtx->width"<<pCodecCtx->width;
+	qDebug()<<"pcodecCtx->height"<<pCodecCtx->height;
+	qDebug()<<"pCodecCtx->gop_size"<<pCodecCtx->gop_size;
+	qDebug()<<"pCodecCtx->time_base.den"<<pCodecCtx->time_base.den;
+	qDebug()<<"pCodecCtx->time_base.num"<<pCodecCtx->time_base.num;
+	qDebug()<<"pCodecCtx->qmin"<<pCodecCtx->qmin;
+	qDebug()<<"pCodecCtx->qmin"<<pCodecCtx->qmax;
+
+
 #if !LIBAVCODEC_VER_AT_LEAST(53,6)
         /* set the output parameters (must be done even if no
                 parameters). */
-        if (av_set_parameters(pFormatCtx, NULL) < 0) {            
+        if (av_set_parameters(pFormatCtx, NULL) < 0) {
             return false;
         }
 #endif
@@ -126,24 +145,24 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
 #else
         if (avcodec_open(pCodecCtx, pCodec) < 0)
 #endif
-        {            
+        {
             return false;
         }
 
         //Allocate memory for output
         if(!initOutputBuf())
-        {            
+        {
             return false;
         }
         // Allocate the YUV frame
         if(!initFrame())
-        {            
+        {
             return false;
         }
     }
     if (!(pOutputFormat->flags & AVFMT_NOFILE)) {
         if (avio_open(&pFormatCtx->pb, fileName.toStdString().c_str(), AVIO_FLAG_WRITE) < 0) {
-            fprintf(stderr, "Could not open '%s'\n", fileName.toStdString().c_str());            
+            fprintf(stderr, "Could not open '%s'\n", fileName.toStdString().c_str());
             return 1;
         }
     }
@@ -185,7 +204,6 @@ bool VideoEncoder::closeFile()
     // Free the stream
     av_free(pFormatCtx);
 
-
     initVars();
     return true;
 }
@@ -214,7 +232,7 @@ int VideoEncoder::encodeImage(const QImage &img)
     int ret = avcodec_encode_video2(pCodecCtx, &pkt, ppicture, &got_packet);
     if (ret < 0) {
         fprintf(stderr, "Error encoding a video frame\n");
-	return -1;
+	    return -1;
         //exit(1);
     }
     if (got_packet) {
@@ -249,7 +267,7 @@ int VideoEncoder::encodeImage(const QImage &img)
 
     if(out_size < 0){
         fprintf(stderr, "Error encoding a video frame\n");
-	return -1;
+	    return -1;
         //exit(1);	
     }
     /* if zero size, it means the image was buffered */
@@ -295,13 +313,13 @@ void VideoEncoder::initVars()
 }
 
 bool VideoEncoder::initCodec()
-{    
+{
     av_register_all();
     return true;
 }
 
 bool VideoEncoder::isSizeValid()
-{    
+{
     if(getWidth()%8)
         return false;
     if(getHeight()%8)
@@ -315,7 +333,7 @@ unsigned VideoEncoder::getWidth()
 }
 
 unsigned VideoEncoder::getHeight()
-{    
+{
     return Height;
 }
 
@@ -345,10 +363,10 @@ void VideoEncoder::freeOutputBuf()
 
 bool VideoEncoder::initFrame()
 {
-#if LIBAVCODEC_VER_AT_LEAST(53,34)
-    ppicture = avcodec_alloc_frame();
-#else
+#if LIBAVCODEC_VER_AT_LEAST(55,28)
     ppicture = av_frame_alloc();
+#else
+    ppicture = avcodec_alloc_frame();
 #endif
     if(ppicture==0)
         return false;
@@ -384,18 +402,18 @@ bool VideoEncoder::convertImage_sws(const QImage &img)
 {
     // Check if the image matches the size
     if((unsigned)img.width()!=getWidth() || (unsigned)img.height()!=getHeight())
-    {        
+    {
         return false;
     }
     if(img.format()!=QImage::Format_RGB32 && img.format() != QImage::Format_ARGB32)
-    {        
+    {
         return false;
     }
 
     img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),PIX_FMT_RGB32,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
     if (img_convert_ctx == NULL)
-    {        
+    {
         return false;
     }
 
@@ -413,6 +431,5 @@ bool VideoEncoder::convertImage_sws(const QImage &img)
 
     return true;
 }
-
 
 

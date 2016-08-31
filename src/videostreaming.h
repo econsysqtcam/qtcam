@@ -69,6 +69,7 @@ public:
     static QStringListModel stillOutputFormat;
     static QStringListModel videoOutputFormat;
     static QStringListModel fpsList;    
+    static QStringListModel encoderList;
 
     void setFrame(unsigned char *data);
     void displayFrame();
@@ -160,6 +161,7 @@ private:
     QString stillOutFormat;
     QString formatType;
     QString filename;
+    QString ubuntuVersion;
 
     QMap<QString,QString> pixFormat;
 
@@ -341,6 +343,8 @@ public slots:
     void masterModeEnabled();
 
     int getMenuIndex(unsigned int,int);
+
+    void displayEncoderList();
 
 signals:
     void logDebugHandle(QString _text);

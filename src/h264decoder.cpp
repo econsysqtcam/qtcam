@@ -66,15 +66,19 @@ bool H264Decoder::initH264Decoder(unsigned width, unsigned height)
         return false;
     }
 
-#if LIBAVCODEC_VER_AT_LEAST(53,34)
-    pH264picture = avcodec_alloc_frame();
-#else
+#if LIBAVCODEC_VER_AT_LEAST(55,28)
     pH264picture = av_frame_alloc();
+#else
+    pH264picture = avcodec_alloc_frame();
 #endif
     if(pH264picture==0)
         return false;
 
+#if LIBAVCODEC_VER_AT_LEAST(55,28)
+    av_frame_unref(pH264picture);
+#else
     avcodec_get_frame_defaults(pH264picture);
+#endif
 
     h264PictureSize = avpicture_get_size(pH264CodecCtx->pix_fmt, pH264CodecCtx->width, pH264CodecCtx->height);
     h264pictureBuf = new uint8_t[h264PictureSize];

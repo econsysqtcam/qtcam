@@ -913,6 +913,7 @@ Rectangle {
                         vidstreamproperty.displayOutputFormat()
                         vidstreamproperty.displayStillResolution()
                         vidstreamproperty.displayVideoResolution()
+                        vidstreamproperty.displayEncoderList()
                         if(device_box.currentText == "CX3-UVC"){
                             vidstreamproperty.cameraFilterControls()
                         }
@@ -2754,12 +2755,8 @@ Rectangle {
                                 ComboBox {
                                     id: fileEncoder
                                     opacity: 1
-                                    model: ListModel {
-                                        ListElement { text: "YUY"  }
-                                        ListElement { text: "MJPG" }
-                                        ListElement { text: "H264" }
-                                        ListElement { text: "VP8" }
-                                    }
+                                    model: encodersModel
+                                    textRole: "display"
                                     activeFocusOnPress: true
                                     style: ComboBoxStyle {
                                         background: Image {

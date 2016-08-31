@@ -91,6 +91,7 @@ int main(int argc, char *argv[])
     viewer.rootContext()->setContextProperty("stillOutputFormatModel", &vs.stillOutputFormat);
     viewer.rootContext()->setContextProperty("videoOutputFormatModel", &vs.videoOutputFormat);
     viewer.rootContext()->setContextProperty("fpsAvailable", &vs.fpsList);
+    viewer.rootContext()->setContextProperty("encodersModel", &vs.encoderList);
     viewer.rootContext()->setContextProperty("SystemPictureFolder",QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).first());
     viewer.rootContext()->setContextProperty("SystemVideoFolder",QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first());
 
