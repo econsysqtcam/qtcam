@@ -95,10 +95,10 @@ Then double click the downloaded binary and install it to your local system.
  $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra-54  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin
 
  In ubuntu 15.10,
- $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra-54  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin
+ $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin
 
  In ubuntu 16.04,
- $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra-54  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin
+ $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin
 
  
 
@@ -125,7 +125,10 @@ You can build your application in two ways
     sudo ./Qtcam
     note: please make sure the path used in application points to qml which is in top level src directory rather than /usr/share directory
 
-4. Deployment
+4. Installation
+Note: If qtcam is already installed, remove the qtcam accessory files using following commands and follow 4.1 section.
+$ sudo rm -rf /usr/share/qml
+$ sudo rm -rf /usr/share/applications/Qtcam*.desktop
 
 4.1 Launchpad
 4.1.1 Ubuntu 14
@@ -153,6 +156,9 @@ $ sudo apt-get install qtcam
    or 
   *  By running command from  terminal,
      $sudo qtcam
+
+
+
 5. Legal
 
 5.1 Licensing
