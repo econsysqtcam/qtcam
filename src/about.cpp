@@ -19,10 +19,15 @@
  */
 
 #include "about.h"
+#include "common.h"
 
 AboutPage::AboutPage()
 {
+#if LAUNCHPAD
     version = new QSettings("/usr/share/qml/qtcam/about/release.ini",QSettings::IniFormat);
+#else
+    version = new QSettings("qml/qtcam/about/release.ini",QSettings::IniFormat);
+#endif
     version->beginGroup("release");
     appName = version->value("applicationname").toString();
     appVerNumber = version->value("version").toString();
@@ -45,7 +50,11 @@ QString AboutPage::getApplicationVersionNumber() {
 }
 
 QByteArray AboutPage::getCopyRight() {
+#if LAUNCHPAD
     copyRightFile = new QFile("/usr/share/qml/qtcam/about/copyright.txt");
+#else
+    copyRightFile = new QFile("qml/qtcam/about/copyright.txt");
+#endif
     if(copyRightFile->open(QIODevice::ReadOnly)){
         copyRight = copyRightFile->readAll();
         copyRightFile->close();

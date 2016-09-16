@@ -19,8 +19,6 @@
  */
 
 #include <QtWidgets/QApplication>
-//#include <QQmlApplicationEngine>
-//#include <QQmlComponent>
 #include <QDateTime>
 #include <QtWidgets/QWidget>
 #include <QIcon>
@@ -37,8 +35,10 @@
 #include "seecam_cu80.h"
 #include "see3cam_cu130.h"
 #include "seecam_ar0130.h"
+#include "seecam_cu30.h"
 #include "ascella.h"
 #include "about.h"
+#include "common.h"
 
 //*! \mainpage Qtcam - A econ's camera product
 // *
@@ -61,8 +61,9 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_10CUG_Mono>("econ.camera.see3cam10Mono", 1, 0, "See3Cam10Mono");
     qmlRegisterType<See3CAM_80>("econ.camera.see3cam80", 1, 0, "See3Cam80");
     qmlRegisterType<See3CAM_CU50>("econ.camera.see3cam50", 1, 0, "See3Cam50");    
-	qmlRegisterType<See3CAM_CU130>("econ.camera.see3cam130", 1, 0, "See3Cam130");
-    qmlRegisterType<See3CAM_CU51>("econ.camera.see3cam51", 1, 0, "See3Cam51");
+    qmlRegisterType<See3CAM_CU130>("econ.camera.see3cam130", 1, 0, "See3Cam130");
+    qmlRegisterType<See3CAM_CU30>("econ.camera.see3cam30", 1, 0, "See3Cam30");
+    qmlRegisterType<See3CAM_CU51>("econ.camera.see3cam51", 1, 0, "See3Cam1");
     qmlRegisterType<ASCELLA>("econ.camera.ascella", 1, 0, "Ascella");
     qmlRegisterType<See3CAM_Control>("econ.camera.see3camControl", 1, 0, "See3CamCtrl");
     qmlRegisterType<See3CAM_GPIOControl>("econ.camera.see3camGpioControl", 1, 0, "See3CamGpio");
@@ -94,14 +95,21 @@ int main(int argc, char *argv[])
     viewer.rootContext()->setContextProperty("encodersModel", &vs.encoderList);
     viewer.rootContext()->setContextProperty("SystemPictureFolder",QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).first());
     viewer.rootContext()->setContextProperty("SystemVideoFolder",QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first());
-
-    viewer.setMainQmlFile(QStringLiteral("/usr/share/qml/qtcam/videocapturefilter_QML/videocapturefilter_qml.qml"));
+#if LAUNCHPAD
+    viewer.setMainQmlFile(QStringLiteral("/usr/share/qml/qtcam/videocapturefilter/videocapturefilter.qml"));
+#else
+    viewer.setMainQmlFile(QStringLiteral("qml/qtcam/videocapturefilter/videocapturefilter.qml"));
+#endif
     QObject *rootObject = dynamic_cast<QObject*>(viewer.rootObject());
 
     QObject::connect(rootObject,SIGNAL(stopCamPreview()),rootObject,SLOT(triggerModeCapture()));
 
     //Setting the Window ICON
+#if LAUNCHPAD
     QIcon icon("/usr/share/qml/qtcam/icon/images/icon.jpg");
+#else
+    QIcon icon("qml/qtcam/icon/images/icon.jpg");
+#endif
     viewer.setIcon(icon);
     viewer.setTitle("Qtcam");
     viewer.showMaximized();

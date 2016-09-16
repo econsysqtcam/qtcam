@@ -1,3 +1,7 @@
+Qtcam Application-9.0.0
+-----------------------
+* Added support for See3CAM_CU30 camera.
+
 Qtcam Application-8.0.2
 -------------------------
 * Added Qtcam support for ubuntu 15.10 and ubuntu 16.04 versions

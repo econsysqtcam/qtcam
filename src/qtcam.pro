@@ -29,7 +29,8 @@ SOURCES += main.cpp \
     seecam_cu51.cpp \
     see3cam_cu130.cpp \
     h264decoder.cpp \
-    ascella.cpp
+    ascella.cpp \
+    seecam_cu30.cpp
 
 # Installation path
 # target.path =
@@ -57,7 +58,8 @@ HEADERS += \
     seecam_cu51.h \
     see3cam_cu130.h \
     h264decoder.h \
-    ascella.h
+    ascella.h \
+    seecam_cu30.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
@@ -80,4 +82,4 @@ QMAKE_CFLAGS_THREAD = -D__STDC_CONSTANT_MACROS      #For Ubuntu 12.04 compilatio
 QMAKE_CXXFLAGS_THREAD = -D__STDC_CONSTANT_MACROS    #For Ubuntu 12.04 compilation
 
 OTHER_FILES += \
-    qml/qtcam/videocapturefilter_QML/videocapturefilter_qml.qml
+    qml/qtcam/videocapturefilter/videocapturefilter.qml

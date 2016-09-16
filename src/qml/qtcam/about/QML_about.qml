@@ -137,19 +137,19 @@ Window {
             scrollToClickedPosition: true
             handle: Image {
                 id: scrollhandle
-                source: "../videocapturefilter_QML/images/scroller.png"
+                source: "../videocapturefilter/images/scroller.png"
             }
             scrollBarBackground: Image {
                 id: scrollStyle
-                source: "../videocapturefilter_QML/images/Scroller_bg.png"
+                source: "../videocapturefilter/images/Scroller_bg.png"
             }
             incrementControl: Image {
                 id: increment
-                source: "../videocapturefilter_QML/images/down_arrow.png"
+                source: "../videocapturefilter/images/down_arrow.png"
             }
             decrementControl: Image {
                 id: decrement
-                source: "../videocapturefilter_QML/images/up_arrow.png"
+                source: "../videocapturefilter/images/up_arrow.png"
             }
         }
 

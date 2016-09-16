@@ -66,7 +66,7 @@ In addition to that, we collected some other useful  information related to the 
 In order to run Qtcam application, your system must have:
 
 1. Qt 5.2.1
-2. Operating System: Linux (Tested on Ubuntu 12.04 & 14.04)
+2. Operating System: Linux (Tested on Ubuntu 12.04, 14.04, 15.10, 16.04 versions)
 
 3.2. Dependencies
 
@@ -109,26 +109,28 @@ You can build your application in two ways
 2. Console
 
 3.3.1 Using Qt Creator:
-1.  Open the project in your Qt creator.
+1. Open the project in your Qt creator.
 2. Provide your qmake path in the Tool->Options.(/home/@user/Qt5.2.1/5.2.1/gcc_64/bin/qmake)
-3.  Right click in your project, click qmake.
-4.  Right click in your project, click build
-5.  Right click in your project, click run.
+3. Set LAUNCHPAD macro in common.h to 0 in "src" directory.
+4. Right click in your project, click qmake.
+5. Right click in your project, click build
+6. Right click in your project, click run.
 
 3.3.2 Using Console:
 1.  Goto your git clone path.
 2.  cd src/
-3.  qmake,(For example, /home/@user/Qt5.2.1/5.2.1/gcc_64/bin/qmake)
-4.  make clean
-5.  make
-6.  Execute the application.
-    sudo ./Qtcam
-    note: please make sure the path used in application points to qml which is in top level src directory rather than /usr/share directory
+3.  Set LAUNCHPAD macro in common.h to 0.
+4.  qmake,(For example, /home/@user/Qt5.2.1/5.2.1/gcc_64/bin/qmake)
+5.  make clean
+6.  make
+7.  Execute the application.
+    sudo ./Qtcam    
 
 4. Installation
 Note: If qtcam is already installed, remove the qtcam accessory files using following commands and follow 4.1 section.
 $ sudo rm -rf /usr/share/qml
 $ sudo rm -rf /usr/share/applications/Qtcam*.desktop
+$ sudo apt-get remove qtcam
 
 4.1 Launchpad
 4.1.1 Ubuntu 14

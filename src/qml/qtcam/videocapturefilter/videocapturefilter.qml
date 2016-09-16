@@ -2248,14 +2248,16 @@ Rectangle {
                                 }
                             }
                             onCurrentIndexChanged: {
-                                JS.stillCaptureFormat = color_comp_box.currentIndex.toString()
-                                if(JS.triggerMode_11cug === 1 || JS.triggerMode_B === 1 || JS.triggerMode_M === 1 || JS.triggerMode_cu51 === 1)
-                                    triggerModeCapture()
+								if(color_comp_box.count > 0){
+                            	    JS.stillCaptureFormat = color_comp_box.currentIndex.toString()
+                            	    if(JS.triggerMode_11cug === 1 || JS.triggerMode_B === 1 || JS.triggerMode_M === 1 || JS.triggerMode_cu51 === 1)
+                                	    triggerModeCapture()
 
-                                if(stillColorSpace) {
+                                	if(stillColorSpace) {
                                       updateStillPreview(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
-                                }
-                            }
+                                	}
+                            	}
+							}
                             Component.onCompleted:
                             {
                                 stillColorSpace = true
@@ -2610,13 +2612,15 @@ Rectangle {
                                         }
                                     }
                                     onCurrentIndexChanged: {
-                                        if(colorSpace) {                                            
-                                            vidFormatChanged = true
-                                            JS.videoCaptureFormat = color_comp_box_VideoPin.currentIndex.toString()                                            
-                                            updateScenePreview(vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString(), color_comp_box_VideoPin.currentIndex.toString(),frame_rate_box.currentIndex)
-                                            vidstreamproperty.displayVideoResolution()
-                                            updateFPS(currentText.toString(), output_size_box_Video.currentText.toString())
-                                            vidFormatChanged = false
+                                        if(output_size_box_Video.count > 0){
+                                            if(colorSpace) {
+                                                vidFormatChanged = true
+                                                JS.videoCaptureFormat = color_comp_box_VideoPin.currentIndex.toString()
+                                                updateScenePreview(vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString(), color_comp_box_VideoPin.currentIndex.toString(),frame_rate_box.currentIndex)
+                                                vidstreamproperty.displayVideoResolution()
+                                                updateFPS(currentText.toString(), output_size_box_Video.currentText.toString())
+                                                vidFormatChanged = false
+                                            }
                                         }
                                     }
                                     Component.onCompleted: {
@@ -2674,11 +2678,13 @@ Rectangle {
                                         }
                                     }                                    
                                     onCurrentIndexChanged: {                                        
-                                        JS.videoCaptureResolution = output_size_box_Video.currentText.toString();
-                                        if(outputSizeBox) {
-                                            updateFPS(color_comp_box_VideoPin.currentText.toString(), currentText.toString())
-                                            updateScenePreview(output_size_box_Video.currentText.toString(), color_comp_box_VideoPin.currentIndex.toString(),frame_rate_box.currentIndex)
-                                        }                                        
+                                        if(output_size_box_Video.count > 0){
+                                            JS.videoCaptureResolution = output_size_box_Video.currentText.toString();
+                                            if(outputSizeBox) {
+                                                updateFPS(color_comp_box_VideoPin.currentText.toString(), currentText.toString())
+                                                updateScenePreview(output_size_box_Video.currentText.toString(), color_comp_box_VideoPin.currentIndex.toString(),frame_rate_box.currentIndex)
+                                            }
+                                        }                                       
                                     }
                                     Component.onCompleted: {
                                         outputSizeBox = true
@@ -3247,22 +3253,21 @@ Rectangle {
         vidstreamproperty.startAgain()
     }
 
-    function updateStillPreview(str, format) {
-        m_Snap = false
+function updateStillPreview(str, format) {
+		m_Snap = false
         stillPreview = true        
         vidstreamproperty.stopCapture()
         vidstreamproperty.vidCapFormatChanged(format)
         vidstreamproperty.displayStillResolution()
         vidstreamproperty.setStillVideoSize(str, format)
-        vidstreamproperty.startAgain()
-
+        JS.videoCaptureFormat = color_comp_box_VideoPin.currentIndex.toString()
+        JS.stillCaptureResolution = output_value.currentText.toString()
         if(JS.videoCaptureFormat !== JS.stillCaptureFormat  || JS.stillCaptureResolution !== JS.videoCaptureResolution)
         {
-            vidstreamproperty.stopCapture()
             vidstreamproperty.vidCapFormatChanged(JS.videoCaptureFormat)
             vidstreamproperty.setResoultion(JS.videoCaptureResolution)
-            vidstreamproperty.startAgain()
         }
+        vidstreamproperty.startAgain()
     }
 
     function updateFPS(pix, size) {        
@@ -3843,6 +3848,8 @@ Rectangle {
                 see3cam = Qt.createComponent("../UVCSettings/see3camar0130/uvc_ar0130.qml").createObject(root)
             } else if(device_box.currentText == "See3CAM_CU40") {
                 see3cam = Qt.createComponent("../UVCSettings/see3cam40/uvc40.qml").createObject(root)
+            } else if(device_box.currentText == "See3CAM_CU30") {
+                see3cam = Qt.createComponent("../UVCSettings/see3cam30/uvc30.qml").createObject(root)
             } else if(device_box.currentText == "CX3-UVC") {
                 see3cam = Qt.createComponent("../UVCSettings/ascella/cx3-uvc.qml").createObject(root)
             } else {

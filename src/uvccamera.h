@@ -156,6 +156,23 @@
 #define TRIGGER_FAIL		0x00
 #define TRIGGER_SUCCESS		0x01
 
+/* SEE3CAM_CU30 */
+#define CAMERA_CONTROL_CU30     0x75
+#define GET_SPECIAL_EFFECT 0x03
+#define SET_SPECIAL_EFFECT 0x04
+
+#define SPECIAL_EFFECT_NORMAL       0x01
+#define SPECIAL_EFFECT_BW           0x04
+#define SPECIAL_EFFECT_GRAYSCALE    0x07
+#define SPECIAL_EFFECT_NEGATIVE     0x08
+#define SPECIAL_EFFECT_SKETCH       0x10
+
+#define CU30_SUCCESS    0x01
+#define CU30_FAIL       0x00
+
+#define SET_DENOISE_CONTROL  0x06
+#define GET_DENOISE_CONTROL  0x05
+
 /* Ascella camera */
 #define ASCELLA_VID 0x04b4
 #define ASCELLA_PID 0x00c3

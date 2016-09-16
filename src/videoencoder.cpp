@@ -120,17 +120,6 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
             pCodecCtx->qmin = 15; // qmin = 10*
             pCodecCtx->qmax = 30; //qmax = 51 **
         }
-	qDebug()<<"pCodecCtx->flags"<<pCodecCtx->flags;
-	qDebug()<<"pCodecCtx->pixfmt"<<pCodecCtx->pix_fmt;
-	qDebug()<<"pcodecCtx->bitrate"<<pCodecCtx->bit_rate;
-	qDebug()<<"pCodecCtx->width"<<pCodecCtx->width;
-	qDebug()<<"pcodecCtx->height"<<pCodecCtx->height;
-	qDebug()<<"pCodecCtx->gop_size"<<pCodecCtx->gop_size;
-	qDebug()<<"pCodecCtx->time_base.den"<<pCodecCtx->time_base.den;
-	qDebug()<<"pCodecCtx->time_base.num"<<pCodecCtx->time_base.num;
-	qDebug()<<"pCodecCtx->qmin"<<pCodecCtx->qmin;
-	qDebug()<<"pCodecCtx->qmin"<<pCodecCtx->qmax;
-
 
 #if !LIBAVCODEC_VER_AT_LEAST(53,6)
         /* set the output parameters (must be done even if no

@@ -49,3 +49,6 @@ Known Issues/Bugs:
 1. If there is a drop in frame rates during video recording, then the actual video playback time and recording time is different.
 2. In see3cam50 still capture is sometime gets distorted due to the extra exposure from camera.
 3. For MJPG color space, images captured is not clear only in the case still and preview resolution are different.
+4. In Ubuntu 15.10 and Ubuntu 16.04, YUY (Raw) video encoder format is not supported.
+5. For see3camcu30 camera, In YUYV format, for 1080p@60fps and 720p@60 fps, zoom is not supported. 
+5.

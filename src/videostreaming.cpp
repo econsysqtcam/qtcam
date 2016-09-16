@@ -884,14 +884,6 @@ void Videostreaming::formatSaveSuccess(bool success) {
         emit titleTextChanged(_title,_text);
     }
 
-//    if(success) {
-//        emit logDebugHandle("Still image saved successfully in " + filename);
-//        qDebug("able to save image");
-//    } else {
-//        emit logCriticalHandle("Still image not saved successfully");
-//        qDebug("Not able to save image");
-//    }
-//    emit enableCaptureAndRecord();
 }
 
 bool Videostreaming::getInterval(struct v4l2_fract &interval)
