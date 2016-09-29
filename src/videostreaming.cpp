@@ -1064,9 +1064,9 @@ void Videostreaming::displayEncoderList(){
         QTextStream in(&f);
         fileContent.append(in.readAll());
 
-        if((-1 != fileContent.indexOf("15.10")) || (-1 != fileContent.indexOf("16.04"))){
+        if( (-1 != fileContent.indexOf("15.10")) || (-1 != fileContent.indexOf("16.04")) || (-1 != fileContent.indexOf("Linux Mint 18")) ){
             encoders<<"MJPG"<<"H264"<<"VP8";
-            ubuntuVersion = ">=15"; // version >=  15 [ Here 15.10 and 16.04 ]
+            ubuntuVersion = ">=15"; // version >=  15 [ Here 15.10 and 16.04 , Linux Mint 18 ]
 
         }else if((-1 != fileContent.indexOf("12.04")) || (-1 != fileContent.indexOf("14.04"))){
             encoders<<"YUY"<<"MJPG"<<"H264"<<"VP8";
@@ -1315,9 +1315,9 @@ QString Videostreaming::getSettings(unsigned int id) {
 void Videostreaming::changeSettings(unsigned int id, QString value) {
     struct v4l2_control c;
     c.id = id;
-    c.value = value.toInt();    
+    c.value = value.toInt();
     if (ioctl(VIDIOC_S_CTRL, &c)) {
-        emit logCriticalHandle("Error in setting the Value");        
+        emit logCriticalHandle("Error in setting the Value");
     }
 }
 

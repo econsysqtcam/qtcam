@@ -51,4 +51,6 @@ Known Issues/Bugs:
 3. For MJPG color space, images captured is not clear only in the case still and preview resolution are different.
 4. In Ubuntu 15.10 and Ubuntu 16.04, YUY (Raw) video encoder format is not supported.
 5. For see3camcu30 camera, In YUYV format, for 1080p@60fps and 720p@60 fps, zoom is not supported. 
-5.
+6. In Ascella camera, Led blink is getting off when led state is in manual in UI[extension settings] after launching and closing application continuously for several times.
+7. In Ascella camera, Limit max frame rate in extension settings is not updating properly in camera after launching and closing application continuously for several times.
+8. In Ascella camera, When Black and white mode is set in UI[Extension settings], it reflects black and white mode in camera. Inconsistently, after launching and closing application continuously for several times, it is changed to normal effect mode.

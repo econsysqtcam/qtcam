@@ -102,6 +102,7 @@ void ASCELLA::setAutoFocusMode(camAfMode afMode){
         emit logHandle(QtCriticalMsg, "setAutoFocusMode: auto focus mode is not in range");
         return void();
     }
+
 }
 
 void ASCELLA::setExposureCompensation(QString exposureVal){
@@ -216,12 +217,14 @@ void ASCELLA::setNoiseReduceMode(camNoiseReduceMode NoiseReduceMode, QString Noi
         emit logHandle(QtCriticalMsg, "setNoiseReduceMode: NoiseReduceMode is not in range");
         return void();
     }
+
 }
 
 void ASCELLA::setLimitMaxFrameRateMode(camLimitMaxFRMode LimitMaxFRMode, QString maxFrameRateVal){
 
     int bytesSent;
     u_int8_t maxFRIntVal;
+
     if(uvccamera::handle == NULL){
         emit logHandle(QtCriticalMsg, "setLimitMaxFrameRate: Handle is Null");
         return void();
@@ -265,6 +268,7 @@ void ASCELLA::setColorMode(camColorMode colorMode, QString blackwhiteThreshold){
         emit logHandle(QtCriticalMsg, "setColorMode: Handle is Null");
         return void();
     }
+
     if(colorMode == ColorModeNormal || colorMode == ColorModeMono || colorMode == ColorModeNegative || colorMode == ColorModeBlackWhite){
         memset(g_out_packet_buf, 0x00, ASCELLA_BUFLEN);
 
@@ -329,9 +333,10 @@ void ASCELLA::setCenterWeightedAutoFocus(){
         emit logHandle(QtCriticalMsg, "setCenterWeightedAutoFocus: libusb_control_transfer set command failed");
         return void();
     }
+
 }
 
-void ASCELLA::setCustomAreaAutoFocus(QString afHoriStart, QString afHoriEnd, QString afVertiStart, QString afVertiEnd){
+bool ASCELLA::setCustomAreaAutoFocus(QString afHoriStart, QString afHoriEnd, QString afVertiStart, QString afVertiEnd){
 
     int bytesSent;
     int afHoriStartIntVal;
@@ -341,7 +346,7 @@ void ASCELLA::setCustomAreaAutoFocus(QString afHoriStart, QString afHoriEnd, QSt
 
     if(uvccamera::handle == NULL){
         emit logHandle(QtCriticalMsg, "setCustomWeightedAutoFocus: Handle is Null");
-        return void();
+        return false;
     }
 
     afHoriStartIntVal = afHoriStart.toInt();
@@ -351,7 +356,7 @@ void ASCELLA::setCustomAreaAutoFocus(QString afHoriStart, QString afHoriEnd, QSt
 
     if((afHoriStartIntVal > afHoriEndIntVal) || (afVertiStartIntVal > afVertiEndIntVal)){
         emit deviceStatus("Error", "Horizontal/Vertical AF window start position must be less than or equal to Horizontal/Vertical AF window end postion");
-        return void();
+        return false;
     }
 
     memset(g_out_packet_buf, 0x00, ASCELLA_BUFLEN);
@@ -377,8 +382,9 @@ void ASCELLA::setCustomAreaAutoFocus(QString afHoriStart, QString afHoriEnd, QSt
                                         ASCELLA_TIMEOUT);
     if(0 > bytesSent){
         emit logHandle(QtCriticalMsg, "setCenterWeightedAutoFocus: libusb_control_transfer set command failed");
-        return void();
+        return false;
     }
+    return true;
 }
 
 
@@ -447,6 +453,8 @@ void ASCELLA::setRollValue(QString rollValue){
 #endif
 
 void ASCELLA::setDefaultValues(){
+
+    // For setting default value, it will take some time to set values in the camera. So for each request , 50ms delay is added.
     u_int8_t defaultValue[30];
 
     memset(defaultValue, 0x00, sizeof(defaultValue));
@@ -457,45 +465,56 @@ void ASCELLA::setDefaultValues(){
     /* Enabling led off */
     QString brightness = QString::number(defaultValue[1]);
     emit ledOffEnable(brightness);
+    setLEDStatusMode(LedOff, brightness);
+
+    usleep(50000);
 
     /* Enabling exposure compensation if auto exposure is selected in Image Quality Settings menu */
     QString exposureValue = QString::number(defaultValue[2]);
     emit autoExposureEnable(exposureValue);
+    usleep(50000);
 
     /* Enabling normal color mode */
     emit normalColorModeEnable();
+    usleep(50000);
 
     /* Enabling black and white color mode auto and setting manual default slider value */
     QString bwThresholdValue = QString::number(defaultValue[18]);
     emit bwColorModeAutoEnable(bwThresholdValue);
     setColorMode(ColorModeNormal, bwThresholdValue);
+    usleep(50000);
 
     /* Enabling auto focus mode control if auto focus is checked in Image Quality Settings menu*/
     emit afContinuousEnable();
+    usleep(50000);
 
     /* Enabling noise reduction auto mode */
     emit noiseReductionAutoEnable();
+    usleep(50000);
 
     /* Enabling normal scene mode */
     emit normalSceneModeEnable();
+    usleep(50000);
 
     /* Enabling limit max frame rate disable mode and setting max frame rate value*/
     QString frameRateValue = QString::number(ASCELLA_DEFAULT_MAXFRAMERATE);
     emit limitMaxFRDisableMode(frameRateValue);
+    usleep(50000);
 
     /* Enabling binned/resized mode */
     QString binResizeMode = QString::number(defaultValue[19]);
-    emit binnResizeEnableDisable(binResizeMode);
-
-//    /* selecting binned mode */
-//    emit binnModeEnable();
+    emit setBinnResizeEnableDisable(binResizeMode);
+    usleep(50000);
 
     /* Select binn or resize mode */
     QString binResizeSelect = QString::number(defaultValue[20]);
-    emit setCurbinnResizeSelect(binResizeSelect);
+    emit setBinnResizeSelect(binResizeSelect);
+    usleep(50000);
 
     /* Enabling auto focus area center mode */
     emit setAfAreaCenterMode();
+    usleep(50000);
+
 }
 
 void ASCELLA::getDefaultValues(u_int8_t *pDefaultValue){
@@ -574,35 +593,32 @@ void ASCELLA::getCurrentValues(u_int8_t *pCurrentValue){
     g_out_packet_buf[1] = 0xCC;
     g_out_packet_buf[2] = 2;
 
-    /* For 1st time call of getting the response gives old values. For 2nd time call, It gives previouly set values correctly*/
-    for (int i=0; i<2; i++){
-        // Sending the request command to get current values - output buffer
-        bytesSent = libusb_control_transfer(uvccamera::handle,
-                                            0x21,
-                                            0x09,
-                                            0x200,
-                                            0x2,
-                                            g_out_packet_buf,
-                                            ASCELLA_BUFLEN,
-                                            ASCELLA_TIMEOUT);
-        if(0 > bytesSent){
-            emit logHandle(QtCriticalMsg, "getCurrentValues: libusb_control_transfer set command failed");
-            return void();
-        }
-        // Getting the response - in buffer
-        bytesSent = libusb_control_transfer(uvccamera::handle,
-                                            0xA1, // req type
-                                            0x01, // request
-                                            0x100, // value
-                                            0x2, // index
-                                            g_in_packet_buf,
-                                            ASCELLA_BUFLEN,
-                                            ASCELLA_TIMEOUT);
-        if(0 > bytesSent){
-            emit logHandle(QtCriticalMsg, "getCurrentValues: libusb_control_transfer get command failed");
-            return void();
-        }
+    // Sending the request command to get current values - output buffer
+    bytesSent = libusb_control_transfer(uvccamera::handle,
+                                        0x21,
+                                        0x09,
+                                        0x200,
+                                        0x2,
+                                        g_out_packet_buf,
+                                        ASCELLA_BUFLEN,
+                                        ASCELLA_TIMEOUT);
+    if(0 > bytesSent){
+        emit logHandle(QtCriticalMsg, "getCurrentValues: libusb_control_transfer set command failed");
+        return void();
+    }
 
+    usleep(100000); // sleep for 100ms
+    bytesSent = libusb_control_transfer(uvccamera::handle,
+                                               0xA1, // req type
+                                               0x01, // request
+                                               0x100, // value
+                                               0x2, // index
+                                               g_in_packet_buf,
+                                               ASCELLA_BUFLEN,
+                                               ASCELLA_TIMEOUT);
+    if(0 > bytesSent){
+       emit logHandle(QtCriticalMsg, "getCurrentValues: libusb_control_transfer get command failed");
+       return void();
     }
 
     int i=0;
@@ -651,6 +667,7 @@ void ASCELLA::getCurrentValues(u_int8_t *pCurrentValue){
         pCurrentValue[i] = 0x00;      //Black&White Auto
     else if(g_in_packet_buf[6] >= 0x01)
         pCurrentValue[i] = g_in_packet_buf[6]; //black and white thresold
+
     i++;
 
     /* pCurrentValue[6] - noise reduction mode */
@@ -672,6 +689,8 @@ void ASCELLA::getCurrentValues(u_int8_t *pCurrentValue){
         pCurrentValue[i] = 0x01;
 
     i++;
+
+
     // pCurrentValue[9] - Auto Focus area either  center or custom
     pCurrentValue[i++] = g_in_packet_buf[10];
 
@@ -686,28 +705,6 @@ void ASCELLA::getCurrentValues(u_int8_t *pCurrentValue){
 
 }
 
-void ASCELLA::setLedValueWithExternalHwButton(){
-    u_int8_t currentValue[30];
-    QString ledCurBrightness;
-
-    /* Every two secs this function will be called and
-     * when hw button for led is pressed the UI will be updated*/
-    memset(currentValue, 0x00, sizeof(currentValue));
-    getCurrentValues(currentValue);
-
-    /* Set Led mode and led brightness */
-    if(currentValue[1] < 1)
-        ledCurBrightness = QString::number(10);
-    else
-        ledCurBrightness = QString::number(currentValue[1]);
-
-    if(currentValue[0] == 0x01)
-        emit setCurrentLedValue(LedOff, ledCurBrightness);
-    else if(currentValue[0] == 0x02)
-        emit setCurrentLedValue(LedAuto, ledCurBrightness);
-    else if(currentValue[0] == 0x03)
-        emit setCurrentLedValue(LedManual, ledCurBrightness);
-}
 
 void ASCELLA::setCurrentValues(QString vidResolution){
     u_int8_t currentValue[30], noiseValue;
@@ -733,7 +730,7 @@ void ASCELLA::setCurrentValues(QString vidResolution){
 
     /* Set auto exposure mode */
     QString curExposure = QString::number(currentValue[2]);
-    emit autoExposureEnable(curExposure);
+    emit setCurAutoExposureEnable(curExposure);
 
     /* Set Auto focus mode */
     QString afMode = QString::number(currentValue[3]);
@@ -782,7 +779,7 @@ void ASCELLA::setCurrentValues(QString vidResolution){
     vidWidth = vidResolution.split('x')[0].toInt();
     vidHeight = vidResolution.split('x')[1].toInt();
     if(currentValue[9] == 0x01){ /* set auto focus area center mode */
-        emit setAfAreaCenterMode();
+        emit setCurrentAfAreaCenterMode();
     }else if(currentValue[9] == 0x02){ /* set auto focus area custom mode */
         position = 256 * currentValue[10] + currentValue[11];
         curPosition = QString::number(position);
@@ -818,7 +815,7 @@ void ASCELLA::setCurrentValues(QString vidResolution){
     }
     /* Enable/Disable binn resize modes */
     QString binResizeMode = QString::number(currentValue[19]);
-    emit binnResizeEnableDisable(binResizeMode);
+    emit setCurrbinnResizeEnableDisable(binResizeMode);
 
     /* Select binn or resize mode */
     QString binResizeSelect = QString::number(currentValue[20]);

@@ -111,6 +111,8 @@ signals:
 
     void setCurrentAfMode(QString afMode);
 
+    void setCurAutoExposureEnable(QString exposureValue);
+
     void setCurrentColorMode(QString curColorMode);
 
     void setCurrentBwMode(QString curBWMode, QString CurBWthreshold);
@@ -123,12 +125,17 @@ signals:
 
     void setCurrentAfAreaCustomMode(QString curPosition, QString afTextBoxNumber);
 
+
+    /*  set current and default values */
+    void setAfAreaCenterMode();
+
+    void setCurrentAfAreaCenterMode();
+
+    void setBinnResizeSelect(QString binResizeSelect);
     void setCurbinnResizeSelect(QString binResizeSelect);
 
-    /* Used in both set current and default values */
-    void binnResizeEnableDisable(QString mode);
-
-    void setAfAreaCenterMode();
+    void setBinnResizeEnableDisable(QString mode);
+    void setCurrbinnResizeEnableDisable(QString mode);
 
 public slots:
     /**
@@ -189,7 +196,7 @@ public slots:
       * @param afVertiStart - Auto focus area vertical start position
       * @param afVertiEnd - Auto focus area vertical end position
       */
-    void setCustomAreaAutoFocus(QString afHoriStart, QString afHoriEnd, QString afVertiStart, QString afVertiEnd);
+    bool setCustomAreaAutoFocus(QString afHoriStart, QString afHoriEnd, QString afVertiStart, QString afVertiEnd);
 
     /**
      * @brief setBinnedResizedMode
@@ -228,7 +235,7 @@ public slots:
     /**
      * @brief setLedValueWithExternalHwButton
      */
-    void setLedValueWithExternalHwButton();
+   // void setLedValueWithExternalHwButton();
 
     /**
      * @brief getFirmwareVersion

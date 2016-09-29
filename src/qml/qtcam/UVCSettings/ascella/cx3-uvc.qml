@@ -14,6 +14,7 @@ Item {
     property string vidResln;
     property int vidWidth;
     property int vidHeight;
+    property bool settingWhenUpdateUI: true
 
     Action {
         id: triggerAction
@@ -43,16 +44,7 @@ Item {
         }
     }
 
-    Timer {
-        id: ledStatusTimer
-        interval: 2000
-        repeat:true
-        onTriggered: {
-            ascella.setLedValueWithExternalHwButton() //every two seconds need to get current led mode and brightness
-        }
-    }
-
-    Image {
+   Image {
         id: bg
         source: "images/bg.png"
         x: 0
@@ -113,11 +105,6 @@ Item {
                     onClicked:{
                         ascella.setLEDStatusMode(Ascella.LedOff, "0x00");
                     }
-                    onCheckedChanged: {
-                        if(checked){
-                            ascella.setLEDStatusMode(Ascella.LedOff, "0x00");
-                        }
-                    }
 
                     Keys.onReturnPressed: {
                     }
@@ -167,8 +154,15 @@ Item {
                     minimumValue: 1
                     maximumValue: 100
                     onValueChanged:  {
-                        if((radioAuto.checked || radioManual.checked))
-                            led_value.text = ledSlider.value
+                        if((radioAuto.checked || radioManual.checked)){
+                            if(settingWhenUpdateUI){
+                                led_value.text = ledSlider.value
+                                if(radioAuto.checked){
+                                    ascella.setLEDStatusMode(Ascella.LedAuto, led_value.text)}
+                                else if(radioManual.checked){
+                                    ascella.setLEDStatusMode(Ascella.LedManual, led_value.text)}
+                            }
+                        }
                     }
                 }
                 TextField {
@@ -178,17 +172,13 @@ Item {
                     font.family: "Ubuntu"
                     smooth: true
                     horizontalAlignment: TextInput.AlignHCenter
-                    enabled: ledSlider.enabled ? 1 : 0
-                    opacity: enabled ? 1 : 0.1
+                    enabled: false
+                    opacity: ledSlider.enabled ? 1 : 0.1
                     style: econTextFieldStyle
                     validator: IntValidator {bottom: ledSlider.minimumValue; top: ledSlider.maximumValue}
                     onTextChanged: {
                         if(text != ""){
                             ledSlider.value = led_value.text
-                            if(radioAuto.checked){
-                                ascella.setLEDStatusMode(Ascella.LedAuto, led_value.text)}
-                            else if(radioManual.checked){
-                                ascella.setLEDStatusMode(Ascella.LedManual, led_value.text)}
                         }
                     }
                 }
@@ -220,7 +210,7 @@ Item {
                         ascella.setAutoFocusMode(Ascella.Continuous);
                       }
                       onCheckedChanged: {
-                          if(JS.autoFocusChecked && checked){
+                          if(JS.autoFocusChecked && checked && settingWhenUpdateUI){
                             ascella.setAutoFocusMode(Ascella.Continuous);
                           }
                       }
@@ -287,7 +277,7 @@ Item {
                         ascella.setCenterWeightedAutoFocus();
                     }
                     onCheckedChanged:{
-                        if(JS.autoFocusChecked && checked){
+                        if(JS.autoFocusChecked && checked && settingWhenUpdateUI){
                             ascella.setCenterWeightedAutoFocus();
                         }
                     }
@@ -340,6 +330,7 @@ Item {
                     validator: IntValidator {bottom: 1; top: vidWidth;}
                     implicitWidth: 70
                     text:"1"
+                    maximumLength:4
                     onTextChanged: {
 
 
@@ -371,6 +362,7 @@ Item {
                     validator: IntValidator {bottom: 1; top: vidWidth;}
                     implicitWidth: 70
                     text:vidWidth
+                    maximumLength:4
                     onTextChanged: {
 
                     }
@@ -400,6 +392,7 @@ Item {
                     opacity: enabled ? 1 : 0.1
                     implicitWidth: 70
                     text:"1"
+                    maximumLength:4
                     validator: IntValidator {bottom: 1; top: vidHeight;}
                     onTextChanged: {
 
@@ -430,6 +423,7 @@ Item {
                     opacity: enabled ? 1 : 0.1
                     implicitWidth: 70
                     text:vidHeight
+                    maximumLength:4
                     validator: IntValidator {bottom: 1; top: vidHeight;}
                     onTextChanged: {
 
@@ -452,8 +446,42 @@ Item {
                     enabled: radiocustom.checked ? 1 : 0
                     opacity: enabled ? 1 : 0.1
                     action: radiocustom.checked ? afAreaSet : null
+                    onClicked: {
+                        if(afhori_start_box_value.length == 0 || afhori_end_box_value.length == 0 || afverti_start_box_value.length == 0 || afverti_end_box_value.length == 0){
+                            messageDialog.title = qsTr("Error")
+                            messageDialog.text = qsTr("Input field(s) is(are) empty. Please check whether all horizontal and vertical focus positions are filled")
+                            messageDialog.open()
+                            return
+                        }
+                        if(ascella.setCustomAreaAutoFocus(afhori_start_box_value.text, afhori_end_box_value.text, afverti_start_box_value.text, afverti_end_box_value.text)){
+                            messageDialog.title = qsTr("Success")
+                            messageDialog.text = qsTr("Auto focus area positions are set successfully")
+                            messageDialog.open()
+                        }else{
+                            messageDialog.title = qsTr("Failure")
+                            messageDialog.text = qsTr("Setting Auto focus area positions is failed")
+                            messageDialog.open()
+                        }
+                    }
+
                     Keys.onReturnPressed: {
-                        ascella.setCustomAreaAutoFocus(afhori_start_box_value.text, afhori_end_box_value.text, afverti_start_box_value.text, afverti_end_box_value.text)
+                        if(afhori_start_box_value.length == 0 || afhori_end_box_value.length == 0 || afverti_start_box_value.length == 0 || afverti_end_box_value.length == 0){
+                            messageDialog.title = qsTr("Error")
+                            messageDialog.text = qsTr("Input field(s) is(are) empty. Please check whether all horizontal and vertical focus positions are filled")
+                            messageDialog.open()
+                            return
+                        }
+
+                        if(ascella.setCustomAreaAutoFocus(afhori_start_box_value.text, afhori_end_box_value.text, afverti_start_box_value.text, afverti_end_box_value.text)){
+                            messageDialog.title = qsTr("Success")
+                            messageDialog.text = qsTr("Auto focus area positions are set successfully")
+                            messageDialog.open()
+                        }
+                        else{
+                            messageDialog.title = qsTr("Failure")
+                            messageDialog.text = qsTr("Setting Auto focus area positions is failed")
+                            messageDialog.open()
+                        }
                     }
                 }
             }
@@ -481,7 +509,7 @@ Item {
                         ascella.setSceneMode(Ascella.SceneNormal);
                     }
                     onCheckedChanged: {
-                        if(checked){
+                        if(checked && settingWhenUpdateUI){
                             ascella.setSceneMode(Ascella.SceneNormal);
                         }
                     }
@@ -528,7 +556,7 @@ Item {
                         ascella.setColorMode(Ascella.ColorModeNormal, "0x00")
                     }
                     onCheckedChanged: {
-                        if(checked){
+                        if(checked && settingWhenUpdateUI){
                             ascella.setColorMode(Ascella.ColorModeNormal, "0x00")
                         }
                     }
@@ -572,9 +600,9 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
-                        if(colorModeBwAuto.checked)
+                        if(colorModeBwAuto.checked && settingWhenUpdateUI)
                             ascella.setColorMode(Ascella.ColorModeBlackWhite, "0x00")
-                        else if(colorModeBwManual.checked)
+                        else if(colorModeBwManual.checked && settingWhenUpdateUI)
                             ascella.setColorMode(Ascella.ColorModeBlackWhite, bwvalue.text)
                     }
                     Keys.onReturnPressed: {
@@ -608,9 +636,9 @@ Item {
                         ascella.setColorMode(Ascella.ColorModeBlackWhite, "0x00")
                     }
                     onCheckedChanged:  {
-//                        if(checked){
-//                            ascella.setColorMode(Ascella.ColorModeBlackWhite, bwvalue.text)
-//                        }
+                        if(checked && settingWhenUpdateUI){
+                            ascella.setColorMode(Ascella.ColorModeBlackWhite, bwvalue.text)
+                        }
                     }
                     Keys.onReturnPressed: {
 
@@ -647,6 +675,11 @@ Item {
                     maximumValue: 255
                     onValueChanged:  {
                         bwvalue.text = bwManualSlider.value
+                        if(colorModeBwManual.enabled && colorModeBwManual.checked){
+                            if(settingWhenUpdateUI){
+                                ascella.setColorMode(Ascella.ColorModeBlackWhite, bwvalue.text)
+                            }
+                        }
                     }
                 }
                 TextField {
@@ -656,15 +689,14 @@ Item {
                     font.family: "Ubuntu"
                     smooth: true
                     horizontalAlignment: TextInput.AlignHCenter
-                    enabled: bwManualSlider.enabled ? 1 : 0
-                    opacity: enabled ? 1 : 0.1
+                    enabled: false
+                    opacity: bwManualSlider.enabled ? 1 : 0.1
                     style: econTextFieldStyle
                     validator: IntValidator {bottom: bwManualSlider.minimumValue; top: bwManualSlider.maximumValue}
                     onTextChanged: {
                         if(text != ""){
                             bwManualSlider.value = bwvalue.text
-                            if(colorModeBwManual.enabled && colorModeBwManual.checked)
-                                ascella.setColorMode(Ascella.ColorModeBlackWhite, bwvalue.text)
+
                         }
 
                     }
@@ -679,14 +711,14 @@ Item {
                     id: colorModeBinned
                     text: "Binned"
                     activeFocusOnPress: true
-                    enabled: (JS.videoCaptureResolution === "1920x1080" || JS.videoCaptureResolution === "2048x1536") ? 1 : 0
+                    enabled: ((JS.videoCaptureResolution === "1920x1080" && JS.videocaptureFps === "30 FPS") || JS.videoCaptureResolution === "2048x1536") ? 1 : 0
                     opacity: enabled ? 1 : 0.1
                     style: econRadioButtonStyle
                     onClicked: {
                         ascella.setBinnedResizedMode(Ascella.Binned)
                     }
                     onCheckedChanged:{
-                        if(checked){
+                        if(checked && settingWhenUpdateUI){
                             ascella.setBinnedResizedMode(Ascella.Binned)
                         }
                     }
@@ -699,11 +731,16 @@ Item {
                     id: colorModeResized
                     text: "Resized"
                     activeFocusOnPress: true
-                    enabled: (JS.videoCaptureResolution === "1920x1080" || JS.videoCaptureResolution === "2048x1536") ? 1 : 0
+                    enabled: ((JS.videoCaptureResolution === "1920x1080" && JS.videocaptureFps === "30 FPS") || JS.videoCaptureResolution === "2048x1536") ? 1 : 0
                     opacity: enabled ? 1 : 0.1
                     style: econRadioButtonStyle
                     onClicked: {
                         ascella.setBinnedResizedMode(Ascella.Resized)
+                    }
+                    onCheckedChanged:{
+                        if(checked && settingWhenUpdateUI){
+                            ascella.setBinnedResizedMode(Ascella.Resized)
+                        }
                     }
                     Keys.onReturnPressed: {
 
@@ -739,6 +776,9 @@ Item {
                     maximumValue: 12
                     onValueChanged:  {
                         exposureCompTextValue.text = exposureCompSlider.value
+                        if(settingWhenUpdateUI){
+                            ascella.setExposureCompensation(exposureCompTextValue.text)
+                        }
                     }
                 }
                 TextField {
@@ -748,13 +788,12 @@ Item {
                     font.family: "Ubuntu"
                     smooth: true
                     horizontalAlignment: TextInput.AlignHCenter
-                    enabled: exposureCompSlider.enabled ? 1 : 0
-                    opacity: enabled ? 1 : 0.1
+                    enabled: false
+                    opacity: exposureCompSlider.enabled ? 1 : 0.1
                     style: econTextFieldStyle
                     onTextChanged: {
                         if(text != ""){
                             exposureCompSlider.value = exposureCompTextValue.text
-                            ascella.setExposureCompensation(exposureCompTextValue.text)
                         }
                     }
                 }
@@ -784,7 +823,7 @@ Item {
                         ascella.setNoiseReduceMode(Ascella.NoiseReduceNormal, "0x00");
                     }
                     onCheckedChanged:{
-                        if(checked){
+                        if(checked && settingWhenUpdateUI){
                             ascella.setNoiseReduceMode(Ascella.NoiseReduceNormal, "0x00");
                         }
                     }
@@ -822,6 +861,9 @@ Item {
                     maximumValue: 10
                     onValueChanged:  {
                         reduceNoiseFixvalue.text = reduceNoiseFixSlider.value
+                        if(settingWhenUpdateUI){
+                            ascella.setNoiseReduceMode(Ascella.NoiseReduceFix, reduceNoiseFixvalue.text)
+                        }
                     }
                 }
                 TextField {
@@ -831,15 +873,13 @@ Item {
                     font.family: "Ubuntu"
                     smooth: true
                     horizontalAlignment: TextInput.AlignHCenter
-                    enabled: reduceNoiseFixSlider.enabled ? 1 : 0
-                    opacity: enabled ? 1 : 0.1
+                    enabled: false
+                    opacity: reduceNoiseFix.checked ? 1 : 0.1
                     style: econTextFieldStyle
                     validator: IntValidator {bottom: reduceNoiseFixSlider.minimumValue; top: reduceNoiseFixSlider.maximumValue}
                     onTextChanged: {
                         if(text != ""){
                             reduceNoiseFixSlider.value = reduceNoiseFixvalue.text
-                            if(reduceNoiseFix.checked)
-                                ascella.setNoiseReduceMode(Ascella.NoiseReduceFix, reduceNoiseFixvalue.text)
                         }
                     }
                 }
@@ -869,7 +909,7 @@ Item {
                         ascella.setLimitMaxFrameRateMode(Ascella.Disable, "0x00");
                     }
                     onCheckedChanged:{
-                        if(checked){
+                        if(checked && settingWhenUpdateUI){
                            ascella.setLimitMaxFrameRateMode(Ascella.Disable, "0x00");
                         }
                     }
@@ -907,8 +947,12 @@ Item {
                     minimumValue: 3
                     maximumValue: 119
                     onValueChanged:  {
-                        if(applyMaxFrameRate.checked)
-                        applyMaxFrameRatevalue.text = applyMaxFrameRateSlider.value
+                        if(applyMaxFrameRate.checked){
+                            applyMaxFrameRatevalue.text = applyMaxFrameRateSlider.value
+                            if(settingWhenUpdateUI){
+                                ascella.setLimitMaxFrameRateMode(Ascella.ApplyMaxFrameRate, applyMaxFrameRatevalue.text)
+                            }
+                        }
                     }
                 }
                 TextField {
@@ -917,19 +961,15 @@ Item {
                     font.pixelSize: 10
                     font.family: "Ubuntu"
                     smooth: true
-                    enabled: applyMaxFrameRateSlider.enabled ? 1 : 0
-                    opacity: enabled ? 1 : 0.1
+                    enabled: false
+                    opacity: applyMaxFrameRateSlider.enabled ? 1 : 0.1
                     horizontalAlignment: TextInput.AlignHCenter
                     style: econTextFieldStyle
                     validator: IntValidator {bottom: applyMaxFrameRateSlider.minimumValue; top: applyMaxFrameRateSlider.maximumValue}
                     onTextChanged: {
                        if(text != ""){
                            applyMaxFrameRateSlider.value = applyMaxFrameRatevalue.text
-                           if(applyMaxFrameRate.checked){
-                               ascella.setLimitMaxFrameRateMode(Ascella.ApplyMaxFrameRate, applyMaxFrameRatevalue.text)
-                           }
                        }
-
                     }
                 }
             }
@@ -994,7 +1034,7 @@ Item {
                     action: setDefault
                     style: econcx3ButtonStyle
                     Keys.onReturnPressed: {
-
+                        ascella.setDefaultValues()
                     }
                 }
             }
@@ -1141,45 +1181,55 @@ Item {
         }
         onLedOffEnable:{
             radioOff.checked = true
+            settingWhenUpdateUI = true
             led_value.text = brightness
         }
         onAutoExposureEnable:{
+            settingWhenUpdateUI = true
             if(JS.autoExposureSelected){
-                exposureCompTextValue.text = exposureValue
+                exposureCompSlider.value = exposureValue
             }
         }
         onAfContinuousEnable:{
+            settingWhenUpdateUI = true
             //if(JS.autoFocusChecked){
                 radioContin.checked = true
             //}
         }
         onNoiseReductionAutoEnable:{
+            settingWhenUpdateUI = true
             reduceNoiseAuto.checked = true
         }
         onNormalSceneModeEnable:{
+            settingWhenUpdateUI = true
             scenenormal.checked = true
         }
         onLimitMaxFRDisableMode:{
+            settingWhenUpdateUI = true
             limitMaxFrameRateDisable.checked = true
             applyMaxFrameRatevalue.text = frameRateValue
         }
         onNormalColorModeEnable:{
+            settingWhenUpdateUI = true
             colorModeNormal.checked = true
         }
         onBwColorModeAutoEnable:{
+            settingWhenUpdateUI = true
             bwvalue.text = bwThresholdValue
             colorModeBwAuto.checked = true
         }
-        onBinnResizeEnableDisable:{
-            if(mode == "0x01"){
-                colorModeBinned.enabled = true
-                colorModeResized.enabled = true
-            }else if(mode == "0x00"){
-                colorModeBinned.enabled = false
-                colorModeResized.enabled = false
-            }
+
+        onSetBinnResizeEnableDisable:{
+                if(mode == "0x01"){
+                    colorModeBinned.enabled = true
+                    colorModeResized.enabled = true
+                }else if(mode == "0x00"){
+                    colorModeBinned.enabled = false
+                    colorModeResized.enabled = false
+                }
         }
-        onSetCurbinnResizeSelect:{
+        onSetBinnResizeSelect:{
+            settingWhenUpdateUI = true
             if(binResizeSelect == "0x01"){
                 colorModeBinned.checked = true
             }else{
@@ -1187,11 +1237,25 @@ Item {
             }
         }
 
-        onBinnModeEnable:{
-            colorModeBinned.checked = true
+        onSetCurrbinnResizeEnableDisable:{
+                if(mode == "0x01"){
+                    colorModeBinned.enabled = true
+                    colorModeResized.enabled = true
+                }else if(mode == "0x00"){
+                    colorModeBinned.enabled = false
+                    colorModeResized.enabled = false
+                }
         }
-
+        onSetCurbinnResizeSelect:{
+            settingWhenUpdateUI = false
+            if(binResizeSelect == "0x01"){
+                colorModeBinned.checked = true
+            }else{
+                colorModeResized.checked = true
+            }
+        }
         onSetCurrentLedValue:{
+            settingWhenUpdateUI = false
             if(ledCurMode == Ascella.LedOff){
                 radioOff.checked = true
             }else if(ledCurMode == Ascella.LedAuto){
@@ -1209,6 +1273,7 @@ Item {
             }
         }
         onSetCurrentColorMode:{
+            settingWhenUpdateUI = false
             if(curColorMode == Ascella.ColorModeNormal){
                 colorModeNormal.checked = true
             }else if(curColorMode == Ascella.ColorModeMono){
@@ -1220,7 +1285,8 @@ Item {
             }
         }
         onSetCurrentBwMode:{
-            if(curBWMode == "0x00"){
+            settingWhenUpdateUI = false
+            if(curBWMode == "0"){
                 colorModeBwAuto.checked = true
             }else{
                 colorModeBwManual.checked = true
@@ -1233,6 +1299,7 @@ Item {
             }else if(curNoiseMode == Ascella.NoiseReduceFix){
                 reduceNoiseFix.checked = true
             }
+            settingWhenUpdateUI = false
             reduceNoiseFixvalue.text = curNoiseValue
         }
         onSetCurSceneMode:{
@@ -1242,19 +1309,33 @@ Item {
                 sceneDocScan.checked = true
             }
         }
+        onSetCurAutoExposureEnable:{
+            settingWhenUpdateUI = false
+            if(JS.autoExposureSelected){
+                exposureCompSlider.value = exposureValue
+            }
+        }
         onSetCurFRMode:{
             if(curFRMode == Ascella.Disable){
                 limitMaxFrameRateDisable.checked = true
             }else if(curFRMode == Ascella.ApplyMaxFrameRate){
                 applyMaxFrameRate.checked = true
             }
+            settingWhenUpdateUI = false
             applyMaxFrameRatevalue.text = curMaxFRLimit
         }
         onSetAfAreaCenterMode:{
             //if(JS.autoFocusChecked){
+                settingWhenUpdateUI = true
                 radiocenter.checked = true
             //}
         }
+
+        onSetCurrentAfAreaCenterMode:{
+                settingWhenUpdateUI = false
+                radiocenter.checked = true
+        }
+
         onSetCurrentAfAreaCustomMode:{
             if(JS.autoFocusChecked){
                 radiocustom.checked = true
@@ -1291,12 +1372,13 @@ Item {
 
     Component.onCompleted:{
         uvccamera.initExtensionUnitAscella()
+        vidResln = JS.videoCaptureResolution
+        vidWidth = vidResln.split('x')[0]
+        vidHeight = vidResln.split('x')[1]
         ascella.setCurrentValues(JS.videoCaptureResolution)
-        //ascella.setRollValue(rollControlTextValue.text)
-        ledStatusTimer.start()
+        settingWhenUpdateUI = true
     }
     Component.onDestruction:{
-        ledStatusTimer.stop()
         uvccamera.exitExtensionUnitAscella()
     }
 }

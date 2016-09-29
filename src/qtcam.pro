@@ -59,7 +59,8 @@ HEADERS += \
     see3cam_cu130.h \
     h264decoder.h \
     ascella.h \
-    seecam_cu30.h
+	seecam_cu30.h \
+	common.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
