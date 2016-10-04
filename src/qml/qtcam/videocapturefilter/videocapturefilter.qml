@@ -108,7 +108,7 @@ Rectangle {
     property bool olderValue:false
     property bool webcamKeyAccept: true
     property bool stillColorSpace
-
+    property bool usb3speed: false
 
     property int videoPinSize;
     property int videoPinSizeIndex;
@@ -918,6 +918,14 @@ Rectangle {
                         vidstreamproperty.displayStillResolution()
                         vidstreamproperty.displayVideoResolution()
                         vidstreamproperty.displayEncoderList()
+                        if(device_box.currentText == "CX3-UVC"){
+                            vidstreamproperty.cameraFilterControls()
+                            if(!usb3speed){
+                                menuitems.push("Auto Mode")
+                                exposureCombo.model = menuitems
+                                menuitems.pop()
+                            }
+                        }
                         updateFPS(color_comp_box.currentText.toString(), output_value.currentText.toString())
                         brightValueChangeProperty = false
                         contrastValueChangeProperty = false
@@ -2129,7 +2137,6 @@ Rectangle {
                                     onValueChanged: {
                                         if(focusValueChangeProperty) {
                                             if(!autoSelect_focus.checked || device_box.currentText == "e-con's CX3 RDK with O\nV5680") {
-                                                camproperty.logDebugWriter("Focus control settings changed to: "+ value.toString())
                                                 vidstreamproperty.changeSettings(focusControlId,value.toString())
                                             } else {
                                                 focus_Slider.enabled = false
@@ -3420,18 +3427,24 @@ function updateStillPreview(str, format) {
                 sharpness_Slider.value = controlDefaultValue
             } else if(controlName === "Exposure (Absolute)") {
                 exposure_absolute.opacity = 1
-                if((device_box.currentText === "e-con's CX3 RDK with O\nV5680") || (device_box.currentText === "e-con's CX3 RDK with M\nT9P031") || (device_box.currentText === "See3CAM_CU40") ) {                    
+                if((device_box.currentText === "e-con's CX3 RDK with O\nV5680") || (device_box.currentText === "e-con's CX3 RDK with M\nT9P031") || (device_box.currentText === "See3CAM_CU40")) {
                     exposure_Slider.opacity = 1
                     exposure_Slider.enabled = true
                     exposure_value.opacity = 1
                     exposure_value.enabled = true
                 }
-
                 exposurecontrolId = ctrlID
                 if(device_box.currentText === "CX3-UVC"){       // For ascella camera, mapped exposure values to slider values 0 to 11
+                    if(exposureCombo.currentText == "Auto Mode"){
+                        exposure_absolute.opacity = 0.1
+                    }else{
+                        exposure_absolute.opacity = 1
+                    }
+                    usb3speed = true
+                    exposure_Slider.enabled = false
                     exposure_Slider.minimumValue = 0
                     exposure_Slider.maximumValue = 11
-                    expAscellaDefaultValue = ctrlDefaultValue                   
+                    expAscellaDefaultValue = ctrlDefaultValue
                     exposure_Slider.value = exposureOrigAscella.indexOf(expAscellaDefaultValue)
                     exposure_value.text = exposureOrigAscella[exposure_Slider.value]
 
@@ -3543,6 +3556,9 @@ function updateStillPreview(str, format) {
             }
             else if(controlName === "Exposure, Auto") {
                 menuitems.pop()
+                if(device_box.currentText == "CX3-UVC" && !usb3speed){
+                    while(menuitems.pop()){}
+                }
                 exposure_auto.opacity = 1
                 exposureCombo.opacity = 1
                 exposureCombo.model = menuitems
@@ -3550,7 +3566,7 @@ function updateStillPreview(str, format) {
                 exposureAutoControlId = ctrlID
                 exposureComboEnable =  true
                 exposureCombo.currentIndex = controlDefaultValue
-                if(exposureCombo.currentText == "Manual Mode"){
+                if(exposureCombo.currentIndex == 1){  // 0 - auto mode, 1 - manual mode
                     JS.autoExposureSelected = false
                     exposure_absolute.opacity = 1
                     exposure_Slider.enabled = true

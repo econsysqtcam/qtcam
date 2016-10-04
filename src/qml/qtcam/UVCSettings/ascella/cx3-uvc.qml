@@ -711,7 +711,7 @@ Item {
                     id: colorModeBinned
                     text: "Binned"
                     activeFocusOnPress: true
-                    enabled: ((JS.videoCaptureResolution === "1920x1080" && JS.videocaptureFps === "30 FPS") || JS.videoCaptureResolution === "2048x1536") ? 1 : 0
+                   // enabled: ((JS.videoCaptureResolution === "1920x1080" && JS.videocaptureFps === "30 FPS") || JS.videoCaptureResolution === "2048x1536") ? 1 : 0
                     opacity: enabled ? 1 : 0.1
                     style: econRadioButtonStyle
                     onClicked: {
@@ -731,7 +731,7 @@ Item {
                     id: colorModeResized
                     text: "Resized"
                     activeFocusOnPress: true
-                    enabled: ((JS.videoCaptureResolution === "1920x1080" && JS.videocaptureFps === "30 FPS") || JS.videoCaptureResolution === "2048x1536") ? 1 : 0
+                   // enabled: ((JS.videoCaptureResolution === "1920x1080" && JS.videocaptureFps === "30 FPS") || JS.videoCaptureResolution === "2048x1536") ? 1 : 0
                     opacity: enabled ? 1 : 0.1
                     style: econRadioButtonStyle
                     onClicked: {
@@ -1179,6 +1179,7 @@ Item {
             messageDialog.text = _text.toString()
             messageDialog.open()
         }
+        /* set default values in UI */
         onLedOffEnable:{
             radioOff.checked = true
             settingWhenUpdateUI = true
@@ -1220,37 +1221,37 @@ Item {
         }
 
         onSetBinnResizeEnableDisable:{
-                if(mode == "0x01"){
-                    colorModeBinned.enabled = true
-                    colorModeResized.enabled = true
-                }else if(mode == "0x00"){
-                    colorModeBinned.enabled = false
-                    colorModeResized.enabled = false
-                }
+            if(mode == 1){
+                colorModeBinned.enabled = true
+                colorModeResized.enabled = true
+            }else if(mode == 0){
+                colorModeBinned.enabled = false
+                colorModeResized.enabled = false
+            }
         }
         onSetBinnResizeSelect:{
             settingWhenUpdateUI = true
-            if(binResizeSelect == "0x01"){
+            if(binResizeSelect == 1){
                 colorModeBinned.checked = true
-            }else{
+            }else if(binResizeSelect == 2){
                 colorModeResized.checked = true
             }
         }
-
+        /* set current values in UI */
         onSetCurrbinnResizeEnableDisable:{
-                if(mode == "0x01"){
-                    colorModeBinned.enabled = true
-                    colorModeResized.enabled = true
-                }else if(mode == "0x00"){
-                    colorModeBinned.enabled = false
-                    colorModeResized.enabled = false
-                }
+            if(mode == 1){
+                colorModeBinned.enabled = true
+                colorModeResized.enabled = true
+            }else if(mode == 0){
+                colorModeBinned.enabled = false
+                colorModeResized.enabled = false
+            }
         }
         onSetCurbinnResizeSelect:{
             settingWhenUpdateUI = false
-            if(binResizeSelect == "0x01"){
+            if(binResizeSelect == 1){
                 colorModeBinned.checked = true
-            }else{
+            }else if(binResizeSelect == 2){
                 colorModeResized.checked = true
             }
         }

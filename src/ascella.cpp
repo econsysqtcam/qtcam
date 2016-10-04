@@ -702,7 +702,6 @@ void ASCELLA::getCurrentValues(u_int8_t *pCurrentValue){
     for(int j = 0;j < 18 ; j++){
         pCurrentValue[i++] = g_in_packet_buf[11 + j];
     }
-
 }
 
 
