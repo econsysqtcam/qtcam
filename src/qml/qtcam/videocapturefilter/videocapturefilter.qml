@@ -896,6 +896,7 @@ Rectangle {
             onCurrentIndexChanged: {
                 if(currentIndex.toString() != "-1" && currentIndex.toString() != "0") {
                     if(oldIndex!=currentIndex) {
+			usb3speed = false
                         oldIndex = currentIndex
                         m_Snap = true
                         outputSizeBox = false
