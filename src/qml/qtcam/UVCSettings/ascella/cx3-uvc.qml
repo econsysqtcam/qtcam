@@ -204,10 +204,11 @@ Item {
                       text: "Continuous"
                       activeFocusOnPress: true
                       style: econRadioButtonStyle
-                      enabled: JS.autoFocusChecked ? 1 : 0
+                      enabled: JS.autoFocusChecked ? true : false
                       opacity: enabled ? 1 : 0.1
                       onClicked: {
                         ascella.setAutoFocusMode(Ascella.Continuous);
+                        trigger.opacity = 0.1
                       }
                       onCheckedChanged: {
                           if(JS.autoFocusChecked && checked && settingWhenUpdateUI){
@@ -231,6 +232,7 @@ Item {
                     opacity: enabled ? 1 : 0.1
                     onClicked: {
                         ascella.setAutoFocusMode(Ascella.OneShot);
+                        trigger.opacity = 1
                     }
                     Keys.onReturnPressed: {
 
@@ -316,7 +318,7 @@ Item {
                   smooth: true
                   Layout.maximumWidth : 150
                   wrapMode: Text.WordWrap
-                  opacity: radiocustom.checked ? 1 : 0.1
+                  opacity: (radiocustom.enabled && radiocustom.checked) ? 1 : 0.1
                 }
                 TextField {
                     id: afhori_start_box_value
@@ -325,7 +327,7 @@ Item {
                     smooth: true
                     horizontalAlignment: TextInput.AlignHCenter
                     style: econTextFieldStyle
-                    enabled: radiocustom.checked ? 1 : 0
+                    enabled: (radiocustom.enabled && radiocustom.checked) ? 1 : 0
                     opacity: enabled ? 1 : 0.1
                     validator: IntValidator {bottom: 1; top: vidWidth;}
                     implicitWidth: 70
@@ -348,7 +350,7 @@ Item {
                     smooth: true
                     Layout.maximumWidth : 150
                     wrapMode: Text.WordWrap
-                    opacity: radiocustom.checked ? 1 : 0.1
+                    opacity: (radiocustom.enabled && radiocustom.checked) ? 1 : 0.1
                 }
                 TextField {
                     id: afhori_end_box_value
@@ -357,7 +359,7 @@ Item {
                     smooth: true
                     horizontalAlignment: TextInput.AlignHCenter
                     style: econTextFieldStyle
-                    enabled: radiocustom.checked ? 1 : 0
+                    enabled: (radiocustom.enabled && radiocustom.checked) ? 1 : 0
                     opacity: enabled ? 1 : 0.1
                     validator: IntValidator {bottom: 1; top: vidWidth;}
                     implicitWidth: 70
@@ -377,7 +379,7 @@ Item {
                     font.family: "Ubuntu"
                     color: "#ffffff"
                     smooth: true
-                    opacity: radiocustom.checked ? 1 : 0.1
+                    opacity: (radiocustom.enabled && radiocustom.checked) ? 1 : 0.1
                     Layout.maximumWidth : 150
                     wrapMode: Text.WordWrap
                 }
@@ -388,7 +390,7 @@ Item {
                     smooth: true
                     horizontalAlignment: TextInput.AlignHCenter
                     style: econTextFieldStyle
-                    enabled: radiocustom.checked ? 1 : 0
+                    enabled: (radiocustom.enabled && radiocustom.checked) ? 1 : 0
                     opacity: enabled ? 1 : 0.1
                     implicitWidth: 70
                     text:"1"
@@ -408,7 +410,7 @@ Item {
                     font.family: "Ubuntu"
                     color: "#ffffff"
                     smooth: true
-                    opacity: radiocustom.checked ? 1 : 0.1
+                    opacity: (radiocustom.enabled && radiocustom.checked) ? 1 : 0.1
                     Layout.maximumWidth : 150
                     wrapMode: Text.WordWrap
                 }
@@ -419,7 +421,7 @@ Item {
                     smooth: true
                     horizontalAlignment: TextInput.AlignHCenter
                     style: econTextFieldStyle
-                    enabled: radiocustom.checked ? 1 : 0
+                    enabled: (radiocustom.enabled && radiocustom.checked) ? 1 : 0
                     opacity: enabled ? 1 : 0.1
                     implicitWidth: 70
                     text:vidHeight
@@ -443,9 +445,9 @@ Item {
                     text: "Set"
                     tooltip: "Click to set focus position entered in text box"
                     style: econcx3ButtonStyle
-                    enabled: radiocustom.checked ? 1 : 0
+                    enabled: (radiocustom.enabled && radiocustom.checked) ? 1 : 0
                     opacity: enabled ? 1 : 0.1
-                    action: radiocustom.checked ? afAreaSet : null
+                    action: (radiocustom.enabled && radiocustom.checked) ? afAreaSet : null
                     onClicked: {
                         if(afhori_start_box_value.length == 0 || afhori_end_box_value.length == 0 || afverti_start_box_value.length == 0 || afverti_end_box_value.length == 0){
                             messageDialog.title = qsTr("Error")
@@ -710,8 +712,7 @@ Item {
                     exclusiveGroup: colorModegroup2
                     id: colorModeBinned
                     text: "Binned"
-                    activeFocusOnPress: true
-                   // enabled: ((JS.videoCaptureResolution === "1920x1080" && JS.videocaptureFps === "30 FPS") || JS.videoCaptureResolution === "2048x1536") ? 1 : 0
+                    activeFocusOnPress: true                   
                     opacity: enabled ? 1 : 0.1
                     style: econRadioButtonStyle
                     onClicked: {
@@ -730,8 +731,7 @@ Item {
                     exclusiveGroup: colorModegroup2
                     id: colorModeResized
                     text: "Resized"
-                    activeFocusOnPress: true
-                   // enabled: ((JS.videoCaptureResolution === "1920x1080" && JS.videocaptureFps === "30 FPS") || JS.videoCaptureResolution === "2048x1536") ? 1 : 0
+                    activeFocusOnPress: true                   
                     opacity: enabled ? 1 : 0.1
                     style: econRadioButtonStyle
                     onClicked: {
@@ -779,7 +779,7 @@ Item {
                         if(settingWhenUpdateUI){
                             ascella.setExposureCompensation(exposureCompTextValue.text)
                         }
-                    }
+                    }                    
                 }
                 TextField {
                     id: exposureCompTextValue
@@ -878,8 +878,8 @@ Item {
                     style: econTextFieldStyle
                     validator: IntValidator {bottom: reduceNoiseFixSlider.minimumValue; top: reduceNoiseFixSlider.maximumValue}
                     onTextChanged: {
-                        if(text != ""){
-                            reduceNoiseFixSlider.value = reduceNoiseFixvalue.text
+                        if(text != ""){                            
+                            reduceNoiseFixSlider.value = reduceNoiseFixvalue.text                            
                         }
                     }
                 }
@@ -968,7 +968,7 @@ Item {
                     validator: IntValidator {bottom: applyMaxFrameRateSlider.minimumValue; top: applyMaxFrameRateSlider.maximumValue}
                     onTextChanged: {
                        if(text != ""){
-                           applyMaxFrameRateSlider.value = applyMaxFrameRatevalue.text
+                           applyMaxFrameRateSlider.value = applyMaxFrameRatevalue.text                           
                        }
                     }
                 }
@@ -1220,7 +1220,7 @@ Item {
             colorModeBwAuto.checked = true
         }
 
-        onSetBinnResizeEnableDisable:{
+        onSetBinnResizeEnableDisable:{                
             if(mode == 1){
                 colorModeBinned.enabled = true
                 colorModeResized.enabled = true
@@ -1263,7 +1263,7 @@ Item {
                 radioAuto.checked = true
             }else if(ledCurMode == Ascella.LedManual){
                 radioManual.checked = true
-            }
+            }            
             led_value.text = ledCurBrightness
         }
         onSetCurrentAfMode:{
@@ -1285,7 +1285,7 @@ Item {
                 colorModeBw.checked = true
             }
         }
-        onSetCurrentBwMode:{
+        onSetCurrentBwMode:{            
             settingWhenUpdateUI = false
             if(curBWMode == "0"){
                 colorModeBwAuto.checked = true
@@ -1358,6 +1358,49 @@ Item {
         }
     }
 
+    function enableDisableAutoExposureControls(autoExposureSelect){
+        if(autoExposureSelect){
+            exposureCompSlider.enabled = true
+            exposureCompTextValue.enabled = true
+            exposureCompSlider.opacity = 1
+            exposureCompTextValue.opacity = 1
+        }else{
+            exposureCompSlider.enabled = false
+            exposureCompTextValue.enabled = false
+            exposureCompSlider.opacity = 0.1
+            exposureCompTextValue.opacity = 0.1
+        }
+
+    }
+
+    function enableDisableAutoFocusUIControls(autoFocusSelect){
+        if(autoFocusSelect){
+            radioContin.enabled = true
+            radioOneshot.enabled = true
+            if(radioOneshot.enabled && radioOneshot.checked){
+                trigger.enabled = true
+                trigger.opacity = 1
+            }
+            radiocenter.enabled = true
+            radiocustom.enabled = true
+            radioContin.opacity = 1
+            radioOneshot.opacity = 1
+            radiocenter.opacity = 1
+            radiocustom.opacity = 1
+        }else{
+            radioContin.enabled = false
+            radioOneshot.enabled = false
+            trigger.enabled = false
+            trigger.opacity = 0.1
+            radiocenter.enabled = false
+            radiocustom.enabled = false
+            radioContin.opacity = 0.1
+            radioOneshot.opacity = 0.1
+            radiocenter.opacity = 0.1
+            radiocustom.opacity = 0.1
+        }
+    }
+
     function displayFirmwareVersion() {
         ascella.getFirmwareVersion()
     }
@@ -1379,7 +1422,14 @@ Item {
         ascella.setCurrentValues(JS.videoCaptureResolution)
         settingWhenUpdateUI = true
     }
-    Component.onDestruction:{
-        uvccamera.exitExtensionUnitAscella()
+
+    Connections{
+         target: root
+         onAutoFocusSelected:{
+             enableDisableAutoFocusUIControls(autoFocusSelect)
+         }
+         onAutoExposureSelected:{
+             enableDisableAutoExposureControls(autoExposureSelect)
+         }
     }
 }

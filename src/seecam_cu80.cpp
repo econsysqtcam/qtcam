@@ -20,28 +20,16 @@
 
 #include "seecam_cu80.h"
 
-void See3CAM_80::getFlashLevel(QString cameraName) {
-    if(cameraName.isEmpty())
-    {
-         emit updateFlashCheckBox("0");
-         return void();
-    }
-
+void See3CAM_80::getFlashLevel() {
     quint8 flash_level = 0;
-    see3cam_ctrl.getFlashState(&flash_level,cameraName);
+    see3cam_ctrl.getFlashState(&flash_level);
     QString tmpStr = QString::number(flash_level);
     emit updateFlashCheckBox(tmpStr);
 }
 
-void See3CAM_80::getTorchLevel(QString cameraName) {
-    if(cameraName.isEmpty())
-    {
-         emit updateTorchCheckBox("0");
-         return void();
-    }
-
+void See3CAM_80::getTorchLevel() {
     quint8 torch_level = 0;
-    see3cam_ctrl.getTorchState(&torch_level,cameraName);
+    see3cam_ctrl.getTorchState(&torch_level);
     QString tmpStr = QString::number(torch_level);
     emit updateTorchCheckBox(tmpStr);
 }

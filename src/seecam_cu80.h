@@ -54,13 +54,13 @@ public slots:
      * @brief Torch Status(on/off)
      *  - Get the torch on/off value from the see3cam_control class
      */
-    void getTorchLevel(QString cameraName);
+    void getTorchLevel();
 
     /**
      * @brief Flash Status(on/off)
      *  - Get the flash on/off value from the see3cam_control class
      */
-    void getFlashLevel(QString cameraName);
+    void getFlashLevel();
 
     /**
      * @brief Get the position of the lens of the seecam80 camera

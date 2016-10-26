@@ -33,15 +33,9 @@ bool  See3CAM_CU51::enableTriggerMode()
     return ret;
 }
 
-void See3CAM_CU51::getTorchLevel(QString cameraName) {
-    if(cameraName.isEmpty())
-    {
-         emit updateFlashCheckBox("0");
-         return void();
-    }
-
+void See3CAM_CU51::getTorchLevel() {
     quint8 torch_level = 0;
-    see3cam_ctrl.getTorchState(&torch_level,cameraName);
+    see3cam_ctrl.getTorchState(&torch_level);
     QString tmpStr = QString::number(torch_level);
     emit updateFlashCheckBox(tmpStr);
 }

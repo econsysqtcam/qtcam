@@ -183,10 +183,6 @@ Item {
         }
     }
     Component.onCompleted: {
-        uvccamera.initExtensionUnit("e-con's 1MP Monochrome Camera")
         mastermmode_selected10CUG.forceActiveFocus()
-    }
-    Component.onDestruction: {
-        uvccamera.exitExtensionUnit()
     }
 }

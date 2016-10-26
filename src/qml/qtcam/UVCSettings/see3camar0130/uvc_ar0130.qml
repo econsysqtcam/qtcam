@@ -274,7 +274,7 @@ Item {
             activeFocusOnPress: true
             style: econRadioButtonStyle
             onClicked:{
-               see3camctrl.setFlashControlState(1,"See3CAM_12CUNIR")
+               see3camctrl.setFlashControlState(1)
             }            
         }
         RadioButton {
@@ -285,7 +285,7 @@ Item {
             activeFocusOnPress: true
             style: econRadioButtonStyle
             onClicked: {
-                see3camctrl.setFlashControlState(0,"See3CAM_12CUNIR")
+                see3camctrl.setFlashControlState(0)
             }           
         }
     }
@@ -370,6 +370,7 @@ Item {
             messageDialog.text = message.toString()
             messageDialog.open()
         }
+
     }
     function enableMasterMode() {
        masterModeCapture();
@@ -445,8 +446,7 @@ Item {
     }
 
     Component.onCompleted:{
-        uvccamera.initExtensionUnit("See3CAM_12CUNIR")
-        seecamar0130.getFlashLevel("See3CAM_12CUNIR")
+        seecamar0130.getFlashLevel()
         outputPinFlag = true
         see3camGpio.getGpioLevel(See3CamGpio.OUT3)
         mastermmode_selected.forceActiveFocus()
@@ -457,9 +457,4 @@ Item {
             vga30fps_selected.opacity = 0.2
         }
     }
-
-    Component.onDestruction: {
-        uvccamera.exitExtensionUnit()
-    }
-
 }

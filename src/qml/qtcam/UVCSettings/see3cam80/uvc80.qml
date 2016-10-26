@@ -503,14 +503,14 @@ Item {
             style: econCheckBoxStyle
             onClicked:
             {
-                see3camctrl.setFlashControlState(checked,"e-con's 8MP Camera")
+                see3camctrl.setFlashControlState(checked)
             }
             Keys.onReturnPressed: {
                 if(checked)
                     checked = false
                 else
                     checked = true
-                see3camctrl.setFlashControlState(checked,"e-con's 8MP Camera")
+                see3camctrl.setFlashControlState(checked)
             }
         }
         CheckBox {
@@ -520,14 +520,14 @@ Item {
             style: econCheckBoxStyle
             onClicked:
             {
-                see3camctrl.setTorchControlState(checked,"e-con's 8MP Camera")
+                see3camctrl.setTorchControlState(checked)
             }
             Keys.onReturnPressed: {
                 if(checked)
                     checked = false
                 else
                     checked = true
-                see3camctrl.setTorchControlState(checked,"e-con's 8MP Camera")
+                see3camctrl.setTorchControlState(checked)
             }
         }
     }
@@ -726,17 +726,12 @@ Item {
     }
 
     Component.onCompleted:{
-        uvccamera.initExtensionUnit("e-con's 8MP Camera")
         focusModeBox.forceActiveFocus()
-        seecam80.getFlashLevel("e-con's 8MP Camera")
-        seecam80.getTorchLevel("e-con's 8MP Camera")
+        seecam80.getFlashLevel()
+        seecam80.getTorchLevel()
         seecam80.getFocusMode()
         seecam80.getFocusPosition()
         outputPinFlag = true
         see3camGpio.getGpioLevel(See3CamGpio.OUT2)
-    }
-
-    Component.onDestruction: {
-        uvccamera.exitExtensionUnit()
     }
 }

@@ -38,6 +38,8 @@
 #include <libusb.h>
 #include <QMap>
 
+#include "common_enums.h"
+
 /* Report Numbers */
 #define APPLICATION_READY 	0x12
 #define READFIRMWAREVERSION	0x40
@@ -142,6 +144,40 @@
 #define GET_FAIL		0x00
 #define GET_SUCCESS		0x01
 
+/* SEE3CAM_130 */
+#define CAMERA_CONTROL_130               0x7B
+#define GET_SCENEMODE_130				0x01
+#define SET_SCENEMODE_130				0x02
+#define GET_SPECIALEFFECT_130			0x03
+#define SET_SPECIALEFFECT_130			0x04
+#define GET_DENOISE_130					0x05
+#define SET_DENOISE_130					0x06
+#define GET_AF_MODE_130					0x07
+#define SET_AF_MODE_130					0x08
+#define GET_AF_ROI_MODE_130				0x09
+#define SET_AF_ROI_MODE_130				0x0A
+#define GET_EXP_ROI_MODE_130			0x0B
+#define SET_EXP_ROI_MODE_130			0x0C
+#define GET_BURST_LENGTH_130			0x0D
+#define SET_BURST_LENGTH_130			0x0E
+#define GET_HDR_MODE_130				0x0F
+#define SET_HDR_MODE_130				0x10
+#define GET_Q_FACTOR_130				0x11
+#define SET_Q_FACTOR_130				0x12
+#define ENABLE_DISABLE_MODE_AF_RECTANGLE_130     0x13
+#define GET_AF_RECT_MODE                0x16
+#define ENABLE_AF_RECTANGLE_130     0x01
+#define DISABLE_AF_RECTANGLE_130     0x00
+#define SET_TO_DEFAULT                0x17
+#define MANUAL_ROI_AF_130             0x02
+#define MANUAL_ROI_EXP_130			  0x02
+#define SET_FLIP_MODE_130                 0x19
+#define GET_FLIP_MODE_130                 0x18
+#define FLIP_ENABLE                   0x01
+#define FLIP_DISABLE                  0x00
+#define SET_HORZ_FLIP_MODE_130             0x00
+#define SET_VERT_FLIP_MODE_130             0x01
+
 /* SEE3CAM_CU51 */
 
 #define GET_EXPOSURE_VALUE	0x01
@@ -220,7 +256,7 @@ public:
      */
     int findEconDevice(QString);
     void getDeviceNodeName(QString);
-    int closeAscellaDevice();
+    bool closeAscellaDevice();
 
     static libusb_device_handle* handle;  /* handle for USB device */
     int kernelDriverDetached;
@@ -229,6 +265,10 @@ public:
     static QMap<QString, QString> serialNumberMap;
     static int hid_fd;
     static QString hidNode;
+    /**
+     * @brief selectedDeviceEnum - This contains selected camera device Enum value
+     */
+    static CommonEnums::ECameraNames  selectedDeviceEnum;
 
 private:
     /**
@@ -249,8 +289,20 @@ private:
     bool readFirmwareVersion(quint8 *pMajorVersion, quint8 *pMinorVersion1, quint16 *pMinorVersion2, quint16 *pMinorVersion3);
 
     bool sendOSCode();
+    /**
+     * @brief initCameraEnumMap - initiate camera enum map with vidpid,enum pair values
+     */
+    void initCameraEnumMap();
 
-    QString openNode;
+    static QString openNode;
+    /**
+     * @brief pidVidMap - This map contains the deviceName and Vid,Pid value
+     */
+    QMap<QString, QString> pidVidMap;
+    /**
+     * @brief cameraEnumMap - This map contains Vid,pid value and corresponding enum value
+     */
+    QMap<QString, CommonEnums::ECameraNames> cameraEnumMap;
 
 protected:
 
@@ -271,6 +323,10 @@ signals:
     void stopPreview(QString);
     void titleTextChanged(QString _title,QString _text);
     void serialNumber(QString serialNumber);
+    /**
+     * @brief currentlySelectedCameraEnum - This signal is used to emit selected camera enum value to camera property.cpp
+     */
+    void currentlySelectedCameraEnum(CommonEnums::ECameraNames);
 
 public slots:
     /**
@@ -313,7 +369,12 @@ public slots:
      *  - This function will close the last opened HID device
      * @
      */
-    int exitExtensionUnitAscella();
+    bool exitExtensionUnitAscella();
+    /**
+     * @brief currentlySelectedDevice - This slot contains currently selected device name
+     * @param deviceName - Name of the camera device
+     */
+    void currentlySelectedDevice(QString deviceName);
 };
 
 class See3CAM_Control: public uvccamera {
@@ -334,13 +395,11 @@ public:
      * @brief Get the torch state
      *  - Reads the torch state from the device
      * @param torchState
-     * This value will hold the state level of the torch (either 0-torch not enabled or 1-torch enabled)
-     * @param cameraName
-     * cameraName - Camera physical name
+     * This value will hold the state level of the torch (either 0-torch not enabled or 1-torch enabled)     
      * @return
      * true - read successfully the torch state level, false- fails to read the torch state level
      */
-    bool getTorchState(quint8 *torchState, QString cameraName);
+    bool getTorchState(quint8 *torchState);
 
     /**
      * @brief   Set the Torch state of the Device.
@@ -350,18 +409,16 @@ public:
      * @return
      * false - Failure (Torch state is not set as per the torchState).
      */
-    bool setTorchState(flashTorchState torchState, QString cameraName);
+    bool setTorchState(flashTorchState torchState);
 
     /**
      * @brief Get the flash state
      * @param Level
-     * This value will hold the state level of the flash (either 0-flash not enabled or 1-flash is enabled)
-     * @param cameraName
-     * cameraName - Camera physical name
+     * This value will hold the state level of the flash (either 0-flash not enabled or 1-flash is enabled)     
      * @return
      * true - read successfully the flash state level, false- fails to read the flash state level
      */
-    bool getFlashState(quint8 *flashState, QString cameraName);
+    bool getFlashState(quint8 *flashState);
 
     /**
      * @brief   Set the Flash state of the Device.
@@ -371,7 +428,7 @@ public:
      * @return
      * false - Failure (Torch state is not set as per the flashState).
      */
-    bool setFlashState(flashTorchState flashState, QString cameraName);
+    bool setFlashState(flashTorchState flashState);
 
     flashTorchState flashCheckBoxState;
     flashTorchState torchCheckBoxState;
@@ -380,8 +437,8 @@ signals:
     void deviceStatus(QString title, QString message);
 public slots:
 
-    void setFlashControlState(const int flashState,QString cameraName);
-    void setTorchControlState(const int torchState, QString cameraName);
+    void setFlashControlState(const int flashState);
+    void setTorchControlState(const int torchState);
 };
 
 

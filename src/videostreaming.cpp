@@ -59,12 +59,18 @@ QStringListModel Videostreaming::fpsList;
 QStringListModel Videostreaming::encoderList;
 int Videostreaming::deviceNumber;
 QString Videostreaming::camDeviceName;
+//Added by Dhurka
+/**
+ * @brief Videostreaming::currentlySelectedCameraEnum - This contains currenly selected camera enum value
+ */
+CommonEnums::ECameraNames Videostreaming::currentlySelectedCameraEnum;
 
 Videostreaming::Videostreaming()
 {
     openSuccess = false;
     updateOnce = true;
     m_snapShot = false;
+    m_burstShot = false;
     makeSnapShot = false;
     triggerShot = false;
     correctionDisplay = 0;
@@ -80,7 +86,7 @@ Videostreaming::Videostreaming()
     sf.denom = 1;
     sf.num = 1;
     flags = TJFLAG_NOREALLOC;
-    yuvpad = 1;
+    yuvpad = 1;    
 }
 
 Videostreaming::~Videostreaming()
@@ -153,6 +159,7 @@ void Videostreaming::capFrame()
     int err = 0;
     __u32 x, y;
     bool again, v4l2convert = false;
+    uint imgSaveSuccessCount;
 
     memset(planes, 0, sizeof(planes));
     buf.length = VIDEO_MAX_PLANES;
@@ -212,8 +219,12 @@ void Videostreaming::capFrame()
      //   return;
     }
 #endif
-
-    if (camDeviceName == "e-con's CX3 RDK with M\nT9P031" || camDeviceName == "See3CAM_12CUNIR" || camDeviceName == "See3CAM_CU51")
+    //Modified by Dhurka - 14th Oct 2016
+    /*
+     * Added camera enum comparision
+     * Before its like camera name comparision
+     */
+    if (currentlySelectedCameraEnum == CommonEnums::ECON_CX3_RDX_T9P031 || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_12CUNIR || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU51)
     {
         tempSrcBuffer = (unsigned char *)malloc(width * height * 2);
         tempDestBuffer = (unsigned char *)malloc(width * height << 1);
@@ -232,7 +243,13 @@ void Videostreaming::capFrame()
                                  m_capImage->bits(), m_capDestFormat.fmt.pix.sizeimage);
         v4l2convert = true;
 
-    }else if (camDeviceName == "See3CAM_CU40")    {
+    }
+    //Modified by Dhurka - 14th Oct 2016
+    /*
+     * Added camera enum comparision
+     * Before its like camera name comparision
+     */
+    else if (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU40)    {
         tempCu40SrcBuffer = (unsigned short int *)malloc(width * height * 2); // 10 bit bayer - short int used
         tempCu40DestBuffer = (unsigned char *)malloc(width * height * 3);
         memcpy(tempCu40SrcBuffer, m_buffers[buf.index].start[0], (width*height*2));
@@ -248,7 +265,13 @@ void Videostreaming::capFrame()
 
         }
 
-    }else if(camDeviceName == "See3CAM_CU130" && m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG &&  m_frame > 8) {
+    }
+    //Modified by Dhurka - 14th Oct 2016
+    /*
+     * Added camera enum comparision
+     * Before its like camera name comparision
+     */
+    else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU130 && m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG &&  m_frame > 8) {
         if(buf.bytesused <= HEADERFRAME1) {
             emit logCriticalHandle("Ignoring empty buffer");
             return;
@@ -268,7 +291,14 @@ void Videostreaming::capFrame()
             qbuf(buf);
             return;
         }
-    }else if(camDeviceName == "HD Pro Webcam C920" && m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264)
+    }
+    //Modified by Dhurka - 14th Oct 2016
+    /*
+     * Added camera enum comparision and also comment teh first if condition.Because no econ camera having
+     * the format H624
+     * Before its like camera name comparision
+     */
+    else if(/*currentlySelectedCameraEnum == CommonEnums::HD_PRO_WEBCAM &&*/ m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264)
     {
         tempLogtechSrcBuffer = (unsigned char *)malloc(width * height << 1);
         tempLogtechDestBuffer = (unsigned char *)malloc(width * (height + 8) * 2);
@@ -298,9 +328,21 @@ void Videostreaming::capFrame()
         logCriticalHandle(v4lconvert_get_error_message(m_convertData));        
         qbuf(buf);
         return void();
-    }else if(camDeviceName == "See3CAM_CU130" && m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG){
+    }
+    //Modified by Dhurka - 14th Oct 2016
+    /*
+     * Added camera enum comparision
+     * Before its like camera name comparision
+     */
+    else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU130 && m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG){
         displaybuf = tempCu130DestBuffer;    
-    }else if(camDeviceName == "See3CAM_CU40"){
+    }
+    //Modified by Dhurka - 14th Oct 2016
+    /*
+     * Added camera enum comparision
+     * Before its like camera name comparision
+     */
+    else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU40){
         displaybuf = tempCu40DestBuffer;
     } 
 
@@ -322,94 +364,124 @@ void Videostreaming::capFrame()
     free(asil);
 
     delete qq;
-    int tmpRet;    
-    if(m_frame > 1 && m_snapShot) {
-        bool tmpValue;
-
-        if(formatType == "raw") {
-            QFile file(filename);
-            if(file.open(QIODevice::WriteOnly)) {     
-                tmpRet = file.write((const char*)m_buffers[buf.index].start[0], buf.bytesused);
-                if(tmpRet != -1) {
-                    tmpValue = true;
+    int tmpRet;        
+    // m_burstShot - if continous number of shots are needed , this flag will be set.
+    if((m_frame > 1 && m_snapShot) || (m_frame > 1 && m_burstShot)) {
+        if(m_burstNumber == m_burstLength){
+            m_burstNumber = 1;
+        }
+        // imgSaveSuccessCount - how many images taken and saved correctly
+        imgSaveSuccessCount = 0;
+        while(m_burstLength >= m_burstNumber){
+            // increasing burst number
+            m_burstNumber++;
+            // get file name to save
+            getFileName(getFilePath(),getImageFormatType());
+            bool tmpValue;
+            // saving raw format
+            if(formatType == "raw") {
+                QFile file(filename);
+                if(file.open(QIODevice::WriteOnly)) {
+                    tmpRet = file.write((const char*)m_buffers[buf.index].start[0], buf.bytesused);
+                    if(tmpRet != -1) {
+                        tmpValue = true;
+                        imgSaveSuccessCount++;
+                    } else {
+                        emit logCriticalHandle("Failure to save raw image");
+                        tmpValue = false;
+                    }
+                    file.close();
                 } else {
                     tmpValue = false;
                 }
-                file.close();
-            } else {
-                tmpValue = false;
-            }
-        }else if(formatType == "IR data(8bit BMP)"){            
-            irBuffer = (unsigned char *)malloc(width * height/4);
-            if(extractIRImage(tempCu40SrcBuffer, irBuffer)){
-                QImage qImage2(irBuffer, width/2, height/2, QImage::Format_Indexed8);
+            }else if(formatType == "IR data(8bit BMP)"){           // saving IR 8bit bmp
+                irBuffer = (unsigned char *)malloc(width * height/4);
+                if(extractIRImage(tempCu40SrcBuffer, irBuffer)){
+                    QImage qImage2(irBuffer, width/2, height/2, QImage::Format_Indexed8);
+                    bool tmpRet;
+                    QImageWriter writer(filename);
+
+                    /* For 8 bit bmp, We have to use Format_Indexed8 and set color table */
+                    QVector<QRgb>table;
+                    for(int i=0; i<256; i++)
+                        table.push_back(qRgb(i,i,i));
+                    qImage2.setColorTable(table);
+
+                    if(!writer.write(qImage2)) {
+                        emit logCriticalHandle("Error while savingak image:"+writer.errorString());
+                        tmpRet = false;
+                    }
+                    else {
+                        tmpRet = true;
+                        imgSaveSuccessCount++;
+                    }
+                    tmpValue = tmpRet;
+                }else{
+                    tmpValue = false;
+                }
+            }else { // other than raw and [IR data(8bit BMP)] format
+                QImage qImage3(displaybuf, width, height, QImage::Format_RGB888);
                 bool tmpRet;
                 QImageWriter writer(filename);
 
-                /* For 8 bit bmp, We have to use Format_Indexed8 and set color table */
-                QVector<QRgb>table;
-                for(int i=0; i<256; i++)
-                    table.push_back(qRgb(i,i,i));
-                qImage2.setColorTable(table);
-
-                if(!writer.write(qImage2)) {
+                if(!writer.write(qImage3)) {
                     emit logCriticalHandle("Error while saving image:"+writer.errorString());
                     tmpRet = false;
-                }
-                else {
+                } else {
                     tmpRet = true;
+                    imgSaveSuccessCount++;
                 }
                 tmpValue = tmpRet;
-            }else{                
-                tmpValue = false;
             }
-        }else {
-            QImage qImage3(displaybuf, width, height,QImage::Format_RGB888);
-            bool tmpRet;
-            QImageWriter writer(filename);
-
-            if(!writer.write(qImage3)) {
-                emit logCriticalHandle("Error while saving image:"+writer.errorString());
-                tmpRet = false;
+            if(triggerShot) {
+                captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
+                makeSnapShot = false;
+                m_snapShot = false;
+				m_burstShot = false;
+                formatSaveSuccess(tmpValue, m_burstShot);
             } else {
-                tmpRet = true;
-            }
-            tmpValue = tmpRet;
-        }        
-        if(triggerShot) {
-            captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
-            makeSnapShot = false;
-            m_snapShot = false;
-            formatSaveSuccess(tmpValue);
-        } else {
-           captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
-            makeSnapShot = false;
-            m_snapShot = false;
-            if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
-            {
-                freeBuffer(tempSrcBuffer);
-                freeBuffers(tempDestBuffer, copyDestBuffer);
-                freeBuffer((unsigned char *)tempCu40SrcBuffer);
-                freeBuffer(tempCu40DestBuffer);
-                freeBuffer(irBuffer);
-                freeBuffer(tempLogtechSrcBuffer);
-                freeBuffer(tempLogtechDestBuffer);
-                if(tempCu130DestBuffer){ /* To do: need to use freeBuffer call */
-                free(tempCu130DestBuffer);  tempCu130DestBuffer = NULL;
+               captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
+                makeSnapShot = false;
+                m_snapShot = false;
+                if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
+                {
+                    freeBuffer(tempSrcBuffer);
+                    freeBuffers(tempDestBuffer, copyDestBuffer);
+                    freeBuffer((unsigned char *)tempCu40SrcBuffer);
+                    freeBuffer(tempCu40DestBuffer);
+                    freeBuffer(irBuffer);
+                    freeBuffer(tempLogtechSrcBuffer);
+                    freeBuffer(tempLogtechDestBuffer);
+                    if(tempCu130DestBuffer){ /* To do: need to use freeBuffer call */
+                    free(tempCu130DestBuffer);  tempCu130DestBuffer = NULL;
+                    }
+                    if(tempCu130SrcBuffer){
+                       free(tempCu130SrcBuffer); tempCu130SrcBuffer = NULL;
+                    }
+                    // after taking shot(s), restore preview resoln and format.
+                    if(m_burstNumber > m_burstLength){
+                        stopCapture();
+                        vidCapFormatChanged(lastFormat);
+                        setResoultion(lastPreviewSize);
+                        startAgain();
+                        break;
+                    }
                 }
-                if(tempCu130SrcBuffer){
-                   free(tempCu130SrcBuffer); tempCu130SrcBuffer = NULL;
-                }                
-                stopCapture();
-                vidCapFormatChanged(lastFormat);
-                setResoultion(lastPreviewSize);
-                startAgain();
-                formatSaveSuccess(tmpValue);
+                else{
+                    emit logDebugHandle("still and preview resolution and format are same");
+                }
+            }
+        }
+        if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat))){
+            formatSaveSuccess(imgSaveSuccessCount, m_burstShot);
+            if(m_burstNumber > m_burstLength){
+                m_burstShot = false;
                 return void();
             }
-            else{
-                formatSaveSuccess(tmpValue);
-            }
+        }
+        else{
+            formatSaveSuccess(imgSaveSuccessCount, m_burstShot);
+             m_burstShot = false;
         }
     }
     getFrameRates();
@@ -768,7 +840,6 @@ int Videostreaming::findMax(QList<int> *list) {
     {
         index_of_min = x;
         for(int y=x; y<list->count(); y++)
-
         {
             if(array[index_of_min] > array[y])
             {
@@ -785,11 +856,11 @@ int Videostreaming::findMax(QList<int> *list) {
 
 
 void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
-
     captureTime.start();
     m_snapShot = true;
-    QDateTime dateTime = QDateTime::currentDateTime();
-    QDir tmpDir;
+    m_burstShot = false;
+    m_burstNumber = 1;
+    m_burstLength = 1; // for single shot
 
     /* cu40 - IR image in bmp format */
     if(imgFormatType == "IR data(8bit BMP)"){
@@ -799,40 +870,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
         formatType = imgFormatType;
     }
 
-    if(tmpDir.cd(filePath)) {
-        QStringList filters,list;
-        filters << "Qtcam-" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-*"+imgFormatType;
-        tmpDir.setNameFilters(filters);
-        list << tmpDir.entryList(filters,QDir::Files);
-        if(!list.isEmpty()) {
-            QList<int> tmpStr;
-            for(int i=0;i<list.count();i++) {
-                tmpStr.append(list.at(i).split(".").at(0).split("-").at(1).toInt());
-            }
-            int lastNumber = findMax(&tmpStr);
-            lastNumber++;
-            filename = filePath +"/Qtcam-" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-" +QString::number(lastNumber,10)+"."+ imgFormatType;
-        } else {
-            filename = filePath +"/Qtcam-" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-" +QString::number(1,10)+"."+ imgFormatType;
-        }
-    } else {
-        QStringList filters,list;
-        filters << "Qtcam-" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-*"+imgFormatType;
-        tmpDir.cd(tmpDir.currentPath());
-        tmpDir.setNameFilters(filters);
-        list << tmpDir.entryList(filters,QDir::Files);
-        if(!list.isEmpty()) {
-            QList<int> tmpStr;
-            for(int i=0;i<list.count();i++) {
-                tmpStr.append(list.at(i).split(".").at(0).split("-").at(1).toInt());
-            }
-            int lastNumber = findMax(&tmpStr);
-            lastNumber++;
-            filename = "Qtcam-" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-" +QString::number(lastNumber,10)+"."+ imgFormatType;
-        } else {
-            filename = "Qtcam-" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-" +QString::number(1,10)+"."+ imgFormatType;
-        }
-    }
+    getFileName(filePath, imgFormatType);
     makeSnapShot = true;
     triggerShot = false;
    // formatType = imgFormatType;
@@ -850,6 +888,7 @@ void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
 
     captureTime.restart();
     m_snapShot = true;
+    m_burstShot = false;
     QDateTime dateTime = QDateTime::currentDateTime();
     QDir tmpDir;
 
@@ -862,26 +901,116 @@ void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
     }
 
     if(tmpDir.cd(filePath)) {
-        filename = filePath +"/Qtcam-" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"."+ imgFormatType;
+        filename = filePath +"/Qtcam_" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"."+ imgFormatType;
     } else {
-        filename = "Qtcam" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"." + imgFormatType;
+        filename = "Qtcam_" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"." + imgFormatType;
     }
     makeSnapShot = true;
     triggerShot = true;
     m_frame = 3;
 }
 
-void Videostreaming::formatSaveSuccess(bool success) {
-    if(success) {
-        _title = "Captured";
-        _text = "Image saved in the location:" + filename;
-        emit logDebugHandle("Still image saved successfully in " + filename);
+void Videostreaming::getFileName(QString filePath,QString imgFormatType){
+    QDateTime dateTime = QDateTime::currentDateTime();
+    QDir tmpDir;
+    if(tmpDir.cd(filePath)) {
+        QStringList filters,list;
+        filters << "Qtcam_" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-*"+imgFormatType;
+        tmpDir.setNameFilters(filters);
+        list << tmpDir.entryList(filters,QDir::Files);        
+        if(!list.isEmpty()) {
+            QList<int> tmpStr;            
+            for(int i=0;i<list.count();i++) {
+                tmpStr.append(list.at(i).split(".").at(0).split("-").at(1).toInt());
+            }
+
+            int lastNumber = findMax(&tmpStr);
+            lastNumber++;            
+            filename = filePath +"/Qtcam_" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-" +QString::number(lastNumber,10)+"."+ imgFormatType;
+        } else {
+            filename = filePath +"/Qtcam_" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-" +QString::number(1,10)+"."+ imgFormatType;
+        }
+    } else {
+        QStringList filters,list;
+        filters << "Qtcam_" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-*"+imgFormatType;
+        tmpDir.cd(tmpDir.currentPath());
+        tmpDir.setNameFilters(filters);
+        list << tmpDir.entryList(filters,QDir::Files);
+        if(!list.isEmpty()) {
+            QList<int> tmpStr;            
+            for(int i=0;i<list.count();i++) {
+                tmpStr.append(list.at(i).split(".").at(0).split("-").at(1).toInt());
+            }
+            int lastNumber = findMax(&tmpStr);
+            lastNumber++;
+            filename = "Qtcam_" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-" +QString::number(lastNumber,10)+"."+ imgFormatType;
+        } else {
+            filename = "Qtcam_" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-" +QString::number(1,10)+"."+ imgFormatType;
+        }
+    }
+    setFilePath(filePath);
+    setImageFormatType(imgFormatType);
+}
+
+void Videostreaming::setFilePath(QString filePath){
+    m_filePath = filePath;
+}
+
+QString Videostreaming::getFilePath(){
+    return m_filePath;
+}
+
+void Videostreaming::setImageFormatType(QString imgFormatType){
+    m_imgFormatType = imgFormatType;
+}
+
+QString Videostreaming::getImageFormatType(){
+    return m_imgFormatType;
+}
+
+
+void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint burstLength){
+    captureTime.start();
+    m_burstShot = true;
+    m_snapShot = false;
+
+    getFileName(filePath, imgFormatType);    
+    m_burstLength = burstLength; // no of shots to take
+    m_burstNumber = 1;
+    formatType = imgFormatType;
+
+    makeSnapShot = true;
+    triggerShot = false;
+    if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
+    {       
+        stopCapture();
+        vidCapFormatChanged(stillOutFormat);
+        setResoultion(stillSize);
+        startAgain();
+    }
+}
+
+void Videostreaming::formatSaveSuccess(uint imgSaveSuccessCount, bool burstFlag) {
+    QString imgSaveSuccessCntStr = QString::number(imgSaveSuccessCount);
+    if(imgSaveSuccessCount) {       
+        if(burstFlag){
+            _title = "Captured";
+            _text = "Captured " +imgSaveSuccessCntStr+ " image(s) and saved successfully in the location:" + m_filePath;
+        }else{
+            _title = "Captured";
+            _text = "Image saved in the location:" + filename;
+        }
+        emit logDebugHandle("Captured image(s) is(are) saved successfully");
         emit titleTextChanged(_title,_text);
     } else {
         _title = "Failure";
         _text = "Image not saved in the selected location";
         emit logCriticalHandle("Still image not saved successfully");
         emit titleTextChanged(_title,_text);
+    }
+    // After capturing image need to enable RF rect in See3CAM_130 cam
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_130){
+        emit enableRfRectBackInPreview();
     }
 
 }
@@ -939,8 +1068,12 @@ void Videostreaming::displayFrame() {
     m_capDestFormat.fmt.pix.sizeimage = width*height*3;
 
     m_capImage = new QImage(width, height, QImage::Format_RGB888);
-
-    if(camDeviceName == "e-con's 1MP Bayer RGB \nCamera") {
+    //Modified by Dhurka - 14th Oct 2016
+    /*
+     * Added camera enum comparision
+     * Before its like camera name comparision
+     */
+    if(currentlySelectedCameraEnum == CommonEnums::ECON_1MP_BAYER_RGB) {
         m_capSrcFormat.fmt.pix.pixelformat = V4L2_PIX_FMT_SGRBG8;
     }
     h264Decode = new H264Decoder();
@@ -1317,7 +1450,7 @@ void Videostreaming::changeSettings(unsigned int id, QString value) {
     c.id = id;
     c.value = value.toInt();
     if (ioctl(VIDIOC_S_CTRL, &c)) {
-        emit logCriticalHandle("Error in setting the Value");
+        emit logCriticalHandle("Error in setting the Value");      
     }
 }
 
@@ -1431,4 +1564,12 @@ void Videostreaming::triggerModeEnabled() {
 
 void Videostreaming::masterModeEnabled() {
     updateStop = false;
+}
+//Added by Dhurka - 13th Oct 2016
+/**
+ * The below slot is used to get teh currently selected camera enum value for comparision
+ */
+void Videostreaming::selectedCameraEnum(CommonEnums::ECameraNames selectedDeviceEnum)
+{
+    currentlySelectedCameraEnum = selectedDeviceEnum;
 }

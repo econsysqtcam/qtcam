@@ -191,15 +191,9 @@ void See3CAM_AR130::setBinnedVGAMode()
     }
 }
 
-void See3CAM_AR130::getFlashLevel(QString cameraName) {
-    if(cameraName.isEmpty())
-    {
-         emit updateFlashCheckBox("0");
-         return void();
-    }
-
+void See3CAM_AR130::getFlashLevel() {
     quint8 flash_level = 0;
-    see3cam_ctrl.getFlashState(&flash_level,cameraName);
+    see3cam_ctrl.getFlashState(&flash_level);
     QString tmpStr = QString::number(flash_level);
     emit updateFlashCheckBox(tmpStr);
 }

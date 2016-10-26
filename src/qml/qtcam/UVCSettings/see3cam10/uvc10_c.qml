@@ -184,11 +184,7 @@ Item {
     }
 
     Component.onCompleted:{
-        uvccamera.initExtensionUnit("e-con's 1MP Bayer RGB Camera")
         mastermmode_selected10CUG.forceActiveFocus()
     }
 
-    Component.onDestruction: {
-        uvccamera.exitExtensionUnit()
-    }
 }

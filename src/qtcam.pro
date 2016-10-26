@@ -30,7 +30,8 @@ SOURCES += main.cpp \
     see3cam_cu130.cpp \
     h264decoder.cpp \
     ascella.cpp \
-    seecam_cu30.cpp
+    seecam_cu30.cpp \
+    see3cam_130.cpp
 
 # Installation path
 # target.path =
@@ -60,7 +61,9 @@ HEADERS += \
     h264decoder.h \
     ascella.h \
 	seecam_cu30.h \
-	common.h
+	common.h \
+    see3cam_130.h \
+	common_enums.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \

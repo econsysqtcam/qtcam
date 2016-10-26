@@ -40,6 +40,8 @@
 #include "v4l2-api.h"
 #include "videoencoder.h"
 #include "h264decoder.h"
+#include "common_enums.h"
+#include "see3cam_130.h"
 
 #if !LIBAVCODEC_VER_AT_LEAST(54,25)
     #define AV_CODEC_ID_NONE CODEC_ID_NONE
@@ -96,7 +98,7 @@ public:
     QString lastFormat;
 
     VideoEncoder  *videoEncoder;
-    H264Decoder *h264Decode;
+    H264Decoder *h264Decode;    
 
     /* Jpeg decode */
     int doyuv;
@@ -113,6 +115,9 @@ private:
     __u32 m_width, m_height;
     __u32 m_buftype;
     __u32 width, height, pixfmt;
+
+    QString m_filePath;
+    QString m_imgFormatType;
 
     fd_set fds;
     struct timeval                  tv;
@@ -135,6 +140,7 @@ private:
     bool m_snapShot;
     bool updateStop;
     bool makeSnapShot;
+    bool m_burstShot;
     bool triggerShot;
     bool m_has_interval;
     bool tempMsgBoxValue;
@@ -177,6 +183,13 @@ private:
     int correctionDisplay;
     static int deviceNumber;
     static QString camDeviceName;
+ /**
+     * @brief currentlySelectedCameraEnum - This contains currently selected camera enum value
+     */
+    static CommonEnums::ECameraNames currentlySelectedCameraEnum;
+
+    uint m_burstLength;
+    uint m_burstNumber;    
 
     QString getSettings(unsigned int);
     void getFrameRates();
@@ -186,6 +199,13 @@ private:
 
     int findMax(QList<int> *llist);
     void freeBuffers(unsigned char *destBuffer,unsigned char *copyBuffer);
+
+    void getFileName(QString filePath,QString imgFormatType);
+    void setFilePath(QString filePath);
+    QString getFilePath();
+    void setImageFormatType(QString imgFormatType);
+    QString getImageFormatType();
+
 
 public slots:
     /**
@@ -204,6 +224,18 @@ public slots:
      * 4. PNG
      */
     void makeShot(QString filePath,QString imgFormatType);
+
+    /**
+     * @brief Make burst shot preview
+     * @param filePath - Captured still will be saved in this location
+     * @param imgFormatType - Image formats is of four typede
+     * @param burstLength - Number of images to take in a single click
+     * 1. JPG
+     * 2. BMP
+     * 3. RAW
+     * 4. PNG
+     */
+    void makeBurstShot(QString filePath,QString imgFormatType, uint burstLength);
 
     /**
      * @brief Still Capture the image preview [In Trigger Mode]
@@ -298,7 +330,7 @@ public slots:
     void vidCapFormatChanged(QString idx);
     void setStillVideoSize(QString stillValue,QString stillFormat);
     void lastPreviewResolution(QString resolution,QString format);
-    void formatSaveSuccess(bool success);
+    void formatSaveSuccess(uint imgSaveSuccessCount, bool burstFlag);
     void updateFrameInterval(QString pixelFormat, QString frameSize);
 
     /**
@@ -345,6 +377,12 @@ public slots:
     int getMenuIndex(unsigned int,int);
 
     void displayEncoderList();
+ /**
+     * @brief selectedCameraEnum - This slot contains selected camera enum value
+     * @param selectedDeviceEnum - Camera enum value
+     */
+    void selectedCameraEnum(CommonEnums::ECameraNames selectedDeviceEnum);
+
 
 signals:
     void logDebugHandle(QString _text);
@@ -363,6 +401,7 @@ signals:
     void addControls();
     void rcdStop(QString recordFail);
     void videoRecord(QString fileName);
+    void enableRfRectBackInPreview();
 };
 
 #endif // VIDEOSTREAMING_H

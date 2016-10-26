@@ -3,7 +3,7 @@
     import QtQuick.Controls.Styles 1.0
     import QtQuick.Dialogs 1.1
     import econ.camera.uvcsettings 1.0
-    import econ.camera.see3cam130 1.0
+    import econ.camera.see3camcu130 1.0
 
     Item {
     width:268
@@ -148,7 +148,7 @@
     activeFocusOnPress: true
     //checked: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_NORMAL)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_NORMAL)
     }
     }
     RadioButton {
@@ -158,7 +158,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_PORTRAIT)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_PORTRAIT)
     }
     }
     RadioButton {
@@ -168,7 +168,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_LANDSCAPE)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_LANDSCAPE)
     }
     }
     RadioButton {
@@ -178,7 +178,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_SPORT)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_SPORT)
     }
     }
     RadioButton {
@@ -188,7 +188,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_CLOSE_UP)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_CLOSE_UP)
     }
     }
     RadioButton {
@@ -198,7 +198,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_NIGHT)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_NIGHT)
     }
     }
     RadioButton {
@@ -208,7 +208,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_TWILIGHT)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_TWILIGHT)
     }
     }
     RadioButton {
@@ -218,7 +218,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_BACKLIGHT)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_BACKLIGHT)
     }
     }
     RadioButton {
@@ -228,7 +228,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_HIGH_SENSITIVE)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_HIGH_SENSITIVE)
     }
     }
     RadioButton {
@@ -238,7 +238,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_NIGHT_PORTRAIT)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_NIGHT_PORTRAIT)
     }
     }
     RadioButton {
@@ -248,7 +248,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_BEACH)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_BEACH)
     }
     }
     RadioButton {
@@ -258,7 +258,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_BEACH)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_BEACH)
     }
     }
     RadioButton {
@@ -268,7 +268,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_PARTY)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_PARTY)
     }
     }
     RadioButton {
@@ -278,7 +278,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_FIREWORKS)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_FIREWORKS)
     }
     }
     RadioButton {
@@ -288,7 +288,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_SUNSET)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_SUNSET)
     }
     }
     RadioButton {
@@ -298,7 +298,7 @@
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setSceneMode(See3Cam130.SCENE_AUTO_DETECT)
+        seecamcu130.setSceneMode(See3CamCu130.SCENE_AUTO_DETECT)
     }
     }
     }
@@ -329,7 +329,7 @@
 
     //checked: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_NORMAL)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_NORMAL)
     }
     }
     RadioButton {
@@ -339,7 +339,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_ALIEN)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_ALIEN)
     }
     }
     RadioButton {
@@ -349,7 +349,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_ANTIQUE)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_ANTIQUE)
     }
     }
     RadioButton {
@@ -359,7 +359,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_BLACK_WHITE)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_BLACK_WHITE)
     }
     }
 
@@ -370,7 +370,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_EMBOSS)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_EMBOSS)
     }
     }
     RadioButton {
@@ -380,7 +380,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_EMBOSS_COLORED)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_EMBOSS_COLORED)
     }
     }
     RadioButton {
@@ -390,7 +390,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_GRAY)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_GRAY)
     }
     }
 
@@ -401,7 +401,7 @@
     exclusiveGroup: effectInputGroup    
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_NEGATIVE)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_NEGATIVE)
     }
     }
     RadioButton {
@@ -411,7 +411,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_BLUE)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_BLUE)
     }
     }
     RadioButton {
@@ -421,7 +421,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_GREEN)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_GREEN)
     }
     }
     RadioButton {
@@ -431,7 +431,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_RED)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_RED)
     }
     }
     RadioButton {
@@ -441,7 +441,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_POSTERIZE_1)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_POSTERIZE_1)
     }
     }
 
@@ -452,7 +452,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_POSTERIZE_2)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_POSTERIZE_2)
     }
     }
     RadioButton {
@@ -462,7 +462,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_SEPIA_1)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_SEPIA_1)
     }
     }
     RadioButton {
@@ -472,7 +472,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_SEPIA_2)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_SEPIA_2)
     }
     }
     RadioButton {
@@ -482,7 +482,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_SKETCH)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_SKETCH)
     }
     }
     RadioButton {
@@ -492,7 +492,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_SOLARIZE)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_SOLARIZE)
     }
     }
     RadioButton {
@@ -502,7 +502,7 @@
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
     onClicked: {
-        seecam130.setEffectMode(See3Cam130.EFFECT_FOGGY)
+        seecamcu130.setEffectMode(See3CamCu130.EFFECT_FOGGY)
     }
     }
 
@@ -571,8 +571,8 @@
     }
 
 
-See3Cam130 {
-    id: seecam130
+See3CamCu130 {
+    id: seecamcu130
 
     onSendSceneMode: {
         defaultSceneMode(sceneMode)
@@ -599,14 +599,9 @@ See3Cam130 {
             }
 
             Component.onCompleted:{
-                uvccamera.initExtensionUnit("See3CAM_CU130")
-                seecam130.getSceneMode()
-                seecam130.getEffectMode() 
+                seecamcu130.getSceneMode()
+                seecamcu130.getEffectMode()
             }
-            Component.onDestruction: {
-                uvccamera.exitExtensionUnit()
-            }
-
             function getSerialNumber() {
                 uvccamera.getSerialNumber()
                 messageDialog.open()

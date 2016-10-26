@@ -113,7 +113,7 @@ public slots:
      * @brief Flash Status(on/off)
      *  - Get the flash on/off value from the see3cam_control class
      */
-    void getFlashLevel(QString cameraName);
+    void getFlashLevel();
 };
 
 #endif // SEECAM_AR0130_H

@@ -97,11 +97,11 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
         if(pFormatCtx->oformat->flags & AVFMT_GLOBALHEADER)
             pCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
-
         pCodecCtx->codec_id = pOutputFormat->video_codec;
 
-        if(encodeType == CODEC_ID_RAWVIDEO)
+        if(encodeType == CODEC_ID_RAWVIDEO){
             pCodecCtx->pix_fmt =  PIX_FMT_YUYV422;//AV_PIX_FMT_YUV444P;//AV_PIX_FMT_YUV422P;//PIX_FMT_YUYV422;//PIX_FMT_YUV420P;
+        }
         else if(encodeType == CODEC_ID_MJPEG)
             pCodecCtx->pix_fmt =  PIX_FMT_YUVJ420P;
         else {
@@ -220,13 +220,14 @@ int VideoEncoder::encodeImage(const QImage &img)
     /* encode the image */
     int ret = avcodec_encode_video2(pCodecCtx, &pkt, ppicture, &got_packet);
     if (ret < 0) {
+        char errText[999]="";
+        av_strerror(ret, errText, 999);
         fprintf(stderr, "Error encoding a video frame\n");
-	    return -1;
-        //exit(1);
+	    return -1;       
     }
     if (got_packet) {
         if (pCodecCtx->coded_frame->pts != AV_NOPTS_VALUE)
-            pkt.pts= av_rescale_q(pCodecCtx->coded_frame->pts, pCodecCtx->time_base, pVideoStream->time_base);
+            pkt.pts = av_rescale_q(pCodecCtx->coded_frame->pts, pCodecCtx->time_base, pVideoStream->time_base);
         pkt.stream_index = pVideoStream->index;
         if((tempExtensionCheck) == "mkv") {
             i++;
@@ -256,8 +257,7 @@ int VideoEncoder::encodeImage(const QImage &img)
 
     if(out_size < 0){
         fprintf(stderr, "Error encoding a video frame\n");
-	    return -1;
-        //exit(1);	
+	    return -1;        
     }
     /* if zero size, it means the image was buffered */
     if (out_size > 0) {
@@ -357,8 +357,9 @@ bool VideoEncoder::initFrame()
 #else
     ppicture = avcodec_alloc_frame();
 #endif
-    if(ppicture==0)
+    if(ppicture==0){
         return false;
+    }
 
     int size = avpicture_get_size(pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
     picture_buf = new uint8_t[size];

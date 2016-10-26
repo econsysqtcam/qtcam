@@ -135,12 +135,4 @@ Item {
         uvccamera.getFirmWareVersion()
         messageDialog.open()
     }
-
-    Component.onCompleted:{
-        uvccamera.initExtensionUnit("See3CAM_CU40")
-    }
-
-    Component.onDestruction: {
-        uvccamera.exitExtensionUnit()
-    }
 }

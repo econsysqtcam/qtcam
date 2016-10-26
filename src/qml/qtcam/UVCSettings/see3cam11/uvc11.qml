@@ -575,8 +575,7 @@ Item {
         }
     }
 
-    Component.onCompleted:{
-        uvccamera.initExtensionUnit("See3CAM_11CUG")
+    Component.onCompleted:{        
         mastermmode_selected.forceActiveFocus()
         if(JS.triggerMode_11cug === 1) {
             vga60fps_selected.enabled = false
@@ -584,8 +583,5 @@ Item {
             vga30fps_selected.enabled = false
             vga30fps_selected.opacity = 0.2
         }
-    }
-    Component.onDestruction: {
-        uvccamera.exitExtensionUnit()
     }
 }

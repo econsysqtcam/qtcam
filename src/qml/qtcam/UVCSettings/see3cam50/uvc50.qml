@@ -337,14 +337,14 @@ Item {
                 }
             }
             onClicked: {
-                see3camctrl.setFlashControlState(checked,"See3Camar0130")
+                see3camctrl.setFlashControlState(checked)
             }
             Keys.onReturnPressed: {
                 if(checked)
                     checked = false
                 else
                     checked = true
-                see3camctrl.setFlashControlState(checked,"See3Camar0130")
+                see3camctrl.setFlashControlState(checked)
             }
         }
         CheckBox {
@@ -365,14 +365,14 @@ Item {
                 }
             }
             onClicked: {
-                see3camctrl.setTorchControlState(checked,"See3CAMCU50")
+                see3camctrl.setTorchControlState(checked)
             }
             Keys.onReturnPressed: {
                 if(checked)
                     checked = false
                 else
                     checked = true
-                see3camctrl.setTorchControlState(checked,"See3CAMCU50")
+                see3camctrl.setTorchControlState(checked)
             }
         }
     }
@@ -534,15 +534,11 @@ Item {
     }
 
     Component.onCompleted:{
-        uvccamera.initExtensionUnit("See3CAMCU50")
         gpioOutputBox.forceActiveFocus()
-        seecam50.getFlashLevel("See3CAMCU50")
-        seecam50.getTorchLevel("See3CAMCU50")
+        seecam50.getFlashLevel()
+        seecam50.getTorchLevel()
         outputPinFlag = true
         see3camGpio.getGpioLevel(See3CamGpio.OUT1)
     }
 
-    Component.onDestruction: {
-        uvccamera.exitExtensionUnit()
-    }
 }

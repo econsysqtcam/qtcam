@@ -116,12 +116,36 @@ public slots:
      * tmpStr - Only Critical message type data to be written in the file
      */
     void logCriticalWriter(QString);
+    /**
+     * @brief selectedDeviceEnum - This slot contains the selected camera enum
+     * @param selectedCameraEnum - Camera enum name
+     */
+    void selectedDeviceEnum(CommonEnums::ECameraNames selectedCameraEnum);
+    //Added by Dhurka - 17th Oct 2016
+    /**
+     * @brief openHIDDevice - This slot is used to open HID device
+     * @param deviceName - device name
+     */
+    void openHIDDevice(QString deviceName);
+
+    void closeLibUsbDeviceAscella();
 
 signals:
 
     void setFirstCamDevice(int);
     void setCamName(QString);
     void logHandle(QtMsgType,QString);
+    /**
+     * @brief currentlySelectedCameraEnum - This signal is used to emit selected camera enum value to
+     * videocapturefilter.qml file
+     * @param selectedDevice
+     */
+    void currentlySelectedCameraEnum(int selectedDevice);
+    //Added by Dhurka - 18th Oct 2016
+    /**
+     * @brief initExtensionUnitSuccess - This signal is used to emit after HID initialization is success
+     */
+    void initExtensionUnitSuccess();
 };
 
 

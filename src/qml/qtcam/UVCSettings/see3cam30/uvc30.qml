@@ -299,13 +299,9 @@ Item {
 
 
     Component.onCompleted:{        
-        uvccamera.initExtensionUnit("See3CAM_CU30")
         see3camcu30.getEffectMode()
         see3camcu30.getDenoiseValue()
 
-    }
-    Component.onDestruction: {
-        uvccamera.exitExtensionUnit()
     }
 
     function getFirmwareVersion() {

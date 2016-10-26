@@ -54,11 +54,11 @@ void ASCELLA::setLEDStatusMode(camLedMode ledMode, QString brightnessVal){
                                             ASCELLA_BUFLEN,
                                             ASCELLA_TIMEOUT);
         if(0 > bytesSent){
-            emit logHandle(QtCriticalMsg, "setLEDStatusMode: libusb_control_transfer set command failed");
+            emit logHandle(QtCriticalMsg, "setLEDStatusMode: libusb_control_transfer set command failed");            
             return void();
         }
     }
-    else{
+    else{        
         emit logHandle(QtCriticalMsg, "setLEDStatusMode: led mode is not in range");
         return void();
     }
@@ -101,7 +101,7 @@ void ASCELLA::setAutoFocusMode(camAfMode afMode){
     else{
         emit logHandle(QtCriticalMsg, "setAutoFocusMode: auto focus mode is not in range");
         return void();
-    }
+    }    
 
 }
 
@@ -133,7 +133,7 @@ void ASCELLA::setExposureCompensation(QString exposureVal){
     if(0 > bytesSent){
         emit logHandle(QtCriticalMsg, "setExposureCompensation: libusb_control_transfer set command failed");
         return void();
-    }
+    }    
 }
 
 
@@ -172,7 +172,7 @@ void ASCELLA::setSceneMode(camSceneMode sceneMode){
     else{
         emit logHandle(QtCriticalMsg, "setSceneMode: scene mode is not in range");
         return void();
-    }
+    }    
 
 }
 
@@ -180,7 +180,7 @@ void ASCELLA::setSceneMode(camSceneMode sceneMode){
 void ASCELLA::setNoiseReduceMode(camNoiseReduceMode NoiseReduceMode, QString NoiseReduceFixVal){
 
     int bytesSent;
-    u_int8_t noiseReduceFixIntVal;
+    u_int8_t noiseReduceFixIntVal;    
 
     if(uvccamera::handle == NULL){
         emit logHandle(QtCriticalMsg, "setNoiseReduceMode: Handle is Null");
@@ -216,7 +216,7 @@ void ASCELLA::setNoiseReduceMode(camNoiseReduceMode NoiseReduceMode, QString Noi
     else{
         emit logHandle(QtCriticalMsg, "setNoiseReduceMode: NoiseReduceMode is not in range");
         return void();
-    }
+    }    
 
 }
 
@@ -302,7 +302,7 @@ void ASCELLA::setColorMode(camColorMode colorMode, QString blackwhiteThreshold){
     else{
         emit logHandle(QtCriticalMsg, "setColorMode: colorMode is not in range");
         return void();
-    }
+    }    
 
 }
 
@@ -418,7 +418,7 @@ void ASCELLA::setBinnedResizedMode(camBinnResizeMode mode){
     else{
         emit logHandle(QtCriticalMsg, "setBinnedResizedMode: binned/Resized mode is not in range");
         return void();
-    }
+    }    
 
 }
 
@@ -616,7 +616,7 @@ void ASCELLA::getCurrentValues(u_int8_t *pCurrentValue){
                                                g_in_packet_buf,
                                                ASCELLA_BUFLEN,
                                                ASCELLA_TIMEOUT);
-    if(0 > bytesSent){
+    if(0 > bytesSent){       
        emit logHandle(QtCriticalMsg, "getCurrentValues: libusb_control_transfer get command failed");
        return void();
     }
@@ -638,7 +638,7 @@ void ASCELLA::getCurrentValues(u_int8_t *pCurrentValue){
     i++;
 
     /* pCurrentValue[2] - Exposure */
-    pCurrentValue[i] = g_in_packet_buf[3];
+    pCurrentValue[i] = g_in_packet_buf[3];    
     i++;
 
     /* pCurrentValue[3] - Auto focus mode */
@@ -668,7 +668,7 @@ void ASCELLA::getCurrentValues(u_int8_t *pCurrentValue){
     else if(g_in_packet_buf[6] >= 0x01)
         pCurrentValue[i] = g_in_packet_buf[6]; //black and white thresold
 
-    i++;
+    i++;    
 
     /* pCurrentValue[6] - noise reduction mode */
     pCurrentValue[i++] = g_in_packet_buf[7];

@@ -254,7 +254,7 @@ Item {
             activeFocusOnPress: true
             style: econRadioButtonStyle
             onClicked:{
-               see3camctrl.setTorchControlState(1,"See3CAM_CU51")                
+               see3camctrl.setTorchControlState(1)
             }
         }
         RadioButton {
@@ -265,7 +265,7 @@ Item {
             activeFocusOnPress: true
             style: econRadioButtonStyle
             onClicked: {
-                see3camctrl.setTorchControlState(0,"See3CAM_CU51")                
+                see3camctrl.setTorchControlState(0)
 
             }
         }
@@ -447,14 +447,9 @@ Item {
 
 
     Component.onCompleted:{
-        uvccamera.initExtensionUnit("See3CAM_CU51")
-        seecam51.getTorchLevel("See3CAM_CU51")
+        seecam51.getTorchLevel()
         mastermmode_selected.forceActiveFocus()
         seecam51.getExposure()
-    }
-
-    Component.onDestruction: {
-        uvccamera.exitExtensionUnit()
     }
 
 }

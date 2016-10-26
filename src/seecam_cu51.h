@@ -62,7 +62,7 @@ public slots:
      * @brief Torch Status(on/off)
      *  - Get the torch on/off value from the see3cam_control class
      */
-    void getTorchLevel(QString cameraName);
+    void getTorchLevel();
     void getExposure();
     void setExposure(const uint& exposureValue);
 
