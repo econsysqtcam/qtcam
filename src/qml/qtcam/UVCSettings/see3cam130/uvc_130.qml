@@ -854,6 +854,10 @@ Item {
                 afManual.checked = true
                 afWindowSizeCombo.currentIndex = winSize-1
             }else if(roiMode == See3Cam130.AFDisabled){
+                rectEnable.enabled = false
+                rectDisable.enabled = false
+                rectEnable.opacity = 0.1
+                rectDisable.opacity = 0.1
                 afCentered.enabled = false
                 afManual.enabled = false
                 afWindowSizeCombo.enabled = false
@@ -1172,6 +1176,10 @@ Item {
                 afWindowSizeCombo.enabled = false
             if(afManual.checked)
                 afWindowSizeCombo.enabled = true
+            rectEnable.enabled = true
+            rectEnable.opacity = 1
+            rectDisable.enabled = true
+            rectDisable.opacity = 1
             radioContin.opacity = 1
             radioOneshot.opacity = 1
             afCentered.opacity = 1
@@ -1187,6 +1195,10 @@ Item {
             radioOneshot.opacity = 0.1
             afCentered.opacity = 0.1
             afManual.opacity = 0.1
+            rectEnable.enabled = false
+            rectEnable.opacity = 0.1
+            rectDisable.enabled = false
+            rectDisable.opacity = 0.1
         }
         getAutoFocusControlValues.start()
     }

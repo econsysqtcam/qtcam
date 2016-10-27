@@ -3483,11 +3483,12 @@ Rectangle {
                 if(selectedDeviceEnumValue === CommonEnums.CX3_UVC_CAM){       // For ascella camera, mapped exposure values to slider values 0 to 11
                     if(exposureCombo.currentText == "Auto Mode"){
                         exposure_absolute.opacity = 0.1
+                        exposure_Slider.enabled = false
                     }else{
                         exposure_absolute.opacity = 1
+                        exposure_Slider.enabled = true
                     }
                     usb3speed = true
-                    exposure_Slider.enabled = false
                     exposure_Slider.minimumValue = 0
                     exposure_Slider.maximumValue = 11
                     expAscellaDefaultValue = ctrlDefaultValue
