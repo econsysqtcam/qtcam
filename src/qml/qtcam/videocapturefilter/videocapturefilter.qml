@@ -439,7 +439,7 @@ Rectangle {
                 messageDialog.visible = true               
             }
             onEnableRfRectBackInPreview:{
-                afterBurst() // signal to do anything need to do after capture continuous[burst] shots. In c
+                afterBurst() // signal to do anything need to do after capture continuous[burst] shots.
             }
 
             onNewControlAdded: {

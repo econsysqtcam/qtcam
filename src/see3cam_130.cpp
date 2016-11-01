@@ -1531,3 +1531,122 @@ bool See3CAM_130::getFlipMode()
     }
     return true;
 }
+
+
+/**
+ * @brief See3CAM_130::setStreamMode - Setting  Streaming mode
+ * @param streamMode - mode selected in UI
+ * @return true/false
+ */
+bool See3CAM_130::setStreamMode(camStreamMode streamMode){
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+    bool timeout = true;
+    int ret =0;
+    unsigned int start, end = 0;
+
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+
+    //Set the Report Number
+    g_out_packet_buf[1] = CAMERA_CONTROL_130; /* Report Number */
+    g_out_packet_buf[2] = SET_STREAM_MODE_130; /* Report Number */
+    g_out_packet_buf[3] = streamMode; /* Report Number */
+
+    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
+
+    if (ret < 0) {
+        perror("write");
+        return false;
+    }
+
+    /* Read the Status code from the device */
+    start = uvc.getTickCount();
+
+    while(timeout)
+    {
+        /* Get a report from the device */
+        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
+        if (ret < 0) {
+            //perror("read");
+        } else {
+            if (g_in_packet_buf[6]==SET_FAIL) {
+                return false;
+            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130 &&
+                g_in_packet_buf[1]==SET_STREAM_MODE_130 &&
+                g_in_packet_buf[2]==streamMode &&
+                g_in_packet_buf[6]==SET_SUCCESS) {
+                timeout = false;
+            }
+        }
+        end = uvc.getTickCount();
+        if(end - start > TIMEOUT)
+        {
+            timeout = false;
+            return false;
+        }
+    }
+    return true;
+}
+
+
+/**
+ * @brief See3CAM_130::getStreamMode - get Stream mode from camera
+ * return true - success /false - failure
+ */
+bool See3CAM_130::getStreamMode()
+{
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+    bool timeout = true;
+    int ret =0;
+    unsigned int start, end = 0;
+
+    uint streamMode;
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    //Set the Report Number
+    g_out_packet_buf[1] = CAMERA_CONTROL_130; /* Report Number */
+    g_out_packet_buf[2] = GET_STREAM_MODE_130; /* Report Number */
+
+    ret = write(uvccamera::hid_fd , g_out_packet_buf, BUFFER_LENGTH);
+
+    if (ret < 0) {
+        perror("write");
+        return false;
+    }
+
+    /* Read the Status code from the device */
+    start = uvc.getTickCount();
+
+    while(timeout)
+    {
+        /* Get a report from the device */
+        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
+        if (ret < 0) {
+            //perror("read");
+        } else {
+            if (g_in_packet_buf[6]==GET_FAIL) {
+                return false;
+            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130 &&
+                g_in_packet_buf[1]==GET_STREAM_MODE_130 &&
+                g_in_packet_buf[6]==GET_SUCCESS) {
+                    streamMode = g_in_packet_buf[2];
+                    emit sendStreamMode(streamMode);
+                    timeout = false;
+            }
+        }
+        end = uvc.getTickCount();
+        if(end - start > TIMEOUT)
+        {
+            timeout = false;
+            return false;
+        }
+    }
+    return true;
+}
+

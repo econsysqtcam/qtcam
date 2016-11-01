@@ -389,6 +389,54 @@ Item {
                     }
                 }
             }
+
+            Text {
+                id: streamModeText
+                text: "--- Stream Mode ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+
+            Row{
+                spacing:68
+                ExclusiveGroup { id: streamModeGroup }
+                RadioButton {
+                    exclusiveGroup: streamModeGroup
+                    id: streamMaster
+                    text: "Master"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked:{
+                        seecam130.setStreamMode(See3Cam130.STREAM_MASTER)
+                    }
+                    Keys.onReturnPressed: {
+                        seecam130.setStreamMode(See3Cam130.STREAM_MASTER)
+                    }
+                }
+                RadioButton {
+                    exclusiveGroup: streamModeGroup
+                    id: streamTrigger
+                    text: "Trigger"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked: {
+                        seecam130.setStreamMode(See3Cam130.STREAM_TRIGGER)
+                        messageDialog.title = "Trigger Mode"
+                        messageDialog.text = "Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document."
+                        messageDialog.open()
+                    }
+                    Keys.onReturnPressed: {
+                        seecam130.setStreamMode(See3Cam130.STREAM_TRIGGER)
+                        messageDialog.title = "Trigger Mode"
+                        messageDialog.text = "Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document."
+                        messageDialog.open()
+                    }
+                }
+            }
             Text {
                 id: denoiseText
                 text: "--- De-Noise ---"
@@ -447,7 +495,7 @@ Item {
             }
 
             Row{
-                  spacing:25
+                  spacing:55
                   ExclusiveGroup { id: roiAfgroup }
                   RadioButton {
                       exclusiveGroup: roiAfgroup
@@ -522,7 +570,7 @@ Item {
             }
 
             Row{
-                  spacing:25
+                  spacing:90
                   ExclusiveGroup { id: roiExpogroup }
                   RadioButton {
                       exclusiveGroup: roiExpogroup
@@ -893,6 +941,18 @@ Item {
         onSendFlipMode:{
            updateFlipMode(flipMode, flipEnableDisableMode)
         }
+        onSendStreamMode:{
+            if(streamMode == See3Cam130.STREAM_MASTER){
+                streamMaster.checked = true
+
+            }else if(streamMode == See3Cam130.STREAM_TRIGGER){
+                streamTrigger.checked = true
+                messageDialog.title = "Trigger Mode"
+                messageDialog.text = "Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document."
+                messageDialog.open()
+            }
+
+        }
     }
 
     Component {
@@ -1043,6 +1103,7 @@ Item {
         seecam130.getAutoExpROIModeAndWindowSize()
         seecam130.getAFRectMode()
         seecam130.getFlipMode()
+        seecam130.getStreamMode()
     }
 
     function updateFlipMode(flipMode, FlipEnableDisableMode){
@@ -1096,6 +1157,7 @@ Item {
         seecam130.getAutoExpROIModeAndWindowSize()
         seecam130.getAFRectMode()
         seecam130.getFlipMode()
+        seecam130.getStreamMode()
     }
 
     function defaultSceneMode(mode)

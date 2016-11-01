@@ -80,6 +80,12 @@ public:
     };
     Q_ENUMS(camFlipEnableDisableMode)
 
+    enum camStreamMode {
+        STREAM_MASTER = 0x00,
+        STREAM_TRIGGER = 0x01
+    };
+    Q_ENUMS(camStreamMode)
+
 signals:
      void sendSceneMode(uint sceneMode);
      void sendEffectMode(uint effectMode);
@@ -92,6 +98,7 @@ signals:
      void sendROIAutoExpMode(uint roiMode, uint winSize);
      void sendAfRectMode(uint afRectMode);
      void sendFlipMode(uint flipMode, uint flipEnableDisableMode);
+     void sendStreamMode(uint streamMode);
 
 public slots:
     bool getSceneMode();
@@ -118,5 +125,7 @@ public slots:
     bool setFlipHorzMode(bool horizModeSel);
     bool setFlipVertiMode(bool vertiModeSel);
     bool getFlipMode();
+    bool setStreamMode(camStreamMode streamMode);
+    bool getStreamMode();
 };
 #endif // SEE3CAM_130_H

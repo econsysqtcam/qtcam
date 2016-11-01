@@ -178,6 +178,9 @@
 #define SET_HORZ_FLIP_MODE_130             0x00
 #define SET_VERT_FLIP_MODE_130             0x01
 
+#define SET_STREAM_MODE_130               0x15
+#define GET_STREAM_MODE_130               0x14
+
 /* SEE3CAM_CU51 */
 
 #define GET_EXPOSURE_VALUE	0x01
