@@ -438,7 +438,7 @@ void Videostreaming::capFrame()
                 makeSnapShot = false;
                 m_snapShot = false;
 				m_burstShot = false;
-                formatSaveSuccess(tmpValue, m_burstShot);
+                formatSaveSuccess(imgSaveSuccessCount, m_burstShot);
             } else {
                captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
                 makeSnapShot = false;
@@ -889,6 +889,8 @@ void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
     captureTime.restart();
     m_snapShot = true;
     m_burstShot = false;
+    m_burstLength = 1;
+    m_burstNumber = 1;
     QDateTime dateTime = QDateTime::currentDateTime();
     QDir tmpDir;
 
