@@ -1,3 +1,7 @@
+Qtcam Application - 11.0.1
+--------------------------
+* Fixed issue of popup display "Image not saved in the location" when external trigger key pressed in econ's 1Mp monochrome, See3CAM_12CUNIR cameras
+
 Qtcam Application-11.0.0
 ------------------------
 * Added support for See3CAM_130 camera.
