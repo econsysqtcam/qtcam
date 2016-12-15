@@ -1021,6 +1021,7 @@ bool See3CAM_ModeControls::enableMasterMode()
     }
     return true;
 }
+
 //Modified by Dhurka - Braces alignment - 14th Oct 2016
 bool See3CAM_ModeControls::enableTriggerMode()
 {

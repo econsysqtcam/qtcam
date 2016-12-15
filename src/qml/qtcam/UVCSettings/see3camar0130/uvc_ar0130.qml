@@ -13,7 +13,7 @@ Item {
     height:720
     property bool outputPinFlag
     property bool masterMode
-    property bool triggerMode
+    property bool triggerMode   
 
     Action {
         id: serialNumber
@@ -101,6 +101,7 @@ Item {
         Keys.onReturnPressed: {
              enableMasterMode()
         }
+
     }
 
     Button {
@@ -115,6 +116,11 @@ Item {
         style: econAR0130ButtonStyle
         Keys.onReturnPressed: {
              enableTriggerMode()
+        }
+        onFocusChanged: {
+            // Disable saving image when focus is changed from trigger mode to master mode
+            // or changing to any other camera if it is m_saveImage flag set as true to avoid displaying unnecessary pop up dialog.
+           root.disableSaveImage()
         }
     }
 
@@ -370,9 +376,12 @@ Item {
             messageDialog.text = message.toString()
             messageDialog.open()
         }
+        onTriggershotSignal:{
+            root.takeTriggershot()
+        }
 
     }
-    function enableMasterMode() {
+    function enableMasterMode() {        
        masterModeCapture();
         masterMode = seecamar0130.enableMasterMode()
         if(masterMode) {
@@ -442,19 +451,28 @@ Item {
                 if(outputPinFlag)
                     radioHighar0130.checked = true
             }
-        }
+        }        
     }
 
     Component.onCompleted:{
         seecamar0130.getFlashLevel()
         outputPinFlag = true
         see3camGpio.getGpioLevel(See3CamGpio.OUT3)
-        mastermmode_selected.forceActiveFocus()
         if(JS.triggerMode_ar0130 === 1) {
             vga60fps_selected.enabled = false
             vga60fps_selected.opacity = 0.2
             vga30fps_selected.enabled = false
             vga30fps_selected.opacity = 0.2
         }
+    }
+    Connections{
+         target: root
+         // Init Trigger shot capture
+         onInitTriggershot:{
+            seecamar0130.initTriggerShotCapture()
+         }
+         onTriggermodeenabled_12CUNIR:{
+             enableTriggerMode()
+         }
     }
 }

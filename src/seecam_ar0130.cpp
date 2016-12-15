@@ -20,6 +20,22 @@
 
 #include "seecam_ar0130.h"
 
+See3CAM_AR130::See3CAM_AR130(QObject *parent):
+QThread(parent){
+    m_trigger = true;
+
+}
+
+See3CAM_AR130::~See3CAM_AR130(){
+    if(!this->wait(3000)) //Wait until it actually has terminated (max. 3 sec)
+    {
+        this->terminate(); //Thread didn't exit in time, probably deadlocked, terminate it!
+        this->wait(); //We have to wait again here!
+        delete(this);
+    }
+
+}
+
 bool See3CAM_AR130::enableMasterMode()
 {
     bool ret = modeControl.enableMasterMode();
@@ -196,4 +212,30 @@ void See3CAM_AR130::getFlashLevel() {
     see3cam_ctrl.getFlashState(&flash_level);
     QString tmpStr = QString::number(flash_level);
     emit updateFlashCheckBox(tmpStr);
+}
+
+
+void See3CAM_AR130::initTriggerShotCapture(){
+    init();
+}
+
+
+/**
+ * @brief WificamAPScan::run - override QThread run method - To avoid key queueing
+ */
+void See3CAM_AR130::run()
+{    
+    emit triggershotSignal();    
+}
+
+/**
+ * @brief WificamAPScan::init - Init thread
+ */
+void See3CAM_AR130::init()
+{
+    if(!isRunning())
+    {
+        this->start();
+    }
+
 }

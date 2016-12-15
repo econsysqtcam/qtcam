@@ -44,6 +44,7 @@ Rectangle {
     signal receiveBurstLength(int burstLen)
     signal autoFocusSelected(bool autoFocusSelect)
     signal autoExposureSelected(bool autoExposureSelect)
+    signal initTriggershot()
     property int burstLength;
     property bool ret;
     property bool vidFormatChanged: false
@@ -116,6 +117,7 @@ Rectangle {
     property bool outputSizeBox
     property bool olderValue:false
     property bool webcamKeyAccept: true
+    property bool webcamKeyTriggerShot: true    
     property bool stillColorSpace
     property bool usb3speed: false
 
@@ -436,7 +438,7 @@ Rectangle {
                 keyEventFiltering = false
                 messageDialog.title = _title.toString()
                 messageDialog.text = _text.toString()
-                messageDialog.visible = true               
+                messageDialog.visible = true
             }
             onEnableRfRectBackInPreview:{
                 afterBurst() // signal to do anything need to do after capture continuous[burst] shots.
@@ -464,6 +466,8 @@ Rectangle {
                     JS.enableMasterMode_11cug()
                 } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU51){
                     JS.enableMasterMode_cu51()
+                } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_12CUNIR){
+                    JS.enableMasterMode_12cuinr()
                 }
                 device_box.oldIndex = 0
                 device_box.currentIndex = 0
@@ -2318,13 +2322,14 @@ Rectangle {
                                     font.pixelSize: 14
                                 }
                             }
-                            onCurrentIndexChanged: {
+                            onCurrentIndexChanged: {                                
                                 if(color_comp_box.count > 0){
                                     JS.stillCaptureFormat = color_comp_box.currentIndex.toString()
-                                    if(JS.triggerMode_11cug === 1 || JS.triggerMode_B === 1 || JS.triggerMode_M === 1 || JS.triggerMode_cu51 === 1)
+                                    if(JS.triggerMode_11cug === 1 || JS.triggerMode_B === 1 || JS.triggerMode_M === 1 || JS.triggerMode_cu51 === 1 || JS.triggerMode_12cuinr === 1){
                                         triggerModeCapture()
-                                    if(stillColorSpace) {
-                                          updateStillPreview(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
+                                    }
+                                    if(stillColorSpace) {                                        
+                                        updateStillPreview(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
                                     }
                                 }
                             }
@@ -2383,10 +2388,11 @@ Rectangle {
                                     font.pixelSize: 14
                                 }
                             }
-                            onCurrentIndexChanged: {
+                            onCurrentIndexChanged: {                                
                                 JS.stillCaptureResolution = output_value.currentText.toString()
-                                if(JS.triggerMode_11cug === 1 || JS.triggerMode_B === 1 || JS.triggerMode_M === 1 || JS.triggerMode_cu51 === 1)
+                                if(JS.triggerMode_11cug === 1 || JS.triggerMode_B === 1 || JS.triggerMode_M === 1 || JS.triggerMode_cu51 === 1 || JS.triggerMode_12cuinr === 1){                                    
                                     triggerModeCapture()
+                                }
                             }
                         }
 
@@ -3671,8 +3677,8 @@ Rectangle {
         capture.opacity = 0.5
         record.enabled = false
         record.opacity = 0.5
-        keyEventFiltering = true
         vidstreamproperty.enabled = false
+        keyEventFiltering = false
         vidstreamproperty.triggerModeEnabled()
         vidstreamproperty.stopCapture()
         vidstreamproperty.vidCapFormatChanged(JS.stillCaptureFormat)
@@ -3680,7 +3686,7 @@ Rectangle {
         vidstreamproperty.startAgain();
     }
 
-    function masterModeCapture(){
+    function masterModeCapture(){       
         if(!capture.enabled || !record.enabled)  {
             capture.enabled = true
             capture.opacity = 1
@@ -3689,13 +3695,14 @@ Rectangle {
             vidstreamproperty.enabled = true
             keyEventFiltering = false
         }
+
         vidstreamproperty.masterModeEnabled()
         if(JS.videoCaptureFormat !== JS.stillCaptureFormat  || JS.stillCaptureResolution !== JS.videoCaptureResolution)
         {
             vidstreamproperty.stopCapture()
             vidstreamproperty.vidCapFormatChanged(JS.videoCaptureFormat)
             vidstreamproperty.setResoultion(JS.videoCaptureResolution);
-            vidstreamproperty.startAgain();            
+            vidstreamproperty.startAgain();
         }
     }
 
@@ -3885,10 +3892,23 @@ Rectangle {
         }
     }
 
+    // Added by Sankari - 9 Dec 2016
+    function takeTriggershot(){
+        // Before processing , disable webcam keys
+        webcamKeyTriggerShot = false
+
+        // Capture shot
+        vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
+        vidstreamproperty.triggerModeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
+
+        // After processing , enable webcam keys
+        webcamKeyTriggerShot = true
+    }
+
     function extensionTab() {
         if(cameraColumnLayout.visible) {
             cameraColumnLayout.visible = false
-            see3cam.visible = true
+            see3cam.visible = true            
         }
     }
 
@@ -3925,6 +3945,10 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
         see3cam.visible = false
+    }
+
+    function disableSaveImage(){
+        vidstreamproperty.disableSavingImage()
     }
 
     //Added by Dhurka - Here commonly open HID device instead of open every QML file - 17th Oct 2016
@@ -3965,67 +3989,78 @@ Rectangle {
         JS.enableMasterMode_10cugM()
         JS.enableMasterMode_10cugB()
         JS.enableMasterMode_11cug()
+        JS.enableMasterMode_12cuinr()
         exitDialog.visible = false
         camproperty.closeLibUsbDeviceAscella()
-    }
+    }    
 
-
-    Keys.onReleased: {
+    Keys.onReleased: {               
         if(event.key === Qt.Key_I) {
             if((!keyEventFiltering)) {
                 mouseClickCapture()
             }
-        } else if(event.key === Qt.Key_WebCam){
+        }else if(event.key === Qt.Key_WebCam){            
             m_Snap = false
-            if(webcamKeyAccept) {
-                if(selectedDeviceEnumValue == CommonEnums.ECON_1MP_MONOCHROME)
-                {
-                    if(JS.masterMode_M === 1) {
+            if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_12CUNIR){
+                if(JS.masterMode_12cuinr === 1) {                    
+                    if(webcamKeyAccept) {
                         vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
                         vidstreamproperty.makeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
-                    } else {
-                        vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
-                        vidstreamproperty.triggerModeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
                     }
-                } else if(selectedDeviceEnumValue == CommonEnums.ECON_1MP_BAYER_RGB) {
-                    if(JS.masterMode_B === 1) {
-                        vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
-                        vidstreamproperty.makeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
-                    } else {
-                        vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
-                        vidstreamproperty.triggerModeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
+                    webcamKeyAccept = false
+                }else{
+
+                    // Added by Sankari : 09 Nov 2016
+                    // Trigger shot  - continuous shots - init trigger shot
+                    if(webcamKeyTriggerShot){                        
+                        initTriggershot()
                     }
-                } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_11CUG) {
-                    if(JS.masterMode_11cug === 1) {
-                        vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
-                        vidstreamproperty.makeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
-                    } else {
-                        vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
-                        vidstreamproperty.triggerModeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
-                    }
-                } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU51) {
-                    if(JS.masterMode_cu51 === 1) {
-                        vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
-                        vidstreamproperty.makeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
-                    } else {
-                        vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
-                        vidstreamproperty.triggerModeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
-                    }
-                } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_12CUNIR) {
-                    if(JS.masterMode_12cuinr === 1) {
-                        vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
-                        vidstreamproperty.makeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
-                    } else {
-                        vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
-                        vidstreamproperty.triggerModeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
-                    }
-                } else {
-                    vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
-                    vidstreamproperty.makeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
                 }
-                webcamKeyAccept = false
+                 event.accepted = true
+            }else{
+                m_Snap = false
+                if(webcamKeyAccept) {
+                    if(selectedDeviceEnumValue == CommonEnums.ECON_1MP_MONOCHROME)
+                    {
+                        if(JS.masterMode_M === 1) {
+                            vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
+                            vidstreamproperty.makeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
+                        } else {
+                            vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
+                            vidstreamproperty.triggerModeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
+                        }
+                    } else if(selectedDeviceEnumValue == CommonEnums.ECON_1MP_BAYER_RGB) {
+                        if(JS.masterMode_B === 1) {
+                            vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
+                            vidstreamproperty.makeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
+                        } else {
+                            vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
+                            vidstreamproperty.triggerModeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
+                        }
+                    } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_11CUG) {
+                        if(JS.masterMode_11cug === 1) {
+                            vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
+                            vidstreamproperty.makeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
+                        } else {
+                            vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
+                            vidstreamproperty.triggerModeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
+                        }
+                    } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU51) {
+                        if(JS.masterMode_cu51 === 1) {
+                            vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
+                            vidstreamproperty.makeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
+                        } else {
+                            vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
+                            vidstreamproperty.triggerModeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
+                        }
+                    } else {
+                        vidstreamproperty.setStillVideoSize(output_value.currentText.toString(), color_comp_box.currentIndex.toString())
+                        vidstreamproperty.makeShot(storage_path.text.toString(),imageFormatCombo.currentText.toString())
+                    }
+                    webcamKeyAccept = false
+                }
+                event.accepted = true
             }
-            event.accepted = true
         }
     }
 

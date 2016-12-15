@@ -20,9 +20,10 @@
 
 #ifndef SEECAM_AR0130_H
 #define SEECAM_AR0130_H
+#include <QThread>
 #include "uvccamera.h"
 
-class See3CAM_AR130:public QObject {
+class See3CAM_AR130: public QThread {
     Q_OBJECT
 private:
     unsigned char g_out_packet_buf[BUFFER_LENGTH];
@@ -32,6 +33,13 @@ private:
 
 public:
     See3CAM_Control see3cam_ctrl;
+
+    explicit See3CAM_AR130(QObject *parent = 0);
+    ~See3CAM_AR130();
+
+    void init();
+    void run();
+    bool m_trigger;
 
     /**
      * @brief Enable camera in cropped mode and its output value is passed/set to the parameter
@@ -66,7 +74,12 @@ signals:
     void updateFlashCheckBox(QVariant flash_Check_state);
     void deviceStatus(QString title, QString message);
 
+    void triggershotSignal();
+
 public slots:
+
+
+    void initTriggerShotCapture();
     /**
      * @brief Enable Master Mode
      *  - Enable the camera in master mode

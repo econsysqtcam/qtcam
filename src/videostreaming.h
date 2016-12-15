@@ -91,6 +91,9 @@ public:
     bool findNativeFormat(__u32 format, QImage::Format &dstFmt);
     bool startCapture();
 
+    // get current resoution set in v4l2
+    QString getResoultion();
+
     v4l2_format fmt;
     QString _title;
     QString _text;
@@ -179,8 +182,7 @@ private:
     unsigned char *m_buf;
     unsigned m_size;
 
-    uint m_nbuffers;
-    int correctionDisplay;
+    uint m_nbuffers;    
     static int deviceNumber;
     static QString camDeviceName;
  /**
@@ -189,7 +191,13 @@ private:
     static CommonEnums::ECameraNames currentlySelectedCameraEnum;
 
     uint m_burstLength;
-    uint m_burstNumber;    
+    uint m_burstNumber;
+
+    // Added by Sankari  - 10 Nov 2016 - To decide whether display pop up dialog will appear in while capturing image
+    bool m_displayCaptureDialog;
+
+    // Added by Sankari  - 10 Nov 2016 - To decide whether to save image or not
+    bool m_saveImage;
 
     QString getSettings(unsigned int);
     void getFrameRates();
@@ -208,6 +216,17 @@ private:
 
 
 public slots:
+
+    // Added by Sankari : 10 Dec 2016
+    // To Disable image capture dialog when taking trigger shot in trigger mode for 12cunir camera
+    void disableImageCaptureDialog();
+
+    // Added by Sankari : 10 Dec 2016
+    // Disable saving image when focus is changed from trigger mode to master mode
+    // or changing to any other camera if it is m_saveImage flag set as true to avoid displaying unnecessary pop up dialog.
+    // It is used in 12cunir camera. It can be used for other cameras also.
+    void disableSavingImage();
+
     /**
      * @brief Query buffer and Deque buffer
      *  -
