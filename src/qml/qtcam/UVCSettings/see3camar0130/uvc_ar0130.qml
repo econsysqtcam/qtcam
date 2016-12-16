@@ -471,8 +471,5 @@ Item {
          onInitTriggershot:{
             seecamar0130.initTriggerShotCapture()
          }
-         onTriggermodeenabled_12CUNIR:{
-             enableTriggerMode()
-         }
     }
 }
