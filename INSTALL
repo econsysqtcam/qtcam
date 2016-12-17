@@ -143,7 +143,7 @@ $ sudo apt-add-repository ppa:qtcam/precise
 $ sudo apt-get update
 $ sudo apt-get install qtcam
 
-4.1.3 Ubuntu 15.10
+4.1.3 Ubuntu 15.10 [ Note: The source code build support is not available from Dec 2016 for wily[15.10] in launchpad . So finally built Qtcam application version is 11.0.1 for wily distribution ]
 $ sudo apt-add-repository ppa:qtcam/wily
 $ sudo apt-get update
 $ sudo apt-get install qtcam
