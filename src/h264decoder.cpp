@@ -38,7 +38,7 @@ H264Decoder::~H264Decoder()
 bool H264Decoder::initH264Decoder(unsigned width, unsigned height)
 {
     // find the decoder
-    pH264Codec = avcodec_find_decoder(CODEC_ID_H264);
+    pH264Codec = avcodec_find_decoder(AV_CODEC_ID_H264);
     if (!pH264Codec)
     {        
         return false;
@@ -53,7 +53,7 @@ bool H264Decoder::initH264Decoder(unsigned width, unsigned height)
 #endif
 
     pH264CodecCtx->flags2 |= CODEC_FLAG2_FAST;
-    pH264CodecCtx->pix_fmt = PIX_FMT_YUV420P;
+    pH264CodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;
     pH264CodecCtx->width = width;
     pH264CodecCtx->height = height;
 
