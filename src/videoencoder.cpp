@@ -78,7 +78,7 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
 
     // find the video encoder
 
-    if(pOutputFormat->video_codec != CODEC_ID_NONE) {
+    if(pOutputFormat->video_codec != AV_CODEC_ID_NONE) {
         pCodec = avcodec_find_encoder(pOutputFormat->video_codec);
         if (!pCodec)
         {
@@ -99,13 +99,13 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
 
         pCodecCtx->codec_id = pOutputFormat->video_codec;
 
-        if(encodeType == CODEC_ID_RAWVIDEO){
-            pCodecCtx->pix_fmt =  PIX_FMT_YUYV422;//AV_PIX_FMT_YUV444P;//AV_PIX_FMT_YUV422P;//PIX_FMT_YUYV422;//PIX_FMT_YUV420P;
+        if(encodeType == AV_CODEC_ID_RAWVIDEO){
+            pCodecCtx->pix_fmt =  AV_PIX_FMT_YUYV422;//AV_PIX_FMT_YUV444P;//AV_PIX_FMT_YUV422P;//PIX_FMT_YUYV422;//PIX_FMT_YUV420P;
         }
-        else if(encodeType == CODEC_ID_MJPEG)
-            pCodecCtx->pix_fmt =  PIX_FMT_YUVJ420P;
+        else if(encodeType == AV_CODEC_ID_MJPEG)
+            pCodecCtx->pix_fmt =  AV_PIX_FMT_YUVJ420P;
         else {
-            pCodecCtx->pix_fmt =  PIX_FMT_YUV420P;
+            pCodecCtx->pix_fmt =  AV_PIX_FMT_YUV420P;
         }
         pCodecCtx->bit_rate = Bitrate;
         pCodecCtx->width = getWidth();
@@ -116,7 +116,7 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
         pCodecCtx->time_base.den = fpsDenominator;
         pCodecCtx->time_base.num = fpsNumerator;
         tempExtensionCheck = fileName.mid(fileName.length()-3);
-        if(pOutputFormat->video_codec == CODEC_ID_H264 || pOutputFormat->video_codec == CODEC_ID_VP8) {
+        if(pOutputFormat->video_codec == AV_CODEC_ID_H264 || pOutputFormat->video_codec == AV_CODEC_ID_VP8) {
             pCodecCtx->qmin = 15; // qmin = 10*
             pCodecCtx->qmax = 30; //qmax = 51 **
         }
@@ -400,7 +400,7 @@ bool VideoEncoder::convertImage_sws(const QImage &img)
         return false;
     }
 
-    img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),PIX_FMT_RGB32,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
+    img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),AV_PIX_FMT_RGB32,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
     if (img_convert_ctx == NULL)
     {

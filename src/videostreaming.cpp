@@ -1542,28 +1542,28 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
     if(ubuntuVersion == ">=15"){
         switch(videoEncoderType) {
         case 0:
-            videoEncoderType = CODEC_ID_MJPEG;
+            videoEncoderType = AV_CODEC_ID_MJPEG;
             break;
         case 1:
-            videoEncoderType = CODEC_ID_H264;
+            videoEncoderType = AV_CODEC_ID_H264;
             break;
         case 2:
-            videoEncoderType = CODEC_ID_VP8;
+            videoEncoderType = AV_CODEC_ID_VP8;
             break;
         }
     } else if(ubuntuVersion == "<15"){
         switch(videoEncoderType) {
         case 0:
-            videoEncoderType = CODEC_ID_RAWVIDEO;
+            videoEncoderType = AV_CODEC_ID_RAWVIDEO;
             break;
         case 1:
-            videoEncoderType = CODEC_ID_MJPEG;
+            videoEncoderType = AV_CODEC_ID_MJPEG;
             break;
         case 2:
-            videoEncoderType = CODEC_ID_H264;
+            videoEncoderType = AV_CODEC_ID_H264;
             break;
         case 3:
-            videoEncoderType = CODEC_ID_VP8;
+            videoEncoderType = AV_CODEC_ID_VP8;
             break;
         }
 
