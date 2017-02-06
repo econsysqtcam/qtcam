@@ -25,13 +25,35 @@ import econ.camera.uvcsettings 1.0
 import econ.camera.see3cam80 1.0
 import econ.camera.see3camControl 1.0
 import econ.camera.see3camGpioControl 1.0
-import "../../JavaScriptFiles/tempValue.js" as JS
+import cameraenum 1.0
 
 Item {
     width:268
     height:720
     id: see3cam80
     property bool outputPinFlag
+
+    Connections
+    {
+        target: root
+        onTakeScreenShot:
+        {
+            root.imageCapture(CommonEnums.SNAP_SHOT);
+        }
+        onGetVideoPinStatus:
+        {
+            root.enableVideoPin(true);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("raw")
+            stillImageFormat.push("png")
+            root.insertStillImageFormat(stillImageFormat);
+        }
+    }
 
     Action {
         id: getGPIStatus

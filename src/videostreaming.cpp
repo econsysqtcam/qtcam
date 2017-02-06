@@ -19,6 +19,7 @@
  */
 
 #include "videostreaming.h"
+#include "common.h"
 #include <QtCore/QCoreApplication>
 #include <QtGui/QGuiApplication>
 #include <QtWidgets>
@@ -477,6 +478,11 @@ void Videostreaming::capFrame()
                     formatSaveSuccess(imgSaveSuccessCount, m_burstShot);
                 }
             }
+            // Added by Sankari: reenable paint in preview after capturing image when still and preview resolution 
+            //are different 
+            if(m_burstShot)
+                updateStop = false;
+
             if(m_burstNumber > m_burstLength){
                 m_burstShot = false;
                 qbuf(buf);
@@ -998,6 +1004,9 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
     m_saveImage = true;
     if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {       
+        // Added by Sankari: disable paint in preview while capturing image when still and preview resolution 
+        //are different 
+        updateStop = true;
         stopCapture();
         vidCapFormatChanged(stillOutFormat);
         setResoultion(stillSize);
@@ -1101,6 +1110,15 @@ void Videostreaming::displayFrame() {
     }
 }
 
+/**
+ * @brief Videostreaming::getCurrentFrameRateIntervalDenominator - get current frame interval denominator value [ for ex: denominator "30" for 30 fps ]
+ */
+void Videostreaming::getCurrentFrameRateIntervalDenominator(){
+    getInterval(interval);
+    // send the frame interval to qml [ for ex: denominator "30" for 30 fps ]
+    emit frameRateInterval(interval.denominator);
+}
+
 void Videostreaming::stopCapture() {
     if (fd() >= 0) {
         emit logDebugHandle("Stop Previewing...");
@@ -1156,6 +1174,14 @@ void Videostreaming::lastPreviewResolution(QString resolution,QString format) {
     lastPreviewSize = resolution;
     lastFormat = format;
     emit logDebugHandle("Last Resolution displayed at::"+resolution);
+}
+
+/**
+ * @brief Videostreaming::lastFPS - setting lastly set FPS
+ * @param fps
+ */
+void Videostreaming::lastFPS(QString fps) {
+    lastFPSValue = fps;
 }
 
 void Videostreaming::setResoultion(QString resolution)
@@ -1350,8 +1376,7 @@ void Videostreaming::updateFrameInterval(QString pixelFormat, QString frameSize)
 
     ok = enum_frameintervals(frmival,pixFormat.value(pixFmtValue).toInt(), width, height);
     m_has_interval = ok && frmival.type == V4L2_FRMIVAL_TYPE_DISCRETE;
-    QStringList availableFPS;
-    availableFPS.clear();
+    availableFPS.clear();    
     if (m_has_interval) {
         m_interval = frmival.discrete;
         curr_ok = v4l2::get_interval(m_buftype, curr);
@@ -1364,6 +1389,13 @@ void Videostreaming::updateFrameInterval(QString pixelFormat, QString frameSize)
         } while (enum_frameintervals(frmival));
     }
     emit logDebugHandle("Available FPS:"+ availableFPS.join(", "));
+    // send fps list to qml
+    emit sendFPSlist(availableFPS.join(", "));
+
+}
+
+// Added by Sankari: setting stringlist model is moved from updateFrameInterval() as a separate function
+void Videostreaming::enumerateFPSList(){
     fpsList.setStringList(availableFPS);
 }
 
@@ -1538,7 +1570,7 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
     if(videoFormatType.isEmpty()) {
         videoFormatType = "avi";        //Application never enters in this condition
     }
-
+#if !LIBAVCODEC_VER_AT_LEAST(54, 25)
     if(ubuntuVersion == ">=15"){
         switch(videoEncoderType) {
         case 0:
@@ -1568,6 +1600,37 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
         }
 
     }
+#else
+    if(ubuntuVersion == ">=15"){
+        switch(videoEncoderType) {
+        case 0:
+            videoEncoderType = AV_CODEC_ID_MJPEG;
+            break;
+        case 1:
+            videoEncoderType = AV_CODEC_ID_H264;
+            break;
+        case 2:
+            videoEncoderType = AV_CODEC_ID_VP8;
+            break;
+        }
+    } else if(ubuntuVersion == "<15"){
+        switch(videoEncoderType) {
+        case 0:
+            videoEncoderType = AV_CODEC_ID_RAWVIDEO;
+            break;
+        case 1:
+            videoEncoderType = AV_CODEC_ID_MJPEG;
+            break;
+        case 2:
+            videoEncoderType = AV_CODEC_ID_H264;
+            break;
+        case 3:
+            videoEncoderType = AV_CODEC_ID_VP8;
+            break;
+        }
+
+    }
+#endif
 
     fileName = fileLocation +"/Qtcam-" + QDateTime::currentDateTime().toString("yy_MM_dd:hh_mm_ss")+"."+ videoFormatType;
     v4l2_frmivalenum frmival;

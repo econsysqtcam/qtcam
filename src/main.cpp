@@ -106,9 +106,9 @@ int main(int argc, char *argv[])
     viewer.rootContext()->setContextProperty("SystemPictureFolder",QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).first());
     viewer.rootContext()->setContextProperty("SystemVideoFolder",QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first());
 #if LAUNCHPAD
-    viewer.setMainQmlFile(QStringLiteral("/usr/share/qml/qtcam/videocapturefilter/videocapturefilter.qml"));
+    viewer.setMainQmlFile(QStringLiteral("/usr/share/qml/qtcam/Views/qtcam.qml"));
 #else
-    viewer.setMainQmlFile(QStringLiteral("qml/qtcam/videocapturefilter/videocapturefilter.qml"));
+    viewer.setMainQmlFile(QStringLiteral("qml/qtcam/Views/qtcam.qml"));
 #endif
     QObject *rootObject = dynamic_cast<QObject*>(viewer.rootObject());
 

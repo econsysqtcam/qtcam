@@ -24,6 +24,7 @@ import QtQuick.Controls.Styles 1.0
 import QtQuick.Dialogs 1.1
 import econ.camera.uvcsettings 1.0
 import econ.camera.see3camControl 1.0
+import cameraenum 1.0
 
 Item {
     width:268
@@ -39,6 +40,29 @@ Item {
         id: firmwareVersion
         onTriggered: {
             getFirmwareVersion()
+        }
+    }
+
+    Connections
+    {
+        target: root
+        onTakeScreenShot:
+        {
+            root.imageCapture(CommonEnums.SNAP_SHOT);
+        }
+        onGetVideoPinStatus:
+        {
+            root.enableVideoPin(true);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("raw")
+            stillImageFormat.push("png")
+            stillImageFormat.push("IR data(8bit BMP)")
+            root.insertStillImageFormat(stillImageFormat);
         }
     }
 

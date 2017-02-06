@@ -26,11 +26,34 @@ import econ.camera.uvcsettings 1.0
 import econ.camera.see3cam50 1.0
 import econ.camera.see3camControl 1.0
 import econ.camera.see3camGpioControl 1.0
+import cameraenum 1.0
 Item {
     width:268
     height:720
     property bool outputPinFlag
     id: see3CAM_cu50Camera
+
+    Connections
+    {
+        target: root
+        onTakeScreenShot:
+        {
+            root.imageCapture(CommonEnums.SNAP_SHOT);
+        }
+        onGetVideoPinStatus:
+        {
+            root.enableVideoPin(true);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("raw")
+            stillImageFormat.push("png")
+            root.insertStillImageFormat(stillImageFormat);
+        }
+    }
 
     Action {
         id: gpiStatus

@@ -221,7 +221,7 @@ void See3CAM_AR130::initTriggerShotCapture(){
 
 
 /**
- * @brief WificamAPScan::run - override QThread run method - To avoid key queueing
+ * @brief See3CAM_AR130::run - override QThread run method - To avoid key queueing
  */
 void See3CAM_AR130::run()
 {    
@@ -229,7 +229,7 @@ void See3CAM_AR130::run()
 }
 
 /**
- * @brief WificamAPScan::init - Init thread
+ * @brief See3CAM_AR130::init - Init thread
  */
 void See3CAM_AR130::init()
 {

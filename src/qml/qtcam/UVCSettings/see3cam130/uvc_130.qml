@@ -5,26 +5,56 @@ import QtQuick.Dialogs 1.1
 import econ.camera.uvcsettings 1.0
 import econ.camera.see3cam130 1.0
 import QtQuick.Layouts 1.1
-import "../../JavaScriptFiles/tempValue.js" as JS
+import cameraenum 1.0
 
 Item {
     id: see3cam30Id
     width:268
-    height:750
+    height:750    
     property int denoiseMin: 0
     property int denoiseMax: 15
     property int qFactorMin: 10
     property int qFactorMax: 96
     property int iHDRMin: 1
     property int iHDRMax: 4
-    property int burstLengthCurrentIndex: burstLengthCombo.currentIndex
     // Flags to prevent setting values in camera when getting the values from camera
     property bool skipUpdateUIOnSetttings : false
     property bool skipUpdateUIOnAFWindowSize: false
     property bool skipUpdateUIOnExpWindowSize: false
     property bool skipUpdateUIOnBurstLength: false
     property bool skipUpdateUIiHDR: false
-    signal sendBurstLengthtoCaptureImg(var burstLength)
+
+    Connections
+    {
+        target: root
+        onTakeScreenShot:
+        {
+            seecam130.enableDisableAFRectangle(false)
+            burstShotTimer.start()
+        }
+        onGetVideoPinStatus:
+        {
+            root.enableVideoPin(true);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("raw")
+            stillImageFormat.push("png")
+            root.insertStillImageFormat(stillImageFormat);
+        }
+    }
+
+    Timer {
+        id: burstShotTimer
+        interval: 1000
+        onTriggered: {
+            root.imageCapture(CommonEnums.BURST_SHOT);
+            stop()
+        }
+    }
 
     Timer {
         id: getCamValuesTimer
@@ -714,7 +744,7 @@ Item {
                 activeFocusOnPress: true
                 style: econComboBoxStyle
                 onCurrentIndexChanged: {                    
-                    root.receiveBurstLength(burstLengthCombo.currentIndex + 1) // combobox index starts from 0
+                    root.stillBurstLength(burstLengthCombo.currentIndex + 1) // combobox index starts from 0
                     if(skipUpdateUIOnBurstLength){
                         seecam130.setBurstLength(burstLengthCombo.currentText)
                     }
@@ -1019,7 +1049,7 @@ Item {
         ComboBoxStyle {
             background: Image {
                 id: burstLengthCombo_bkgrnd
-                source: "../../videocapturefilter/images/device_box.png"
+                source: "../../Views/images/device_box.png"
                 Rectangle {
                     width: burstLengthCombo_bkgrnd.sourceSize.width  - 28
                     height: burstLengthCombo_bkgrnd.sourceSize.height
@@ -1309,9 +1339,6 @@ Item {
 
     Connections{
          target: root
-         onBeforeBurst:{
-             seecam130.enableDisableAFRectangle(false)
-         }
          onAfterBurst:{
              if(rectEnable.checked){
                 seecam130.enableDisableAFRectangle(true)

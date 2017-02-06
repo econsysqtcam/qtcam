@@ -6,14 +6,54 @@ import econ.camera.uvcsettings 1.0
 import econ.camera.see3cam51 1.0
 import econ.camera.see3camControl 1.0
 import "../../JavaScriptFiles/tempValue.js" as JS
-
+import cameraenum 1.0
 
 Item {
     width:268
     height:720
-    property bool outputPinFlag
     property bool masterMode
     property bool triggerMode
+
+    Connections
+    {
+        target: root
+        onTakeScreenShot:
+        {
+            if(JS.masterMode_cu51 === 1)
+            {
+                root.imageCapture(CommonEnums.SNAP_SHOT);
+            }
+            else
+            {
+                if(isWebKeyPressed)
+                {
+                    root.imageCapture(CommonEnums.TRIGGER_SHOT);
+                }
+            }
+        }
+        onGetVideoPinStatus:
+        {
+            var videoPin = JS.masterMode_cu51 === 1 ? true : false
+            root.enableVideoPin(videoPin);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("raw")
+            stillImageFormat.push("png")
+            root.insertStillImageFormat(stillImageFormat);
+        }
+        onCameraDeviceUnplugged:
+        {
+            JS.enableMasterMode_cu51()
+        }
+        onSetMasterMode:
+        {
+            enableMasterMode();
+        }
+    }
 
     Action {
         id: serialNumber
@@ -61,7 +101,7 @@ Item {
     Action {
         id:  captureAction
         onTriggered: {
-             root.seeCamCu51Capture()
+             root.imageCapture(CommonEnums.SNAP_SHOT);
         }
     }
     Component {

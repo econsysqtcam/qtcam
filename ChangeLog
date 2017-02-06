@@ -1,3 +1,7 @@
+Qtcam Applicaiton - 11.1.0
+--------------------------
+* Qtcam code refactored, codec id name is changed based on codec version and some of the application bugfixes.
+
 Qtcam Application - 11.0.2
 --------------------------
 * Added multiple shots in trigger mode for See3CAM_12CUNIR camera.

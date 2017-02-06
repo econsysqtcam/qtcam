@@ -25,7 +25,6 @@
 #include <libv4l2.h>
 #include "v4l2-api.h"
 
-
 bool v4l2::open(const QString &device, bool useWrapper)
 {
 

@@ -25,12 +25,54 @@ import QtQuick.Dialogs 1.1
 import econ.camera.uvcsettings 1.0
 import econ.camera.see3cam10Bayer 1.0
 import "../../JavaScriptFiles/tempValue.js" as JS
+import cameraenum 1.0
 Item {
     width:268
     height:720
     id:see3cam10
     property bool masterMode
     property bool triggerMode
+
+    Connections
+    {
+        target: root
+        onTakeScreenShot:
+        {
+            if(JS.masterMode_B === 1)
+            {
+               root.imageCapture(CommonEnums.SNAP_SHOT);
+            }
+            else
+            {
+                if(isWebKeyPressed)
+                {
+                    root.imageCapture(CommonEnums.TRIGGER_SHOT);
+                }
+            }
+        }
+        onGetVideoPinStatus:
+        {
+            var videoPin = JS.masterMode_B === 1 ? true : false
+            root.enableVideoPin(videoPin);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("raw")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("png")
+            root.insertStillImageFormat(stillImageFormat);
+        }
+        onCameraDeviceUnplugged:
+        {
+            JS.enableMasterMode_10cugB()
+        }
+        onSetMasterMode:
+        {
+            enableMasterMode();
+        }
+    }
 
     MessageDialog {
         id: messageDialog
@@ -53,14 +95,14 @@ Item {
     Action {
         id: masterModeAction
         onTriggered: {
-            masterModeEnable()
+            enableMasterMode()
         }
     }
 
     Action {
         id: triggerModeAction
         onTriggered: {
-            triggerModeEnable()
+            enableTriggerMode()
         }
     }
 
@@ -82,7 +124,7 @@ Item {
         tooltip: "Set camera in Master Mode"
         style: econ10CUG_BayerButtonStyle
         Keys.onReturnPressed: {
-            masterModeEnable()
+            enableMasterMode()
         }
     }
 
@@ -97,7 +139,7 @@ Item {
         tooltip: "Set camera in Trigger Mode"
         style: econ10CUG_BayerButtonStyle
         Keys.onReturnPressed: {
-            triggerModeEnable()
+            enableTriggerMode()
         }
     }
 
@@ -139,7 +181,7 @@ Item {
     }
 
 
-    function masterModeEnable() {
+    function enableMasterMode() {
         masterModeCapture();
         masterMode = seecam10.enableMasterMode()
         if(masterMode) {
@@ -153,7 +195,7 @@ Item {
         }
     }
 
-    function triggerModeEnable() {
+    function enableTriggerMode() {
         triggerModeCapture()
         triggerMode = seecam10.enableTriggerMode()
         if(triggerMode) {

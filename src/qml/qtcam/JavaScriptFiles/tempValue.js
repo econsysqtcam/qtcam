@@ -16,7 +16,6 @@ var videoCaptureResolution
 var videocaptureFps
 var videoExtension
 var videoEncoder
-var cameraComboIndex
 var autoFocusChecked
 var autoExposureSelected
 
@@ -70,6 +69,4 @@ function enableMasterMode_cu51() {
     masterMode_cu51=1;
 }
 
-function checkVideoExtension() {
-    videoExtension = 'mkv'
-}
+

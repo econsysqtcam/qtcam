@@ -4,10 +4,33 @@
     import QtQuick.Dialogs 1.1
     import econ.camera.uvcsettings 1.0
     import econ.camera.see3camcu130 1.0
+    import cameraenum 1.0
 
     Item {
     width:268
     height:720
+
+    Connections
+    {
+        target: root
+        onTakeScreenShot:
+        {
+            root.imageCapture(CommonEnums.SNAP_SHOT);
+        }
+        onGetVideoPinStatus:
+        {
+            root.enableVideoPin(true);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("raw")
+            stillImageFormat.push("png")
+            root.insertStillImageFormat(stillImageFormat);
+        }
+    }
 
     Action {
     id: firmwareVersion
@@ -59,28 +82,6 @@
         Component.onCompleted: close()
     }
 
-
-//    Component {
-//    id: uvc130_radioButtonStyle
-//    RadioButtonStyle {
-//    label: Text {
-//    x: 5
-//    width: 60
-//    height: 30
-//    renderType: Text.NativeRendering
-//    verticalAlignment: Text.AlignVCenter
-//    font.pixelSize: 14
-//    font.family: "Ubuntu"
-//    color: "white"
-//    text: control.text
-//    wrapMode: Text.WordWrap
-//    }
-//    background: Rectangle {
-//                   color: "#222021"
-//                   border.color: control.activeFocus ? "#ffffff" : "#222021"
-//    }
-//    }
-//    }
     Component {
         id: uvc130_radioButtonStyle
         RadioButtonStyle {
@@ -146,7 +147,6 @@
     text:   qsTr("Normal")
     exclusiveGroup: sceneInputGroup
     activeFocusOnPress: true
-    //checked: true
     onClicked: {
         seecamcu130.setSceneMode(See3CamCu130.SCENE_NORMAL)
     }
@@ -326,8 +326,6 @@
     text: qsTr("Normal")
     exclusiveGroup: effectInputGroup
     activeFocusOnPress: true
-
-    //checked: true
     onClicked: {
         seecamcu130.setEffectMode(See3CamCu130.EFFECT_NORMAL)
     }

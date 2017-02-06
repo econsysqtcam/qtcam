@@ -1,5 +1,5 @@
 /*
- * QML_about.qml -- Display the about window
+ * about.qml -- Display the about window
  * Copyright © 2015  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
@@ -137,19 +137,19 @@ Window {
             scrollToClickedPosition: true
             handle: Image {
                 id: scrollhandle
-                source: "../videocapturefilter/images/scroller.png"
+                source: "../Views/images/scroller.png"
             }
             scrollBarBackground: Image {
                 id: scrollStyle
-                source: "../videocapturefilter/images/Scroller_bg.png"
+                source: "../Views/images/Scroller_bg.png"
             }
             incrementControl: Image {
                 id: increment
-                source: "../videocapturefilter/images/down_arrow.png"
+                source: "../Views/images/down_arrow.png"
             }
             decrementControl: Image {
                 id: decrement
-                source: "../videocapturefilter/images/up_arrow.png"
+                source: "../Views/images/up_arrow.png"
             }
         }
 

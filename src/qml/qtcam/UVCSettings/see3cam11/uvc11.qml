@@ -26,12 +26,54 @@ import QtQuick.Layouts 1.1
 import econ.camera.uvcsettings 1.0
 import econ.camera.see3cam11 1.0
 import "../../JavaScriptFiles/tempValue.js" as JS
+import cameraenum 1.0
 Item {
     width:268
     height:720
     id: see3CAM_11CUGCamera
     property bool masterMode
     property bool triggerMode
+
+    Connections
+    {
+        target: root
+        onTakeScreenShot:
+        {
+            if(JS.masterMode_11cug === 1)
+            {
+                root.imageCapture(CommonEnums.SNAP_SHOT);
+            }
+            else
+            {
+                if(isWebKeyPressed)
+                {
+                    root.imageCapture(CommonEnums.TRIGGER_SHOT);
+                }
+            }
+        }
+        onGetVideoPinStatus:
+        {
+            var videoPin = JS.masterMode_11cug === 1 ? true : false
+            root.enableVideoPin(videoPin);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("raw")
+            stillImageFormat.push("png")
+            root.insertStillImageFormat(stillImageFormat);
+        }
+        onCameraDeviceUnplugged:
+        {
+            JS.enableMasterMode_11cug()
+        }
+        onSetMasterMode:
+        {
+            enableMasterMode();
+        }
+    }
 
     Timer {
         id: masterModeTimer
@@ -447,8 +489,6 @@ Item {
         }
     }
 
-
-
     function enableMasterMode() {
        masterModeCapture();
         masterMode = seecam11.enableMasterMode()
@@ -510,32 +550,6 @@ Item {
             seecam11.setWbMode(See3Cam11.Manual)
         }
 
-    }
-
-    Component {
-        id: econSliderStyle
-        SliderStyle {
-            groove:Row {
-                spacing: 0
-                Rectangle {
-                    width: styleData.handlePosition
-                    height: 4
-                    color: "#dc6239"
-                    radius: 5
-                }
-                Rectangle {
-                    width: control.width - styleData.handlePosition
-                    height: 4
-                    color: "#dddddd"
-                    radius: 5
-                }
-            }
-            handle: Image {
-                source: "images/scroller.png"
-                y: -4
-                opacity: 1
-            }
-        }
     }
 
     Component {

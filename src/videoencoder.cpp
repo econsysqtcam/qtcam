@@ -78,7 +78,11 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
 
     // find the video encoder
 
+#if !LIBAVCODEC_VER_AT_LEAST(54, 25)
     if(pOutputFormat->video_codec != CODEC_ID_NONE) {
+#else
+    if(pOutputFormat->video_codec != AV_CODEC_ID_NONE) {
+#endif
         pCodec = avcodec_find_encoder(pOutputFormat->video_codec);
         if (!pCodec)
         {
@@ -98,7 +102,7 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
             pCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
         pCodecCtx->codec_id = pOutputFormat->video_codec;
-
+#if !LIBAVCODEC_VER_AT_LEAST(54, 25)
         if(encodeType == CODEC_ID_RAWVIDEO){
             pCodecCtx->pix_fmt =  PIX_FMT_YUYV422;//AV_PIX_FMT_YUV444P;//AV_PIX_FMT_YUV422P;//PIX_FMT_YUYV422;//PIX_FMT_YUV420P;
         }
@@ -107,6 +111,16 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
         else {
             pCodecCtx->pix_fmt =  PIX_FMT_YUV420P;
         }
+#else
+        if(encodeType == AV_CODEC_ID_RAWVIDEO){
+            pCodecCtx->pix_fmt =  AV_PIX_FMT_YUYV422;//AV_PIX_FMT_YUV444P;//AV_PIX_FMT_YUV422P;//PIX_FMT_YUYV422;//PIX_FMT_YUV420P;
+        }
+        else if(encodeType == AV_CODEC_ID_MJPEG)
+            pCodecCtx->pix_fmt =  AV_PIX_FMT_YUVJ420P;
+        else {
+            pCodecCtx->pix_fmt =  AV_PIX_FMT_YUV420P;
+        }
+#endif
         pCodecCtx->bit_rate = Bitrate;
         pCodecCtx->width = getWidth();
         pCodecCtx->height = getHeight();
@@ -116,7 +130,11 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
         pCodecCtx->time_base.den = fpsDenominator;
         pCodecCtx->time_base.num = fpsNumerator;
         tempExtensionCheck = fileName.mid(fileName.length()-3);
+#if !LIBAVCODEC_VER_AT_LEAST(54, 25)
         if(pOutputFormat->video_codec == CODEC_ID_H264 || pOutputFormat->video_codec == CODEC_ID_VP8) {
+#else
+        if(pOutputFormat->video_codec == AV_CODEC_ID_H264 || pOutputFormat->video_codec == AV_CODEC_ID_VP8) {
+#endif
             pCodecCtx->qmin = 15; // qmin = 10*
             pCodecCtx->qmax = 30; //qmax = 51 **
         }
@@ -400,7 +418,11 @@ bool VideoEncoder::convertImage_sws(const QImage &img)
         return false;
     }
 
+#if !LIBAVCODEC_VER_AT_LEAST(54, 25)
     img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),PIX_FMT_RGB32,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
+#else
+    img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),AV_PIX_FMT_RGB32,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
+#endif
 
     if (img_convert_ctx == NULL)
     {

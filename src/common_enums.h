@@ -37,7 +37,15 @@ public:
         ECON_8MP_CAMERA,
         SEE3CAM_130
     }ECameraNames;
+    //Enum for capture shot type
+    typedef enum
+    {
+        SNAP_SHOT,
+        TRIGGER_SHOT,
+        BURST_SHOT        
+    }ECaptureShotType;
 
     Q_ENUMS(ECameraNames)
+	Q_ENUMS(ECaptureShotType)
 };
 #endif // COMMON_ENUMS_H

@@ -24,6 +24,7 @@ import QtQuick.Dialogs 1.1
 import econ.camera.uvcsettings 1.0
 import econ.camera.see3cam30 1.0
 import QtQuick.Layouts 1.1
+import cameraenum 1.0
 
 Item {
     width:240
@@ -31,7 +32,28 @@ Item {
     property int defaultNoiseVal: 8
     property int denoiseMin: 0
     property int denoiseMax: 15
-    property var uvccameraObj
+
+    Connections
+    {
+        target: root
+        onTakeScreenShot:
+        {
+            root.imageCapture(CommonEnums.SNAP_SHOT);
+        }
+        onGetVideoPinStatus:
+        {
+            root.enableVideoPin(true);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("raw")
+            stillImageFormat.push("png")
+            root.insertStillImageFormat(stillImageFormat);
+        }
+    }
 
     Action {
     id: firmwareVersion
@@ -78,6 +100,7 @@ Item {
             exclusiveGroup: sceneInputGroup
             activeFocusOnPress: true
             onClicked: {
+                defaultValue.enabled = true
                 see3camcu30.setEffectMode(See3Cam30.EFFECT_BLACK_WHITE)
             }
         }
@@ -88,6 +111,7 @@ Item {
             exclusiveGroup: sceneInputGroup
             activeFocusOnPress: true
             onClicked: {
+                defaultValue.enabled = true
                 see3camcu30.setEffectMode(See3Cam30.EFFECT_GREYSCALE)
             }
         }
@@ -98,6 +122,7 @@ Item {
             exclusiveGroup: sceneInputGroup
             activeFocusOnPress: true
             onClicked: {
+                defaultValue.enabled = true
                 see3camcu30.setEffectMode(See3Cam30.EFFECT_SKETCH)
             }
         }
@@ -108,6 +133,7 @@ Item {
             exclusiveGroup: sceneInputGroup
             activeFocusOnPress: true
             onClicked: {
+                defaultValue.enabled = true
                 see3camcu30.setEffectMode(See3Cam30.EFFECT_NEGATIVE)
             }
         }
@@ -130,13 +156,15 @@ Item {
         text: "Default"
         tooltip: "Click to set default values"
         style: econButtonStyle
-        onClicked: {
+        onClicked: {            
+            defaultValue.enabled = false
             see3camcu30.setEffectMode(See3Cam30.EFFECT_NORMAL)
             rdoEffectNormal.checked = true
             see3camcu30.setDenoiseValue(defaultNoiseVal)
             deNoiseSlider.value = defaultNoiseVal
         }
         Keys.onReturnPressed: {
+            defaultValue.enabled = false
             see3camcu30.setEffectMode(See3Cam30.EFFECT_NORMAL)
             rdoEffectNormal.checked = true
             see3camcu30.setDenoiseValue(defaultNoiseVal)
@@ -183,6 +211,7 @@ Item {
         minimumValue: denoiseMin
         maximumValue: denoiseMax
         onValueChanged:  {
+            defaultValue.enabled = true
             deNoiseTextField.text = deNoiseSlider.value
             see3camcu30.setDenoiseValue(deNoiseSlider.value)
         }
@@ -200,6 +229,7 @@ Item {
         validator: IntValidator {bottom: deNoiseSlider.minimumValue; top: deNoiseSlider.maximumValue}
         onTextChanged: {
             if(text != ""){
+                defaultValue.enabled = true
                 deNoiseSlider.value = deNoiseTextField.text
             }
         }
@@ -300,8 +330,8 @@ Item {
 
     Component.onCompleted:{        
         see3camcu30.getEffectMode()
-        see3camcu30.getDenoiseValue()
-
+        see3camcu30.getDenoiseValue()        
+        defaultValue.enabled = true
     }
 
     function getFirmwareVersion() {

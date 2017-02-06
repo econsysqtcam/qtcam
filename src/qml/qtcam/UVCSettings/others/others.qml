@@ -20,6 +20,7 @@
 
 import QtQuick 2.0
 import QtQuick.Controls 1.1
+import cameraenum 1.0
 Item {
     width:268
     height:720
@@ -34,5 +35,27 @@ Item {
         x: 18
         y: 250
         opacity: 1
+    }
+
+    Connections
+    {
+        target: root
+        onTakeScreenShot:
+        {
+            root.imageCapture(CommonEnums.SNAP_SHOT);
+        }
+        onGetVideoPinStatus:
+        {
+            root.enableVideoPin(true);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("raw")
+            stillImageFormat.push("png")
+            root.insertStillImageFormat(stillImageFormat);
+        }
     }
 }

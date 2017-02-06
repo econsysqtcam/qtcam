@@ -19,12 +19,7 @@
  */
 #ifndef H264DECODER_H
 #define H264DECODER_H
-
-
-/* checking version compatibility */
-#define LIBAVCODEC_VER_AT_LEAST(major,minor)  (LIBAVCODEC_VERSION_MAJOR > major || \
-                                              (LIBAVCODEC_VERSION_MAJOR == major && \
-                                               LIBAVCODEC_VERSION_MINOR >= minor))
+#include "common.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"

@@ -6,6 +6,7 @@ import QtQuick.Dialogs 1.1
 import econ.camera.ascella 1.0
 import econ.camera.uvcsettings 1.0
 import "../../JavaScriptFiles/tempValue.js" as JS
+import cameraenum 1.0
 
 Item {
     width:268
@@ -15,6 +16,39 @@ Item {
     property int vidWidth;
     property int vidHeight;
     property bool settingWhenUpdateUI: true
+
+    // Added by Sankari: 12 Jan 2017
+    // Not getting correct current values from camera for binned / resized mode. So delay 1sec is added
+    Timer {
+        id: setcurrentValuesTimer
+        interval: 1000
+        onTriggered: {
+            ascella.setCurrentValues(JS.videoCaptureResolution)
+            settingWhenUpdateUI = true
+            stop()
+        }
+    }
+    Connections
+    {
+        target: root
+        onTakeScreenShot:
+        {
+            root.imageCapture(CommonEnums.SNAP_SHOT);
+        }
+        onGetVideoPinStatus:
+        {
+            root.enableVideoPin(true);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("raw")
+            stillImageFormat.push("png")
+            root.insertStillImageFormat(stillImageFormat);
+        }
+    }
 
     Action {
         id: triggerAction
@@ -973,51 +1007,6 @@ Item {
                     }
                 }
             }
-//            RowLayout{
-//                 Text {
-//                     id: rollControlText
-//                     text:"                 --- Roll Control ---"
-//                     font.pixelSize: 14
-//                     font.family: "Ubuntu"
-//                     color: "#ffffff"
-//                     smooth: true
-//                     opacity: 0.50196078431373
-//                     Layout.maximumWidth: 230
-//                 }
-//            }
-//            Row{
-//                spacing:25
-//                Slider {
-//                    activeFocusOnPress: true
-//                    updateValueWhileDragging: false
-//                    id: rollControlSlider
-//                    opacity: enabled ? 1 : 0.1
-//                    width: 150
-//                    stepSize: 180
-//                    style:econSliderStyle
-//                    minimumValue:0
-//                    maximumValue: 180
-//                    onValueChanged:  {
-//                       rollControlTextValue.text = rollControlSlider.value
-//                    }
-//                }
-//                TextField {
-//                    id: rollControlTextValue
-//                    text: rollControlSlider.value
-//                    font.pixelSize: 10
-//                    font.family: "Ubuntu"
-//                    smooth: true
-//                    horizontalAlignment: TextInput.AlignHCenter
-//                    opacity: enabled ? 1 : 0.1
-//                    style: econTextFieldStyle
-//                    onTextChanged: {
-//                        if(text != ""){
-//                            rollControlSlider.value = rollControlTextValue.text
-//                            ascella.setRollValue(rollControlTextValue.text)
-//                        }
-//                    }
-//                }
-//            }
             RowLayout{
                 Image {
                     id: hideImage1
@@ -1104,33 +1093,6 @@ Item {
             }
         }
     }
-
-    Component {
-        id: econSliderStyle
-        SliderStyle {
-            groove:Row {
-                spacing: 0
-                y: 3
-                Rectangle {
-                    width: styleData.handlePosition
-                    height: 4
-                    color: "#dc6239"
-                    radius: 5
-                }
-                Rectangle {
-                    width: control.width - styleData.handlePosition
-                    height: 4
-                    color: "#dddddd"
-                    radius: 5
-                }
-            }
-            handle: Image {
-                source: "images/handle.png"
-                opacity: 1
-            }
-        }
-    }
-
     Component {
         id: econTextFieldStyle
         TextFieldStyle {
@@ -1193,9 +1155,7 @@ Item {
         }
         onAfContinuousEnable:{
             settingWhenUpdateUI = true
-            //if(JS.autoFocusChecked){
                 radioContin.checked = true
-            //}
         }
         onNoiseReductionAutoEnable:{
             settingWhenUpdateUI = true
@@ -1326,10 +1286,8 @@ Item {
             applyMaxFrameRatevalue.text = curMaxFRLimit
         }
         onSetAfAreaCenterMode:{
-            //if(JS.autoFocusChecked){
                 settingWhenUpdateUI = true
                 radiocenter.checked = true
-            //}
         }
 
         onSetCurrentAfAreaCenterMode:{
@@ -1430,6 +1388,16 @@ Item {
          }
          onAutoExposureSelected:{
              enableDisableAutoExposureControls(autoExposureSelect)
+         }
+         onPreviewFPSChanged:{
+             setcurrentValuesTimer.start()
+         }
+
+         // Added by Sankari: 23 Dec 2016 - If video resolution is changed, set binned/resized mode enable/disable in UI. So
+         // setCurrentValues is called
+         onVideoResolutionChanged:{
+            ascella.setCurrentValues(JS.videoCaptureResolution)
+            settingWhenUpdateUI = true
          }
     }
 }

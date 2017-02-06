@@ -24,6 +24,7 @@
 #include "uvccamera.h"
 #define DENOISE_MIN 0
 #define DENOISE_MAX 15
+#define SET_COMMAND_TIMEOUT 3000
 
 class See3CAM_CU30 : public QObject
 {
