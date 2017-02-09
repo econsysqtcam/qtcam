@@ -93,6 +93,8 @@
                 color: "#ffffff"
                 smooth: true
                 opacity: 1
+                width: 80
+                wrapMode: Text.WordWrap
             }
             background: Rectangle {
                 color: "#222021"
