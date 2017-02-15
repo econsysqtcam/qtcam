@@ -1,5 +1,5 @@
 /*
- * futudent.qml -- extension settings for other cameras
+ * uvc30.qml -- extension settings for other cameras
  * Copyright © 2015  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
