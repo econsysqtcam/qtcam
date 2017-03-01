@@ -35,7 +35,9 @@ public:
         ECON_CX3_RDX_T9P031,
         ECON_CX3_RDX_V5680,
         ECON_8MP_CAMERA,
-        SEE3CAM_130
+        SEE3CAM_130,
+		// Added by Sankari - 7 Feb 2017
+		SEE3CAM_30
     }ECameraNames;
     //Enum for capture shot type
     typedef enum

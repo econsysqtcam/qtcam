@@ -1,4 +1,8 @@
-Qtcam Applicaiton - 11.1.0
+Qtcam Application - 12.0.0
+--------------------------
+* Added support for See3CAM_30 camera.
+
+Qtcam Application - 11.1.0
 --------------------------
 * Qtcam code refactored, codec id name is changed based on codec version and some of the application bugfixes.
 

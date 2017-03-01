@@ -1,5 +1,5 @@
 /*
- * uvc30.qml -- extension settings for other cameras
+ * uvc_cu30.qml -- extension settings for other cameras
  * Copyright © 2015  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
@@ -22,7 +22,7 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.0
 import QtQuick.Dialogs 1.1
 import econ.camera.uvcsettings 1.0
-import econ.camera.see3cam30 1.0
+import econ.camera.see3camcu30 1.0
 import QtQuick.Layouts 1.1
 import cameraenum 1.0
 
@@ -90,7 +90,7 @@ Item {
             exclusiveGroup: sceneInputGroup
             activeFocusOnPress: true
             onClicked: {
-                see3camcu30.setEffectMode(See3Cam30.EFFECT_NORMAL)
+                see3camcu30.setEffectMode(See3Camcu30.EFFECT_NORMAL)
             }
         }
         RadioButton {
@@ -101,7 +101,7 @@ Item {
             activeFocusOnPress: true
             onClicked: {
                 defaultValue.enabled = true
-                see3camcu30.setEffectMode(See3Cam30.EFFECT_BLACK_WHITE)
+                see3camcu30.setEffectMode(See3Camcu30.EFFECT_BLACK_WHITE)
             }
         }
         RadioButton {
@@ -112,7 +112,7 @@ Item {
             activeFocusOnPress: true
             onClicked: {
                 defaultValue.enabled = true
-                see3camcu30.setEffectMode(See3Cam30.EFFECT_GREYSCALE)
+                see3camcu30.setEffectMode(See3Camcu30.EFFECT_GREYSCALE)
             }
         }
         RadioButton {
@@ -123,7 +123,7 @@ Item {
             activeFocusOnPress: true
             onClicked: {
                 defaultValue.enabled = true
-                see3camcu30.setEffectMode(See3Cam30.EFFECT_SKETCH)
+                see3camcu30.setEffectMode(See3Camcu30.EFFECT_SKETCH)
             }
         }
         RadioButton {
@@ -134,7 +134,7 @@ Item {
             activeFocusOnPress: true
             onClicked: {
                 defaultValue.enabled = true
-                see3camcu30.setEffectMode(See3Cam30.EFFECT_NEGATIVE)
+                see3camcu30.setEffectMode(See3Camcu30.EFFECT_NEGATIVE)
             }
         }
     }
@@ -158,14 +158,14 @@ Item {
         style: econButtonStyle
         onClicked: {            
             defaultValue.enabled = false
-            see3camcu30.setEffectMode(See3Cam30.EFFECT_NORMAL)
+            see3camcu30.setEffectMode(See3Camcu30.EFFECT_NORMAL)
             rdoEffectNormal.checked = true
             see3camcu30.setDenoiseValue(defaultNoiseVal)
             deNoiseSlider.value = defaultNoiseVal
         }
         Keys.onReturnPressed: {
             defaultValue.enabled = false
-            see3camcu30.setEffectMode(See3Cam30.EFFECT_NORMAL)
+            see3camcu30.setEffectMode(See3Camcu30.EFFECT_NORMAL)
             rdoEffectNormal.checked = true
             see3camcu30.setDenoiseValue(defaultNoiseVal)
             deNoiseSlider.value = defaultNoiseVal
@@ -300,7 +300,7 @@ Item {
     }
 
 
-    See3Cam30 {
+    See3Camcu30 {
         id: see3camcu30
         onSendEffectMode:{
             switch(effectMode){

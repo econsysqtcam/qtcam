@@ -118,6 +118,9 @@ Rectangle {
     signal captureBtnEnable(bool enable)
     signal videoRecordBtnEnable(bool enable)
     signal videoRecordBtnVisible(bool visible)
+
+    // Added by Sankari: 27 Feb 2017. After capturing image, disable the focus.
+    signal captureBtnFocusDisable()
     //Take screen shot for corressponding camera qml file - Added by Dhurka - 7th Nov 2016
     signal takeScreenShot(bool isWebKeyPressed)
     signal getVideoPinStatus()
@@ -684,6 +687,7 @@ Rectangle {
         keyEventFiltering = true
         vidstreamproperty.enabled = false
         takeScreenShot(false);
+		captureBtnFocusDisable()
     }
 
     function updateScenePreview(str, format, fps) {
@@ -858,7 +862,9 @@ Rectangle {
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU40) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam40/uvc40.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU30) {
-            see3cam = Qt.createComponent("../UVCSettings/see3cam30/uvc30.qml").createObject(root)
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu30/uvc_cu30.qml").createObject(root)
+        } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_30) {
+            see3cam = Qt.createComponent("../UVCSettings/see3cam30/uvc_30.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.CX3_UVC_CAM) {
             see3cam = Qt.createComponent("../UVCSettings/ascella/cx3-uvc.qml").createObject(root)
         } else {
@@ -891,7 +897,7 @@ Rectangle {
             case CommonEnums.SEE3CAM_12CUNIR:
             case CommonEnums.ECON_8MP_CAMERA:
             case CommonEnums.SEE3CAM_130:
-            case CommonEnums.SEE3CAM_81:
+            case CommonEnums.SEE3CAM_30:            
                 camproperty.openHIDDevice(device_box.currentText);
             break;
         }

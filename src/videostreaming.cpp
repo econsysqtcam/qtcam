@@ -1032,11 +1032,8 @@ void Videostreaming::formatSaveSuccess(uint imgSaveSuccessCount, bool burstFlag)
         emit logCriticalHandle("Still image not saved successfully");
         emit titleTextChanged(_title,_text);
     }
-    // After capturing image need to enable RF rect in See3CAM_130 cam
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_130){
-        emit enableRfRectBackInPreview();
-    }
-
+    // After capturing image need to enable RF rect in See3CAM_130 or See3CAM_30 cam
+    emit enableRfRectBackInPreview();
 }
 
 bool Videostreaming::getInterval(struct v4l2_fract &interval)
@@ -1633,12 +1630,23 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
 #endif
 
     fileName = fileLocation +"/Qtcam-" + QDateTime::currentDateTime().toString("yy_MM_dd:hh_mm_ss")+"."+ videoFormatType;
-    v4l2_frmivalenum frmival;
-    enum_frameintervals(frmival, m_pixelformat, m_width, m_height);
+
+    // Fixed issue: Incorrect frame rate for video recording
+    v4l2_fract temp_interval;
+
+    if (m_has_interval) {        
+        temp_interval = m_interval;
+    }
+    else {        
+        v4l2_frmivalenum frmival;
+        enum_frameintervals(frmival, m_pixelformat, m_width, m_height);
+        temp_interval = frmival.discrete;
+    }    
+
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
-    bool tempRet = videoEncoder->createFile(fileName,(AVCodecID)videoEncoderType, m_capDestFormat.fmt.pix.width,m_capDestFormat.fmt.pix.height,frmival.discrete.denominator,frmival.discrete.numerator,10000000);
+    bool tempRet = videoEncoder->createFile(fileName,(AVCodecID)videoEncoderType, m_capDestFormat.fmt.pix.width,m_capDestFormat.fmt.pix.height,temp_interval.denominator,temp_interval.numerator,10000000);
 #else
-    bool tempRet = videoEncoder->createFile(fileName,(CodecID)videoEncoderType, m_capDestFormat.fmt.pix.width,m_capDestFormat.fmt.pix.height,frmival.discrete.denominator,frmival.discrete.numerator,10000000);
+    bool tempRet = videoEncoder->createFile(fileName,(CodecID)videoEncoderType, m_capDestFormat.fmt.pix.width,m_capDestFormat.fmt.pix.height,temp_interval.denominator,temp_interval.numerator,10000000);
 #endif
     if(!tempRet){
         emit rcdStop("Unable to record the video");

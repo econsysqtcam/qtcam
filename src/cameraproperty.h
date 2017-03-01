@@ -137,7 +137,7 @@ signals:
     void logHandle(QtMsgType,QString);
     /**
      * @brief currentlySelectedCameraEnum - This signal is used to emit selected camera enum value to
-     * videocapturefilter.qml file
+     * qtcam.qml file
      * @param selectedDevice
      */
     void currentlySelectedCameraEnum(int selectedDevice);

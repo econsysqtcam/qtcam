@@ -144,6 +144,32 @@
 #define GET_FAIL		0x00
 #define GET_SUCCESS		0x01
 
+
+/* SEE3CAM_30 */
+#define CAMERA_CONTROL_30               0x80
+#define GET_AF_MODE_30					0x07
+#define SET_AF_MODE_30					0x08
+#define GET_Q_FACTOR_30                 0x0F
+#define SET_Q_FACTOR_30                 0x10
+#define SET_ORIENTATION_30              0x12
+#define GET_ORIENTATION_30              0x11
+#define SET_ORIENTATION_HORZFLIP_30     0x01
+#define SET_ORIENTATION_VERTFLIP_30     0x02
+#define SET_ORIENTATION_BOTHFLIP_ENABLE_30      0x03
+#define SET_ORIENTATION_BOTHFLIP_DISABLE_30     0x00
+#define GET_ORIENTATION_30              0x11
+#define GET_AF_ROI_MODE_30				0x09
+#define SET_AF_ROI_MODE_30				0x0A
+#define SET_EXP_ROI_MODE_30             0x0C
+#define GET_EXP_ROI_MODE_30             0x0B
+#define GET_AF_RECT_MODE_30             0x13
+#define SET_AF_RECT_MODE_30             0x14
+#define ENABLE_AF_RECTANGLE_30          0x01
+#define DISABLE_AF_RECTANGLE_30         0x00
+#define GET_BURST_LENGTH_30             0x0D
+#define SET_BURST_LENGTH_30             0x0E
+#define SET_TO_DEFAULT_30               0xFF
+
 /* SEE3CAM_130 */
 #define CAMERA_CONTROL_130               0x7B
 #define GET_SCENEMODE_130				0x01

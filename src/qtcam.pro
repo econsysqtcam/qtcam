@@ -3,7 +3,7 @@ folder_01.source = qml/qtcam
 folder_01.target = qml
 DEPLOYMENTFOLDERS = folder_01
 
-QT += widgets
+QT += widgets concurrent
 TARGET = Qtcam
 
 CONFIG += release
@@ -31,7 +31,8 @@ SOURCES += main.cpp \
     h264decoder.cpp \
     ascella.cpp \
     seecam_cu30.cpp \
-    see3cam_130.cpp
+    see3cam_130.cpp \
+	see3cam_30.cpp
 
 # Installation path
 # target.path =
@@ -63,7 +64,8 @@ HEADERS += \
 	seecam_cu30.h \
 	common.h \
     see3cam_130.h \
-	common_enums.h
+	common_enums.h \
+	see3cam_30.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
@@ -86,4 +88,4 @@ QMAKE_CFLAGS_THREAD = -D__STDC_CONSTANT_MACROS      #For Ubuntu 12.04 compilatio
 QMAKE_CXXFLAGS_THREAD = -D__STDC_CONSTANT_MACROS    #For Ubuntu 12.04 compilation
 
 OTHER_FILES += \
-    qml/qtcam/videocapturefilter/videocapturefilter.qml
+    qml/qtcam/Views/qtcam.qml
