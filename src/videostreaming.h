@@ -85,6 +85,9 @@ public:
     // get current resoution set in v4l2
     QString getResoultion();
 
+    // Things need to do after change FPS and take shot
+    void doAfterChangeFPSAndShot();
+
     v4l2_format fmt;
     QString _title;
     QString _text;
@@ -104,6 +107,8 @@ public:
     int warmup;
     int flags;
     tjscalingfactor sf;
+
+    uint frameToSkip;
 
 private:
 
@@ -136,6 +141,8 @@ private:
     bool m_snapShot;
     bool updateStop;
     bool makeSnapShot;
+    bool changeFpsAndShot; // To change fps and take shot
+    bool fpsChangedForStill;
     bool m_burstShot;
     bool triggerShot;
     bool m_has_interval;
@@ -251,6 +258,13 @@ public slots:
      * 4. PNG
      */
     void makeBurstShot(QString filePath,QString imgFormatType, uint burstLength);
+
+    /**
+     * @brief changeFPSandTakeShot - change fps and take still
+     * @param filePath
+     * @param imgFormatType
+     */
+    void  changeFPSandTakeShot(QString filePath,QString imgFormatType, uint fpsIndex);
 
     /**
      * @brief Still Capture the image preview [In Trigger Mode]
@@ -400,7 +414,9 @@ public slots:
      */
     void selectedCameraEnum(CommonEnums::ECameraNames selectedDeviceEnum);
 
-	void enumerateFPSList();
+    void updateFrameToSkip(uint stillSkip);
+
+    void enumerateFPSList();
 
 
 signals:
@@ -422,7 +438,14 @@ signals:
     void videoRecord(QString fileName);
     void enableRfRectBackInPreview();
 
-// To get FPS list
+    // Added by Sankari: 02 Dec 2017
+    void stillSkipCount(QString stillResoln, QString videoResoln);
+
+    void stillSkipCountWhenFPSChange(bool fpsChange);
+
+    void requestToChangeFPSandTakeShot();
+
+    // To get FPS list
     void sendFPSlist(QString fpsList);
 
     void frameRateInterval(uint currentfpsInterval);

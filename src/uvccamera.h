@@ -84,6 +84,7 @@
 #define GPIO_OPERATION		0x20
 #define GPIO_GET_LEVEL		0x01
 #define GPIO_SET_LEVEL		0x02
+#define GET_INPUT_GPIO_LEVEL 0x04
 
 #define GPIO_LOW		0x00
 #define GPIO_HIGH		0x01
@@ -144,6 +145,21 @@
 #define GET_FAIL		0x00
 #define GET_SUCCESS		0x01
 
+/* SEE3CAM_81 */
+#define CAMERA_CONTROL_81					0x7C
+#define SETSPECIALEFFECT_81					0x09
+#define GETSPECIALEFFECT_81					0x08
+#define GETFLIPMIRRORSTATUS_81				0x0A
+#define SETFLIPMIRRORSTATUS_81				0x0B
+#define GET_AF_ROI_MODE_81                  0x13
+#define SET_AF_ROI_MODE_81                  0x14
+#define SET_AF_ROI_MODE_COORDINATES_81      0x16
+#define GETSTROBE_STATUS					0x06
+#define SETSTROBE_STATUS					0x07
+#define GETFOCUS_STATUS                     0x05
+
+#define GET_FAIL_CAM81                      0x01
+#define GET_SUCCESS_CAM81                   0x00
 
 /* SEE3CAM_30 */
 #define CAMERA_CONTROL_30               0x80
@@ -207,6 +223,34 @@
 #define SET_STREAM_MODE_130               0x15
 #define GET_STREAM_MODE_130               0x14
 
+#define SET_FACE_DETECT_RECT            0x1F
+#define GET_FACE_DETECT_RECT            0x1E
+#define ENABLE_FACE_RECT                0x01
+#define DISABLE_FACE_RECT               0x00
+#define ENABLE_EMBED_DATA               0x01
+#define DISABLE_EMBED_DATA              0x00
+#define ENABLE_OVERLAY_RECT             0x01
+#define DISABLE_OVERLAY_RECT            0x00
+#define FACE_RECT_SUCCESS               0x01
+#define FACE_RECT_FAIL                  0x00
+
+#define SET_SMILE_DETECTION             0x21
+#define GET_SMILE_DETECTION             0x20
+#define ENABLE_SMILE_DETECT             0x01
+#define DISABLE_SMILE_DETECT            0x00
+#define SMILE_DETECT_SUCCESS            0x01
+#define SMILE_DETECT_FAIL               0x00
+
+#define SET_EXPOSURE_COMPENSATION       0x23
+#define GET_EXPOSURE_COMPENSATION       0x22
+#define EXPOSURE_COMP_CMD_SUCCESS       0x01
+#define EXPOSURE_COMP_CMD_FAIL          0x00
+
+#define SET_FRAME_RATE_130              0x25
+#define GET_FRAME_RATE_130              0x24
+#define FRAMERATE_CMD_SUCCESS           0x01
+#define FRAMERATE_CMD_FAIL              0x00
+
 /* SEE3CAM_CU51 */
 
 #define GET_EXPOSURE_VALUE	0x01
@@ -237,6 +281,9 @@
 
 #define SET_DENOISE_CONTROL  0x06
 #define GET_DENOISE_CONTROL  0x05
+
+/* See3Cam_81 */
+#define SET_TO_DEFAULT_CAM81                0x0C
 
 /* Ascella camera */
 #define ASCELLA_VID 0x04b4
@@ -492,7 +539,15 @@ public:
     OUT3 = 21,
     IN1 = 19,
     IN2 = 22,
-    IN3 = 33
+    IN3 = 33,
+    CAM81_IN3 = 0x01,
+    CAM81_IN6 = 0x02,
+    CAM81_OUT8 = 0x01,
+    CAM81_OUT9 = 0x02,
+    CAM81_OUT8_READVAL = 25,
+    CAM81_OUT9_READVAL = 24,
+    CAM81_IN3_READVAL = 21,
+    CAM81_IN6_READVAL = 23,
     };
 
     Q_ENUMS(camGpioPin)
@@ -516,7 +571,8 @@ public slots:
      * @return
      * false -failed to read Gpio Status for particular Gpio pin.
      */
-    void getGpioLevel(camGpioPin gpioPinNumber);
+    bool getGpioLevel(camGpioPin gpioPinNumber);
+
     /**
      * @brief   Set the GPIO status(High=1/Low=0) for the particular Gpio pin.
      * @param gpioPin  pin(OUT1) for which user needs to  set the status.
@@ -526,7 +582,7 @@ public slots:
      * @return
      * false - Failed to change the GPIO level.
      */
-     void setGpioLevel(camGpioPin gpioPin,camGpioValue gpioValue);
+     bool setGpioLevel(camGpioPin gpioPin,camGpioValue gpioValue);
 };
 
 class See3CAM_ModeControls {

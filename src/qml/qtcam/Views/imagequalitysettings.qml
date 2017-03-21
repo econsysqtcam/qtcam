@@ -423,12 +423,14 @@ Item {
                                 {
                                     root.logInfo("White Balance set to Auto Mode")
                                     root.changeCameraSettings(whiteBalanceControl_auto_Id,1)
+                                    root.autoWhiteBalanceSelected(true)
                                     white_balance_Slider.opacity = 0.1
                                     white_balance_Slider.enabled = false
                                 }
                                 else
                                 {
                                     root.logInfo("White Balance set to Manual Mode")
+                                    root.autoWhiteBalanceSelected(false)
                                     root.changeCameraSettings(whiteBalanceControl_auto_Id,0)
                                     if(root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM){
                                         white_balance_Slider.opacity = 1
@@ -451,6 +453,7 @@ Item {
                                 if(!autoSelect_wb.checked) {
                                     root.logInfo("White Balance changed to: "+ value.toString())
                                     root.changeCameraSettings(whiteBalanceControlId,value.toString())
+                                    root.manualWbSliderValueChanged()
                                 } else {
                                     white_balance_Slider.enabled = false
                                 }
@@ -1231,6 +1234,12 @@ Item {
     Connections
     {
         target: root
+        // Enable Image Quality settings after capturing image
+        onImageQualitySettingsEnable:
+        {
+            videoFilter.enabled = enableStatus
+            videoFilter.opacity = enableStatus ? 1 : 0.5
+        }
         onSidebarVisibleStatus:
         {
             videoFilter.visible = status;
@@ -1310,6 +1319,10 @@ Item {
                 }
             }
         }
+        onQueryUvcControls:{
+            root.cameraFilterControls(true)
+        }
+
     }
     function setCameraControls(controlName,controlType,controlMinValue,controlMaxValue,controlDefaultValue,controlID)
     {
@@ -1643,6 +1656,9 @@ Item {
         whiteBalanceControl_auto_Id = controlID
         if(!autoSelect_wb.checked && root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM) {
             white_balance_Slider.enabled = true
+            JS.autoWhiteBalSelected = false             // manual white balance selected
+        }else{
+            JS.autoWhiteBalSelected = true              // auto white balance selected
         }
     }
     function autoFocusUIUpdate(controlID,controlDefaultValue)

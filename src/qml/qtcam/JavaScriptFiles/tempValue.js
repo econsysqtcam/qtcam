@@ -18,6 +18,7 @@ var videoExtension
 var videoEncoder
 var autoFocusChecked
 var autoExposureSelected
+var autoWhiteBalSelected
 
 function enableTriggerMode_10cugM() {
     triggerMode_M=1;

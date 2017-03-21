@@ -32,7 +32,8 @@ SOURCES += main.cpp \
     ascella.cpp \
     seecam_cu30.cpp \
     see3cam_130.cpp \
-	see3cam_30.cpp
+	see3cam_30.cpp \
+	seecam_81.cpp
 
 # Installation path
 # target.path =
@@ -65,7 +66,8 @@ HEADERS += \
 	common.h \
     see3cam_130.h \
 	common_enums.h \
-	see3cam_30.h
+    see3cam_30.h \
+    seecam_81.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \

@@ -73,6 +73,7 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",d052"),CommonEnums::ECON_CX3_RDX_V5680);
     cameraEnumMap.insert(econVid + (",c080"),CommonEnums::ECON_8MP_CAMERA);
     cameraEnumMap.insert(econVid + (",c0d0"),CommonEnums::SEE3CAM_130);
+    cameraEnumMap.insert(econVid + (",c081"),CommonEnums::SEE3CAM_81);
 }
 
 unsigned int uvccamera::getTickCount()
@@ -870,137 +871,118 @@ void See3CAM_Control::setTorchControlState(const int torchState) {
     setTorchState(torchCheckBoxState);
 }
 
-void See3CAM_GPIOControl::getGpioLevel(camGpioPin gpioPinNumber)
-{
+bool See3CAM_GPIOControl::getGpioLevel(camGpioPin gpioPinNumber)
+{    
     if(uvccamera::hid_fd < 0)
     {
-        return void();
-    }
+        return false;
+    }    
     bool timeout = true;
     int ret = 0;
-    unsigned int start, end = 0;
+    unsigned int start, end = 0;    
 
-    if(gpioPinNumber == OUT1 || gpioPinNumber == OUT2 || gpioPinNumber == OUT3 || gpioPinNumber == IN1 || gpioPinNumber == IN2 || gpioPinNumber == IN3 )
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+
+    //Set the Report Number
+    g_out_packet_buf[1] = GPIO_OPERATION; 	/* Report Number */
+    g_out_packet_buf[2] = GPIO_GET_LEVEL; 	/* Report Number */
+    g_out_packet_buf[3] = gpioPinNumber; 		/* GPIO Pin Number */
+
+    /* Send a Report to the Device */
+    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
+    if (ret < 0) {
+        perror("write");
+        return false;
+    }
+    /* Read the GPIO level and status of read from the device */
+    start = uvc.getTickCount();
+    while(timeout)
     {
-        //Initialize the buffer
-        memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+        /* Get a report from the device */
+        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
 
-        //Set the Report Number
-        g_out_packet_buf[1] = GPIO_OPERATION; 	/* Report Number */
-        g_out_packet_buf[2] = GPIO_GET_LEVEL; 	/* Report Number */
-        g_out_packet_buf[3] = gpioPinNumber; 		/* GPIO Pin Number */
-        /* Send a Report to the Device */
-        ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
         if (ret < 0) {
-            perror("write");
-            return void();
-        }
-        /* Read the GPIO level and status of read from the device */
-        start = uvc.getTickCount();
-        while(timeout)
-        {
-            /* Get a report from the device */
-            ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-
-            if (ret < 0) {
-                //perror("read");
-            } else {                
-                if(g_in_packet_buf[0] == GPIO_OPERATION &&
-                        g_in_packet_buf[1] == GPIO_GET_LEVEL &&
-                        g_in_packet_buf[2] == gpioPinNumber) {
-                    emit gpioLevel(g_in_packet_buf[3]);
-                    if(g_in_packet_buf[4] == GPIO_LEVEL_FAIL) {
-                        return void();
-                    } else if(g_in_packet_buf[4]==GPIO_LEVEL_SUCCESS) {
-                        timeout = false;
-                    }
+            perror("read");
+        } else {
+            if(g_in_packet_buf[0] == GPIO_OPERATION &&
+                    g_in_packet_buf[1] == GPIO_GET_LEVEL &&
+                    g_in_packet_buf[2] == gpioPinNumber) {
+                emit gpioLevel(g_in_packet_buf[3]);
+                if(g_in_packet_buf[4] == GPIO_LEVEL_FAIL) {
+                    return false;
+                } else if(g_in_packet_buf[4]==GPIO_LEVEL_SUCCESS) {
+                    timeout = false;
                 }
             }
-            end = uvc.getTickCount();
-            if(end - start > TIMEOUT)
-            {                
-                timeout = false;
-                return void();
-            }
+        }
+        end = uvc.getTickCount();
+        if(end - start > TIMEOUT)
+        {
+            timeout = false;
+            return false;
         }
     }
-    else
-    {
-        return void();
-    }
+    return true;
 }
 
-void See3CAM_GPIOControl::setGpioLevel(camGpioPin gpioPin,camGpioValue gpioValue)
+bool See3CAM_GPIOControl::setGpioLevel(camGpioPin gpioPin,camGpioValue gpioValue)
 {
-
     if(uvccamera::hid_fd < 0)
     {
-        return void();
+        return false;
     }
 
     bool timeout = true;
     int ret = 0;
     unsigned int start, end = 0;
 
-    if((gpioPin == OUT1 || gpioPin == OUT2 || gpioPin == OUT3 ))
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+
+    //Set the Report Number
+    g_out_packet_buf[1] = GPIO_OPERATION; 	/* Report Number */
+    g_out_packet_buf[2] = GPIO_SET_LEVEL; 	/* Report Number */
+    g_out_packet_buf[3] = gpioPin; 		/* GPIO Pin Number */
+    g_out_packet_buf[4] = gpioValue; 	/* GPIO Value */
+
+    /* Send a Report to the Device */
+    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
+    if (ret < 0) {
+        perror("write");
+        return false;
+    }
+    /* Read the GPIO level and status of read from the device */
+    start = uvc.getTickCount();
+    while(timeout)
     {
-        if((gpioValue == High || gpioValue == Low))
-        {
-            //Initialize the buffer
-            memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-
-            //Set the Report Number
-            g_out_packet_buf[1] = GPIO_OPERATION; 	/* Report Number */
-            g_out_packet_buf[2] = GPIO_SET_LEVEL; 	/* Report Number */
-            g_out_packet_buf[3] = gpioPin; 		/* GPIO Pin Number */
-            g_out_packet_buf[4] = gpioValue; 	/* GPIO Value */
-
-            /* Send a Report to the Device */
-            ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-            if (ret < 0) {
-                perror("write");
-                return void();
-            }
-            /* Read the GPIO level and status of read from the device */
-            start = uvc.getTickCount();
-            while(timeout)
-            {
-                /* Get a report from the device */
-                ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-                if (ret < 0) {
-                    //perror("read");
-                } else {                    
-                    if(g_in_packet_buf[0] == GPIO_OPERATION &&
-                            g_in_packet_buf[1] == GPIO_SET_LEVEL &&
-                            g_in_packet_buf[2] == gpioPin &&
-                            g_in_packet_buf[3] == gpioValue) {
-                        if(g_in_packet_buf[4] == GPIO_LEVEL_FAIL) {
-                            emit deviceStatus(tr("Failure"), tr("Unable to change the GPIO level"));
-                            return void();
-                        } else if(g_in_packet_buf[4]==GPIO_LEVEL_SUCCESS) {
-                            timeout = false;
-                        }
-                    }
-                }
-                end = uvc.getTickCount();
-                if(end - start > TIMEOUT)
-                {                    
+        /* Get a report from the device */
+        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
+        if (ret < 0) {
+            perror("read");
+        } else {
+            if(g_in_packet_buf[0] == GPIO_OPERATION &&
+                    g_in_packet_buf[1] == GPIO_SET_LEVEL &&
+                    g_in_packet_buf[2] == gpioPin &&
+                    g_in_packet_buf[3] == gpioValue) {
+                if(g_in_packet_buf[4] == GPIO_LEVEL_FAIL) {
+                    emit deviceStatus(tr("Failure"), tr("Unable to change the GPIO level"));
+                    return false;
+                } else if(g_in_packet_buf[4]==GPIO_LEVEL_SUCCESS) {
                     timeout = false;
-                    return void();
                 }
             }
         }
-        //Modified by Dhurka - Braces alignment - 14th Oct 2016
-        else
+        end = uvc.getTickCount();
+        if(end - start > TIMEOUT)
         {
-            return void();
+            timeout = false;
+            return false;
         }
     }
-    else
-    {
-        return void();
-    }
+    return true;
 }
+
 //Modified by Dhurka - Braces alignment - 14th Oct 2016
 bool See3CAM_ModeControls::enableMasterMode()
 {

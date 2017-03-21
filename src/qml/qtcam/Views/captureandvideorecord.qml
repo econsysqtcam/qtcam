@@ -317,11 +317,7 @@ Item {
         {
             capture.enabled = enable
             capture.opacity = enable ? 1 : 0.5
-        }
-	// Added By Sankari: 27 Feb 2017 . After capturing image, disable the focus.
-	onCaptureBtnFocusDisable:{
-	    capture.focus = false
-	}
+        }	
     }
     Connections
     {

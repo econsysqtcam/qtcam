@@ -1,3 +1,11 @@
+Qtcam Application - 13.0.0
+--------------------------
+* Added support for See3CAM_81 camera.
+* The following additional features are supported in see3cam_130 camera.
+	1. Face detection
+	2. Smile detection
+	3. Exposure compensation
+	4. Frame Rate Control
 Qtcam Application - 12.0.0
 --------------------------
 * Added support for See3CAM_30 camera.

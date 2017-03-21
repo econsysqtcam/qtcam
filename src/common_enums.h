@@ -37,14 +37,18 @@ public:
         ECON_8MP_CAMERA,
         SEE3CAM_130,
 		// Added by Sankari - 7 Feb 2017
-		SEE3CAM_30
+		SEE3CAM_30,
+		// Added by Sankari - 17 Dec 2016
+        SEE3CAM_81
+
     }ECameraNames;
     //Enum for capture shot type
     typedef enum
     {
         SNAP_SHOT,
         TRIGGER_SHOT,
-        BURST_SHOT        
+        BURST_SHOT,
+        CHANGE_FPS_SHOT
     }ECaptureShotType;
 
     Q_ENUMS(ECameraNames)

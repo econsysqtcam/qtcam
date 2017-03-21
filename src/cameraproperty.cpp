@@ -112,7 +112,7 @@ void Cameraproperty::checkforDevice() {
      * uvccam.findEconDevice(&availableCam,"video4linux");
      */
     uvccam.findEconDevice("video4linux");
-    availableCam.prepend("----Select camera Device----");
+    availableCam.prepend("----Select Camera Device----");
     modelCam.setStringList(availableCam);
     //Modified by Nithyesh
     /*

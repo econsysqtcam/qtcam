@@ -33,6 +33,7 @@
 #include "seecam_cu50.h"
 #include "seecam_cu51.h"
 #include "seecam_cu80.h"
+#include "seecam_81.h"
 #include "see3cam_cu130.h"
 #include "see3cam_130.h"
 #include "seecam_ar0130.h"
@@ -67,6 +68,9 @@ int main(int argc, char *argv[])
 
   // Added by Sankari : 07 Feb 2017
     qmlRegisterType<See3CAM_30>("econ.camera.see3cam30", 1, 0, "See3Cam30");
+
+ // Added by Sankari: 17 Dec 2016
+    qmlRegisterType<See3CAM_81>("econ.camera.see3cam81", 1, 0, "See3Cam81");
 
     qmlRegisterType<See3CAM_CU50>("econ.camera.see3cam50", 1, 0, "See3Cam50");    
     qmlRegisterType<See3CAM_CU130>("econ.camera.see3camcu130", 1, 0, "See3CamCu130");

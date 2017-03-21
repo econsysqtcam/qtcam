@@ -73,6 +73,7 @@ Videostreaming::Videostreaming()
     m_snapShot = false;
     m_burstShot = false;
     makeSnapShot = false;
+    changeFpsAndShot = false;
     triggerShot = false;
     m_displayCaptureDialog = false;
     m_saveImage = false;
@@ -88,9 +89,9 @@ Videostreaming::Videostreaming()
     sf.denom = 1;
     sf.num = 1;
     flags = TJFLAG_NOREALLOC;
-    yuvpad = 1;    
-
-
+    yuvpad = 1;
+    frameToSkip = 1;
+    fpsChangedForStill = false;
 }
 
 Videostreaming::~Videostreaming()
@@ -372,8 +373,9 @@ void Videostreaming::capFrame()
     delete qq;
     int tmpRet;
 
+    // Added by Sankari : 03 Dec 2016 - frameToSkip - number of frames to skip while taking images
     // m_burstShot - if continous number of shots are needed , this flag will be set.
-    if((m_frame > 1 && m_snapShot) || (m_frame > 1 && m_burstShot)) {
+    if(((m_frame > frameToSkip) && m_snapShot) || ((m_frame > frameToSkip) && m_burstShot)) {
         if(m_burstNumber == m_burstLength){
             m_burstNumber = 1;
         }
@@ -435,7 +437,11 @@ void Videostreaming::capFrame()
                 makeSnapShot = false;
                 m_snapShot = false;
 				m_burstShot = false;                
-            } else {
+            } else if(changeFpsAndShot){
+                captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
+                doAfterChangeFPSAndShot();
+            }
+            else {
                 captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
                 makeSnapShot = false;
                 m_snapShot = false;
@@ -517,6 +523,24 @@ void Videostreaming::capFrame()
     freeBuffer(tempSrcBuffer);
     freeBuffers(tempDestBuffer, copyDestBuffer);
     qbuf(buf);
+}
+
+// Added by Sankari - 04 Jan 2017
+/**
+ * @brief Videostreaming::doAfterChangeFPSAndShot
+ */
+void Videostreaming::doAfterChangeFPSAndShot(){
+    makeSnapShot = false;
+    m_snapShot = false;
+    m_burstShot = false;
+    // Restore preview color space, resolution, fps.
+    if(fpsChangedForStill){
+        stopCapture();
+        vidCapFormatChanged(lastFormat);
+        setResoultion(lastPreviewSize);
+        frameIntervalChanged(lastFPSValue.toUInt());
+        startAgain();
+    }
 }
 
 void Videostreaming::freeBuffer(unsigned char *ptr)
@@ -871,10 +895,18 @@ int Videostreaming::findMax(QList<int> *list) {
     return array[index_of_min];
 }
 
+/**
+ * @brief Videostreaming::updateFrameToSkip
+ * @param stillSkip
+ */
+void Videostreaming::updateFrameToSkip(uint stillSkip){
+    frameToSkip = stillSkip;
+}
 
-
-void Videostreaming::makeShot(QString filePath,QString imgFormatType) {    
+void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     captureTime.start();
+	// Added by Sankari : to set still skip
+    emit stillSkipCount(stillSize, lastPreviewSize);
     m_snapShot = true;
     m_burstShot = false;
     m_burstNumber = 1;
@@ -892,6 +924,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     getFileName(filePath, imgFormatType);
     makeSnapShot = true;
     triggerShot = false;
+    changeFpsAndShot = false;
     m_displayCaptureDialog = true;   
 
     if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
@@ -903,6 +936,45 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     }
 }
 
+/**
+ * @brief Videostreaming::changeFPSandTakeShot - Change fps and take shot
+ * @param filePath - file path - file location to save
+ * @param imgFormatType - image format type like jpg,png,raw,bmp
+ * @param fpsIndex - fps list index value need to set
+ */
+void  Videostreaming::changeFPSandTakeShot(QString filePath,QString imgFormatType, uint fpsIndex){
+    captureTime.start();
+    m_snapShot = true;
+    m_burstShot = false;
+    m_burstNumber = 1;
+    m_burstLength = 1; // for single shot
+    m_saveImage = true;
+
+    formatType = imgFormatType;
+
+    getFileName(filePath, imgFormatType);
+    makeSnapShot = true;
+    triggerShot = false;
+    m_displayCaptureDialog = true;
+    changeFpsAndShot = true;
+    fpsChangedForStill = false;
+
+    // If lastly setfpsvalue and currently set fps value is different, then set currently selected fps to take still.
+    if (!((fpsIndex == lastFPSValue.toUInt()) && (stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
+    {
+        emit stillSkipCountWhenFPSChange(true);
+        stopCapture();
+        vidCapFormatChanged(stillOutFormat);
+        setResoultion(stillSize);
+        frameIntervalChanged(fpsIndex);
+        startAgain();
+        fpsChangedForStill = true;
+    }else{
+        emit stillSkipCountWhenFPSChange(false);
+    }
+
+}
+
 void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
 
     captureTime.restart();
@@ -910,6 +982,9 @@ void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
     m_burstShot = false;
     m_burstLength = 1;
     m_burstNumber = 1;
+
+    // emit signal to set still skip count
+    emit stillSkipCount(stillSize, lastPreviewSize);
 
     /* cu40 - IR image in bmp format */
     if(imgFormatType == "IR data(8bit BMP)"){
@@ -922,6 +997,7 @@ void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
     getFileName(filePath, imgFormatType);    
 
     makeSnapShot = true;
+    changeFpsAndShot = false;
     triggerShot = true;
     m_saveImage = true;
     m_displayCaptureDialog = false;
@@ -988,10 +1064,13 @@ QString Videostreaming::getImageFormatType(){
 }
 
 
-void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint burstLength){    
+void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint burstLength){
     captureTime.start();
     m_burstShot = true;
     m_snapShot = false;
+
+    // emit signal to set still skip count
+    emit stillSkipCount(stillSize, lastPreviewSize);
 
     getFileName(filePath, imgFormatType);    
     m_burstLength = burstLength; // no of shots to take

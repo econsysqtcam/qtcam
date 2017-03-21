@@ -39,6 +39,15 @@ Rectangle {
     signal afterRecordVideo()    
     signal autoFocusSelected(bool autoFocusSelect)
     signal autoExposureSelected(bool autoExposureSelect)
+
+    //Added by Sankari: 07 Mar 2017
+    // signal to notify auto white balance selected
+    signal autoWhiteBalanceSelected(bool autoWhiteBalanceSelect)
+
+    //Added by Sankari: 07 Mar 2017
+    // signal to notify whitebalance slider value changed
+    signal manualWbSliderValueChanged()
+
     property int burstLength;
     property bool vidFormatChanged: false
     property bool keyEventFiltering
@@ -92,6 +101,9 @@ Rectangle {
     //Default still format y pos value
     property int defaultStillPropertyYValue : 240
 
+    // To check mouse click capture function is called
+    property bool mouseClickCap: false
+
     // Avaialble FPS list
     property string availableFpslist
 
@@ -102,6 +114,9 @@ Rectangle {
 
     //Video frame interval
     signal videoFrameInterval(int frameInterval)
+
+    // Image Quality settings enable/disable
+    signal imageQualitySettingsEnable(bool enableStatus)
     //Video Property item enable or disable
     signal videoPropertyItemEnable(bool enableStatus)
     //Video menu open or closed status
@@ -114,13 +129,15 @@ Rectangle {
     signal updateVideoMenuPosition();
     //Add Auto mode menu item in the image quality settings tab
     signal addAutoModeMenuItem();
+
+    // Query controls when selecting camera
+    signal queryUvcControls();
+
     //Capture and Video Recording
     signal captureBtnEnable(bool enable)
     signal videoRecordBtnEnable(bool enable)
     signal videoRecordBtnVisible(bool visible)
 
-    // Added by Sankari: 27 Feb 2017. After capturing image, disable the focus.
-    signal captureBtnFocusDisable()
     //Take screen shot for corressponding camera qml file - Added by Dhurka - 7th Nov 2016
     signal takeScreenShot(bool isWebKeyPressed)
     signal getVideoPinStatus()
@@ -234,7 +251,17 @@ Rectangle {
                 keyEventFiltering = false
                 messageDialog.title = _title.toString()
                 messageDialog.text = _text.toString()
-                messageDialog.visible = true               
+                messageDialog.visible = true
+                if(mouseClickCap){
+                    //Added by Sankari : 08 Mar 2017
+                    //Enable camera settings/extension settings tab after capturing image
+                    imageQualitySettingsEnable(true)
+                    videoPropertyItemEnable(true)
+                    stillPropertyItemEnable(true)
+                    uvc_settings.enabled = true
+                    uvc_settings.opacity = 1
+					mouseClickCap = false
+                }
             }
             onEnableRfRectBackInPreview:{
                 afterBurst() // signal to do anything need to do after capture continuous[burst] shots.
@@ -350,7 +377,15 @@ Rectangle {
             onVideoRecord: {
                 videofileName = fileName
             }
-            
+
+            onStillSkipCount:{                
+                frameSkipCount(stillResoln, videoResoln);
+            }
+
+            onStillSkipCountWhenFPSChange:{
+                frameSkipCountWhenFPSChange(fpsChange)
+            }
+
             // Added by Sankari - get FPS list
             onSendFPSlist:{
                 availableFpslist = fpsList;
@@ -482,7 +517,9 @@ Rectangle {
                         vidstreamproperty.displayVideoResolution()
                         vidstreamproperty.displayEncoderList()
                         //Added by Dhurka - 24th Oct 2016 - Push Auto mode item in image quality settings for ascella camera
-                        addAutoModeMenuItem();
+                        addAutoModeMenuItem();                        
+                        //Added by Sankari - 06th Mar 2016
+                        queryUvcControls();
                         //Added by Dhurka - 20th Oct 2016
                         disableImageSettings()
                         //Added by Dhurka - Here commonly open HID device instead of open every QML file - 17th Oct 2016
@@ -686,8 +723,16 @@ Rectangle {
         captureBtnEnable(false)
         keyEventFiltering = true
         vidstreamproperty.enabled = false
+        mouseClickCap = true
+        //Added by Sankari : 08 Mar 2017
+        // Disable camera settings/extension settings tab before capturing image
+        imageQualitySettingsEnable(false)
+        videoPropertyItemEnable(false)
+        stillPropertyItemEnable(false)
+        uvc_settings.enabled = false
+        uvc_settings.opacity = 0.5
+        selectCameraSettings()
         takeScreenShot(false);
-		captureBtnFocusDisable()
     }
 
     function updateScenePreview(str, format, fps) {
@@ -897,7 +942,8 @@ Rectangle {
             case CommonEnums.SEE3CAM_12CUNIR:
             case CommonEnums.ECON_8MP_CAMERA:
             case CommonEnums.SEE3CAM_130:
-            case CommonEnums.SEE3CAM_30:            
+            case CommonEnums.SEE3CAM_30:
+			case CommonEnums.SEE3CAM_81:
                 camproperty.openHIDDevice(device_box.currentText);
             break;
         }

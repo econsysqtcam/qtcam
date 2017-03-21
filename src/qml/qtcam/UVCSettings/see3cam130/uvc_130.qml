@@ -15,14 +15,22 @@ Item {
     property int denoiseMax: 15
     property int qFactorMin: 10
     property int qFactorMax: 96
+    property int frameRateMin: 1
+    property int frameRateMax: 120
+    property int expoCompMin: 8000
+    property int expoCompMax: 1000000
+    property int defaultSmileThreshold: 40
     property int iHDRMin: 1
-    property int iHDRMax: 4
-    // Flags to prevent setting values in camera when getting the values from camera
-    property bool skipUpdateUIOnSetttings : false
+    property int iHDRMax: 4   
+    // Flags to prevent setting values in camera when getting the values from camera    
+    property bool skipUpdateUIQFactor : false
+    property bool skipUpdateUIDenoise : false
+    property bool skipUpdateUIFrameRate: false
     property bool skipUpdateUIOnAFWindowSize: false
     property bool skipUpdateUIOnExpWindowSize: false
     property bool skipUpdateUIOnBurstLength: false
     property bool skipUpdateUIiHDR: false
+    property bool setButtonClicked: false
 
     Connections
     {
@@ -61,9 +69,21 @@ Item {
         interval: 500
         onTriggered: {
             seecam130.getSceneMode()
-            seecam130.getEffectMode()
-            seecam130.getDenoiseValue()
+            seecam130.getEffectMode()            
+            seecam130.getDenoiseValue()            
             seecam130.getQFactor()
+            seecam130.getExposureCompensation()            
+            seecam130.getFrameRateCtrlValue()
+            stop()
+        }
+    }
+
+    Timer {
+        id: getexposureCompFrameRateCtrlTimer
+        interval: 500
+        onTriggered: {
+            seecam130.getExposureCompensation()            
+            seecam130.getFrameRateCtrlValue()
             stop()
         }
     }
@@ -491,10 +511,10 @@ Item {
                     maximumValue: denoiseMax
                     onValueChanged:  {
                         deNoiseTextField.text = deNoiseSlider.value
-                        if(skipUpdateUIOnSetttings){
+                        if(skipUpdateUIDenoise){
                             seecam130.setDenoiseValue(deNoiseSlider.value)
                         }
-                        skipUpdateUIOnSetttings = true
+                        skipUpdateUIDenoise = true
                     }
                 }
                 TextField {
@@ -578,7 +598,7 @@ Item {
                     ListElement { text: "6" }
                     ListElement { text: "7" }
                     ListElement { text: "8" }
-                }
+                }                
                 activeFocusOnPress: true
                 style: econComboBoxStyle
                 onCurrentIndexChanged: {
@@ -687,10 +707,11 @@ Item {
                     maximumValue: qFactorMax
                     onValueChanged:  {
                         qFactorTextField.text = qFactorSlider.value
-                        if(skipUpdateUIOnSetttings){
+                        if(skipUpdateUIQFactor){
+                            console.log("skipUpdateUIQFactor"+skipUpdateUIQFactor)
                             seecam130.setQFactor(qFactorSlider.value)
                         }
-                        skipUpdateUIOnSetttings = true
+                        skipUpdateUIQFactor = true
                     }
                 }
                 TextField {
@@ -830,6 +851,291 @@ Item {
                 }
             }
 
+            Text {
+                id: faceDetectionText
+                text: "--- Face Detection ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+
+            Row{
+                spacing: 62
+                ExclusiveGroup { id: faceRectGroup }
+                RadioButton {
+                    exclusiveGroup: faceRectGroup
+                    id: faceRectEnable
+                    text: "Enable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked:{
+                        seecam130.setFaceDetectionRect(true, faceDetectEmbedData.checked, overlayRect.checked)
+                    }
+                    Keys.onReturnPressed: {
+                        seecam130.setFaceDetectionRect(true, faceDetectEmbedData.checked, overlayRect.checked)
+                    }
+                }
+                RadioButton {
+                    exclusiveGroup: faceRectGroup
+                    id:faceRectDisable
+                    text: "Disable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked: {
+                        seecam130.setFaceDetectionRect(false, faceDetectEmbedData.checked, overlayRect.checked)
+                    }
+                    Keys.onReturnPressed: {
+                        seecam130.setFaceDetectionRect(false, faceDetectEmbedData.checked, overlayRect.checked)
+                    }
+                }
+            }
+            Row{
+                spacing: 5
+                CheckBox {
+                    id: faceDetectEmbedData
+                    activeFocusOnPress : true
+                    text: "Embed \nData"
+                    style: econCheckBoxTextWrapModeStyle
+                    enabled: faceRectEnable.checked ? true : false
+                    opacity: enabled ? 1 : 0.1
+                    onClicked:{
+                        enableFaceDetectEmbedData()
+                    }
+                    Keys.onReturnPressed: {
+                        enableFaceDetectEmbedData()
+                    }
+                }
+                CheckBox {
+                    id: overlayRect
+                    activeFocusOnPress : true
+                    text: "Overlay Rectangle"
+                    style: econCheckBoxTextWrapModeStyle
+                    enabled: faceRectEnable.checked ? true : false
+                    opacity: enabled ? 1 : 0.1
+                    onClicked:{
+                        seecam130.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, checked)
+                    }
+                    Keys.onReturnPressed: {
+                        seecam130.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, checked)
+                    }
+                }
+            }
+
+            Text {
+                id: smileDetectionText
+                text: "--- Smile Detection ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                spacing: 62
+                ExclusiveGroup { id: smileDetectGroup }
+                RadioButton {
+                    exclusiveGroup: smileDetectGroup
+                    id: smileDetectEnable
+                    text: "Enable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked:{
+                        seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)
+                    }
+                    Keys.onReturnPressed: {
+                        seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)
+                    }
+                }
+                RadioButton {
+                    exclusiveGroup: smileDetectGroup
+                    id:smileDetectDisable
+                    text: "Disable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked: {
+                        seecam130.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text)
+                    }
+                    Keys.onReturnPressed: {
+                        seecam130.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text)
+                    }
+                }
+            }
+            Row{
+                spacing: 14
+                Text {
+                    id: smileThresholdText
+                    text: "Threshold value[40-75]"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    width: 80
+                    wrapMode: Text.WordWrap
+                    opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
+                }
+                TextField {                    
+                    id: smileThreshold
+                    font.pixelSize: 10
+                    font.family: "Ubuntu"
+                    smooth: true
+                    horizontalAlignment: TextInput.AlignHCenter
+                    enabled: (smileDetectEnable.enabled && smileDetectEnable.checked) ? true : false
+                    opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
+                    style: econTextFieldStyle
+                    implicitHeight: 25
+                    implicitWidth: 70
+                    validator: IntValidator {bottom: 40; top: 75}
+                }
+                Button {
+                    id: smileThresholdSet
+                    activeFocusOnPress : true
+                    text: "Set"
+                    style: econButtonStyle
+                    enabled: (smileDetectEnable.enabled && smileDetectEnable.checked) ? true : false
+                    opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
+                    implicitHeight: 25
+                    implicitWidth: 60
+                    onClicked: {
+                        smileThresholdSet.enabled = false
+                        setButtonClicked = true
+                        seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)
+                        smileThresholdSet.enabled = true
+                    }
+                    Keys.onReturnPressed: {
+                        smileThresholdSet.enabled = false
+                        setButtonClicked = true
+                        seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)
+                        smileThresholdSet.enabled = true
+                    }
+                }
+            }
+            Row{
+                spacing: 5
+                CheckBox {
+                    id: smileDetectEmbedData
+                    activeFocusOnPress : true
+                    text: "Embed Data"
+                    style: econCheckBoxStyle
+                    enabled: smileDetectEnable.checked ? true : false
+                    opacity: enabled ? 1 : 0.1
+                    onClicked:{
+                        enableSmileDetectEmbedData()
+                    }
+                    Keys.onReturnPressed: {
+                        enableSmileDetectEmbedData()
+                    }
+                }
+            }
+
+            Text {
+                id: exposureCompTextTitle
+                text: "--- Exposure Compensation ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                spacing: 9
+                Text {
+                    id: exposureCompText
+                    text: "value(µs)[8000 - 1000000]"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    width: 80
+                    wrapMode: Text.WordWrap
+                    opacity: 1
+                }
+                TextField {
+                    id: exposureCompValue
+                    font.pixelSize: 10
+                    font.family: "Ubuntu"
+                    smooth: true
+                    horizontalAlignment: TextInput.AlignHCenter
+                    opacity: 1
+                    style: econTextFieldStyle
+                    implicitHeight: 25
+                    implicitWidth: 80
+                    validator: IntValidator {bottom: expoCompMin; top: expoCompMax}
+                }
+                Button {
+                    id: exposureCompSet
+                    activeFocusOnPress : true
+                    text: "Set"
+                    style: econButtonStyle
+                    enabled: true
+                    opacity: 1
+                    implicitHeight: 25
+                    implicitWidth: 60
+                    onClicked: {
+                        exposureCompSet.enabled = false
+                        setButtonClicked = true
+                        seecam130.setExposureCompensation(exposureCompValue.text)
+                        exposureCompSet.enabled = true
+                    }
+                    Keys.onReturnPressed: {
+                        exposureCompSet.enabled = false
+                        setButtonClicked = true
+                        seecam130.setExposureCompensation(exposureCompValue.text)
+                        exposureCompSet.enabled = true
+                    }
+                }
+            }
+            Text {
+                id: frameRateText
+                text: "--- Frame Rate Control ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+
+            Row{
+                spacing: 35
+                Slider {
+                    activeFocusOnPress: true
+                    updateValueWhileDragging: false
+                    id: frameRateSlider
+                    width: 150
+                    stepSize: 1
+                    style:econSliderStyle
+                    minimumValue: frameRateMin
+                    maximumValue: frameRateMax
+                    onValueChanged:  {
+                        frameRateTextField.text = frameRateSlider.value
+                        if(skipUpdateUIFrameRate){
+                            seecam130.setFrameRateCtrlValue(frameRateSlider.value)
+                        }
+                        skipUpdateUIFrameRate = true
+                    }
+                }
+                TextField {
+                    id: frameRateTextField
+                    text: frameRateSlider.value
+                    font.pixelSize: 10
+                    font.family: "Ubuntu"
+                    smooth: true
+                    horizontalAlignment: TextInput.AlignHCenter
+                    style: econTextFieldStyle
+                    validator: IntValidator {bottom: frameRateSlider.minimumValue; top: frameRateSlider.maximumValue}
+                    onTextChanged: {
+                        if(text.length > 0){
+                            frameRateSlider.value = frameRateTextField.text
+                        }
+                    }
+                }
+            }
+
             Row{
                 Layout.alignment: Qt.AlignCenter
                 Button {
@@ -903,28 +1209,64 @@ Item {
 
     See3Cam130 {
         id: seecam130
-        onSendSceneMode: {
+        onSceneModeValue: {
             defaultSceneMode(sceneMode)
         }
-        onSendEffectMode: {
+        onEffectModeValue: {
             defaultEffectMode(effectMode)
         }
-        onSendDenoiseValue:{
+        onDenoiseValueReceived:{
+            skipUpdateUIDenoise = false
             deNoiseSlider.value = denoiseValue
-        }        
-        onSendAfMode:{
+        }
+        onFrameRateCtrlValueReceived:{
+            skipUpdateUIFrameRate = false
+            frameRateSlider.value = frameRateCtrlValue
+        }
+
+        onAfModeValue:{
             defaultAfMode(afMode)
         }
-        onSendHDRMode:{
+        onFaceDetectModeValue:{
+            if(faceDetectMode == See3Cam130.FaceRectEnable){
+                faceRectEnable.checked = true
+                if(faceDetectEmbedDataValue == See3Cam130.FaceDetectEmbedDataEnable){
+                    faceDetectEmbedData.checked = true
+                }
+                if(faceDetectOverlayRect == See3Cam130.FaceDetectOverlayRectEnable){
+                    overlayRect.checked = true
+                }
+            }else if(faceDetectMode == See3Cam130.FaceRectDisable){
+                faceRectDisable.checked = true
+            }
+        }        
+        onSmileDetectModeValue:{
+            smileThreshold.text = smileDetectThresholdValue
+            if(smileDetectMode == See3Cam130.SmileDetectEnable){
+                smileDetectEnable.checked = true
+                if(smileDetectEmbedDataValue == See3Cam130.smileDetectEmbedDataEnable){
+                    smileDetectEmbedData.checked = true
+                }
+            }else if(smileDetectMode == See3Cam130.SmileDetectDisable){
+                smileDetectDisable.checked = true
+            }
+        }
+
+        onExposureCompValueReceived:{
+            exposureCompValue.text = exposureCompensation
+        }
+
+        onHDRModeValueReceived:{
             defaultHDRMode(hdrMode)
             if(hdrMode == See3Cam130.HdrManual){
                 iHDRSlider.value = hdrValue
             }
         }
-        onSendqFactor:{
+        onQFactorValue:{
+              skipUpdateUIQFactor = false
               qFactorSlider.value = qFactor
         }
-        onSendROIAfMode:{
+        onRoiAfModeValue:{
             if(roiMode == See3Cam130.AFCentered){
                 afCentered.checked = true
             }else if(roiMode == See3Cam130.AFManual){
@@ -941,7 +1283,7 @@ Item {
                 afWindowSizeCombo.enabled = false
             }
         }
-        onSendROIAutoExpMode:{
+        onRoiAutoExpModeValue:{
             if(roiMode == See3Cam130.AutoExpFull){                
                 autoexpFull.checked = true
             }else if(roiMode == See3Cam130.AutoExpManual){
@@ -955,34 +1297,54 @@ Item {
                 autoExpoWinSizeCombo.enabled = false
             }
         }
-        onSendBurstLength:{
+        onBurstLengthValue:{
             skipUpdateUIOnBurstLength = false
             burstLengthCombo.currentIndex = burstLength - 1
         }
-        onSendAfRectMode:{
-            if(afRectMode == See3Cam130.AFRectEnable){
+        onAfRectModeValue:{            
+            if(afRectMode == See3Cam130.AFRectEnable){                
                 rectEnable.checked = true
 
-            }else if(afRectMode == See3Cam130.AFRectDisable){
+            }else if(afRectMode == See3Cam130.AFRectDisable){            
                 rectDisable.checked = true
             }
 
         }
-        onSendFlipMode:{
+        onFlipModeValue:{
            updateFlipMode(flipMode, flipEnableDisableMode)
         }
-        onSendStreamMode:{
+        onStreamModeValue:{
             if(streamMode == See3Cam130.STREAM_MASTER){
                 streamMaster.checked = true
 
             }else if(streamMode == See3Cam130.STREAM_TRIGGER){
                 streamTrigger.checked = true
-                messageDialog.title = "Trigger Mode"
-                messageDialog.text = "Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document."
-                messageDialog.open()
+                displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document."))
             }
-
         }
+        onIndicateCommandStatus:{            
+            if(setButtonClicked){
+                displayMessageBox(title, text)
+                setButtonClicked = false
+            }            
+        }
+
+        onIndicateExposureValueRangeFailure:{
+            if(setButtonClicked){
+                displayMessageBox(title, text)
+                setButtonClicked = false
+                seecam130.getExposureCompensation()
+            }
+        }
+
+        onIndicateSmileThresholdRangeFailure:{
+            if(setButtonClicked){
+                displayMessageBox(title, text)
+                setButtonClicked = false
+                seecam130.getSmileDetectMode()
+            }
+        }
+
     }
 
     Component {
@@ -1089,6 +1451,27 @@ Item {
             }
         }
     }
+
+
+    Component {
+        id: econCheckBoxTextWrapModeStyle
+        CheckBoxStyle {
+            label: Text {
+                text: control.text
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                opacity: 1
+                width: 100
+                wrapMode: Text.WordWrap
+            }
+            background: Rectangle {
+                color: "#222021"
+                border.color: control.activeFocus ? "#ffffff" : "#222021"
+            }
+        }
+    }
     Component {
         id: econRadioButtonStyle
         RadioButtonStyle {
@@ -1125,8 +1508,7 @@ Item {
         //So In timer, after 200 ms, getting effect mode and scene mode is done
         getCamValuesTimer.start()
         seecam130.getAutoFocusMode()
-        seecam130.getiHDRMode()
-        //seecam130.getDenoiseValue()
+        seecam130.getiHDRMode()       
         seecam130.getQFactor()
         seecam130.getBurstLength()
         seecam130.getAutoFocusROIModeAndWindowSize()
@@ -1134,6 +1516,15 @@ Item {
         seecam130.getAFRectMode()
         seecam130.getFlipMode()
         seecam130.getStreamMode()
+        seecam130.getFaceDetectMode()
+        seecam130.getSmileDetectMode()
+
+    }
+
+    function displayMessageBox(title, text){
+        messageDialog.title = qsTr(title)
+        messageDialog.text = qsTr(text)
+        messageDialog.open()
     }
 
     function updateFlipMode(flipMode, FlipEnableDisableMode){
@@ -1188,6 +1579,10 @@ Item {
         seecam130.getAFRectMode()
         seecam130.getFlipMode()
         seecam130.getStreamMode()
+        seecam130.getFaceDetectMode()
+        seecam130.getSmileDetectMode()
+        seecam130.getExposureCompensation()        
+        seecam130.getFrameRateCtrlValue()
     }
 
     function defaultSceneMode(mode)
@@ -1295,6 +1690,35 @@ Item {
         getAutoFocusControlValues.start()
     }
 
+    function enableFaceDetectEmbedData(){        
+        if(seecam130.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){            
+            if(faceDetectEmbedData.checked){
+                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_130_Face_and_Smile_Detection for more details"))
+            }
+        } else{
+            if(faceDetectEmbedData.checked){
+                displayMessageBox(qsTr("Error"), qsTr("Enabling embed data is failed"))
+            }
+        }
+    }
+
+    function enableSmileDetectEmbedData(){
+        setButtonClicked = false
+        if(seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)){
+            if(smileDetectEmbedData.checked){
+                messageDialog.title = qsTr("Status")
+                messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_130_Face_and_Smile_Detection for more details")
+                messageDialog.open()
+            }
+        }else{
+            if(smileDetectEmbedData.checked){
+                messageDialog.title = qsTr("Error")
+                messageDialog.text = qsTr("Enabling embed data is failed")
+                messageDialog.open()
+            }
+        }
+    }
+
     function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
             autoexpManual.enabled = true
@@ -1351,7 +1775,16 @@ Item {
              if(rectEnable.checked){
                 seecam130.enableDisableAFRectangle(true)
              }
-         }         
+         }
+         onVideoResolutionChanged:{
+             getexposureCompFrameRateCtrlTimer.start()
+         }
+         onPreviewFPSChanged:{
+             getexposureCompFrameRateCtrlTimer.start()
+         }
+         onVideoColorSpaceChanged:{
+             getexposureCompFrameRateCtrlTimer.start()
+         }
     }
 
 }

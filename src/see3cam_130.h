@@ -4,6 +4,11 @@
 #include "uvccamera.h"
 #define DENOISE_MIN 0
 #define DENOISE_MAX 15
+#define EXPOSURECOMP_MIN 8000
+#define EXPOSURECOMP_MAX 1000000
+#define SMILE_THRESHOLD_MIN 40
+#define SMILE_THRESHOLD_MAX 75
+#define DEFAULT_SMILE_THRESHOLD 40
 
 class See3CAM_130 : public QObject
 {
@@ -86,46 +91,109 @@ public:
     };
     Q_ENUMS(camStreamMode)
 
+    enum camFaceRectMode {
+        FaceRectEnable = 0x01,
+        FaceRectDisable = 0x00
+    };
+    Q_ENUMS(camFaceRectMode)
+
+    enum camFaceDetectEmbedDataMode {
+        FaceDetectEmbedDataEnable = 0x01,
+        FaceDetectEmbedDataDisable = 0x00
+    };
+    Q_ENUMS(camFaceDetectEmbedDataMode)
+
+    enum camFaceDetectOverlayRect {
+        FaceDetectOverlayRectEnable = 0x01,
+        FaceDetectOverlayRectDisable = 0x00
+    };
+    Q_ENUMS(camFaceDetectOverlayRect)
+
+    enum camSmileDetectMode {
+        SmileDetectEnable = 0x01,
+        SmileDetectDisable = 0x00
+    };
+    Q_ENUMS(camSmileDetectMode)
+
+    enum camSmileDetectEmbedDataMode {
+        smileDetectEmbedDataEnable = 0x01,
+        smileDetectEmbedDataDisable = 0x00
+    };
+    Q_ENUMS(camSmileDetectEmbedDataMode)
+
+
 signals:
-     void sendSceneMode(uint sceneMode);
-     void sendEffectMode(uint effectMode);
-     void sendAfMode(uint afMode);
-     void sendHDRMode(uint hdrMode, uint hdrValue);
-     void sendDenoiseValue(uint denoiseValue);
-     void sendBurstLength(uint burstLength);
-     void sendqFactor(uint qFactor);
-     void sendROIAfMode(uint roiMode, uint winSize);
-     void sendROIAutoExpMode(uint roiMode, uint winSize);
-     void sendAfRectMode(uint afRectMode);
-     void sendFlipMode(uint flipMode, uint flipEnableDisableMode);
-     void sendStreamMode(uint streamMode);
+     void sceneModeValue(uint sceneMode);
+     void effectModeValue(uint effectMode);
+     void afModeValue(uint afMode);
+     void hDRModeValueReceived(uint hdrMode, uint hdrValue);
+     void denoiseValueReceived(uint denoiseValue);
+     void burstLengthValue(uint burstLength);
+     void qFactorValue(uint qFactor);
+     void roiAfModeValue(uint roiMode, uint winSize);
+     void roiAutoExpModeValue(uint roiMode, uint winSize);
+     void afRectModeValue(uint afRectMode);
+     void flipModeValue(uint flipMode, uint flipEnableDisableMode);
+     void streamModeValue(uint streamMode);
+     void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
+     void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue);
+     void exposureCompValueReceived(uint exposureCompensation);
+     void frameRateCtrlValueReceived(uint frameRateCtrlValue);
+     void indicateCommandStatus(QString title, QString text);
+     void indicateSmileThresholdRangeFailure(QString title, QString text);
+     void indicateExposureValueRangeFailure(QString title, QString text);
 
 public slots:
     bool getSceneMode();
-    bool getEffectMode();
     bool setSceneMode(const sceneModes& sceneMode);
+
+    bool getEffectMode();
     bool setEffectMode(const specialEffects& specialEffect);
+
     bool setDenoiseValue(int deNoiseVal);
     bool getDenoiseValue();
+
     bool setAutoFocusMode(camAfMode afMode);
     bool getAutoFocusMode();
+
     bool setiHDRMode(camiHDRMode iHDRMode, uint iHDRValue);
     bool getiHDRMode();    
+
     bool setROIAutoFoucs(camROIAfMode see3camAfROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
     bool setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
+
     bool getAutoFocusROIModeAndWindowSize();
     bool getAutoExpROIModeAndWindowSize();
+
     bool setBurstLength(uint burstLength);
     bool getBurstLength();
+
     bool setQFactor(uint qFactor);
     bool getQFactor();
+
     bool enableDisableAFRectangle(bool enableRFRect);    
     bool getAFRectMode();
+
     bool setToDefault();
+
     bool setFlipHorzMode(bool horizModeSel);
     bool setFlipVertiMode(bool vertiModeSel);
     bool getFlipMode();
+
     bool setStreamMode(camStreamMode streamMode);
     bool getStreamMode();
+
+    bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
+    bool getFaceDetectMode();
+
+    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue);
+    bool getSmileDetectMode();
+
+    bool setExposureCompensation(unsigned int exposureCompValue);
+    bool getExposureCompensation();
+
+    bool setFrameRateCtrlValue(uint frameRate);
+    bool getFrameRateCtrlValue();
+
 };
 #endif // SEE3CAM_130_H

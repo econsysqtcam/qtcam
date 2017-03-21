@@ -316,7 +316,7 @@ Item {
 
                     Text {
                         id: extension
-                        text: "Video record format"
+                        text: "Video Record Format"
                         font.pixelSize: 14
                         font.family: "Ubuntu"
                         color: "#ffffff"
@@ -364,7 +364,7 @@ Item {
 
                     Text {
                         id: encoder
-                        text: "Video Encoder format"
+                        text: "Video Encoder Format"
                         font.pixelSize: 14
                         font.family: "Ubuntu"
                         color: "#ffffff"

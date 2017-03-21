@@ -135,7 +135,7 @@ bool See3CAM_CU30::setDenoiseValue(int deNoiseVal)
                 }
             }
             end = uvc.getTickCount();
-            if(end - start > TIMEOUT)
+            if(end - start > SET_COMMAND_TIMEOUT)
             {
                 timeout = false;
                 return false;
