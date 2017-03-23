@@ -82,6 +82,16 @@ Item {
     property int expAscellaTxtFiledValue;
     property var menuitems:[]
 
+    // It needs some time to get exposure control correct index value recently set in image quality settings when selecting camera in UI.
+    Timer {
+        id: queryctrlTimer
+        interval: 500
+        onTriggered: {
+            root.cameraFilterControls(true)
+            stop()
+        }
+    }
+
     MessageDialog {
         id: messageDialog
         icon: StandardIcon.Information
@@ -1320,7 +1330,7 @@ Item {
             }
         }
         onQueryUvcControls:{
-            root.cameraFilterControls(true)
+            queryctrlTimer.start()
         }
 
     }

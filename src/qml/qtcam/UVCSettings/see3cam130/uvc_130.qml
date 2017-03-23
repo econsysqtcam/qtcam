@@ -343,6 +343,122 @@ Item {
                     }
                 }
             }
+	    Text {
+                id: enableDisableAFRectText
+                text: "--- Enable/Disable AF Rectangle ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+
+            Row{
+                spacing:75
+                ExclusiveGroup { id: afRectGroup }
+                RadioButton {
+                    exclusiveGroup: afRectGroup
+                    id: rectEnable
+                    text: "Enable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked:{
+                        seecam130.enableDisableAFRectangle(true)
+                    }
+                    Keys.onReturnPressed: {
+                        seecam130.enableDisableAFRectangle(true)
+                    }
+                }
+                RadioButton {
+                    exclusiveGroup: afRectGroup
+                    id:rectDisable
+                    text: "Disable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked: {
+                        seecam130.enableDisableAFRectangle(false)
+                    }
+                    Keys.onReturnPressed: {
+                        seecam130.enableDisableAFRectangle(false)
+                    }
+                }
+            }
+	    Text {
+                id: roiAutoFocusMode
+                text: "--- ROI - Auto Focus ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+
+            Row{
+                  spacing:55
+                  ExclusiveGroup { id: roiAfgroup }
+                  RadioButton {
+                      exclusiveGroup: roiAfgroup
+                      id: afCentered
+                      text: "Centered"
+                      activeFocusOnPress: true
+                      style: econRadioButtonStyle
+                      opacity: afCentered.enabled ? 1 : 0.1
+                      // setROIAutoFoucs() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
+                      // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
+                      // winSize is required only for manual mode
+                      onClicked: {
+                            seecam130.setROIAutoFoucs(See3Cam130.AFCentered, 0, 0, 0, 0, 0);
+                            afWindowSizeCombo.enabled = false
+                      }                      
+                      Keys.onReturnPressed: {
+                            seecam130.setROIAutoFoucs(See3Cam130.AFCentered, 0, 0, 0, 0, 0);
+                            afWindowSizeCombo.enabled = false
+                      }
+                  }
+                  RadioButton {
+                      exclusiveGroup: roiAfgroup
+                      id: afManual
+                      text: "Manual"
+                      activeFocusOnPress: true
+                      style: econRadioButtonStyle
+                      opacity: afManual.enabled ? 1 : 0.1
+                      onClicked: {
+                            seecam130.setROIAutoFoucs(See3Cam130.AFManual, 0, 0, 0, 0, afWindowSizeCombo.currentText)
+                            afWindowSizeCombo.enabled = true
+                      }
+                      Keys.onReturnPressed: {
+                            seecam130.setROIAutoFocusMode(See3Cam130.AFManual, 0, 0, 0, 0, afWindowSizeCombo.currentText);
+                            afWindowSizeCombo.enabled = true
+                      }
+                  }
+            }
+
+            ComboBox
+            {
+                id: afWindowSizeCombo                
+                enabled: (afManual.enabled && afManual.checked) ? true : false
+                opacity: (afManual.enabled && afManual.checked) ? 1 : 0.1
+                model: ListModel {
+                    ListElement { text: "1" }
+                    ListElement { text: "2" }
+                    ListElement { text: "3" }
+                    ListElement { text: "4" }
+                    ListElement { text: "5" }
+                    ListElement { text: "6" }
+                    ListElement { text: "7" }
+                    ListElement { text: "8" }
+                }                
+                activeFocusOnPress: true
+                style: econComboBoxStyle
+                onCurrentIndexChanged: {
+                    if(skipUpdateUIOnAFWindowSize){
+                        seecam130.setROIAutoFoucs(See3Cam130.AFManual, 0, 0, 0, 0, afWindowSizeCombo.currentText)
+                    }
+                    skipUpdateUIOnAFWindowSize = true
+                }
+            }
             Text {
                 id: iHdrMode
                 text: "--- iHDR ---"
@@ -533,81 +649,7 @@ Item {
                     }
                 }
             }
-            Text {
-                id: roiAutoFocusMode
-                text: "--- ROI - Auto Focus ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-
-            Row{
-                  spacing:55
-                  ExclusiveGroup { id: roiAfgroup }
-                  RadioButton {
-                      exclusiveGroup: roiAfgroup
-                      id: afCentered
-                      text: "Centered"
-                      activeFocusOnPress: true
-                      style: econRadioButtonStyle
-                      opacity: afCentered.enabled ? 1 : 0.1
-                      // setROIAutoFoucs() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
-                      // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
-                      // winSize is required only for manual mode
-                      onClicked: {
-                            seecam130.setROIAutoFoucs(See3Cam130.AFCentered, 0, 0, 0, 0, 0);
-                            afWindowSizeCombo.enabled = false
-                      }                      
-                      Keys.onReturnPressed: {
-                            seecam130.setROIAutoFoucs(See3Cam130.AFCentered, 0, 0, 0, 0, 0);
-                            afWindowSizeCombo.enabled = false
-                      }
-                  }
-                  RadioButton {
-                      exclusiveGroup: roiAfgroup
-                      id: afManual
-                      text: "Manual"
-                      activeFocusOnPress: true
-                      style: econRadioButtonStyle
-                      opacity: afManual.enabled ? 1 : 0.1
-                      onClicked: {
-                            seecam130.setROIAutoFoucs(See3Cam130.AFManual, 0, 0, 0, 0, afWindowSizeCombo.currentText)
-                            afWindowSizeCombo.enabled = true
-                      }
-                      Keys.onReturnPressed: {
-                            seecam130.setROIAutoFocusMode(See3Cam130.AFManual, 0, 0, 0, 0, afWindowSizeCombo.currentText);
-                            afWindowSizeCombo.enabled = true
-                      }
-                  }
-            }
-
-            ComboBox
-            {
-                id: afWindowSizeCombo                
-                enabled: (afManual.enabled && afManual.checked) ? true : false
-                opacity: (afManual.enabled && afManual.checked) ? 1 : 0.1
-                model: ListModel {
-                    ListElement { text: "1" }
-                    ListElement { text: "2" }
-                    ListElement { text: "3" }
-                    ListElement { text: "4" }
-                    ListElement { text: "5" }
-                    ListElement { text: "6" }
-                    ListElement { text: "7" }
-                    ListElement { text: "8" }
-                }                
-                activeFocusOnPress: true
-                style: econComboBoxStyle
-                onCurrentIndexChanged: {
-                    if(skipUpdateUIOnAFWindowSize){
-                        seecam130.setROIAutoFoucs(See3Cam130.AFManual, 0, 0, 0, 0, afWindowSizeCombo.currentText)
-                    }
-                    skipUpdateUIOnAFWindowSize = true
-                }
-            }
+            
             Text {
                 id: roiAutoExpMode
                 text: "--- ROI - Auto Exposure ---"
@@ -683,6 +725,64 @@ Item {
                     skipUpdateUIOnExpWindowSize = true
                 }
             }
+	    Text {
+                id: exposureCompTextTitle
+                text: "--- Exposure Compensation ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            } 
+	    Row{
+                spacing: 9
+                Text {
+                    id: exposureCompText
+                    text: "value(µs)[8000 - 1000000]"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    width: 80
+                    wrapMode: Text.WordWrap
+                    opacity: 1
+                }
+                TextField {
+                    id: exposureCompValue
+                    font.pixelSize: 10
+                    font.family: "Ubuntu"
+                    smooth: true
+                    horizontalAlignment: TextInput.AlignHCenter
+                    opacity: 1
+                    style: econTextFieldStyle
+                    implicitHeight: 25
+                    implicitWidth: 80
+                    validator: IntValidator {bottom: expoCompMin; top: expoCompMax}
+                }
+                Button {
+                    id: exposureCompSet
+                    activeFocusOnPress : true
+                    text: "Set"
+                    style: econButtonStyle
+                    enabled: true
+                    opacity: 1
+                    implicitHeight: 25
+                    implicitWidth: 60
+                    onClicked: {
+                        exposureCompSet.enabled = false
+                        setButtonClicked = true
+                        seecam130.setExposureCompensation(exposureCompValue.text)
+                        exposureCompSet.enabled = true
+                    }
+                    Keys.onReturnPressed: {
+                        exposureCompSet.enabled = false
+                        setButtonClicked = true
+                        seecam130.setExposureCompensation(exposureCompValue.text)
+                        exposureCompSet.enabled = true
+                    }
+                }
+            }
             Text {
                 id: qFactorText
                 text: "--- Q Factor ---"
@@ -708,7 +808,6 @@ Item {
                     onValueChanged:  {
                         qFactorTextField.text = qFactorSlider.value
                         if(skipUpdateUIQFactor){
-                            console.log("skipUpdateUIQFactor"+skipUpdateUIQFactor)
                             seecam130.setQFactor(qFactorSlider.value)
                         }
                         skipUpdateUIQFactor = true
@@ -772,47 +871,7 @@ Item {
                     skipUpdateUIOnBurstLength = true
                 }
             }
-            Text {
-                id: enableDisableAFRectText
-                text: "--- Enable/Disable AF Rectangle ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-
-            Row{
-                spacing:75
-                ExclusiveGroup { id: afRectGroup }
-                RadioButton {
-                    exclusiveGroup: afRectGroup
-                    id: rectEnable
-                    text: "Enable"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    onClicked:{
-                        seecam130.enableDisableAFRectangle(true)
-                    }
-                    Keys.onReturnPressed: {
-                        seecam130.enableDisableAFRectangle(true)
-                    }
-                }
-                RadioButton {
-                    exclusiveGroup: afRectGroup
-                    id:rectDisable
-                    text: "Disable"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    onClicked: {
-                        seecam130.enableDisableAFRectangle(false)
-                    }
-                    Keys.onReturnPressed: {
-                        seecam130.enableDisableAFRectangle(false)
-                    }
-                }
-            }
+            
             Text {
                 id: flipText
                 text: "--- Flip Control ---"
@@ -1030,65 +1089,7 @@ Item {
                     }
                 }
             }
-
-            Text {
-                id: exposureCompTextTitle
-                text: "--- Exposure Compensation ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-            Row{
-                spacing: 9
-                Text {
-                    id: exposureCompText
-                    text: "value(µs)[8000 - 1000000]"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    width: 80
-                    wrapMode: Text.WordWrap
-                    opacity: 1
-                }
-                TextField {
-                    id: exposureCompValue
-                    font.pixelSize: 10
-                    font.family: "Ubuntu"
-                    smooth: true
-                    horizontalAlignment: TextInput.AlignHCenter
-                    opacity: 1
-                    style: econTextFieldStyle
-                    implicitHeight: 25
-                    implicitWidth: 80
-                    validator: IntValidator {bottom: expoCompMin; top: expoCompMax}
-                }
-                Button {
-                    id: exposureCompSet
-                    activeFocusOnPress : true
-                    text: "Set"
-                    style: econButtonStyle
-                    enabled: true
-                    opacity: 1
-                    implicitHeight: 25
-                    implicitWidth: 60
-                    onClicked: {
-                        exposureCompSet.enabled = false
-                        setButtonClicked = true
-                        seecam130.setExposureCompensation(exposureCompValue.text)
-                        exposureCompSet.enabled = true
-                    }
-                    Keys.onReturnPressed: {
-                        exposureCompSet.enabled = false
-                        setButtonClicked = true
-                        seecam130.setExposureCompensation(exposureCompValue.text)
-                        exposureCompSet.enabled = true
-                    }
-                }
-            }
+                       
             Text {
                 id: frameRateText
                 text: "--- Frame Rate Control ---"
@@ -1218,10 +1219,12 @@ Item {
         onDenoiseValueReceived:{
             skipUpdateUIDenoise = false
             deNoiseSlider.value = denoiseValue
+	    skipUpdateUIDenoise = true
         }
         onFrameRateCtrlValueReceived:{
             skipUpdateUIFrameRate = false
             frameRateSlider.value = frameRateCtrlValue
+	    skipUpdateUIFrameRate = true
         }
 
         onAfModeValue:{
@@ -1265,6 +1268,7 @@ Item {
         onQFactorValue:{
               skipUpdateUIQFactor = false
               qFactorSlider.value = qFactor
+	      skipUpdateUIQFactor = true
         }
         onRoiAfModeValue:{
             if(roiMode == See3Cam130.AFCentered){
@@ -1505,11 +1509,10 @@ Item {
 
     Component.onCompleted:{
         //getting valid effect mode and scene mode takes some time.
-        //So In timer, after 200 ms, getting effect mode and scene mode is done
+        //So In timer, after 500 ms, getting effect mode and scene mode is done
         getCamValuesTimer.start()
         seecam130.getAutoFocusMode()
-        seecam130.getiHDRMode()       
-        seecam130.getQFactor()
+        seecam130.getiHDRMode()               
         seecam130.getBurstLength()
         seecam130.getAutoFocusROIModeAndWindowSize()
         seecam130.getAutoExpROIModeAndWindowSize()
@@ -1704,16 +1707,10 @@ Item {
 
     function enableSmileDetectEmbedData(){
         setButtonClicked = false
-        if(seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)){
+        if(seecam130.setSmileDetection(true, smileDetectEmbedData.checked, defaultSmileThreshold)){
             if(smileDetectEmbedData.checked){
                 messageDialog.title = qsTr("Status")
                 messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_130_Face_and_Smile_Detection for more details")
-                messageDialog.open()
-            }
-        }else{
-            if(smileDetectEmbedData.checked){
-                messageDialog.title = qsTr("Error")
-                messageDialog.text = qsTr("Enabling embed data is failed")
                 messageDialog.open()
             }
         }
@@ -1729,12 +1726,22 @@ Item {
                 autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 1
             autoexpFull.opacity = 1
+            exposureCompValue.enabled = true
+            exposureCompValue.opacity = 1
+            exposureCompSet.enabled = true
+            exposureCompSet.opacity = 1
+            exposureCompText.opacity = 1
         }else{
             autoexpManual.enabled = false
             autoexpFull.enabled = false
             autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 0.1
             autoexpFull.opacity = 0.1
+            exposureCompValue.enabled = false
+            exposureCompValue.opacity = 0.1
+            exposureCompSet.enabled = false
+            exposureCompSet.opacity = 0.1
+            exposureCompText.opacity = 0.1
         }
         getAutoExpsoureControlValues.start()
     }

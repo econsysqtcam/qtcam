@@ -2139,7 +2139,7 @@ bool See3CAM_130::getFrameRateCtrlValue()
     memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
     //Set the Report Number
     g_out_packet_buf[1] = CAMERA_CONTROL_130; /* set camera control code */
-    g_out_packet_buf[2] = GET_FRAME_RATE_130; /* get denoise code */
+    g_out_packet_buf[2] = GET_FRAME_RATE_130; /* get frame rate code */
 
     ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
 

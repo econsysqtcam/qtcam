@@ -1044,9 +1044,7 @@ Item {
              enableDisableAutoExposureControls(autoExposureSelect)
          }
          onAfterBurst:{
-             console.log("after burst ........")
              if(rectEnable.checked){
-                 console.log("after burst - rectEnable selected")
                 see3cam30.enableDisableAFRectangle(true)
              }
          }
@@ -1054,9 +1052,7 @@ Item {
              see3cam30.enableDisableAFRectangle(false)
          }
          onAfterRecordVideo:{
-             console.log("after record video ........")
              if(rectEnable.checked){
-                 console.log("after record video - rectEnable.checked ........")
                 see3cam30.enableDisableAFRectangle(true)
              }
          }
