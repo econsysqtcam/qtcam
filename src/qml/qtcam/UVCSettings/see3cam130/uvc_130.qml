@@ -1512,7 +1512,7 @@ Item {
         //So In timer, after 500 ms, getting effect mode and scene mode is done
         getCamValuesTimer.start()
         seecam130.getAutoFocusMode()
-        seecam130.getiHDRMode()               
+        seecam130.getiHDRMode()      
         seecam130.getBurstLength()
         seecam130.getAutoFocusROIModeAndWindowSize()
         seecam130.getAutoExpROIModeAndWindowSize()
@@ -1707,7 +1707,8 @@ Item {
 
     function enableSmileDetectEmbedData(){
         setButtonClicked = false
-        if(seecam130.setSmileDetection(true, smileDetectEmbedData.checked, defaultSmileThreshold)){
+	seecam130.getSmileDetectMode()
+        if(seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)){
             if(smileDetectEmbedData.checked){
                 messageDialog.title = qsTr("Status")
                 messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_130_Face_and_Smile_Detection for more details")
