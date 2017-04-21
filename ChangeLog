@@ -1,3 +1,7 @@
+Qtcam Application - 13.1.0
+--------------------------
+* Implemented flash control for See3cam_cu40 camera.
+
 Qtcam Application - 13.0.0
 --------------------------
 * Added support for See3CAM_81 camera.

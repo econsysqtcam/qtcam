@@ -24,6 +24,8 @@ import QtQuick.Controls.Styles 1.0
 import QtQuick.Dialogs 1.1
 import econ.camera.uvcsettings 1.0
 import econ.camera.see3camControl 1.0
+import econ.camera.see3camcu40 1.0
+import QtQuick.Layouts 1.1
 import cameraenum 1.0
 
 Item {
@@ -65,12 +67,80 @@ Item {
             root.insertStillImageFormat(stillImageFormat);
         }
     }
+    Text{
+        id: flashCtrlText
+        x: 85
+        y: 200
+        text: "--- Flash Control ---"
+        font.pixelSize: 14
+        font.family: "Ubuntu"
+        color: "#ffffff"
+        smooth: true
+        Layout.alignment: Qt.AlignCenter
+        opacity: 0.50196078431373
+    }
+
+    RowLayout{
+        x:25
+        y:230
+        spacing: 25
+        ExclusiveGroup { id: flashGrp }
+        Column{
+            RadioButton {
+                exclusiveGroup: flashGrp
+                checked: false
+                id: flashModeStrobe
+                text: "Strobe"
+                activeFocusOnPress: true
+                style: econRadioButtonStyle
+                onClicked: {
+                    see3camcu40.setFlashState(See3Camcu40.FLASHMODE_STROBE)
+                }
+                Keys.onReturnPressed: {
+                    see3camcu40.setFlashState(See3Camcu40.FLASHMODE_STROBE)
+                }
+            }
+        }
+        Column{
+            RadioButton {
+                exclusiveGroup: flashGrp
+                checked: false
+                id: flashModeTorch
+                text: "Torch"
+                activeFocusOnPress: true
+                style: econRadioButtonStyle
+                onClicked: {
+                    see3camcu40.setFlashState(See3Camcu40.FLASHMODE_TORCH)
+                }
+                Keys.onReturnPressed: {
+                    see3camcu40.setFlashState(See3Camcu40.FLASHMODE_TORCH)
+                }
+            }
+        }
+        Column{
+            RadioButton {
+                exclusiveGroup: flashGrp
+                checked: false
+                id: flashModeOff
+                text: "OFF"
+                activeFocusOnPress: true
+                style: econRadioButtonStyle
+                onClicked: {
+                    see3camcu40.setFlashState(See3Camcu40.FLASHMODE_OFF)
+                }
+                Keys.onReturnPressed: {
+                    see3camcu40.setFlashState(See3Camcu40.FLASHMODE_OFF)
+                }
+            }
+        }
+    }
+
 
 
     Button {
         id: serial_no_selected
         x: 85
-        y: 220
+        y: 270
         opacity: 1
         action: serialNumber
         activeFocusOnPress : true
@@ -94,7 +164,7 @@ Item {
     Button {
         id: f_wversion_selectedCU40
         x: 85
-        y: 280
+        y: 320
         opacity: 1
         action: firmwareVersion
         activeFocusOnPress : true
@@ -115,6 +185,25 @@ Item {
         }
     }
 
+
+    Component {
+        id: econRadioButtonStyle
+        RadioButtonStyle {
+            label: Text {
+                text: control.text
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                opacity: 1
+            }
+            background: Rectangle {
+                color: "#222021"
+                border.color: control.activeFocus ? "#ffffff" : "#222021"
+            }
+        }
+    }
+
     MessageDialog {
         id: messageDialog
         icon: StandardIcon.Information
@@ -127,7 +216,26 @@ Item {
         }
     }
 
+    See3Camcu40{
+        id: see3camcu40
+        onFlashModeValue:{
+            currentFlashMode(flashMode)
+        }
+    }
 
+    function currentFlashMode(mode){
+        switch(mode){
+        case See3Camcu40.FLASHMODE_TORCH:
+            flashModeTorch.checked = true
+            break;
+        case See3Camcu40.FLASHMODE_STROBE:
+            flashModeStrobe.checked = true
+            break;
+        case See3Camcu40.FLASHMODE_OFF:
+            flashModeOff.checked = true
+            break;
+        }
+    }
     Uvccamera {
         id: uvccamera
         onTitleTextChanged: {
@@ -158,5 +266,8 @@ Item {
     function getFirmwareVersion() {
         uvccamera.getFirmWareVersion()
         messageDialog.open()
+    }
+    Component.onCompleted: {
+        see3camcu40.getFlashState();
     }
 }

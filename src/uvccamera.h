@@ -282,8 +282,15 @@
 #define SET_DENOISE_CONTROL  0x06
 #define GET_DENOISE_CONTROL  0x05
 
+/* SEE3CAM_CU40 */
+#define CAMERA_CONTROL_CU40         0x77
+#define SETFLASH_STATUS_CU40        0x02
+#define GETFLASH_STATUS_CU40        0x01
+#define GET_FAIL_CU40		0x01
+#define GET_SUCCESS_CU40	0x00
+
 /* See3Cam_81 */
-#define SET_TO_DEFAULT_CAM81                0x0C
+#define SET_TO_DEFAULT_CAM81        0x0C
 
 /* Ascella camera */
 #define ASCELLA_VID 0x04b4
