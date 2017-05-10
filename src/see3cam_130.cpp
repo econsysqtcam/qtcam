@@ -793,7 +793,7 @@ bool See3CAM_130::setQFactor(uint qFactor){
             } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130 &&
                 g_in_packet_buf[1]==SET_Q_FACTOR_130 &&
                 g_in_packet_buf[2]==qFactor &&
-                g_in_packet_buf[6]==SET_SUCCESS) {               
+                g_in_packet_buf[6]==SET_SUCCESS) {
                     timeout=false;
             }
         }
@@ -936,7 +936,7 @@ bool See3CAM_130::setROIAutoFoucs(camROIAfMode see3camAfROIMode, uint vidResolnW
             } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130 &&
                 g_in_packet_buf[1]== SET_AF_ROI_MODE_130 &&
                 g_in_packet_buf[2]==see3camAfROIMode &&
-                g_in_packet_buf[6]==SET_SUCCESS) {                
+                g_in_packet_buf[6]==SET_SUCCESS) {
                     timeout=false;
             }
         }
@@ -992,11 +992,9 @@ bool See3CAM_130::getAutoFocusROIModeAndWindowSize(){
                 return false;
             } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130 &&
                 g_in_packet_buf[1]==GET_AF_ROI_MODE_130 &&
-                g_in_packet_buf[6]==GET_SUCCESS) {
-                    roiMode = g_in_packet_buf[2];                    
-                    if(roiMode == AFManual){
-                        windowSize = g_in_packet_buf[5];                        
-                    }
+                g_in_packet_buf[6]==GET_SUCCESS) {                
+                    roiMode = g_in_packet_buf[2];                                        
+                    windowSize = g_in_packet_buf[5];
                     emit roiAfModeValue(roiMode, windowSize);
                     timeout = false;
             }
@@ -1140,10 +1138,9 @@ bool See3CAM_130::getAutoExpROIModeAndWindowSize(){
             } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130 &&
                 g_in_packet_buf[1]==GET_EXP_ROI_MODE_130 &&
                 g_in_packet_buf[6]==GET_SUCCESS) {
-                    roiMode = g_in_packet_buf[2];                    
-                    if(roiMode == AutoExpManual){
-                        windowSize = g_in_packet_buf[5];                        
-                    }
+
+                    roiMode = g_in_packet_buf[2];                                        
+                    windowSize = g_in_packet_buf[5];                     
                     emit roiAutoExpModeValue(roiMode, windowSize);
                     timeout = false;
             }
@@ -1531,7 +1528,6 @@ bool See3CAM_130::getFlipMode()
     }
     return true;
 }
-
 
 /**
  * @brief See3CAM_130::setStreamMode - Setting  Streaming mode
@@ -2172,6 +2168,75 @@ bool See3CAM_130::getFrameRateCtrlValue()
         end = uvc.getTickCount();
         if(end - start > TIMEOUT)
         {            
+            timeout = false;
+            return false;
+        }
+    }
+    return true;
+}
+
+
+/**
+ * @brief See3CAM_130::enableDisableFaceRectangle - disable RF rectangle before capture image and enable back after capturing image
+ * and disable before recording video and enable back.
+ * @param enableRFRect - true / false
+ * @return true/false
+ */
+bool See3CAM_130::enableDisableFaceRectangle(bool enableFaceRect){
+
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+    bool timeout = true;
+    int ret =0;
+    unsigned int start, end = 0;
+    uint inputFaceRectMode = ENABLE_FACE_RECTANGLE_130;
+
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+
+    //Set the Report Number
+    g_out_packet_buf[1] = CAMERA_CONTROL_130; /* camera id */
+    g_out_packet_buf[2] = ENABLE_DISABLE_MODE_FACE_RECTANGLE_130; /* pass enable/disable command */
+    if(enableFaceRect)
+        g_out_packet_buf[3] = ENABLE_FACE_RECTANGLE_130; /* enable auto focus rect */
+    else
+        g_out_packet_buf[3] = DISABLE_FACE_RECTANGLE_130; /* disable auto focus rect */
+
+    inputFaceRectMode = g_out_packet_buf[3];
+
+    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
+
+    if (ret < 0) {
+        perror("write");
+        return false;
+    }
+
+    /* Read the Status code from the device */
+    start = uvc.getTickCount();
+
+    while(timeout)
+    {
+
+        /* Get a report from the device */
+        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
+
+        if (ret < 0) {
+            //perror("read");
+        } else {
+            if (g_in_packet_buf[6]==SET_FAIL) {
+                return false;
+            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130 &&
+                g_in_packet_buf[1]==ENABLE_DISABLE_MODE_FACE_RECTANGLE_130 &&
+                g_in_packet_buf[2]==inputFaceRectMode &&
+                g_in_packet_buf[6]==SET_SUCCESS) {
+                    timeout=false;
+            }
+        }
+        end = uvc.getTickCount();
+        if(end - start > TIMEOUT)
+        {
             timeout = false;
             return false;
         }

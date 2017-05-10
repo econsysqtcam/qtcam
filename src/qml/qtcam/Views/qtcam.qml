@@ -36,7 +36,8 @@ Rectangle {
     signal mouseRightClicked(var x, var y, var width, var height)
     signal afterBurst()
     signal beforeRecordVideo()
-    signal afterRecordVideo()    
+    signal afterRecordVideo()
+    signal enableFaceRectafterBurst()
     signal autoFocusSelected(bool autoFocusSelect)
     signal autoExposureSelected(bool autoExposureSelect)
 
@@ -255,16 +256,17 @@ Rectangle {
                 if(mouseClickCap){
                     //Added by Sankari : 08 Mar 2017
                     //Enable camera settings/extension settings tab after capturing image
-                    imageQualitySettingsEnable(true)
-                    videoPropertyItemEnable(true)
-                    stillPropertyItemEnable(true)
-                    uvc_settings.enabled = true
-                    uvc_settings.opacity = 1
-					mouseClickCap = false
+                    enableAllSettingsTab()
+                    mouseClickCap = false
                 }
             }
             onEnableRfRectBackInPreview:{
                 afterBurst() // signal to do anything need to do after capture continuous[burst] shots.
+            }
+
+            // Enable Face detection rect in preview
+            onEnableFactRectInPreview:{
+                enableFaceRectafterBurst()
             }
 
             onNewControlAdded: {
@@ -501,6 +503,8 @@ Rectangle {
                         oldIndex = currentIndex
                         //Added by Dhurka - 20th Oct 2016
                         cameraControlPropertyChange();
+                        // Added by Sankari: 20 Apr 2017 - If we unplug and plug the camera, the video color space is not updated properly
+                        stillPreview = false
                         m_Snap = true
                         captureBtnEnable(true)
                         videoRecordBtnEnable(true)
@@ -805,6 +809,15 @@ Rectangle {
         cameraSettingsTabEnable(true)
     }
 
+
+    function stopUpdatePreviewInTriggerMode(){
+        vidstreamproperty.triggerModeEnabled()
+    }
+
+    function startUpdatePreviewInMasterMode(){
+        vidstreamproperty.masterModeEnabled()
+    }
+
     function triggerModeCapture(){
         captureBtnEnable(false)
         videoRecordBtnEnable(false)
@@ -1040,6 +1053,16 @@ Rectangle {
         sidebarVisibleStatus(sideBarItems.visible)
         open_sideBar.visible = false
    }
+
+    function enableAllSettingsTab(){
+        imageQualitySettingsEnable(true)
+        videoPropertyItemEnable(true)
+        stillPropertyItemEnable(true)
+        uvc_settings.enabled = true
+        uvc_settings.opacity = 1
+        captureBtnEnable(true)
+        keyEventFiltering = false
+    }
 
     // Added by Sankari: 23 Dec 2016 - emit the signal to inform video resolution is changed in video capture settings
     function informVideoResoutionChanged(){

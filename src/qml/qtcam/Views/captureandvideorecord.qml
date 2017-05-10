@@ -317,7 +317,7 @@ Item {
         {
             capture.enabled = enable
             capture.opacity = enable ? 1 : 0.5
-        }	
+        }
     }
     Connections
     {

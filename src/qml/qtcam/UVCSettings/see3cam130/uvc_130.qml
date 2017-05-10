@@ -38,7 +38,12 @@ Item {
         onTakeScreenShot:
         {
             seecam130.enableDisableAFRectangle(false)
+            seecam130.enableDisableFaceRectangle(false)
             burstShotTimer.start()
+            // In trigger mode, if frames are not coming then after 3 seconds enable all settings
+            if(streamTrigger.checked){
+                enableSettings.start()
+            }
         }
         onGetVideoPinStatus:
         {
@@ -60,6 +65,19 @@ Item {
         interval: 1000
         onTriggered: {
             root.imageCapture(CommonEnums.BURST_SHOT);
+            // Added by Sankari: 20 Apr 2017
+            // Disable saving image when trigger mode is selected initially and capturing image then switch to master mode
+            if(streamTrigger.checked)
+                root.disableSaveImage()
+            stop()
+        }
+    }
+
+    Timer {
+        id: enableSettings
+        interval: 3000
+        onTriggered: {
+            root.enableAllSettingsTab()
             stop()
         }
     }
@@ -69,8 +87,8 @@ Item {
         interval: 500
         onTriggered: {
             seecam130.getSceneMode()
-            seecam130.getEffectMode()            
-            seecam130.getDenoiseValue()            
+            seecam130.getEffectMode()
+            seecam130.getDenoiseValue()
             seecam130.getQFactor()
             seecam130.getExposureCompensation()            
             seecam130.getFrameRateCtrlValue()
@@ -577,9 +595,11 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
+                        root.startUpdatePreviewInMasterMode()
                         seecam130.setStreamMode(See3Cam130.STREAM_MASTER)
                     }
                     Keys.onReturnPressed: {
+                        root.startUpdatePreviewInMasterMode()
                         seecam130.setStreamMode(See3Cam130.STREAM_MASTER)
                     }
                 }
@@ -590,16 +610,15 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
-                        seecam130.setStreamMode(See3Cam130.STREAM_TRIGGER)
-                        messageDialog.title = "Trigger Mode"
-                        messageDialog.text = "Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document."
-                        messageDialog.open()
+                        setTriggerMode()
                     }
                     Keys.onReturnPressed: {
-                        seecam130.setStreamMode(See3Cam130.STREAM_TRIGGER)
-                        messageDialog.title = "Trigger Mode"
-                        messageDialog.text = "Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document."
-                        messageDialog.open()
+                        setTriggerMode()
+                    }
+                    onFocusChanged: {
+                        // Disable saving image when focus is changed from trigger mode to master mode
+                        // or changing to any other camera if it is m_saveImage flag set as true to avoid saving image.
+                       root.disableSaveImage()
                     }
                 }
             }
@@ -1148,7 +1167,7 @@ Item {
                     action: setDefault
                     style: econButtonStyle
                     Keys.onReturnPressed: {
-                        seecam130.setToDefault()
+                        setToDefaultValues()
                     }
                 }
             }
@@ -1241,6 +1260,16 @@ Item {
                 }
             }else if(faceDetectMode == See3Cam130.FaceRectDisable){
                 faceRectDisable.checked = true
+                if(faceDetectEmbedDataValue == See3Cam130.FaceDetectEmbedDataEnable){
+                    faceDetectEmbedData.checked = true
+                }else{
+                    faceDetectEmbedData.checked = false
+                }
+                if(faceDetectOverlayRect == See3Cam130.FaceDetectOverlayRectEnable){
+                    overlayRect.checked = true
+                }else{
+                    overlayRect.checked = false
+                }
             }
         }        
         onSmileDetectModeValue:{
@@ -1252,6 +1281,11 @@ Item {
                 }
             }else if(smileDetectMode == See3Cam130.SmileDetectDisable){
                 smileDetectDisable.checked = true
+                if(smileDetectEmbedDataValue == See3Cam130.smileDetectEmbedDataEnable){
+                    smileDetectEmbedData.checked = true
+                }else{
+                    smileDetectEmbedData.checked = false
+                }
             }
         }
 
@@ -1273,6 +1307,7 @@ Item {
         onRoiAfModeValue:{
             if(roiMode == See3Cam130.AFCentered){
                 afCentered.checked = true
+                afWindowSizeCombo.currentIndex = winSize-1
             }else if(roiMode == See3Cam130.AFManual){
                 skipUpdateUIOnAFWindowSize = false
                 afManual.checked = true
@@ -1289,7 +1324,8 @@ Item {
         }
         onRoiAutoExpModeValue:{
             if(roiMode == See3Cam130.AutoExpFull){                
-                autoexpFull.checked = true
+                autoexpFull.checked = true                
+                autoExpoWinSizeCombo.currentIndex = winSize-1
             }else if(roiMode == See3Cam130.AutoExpManual){
                 skipUpdateUIOnExpWindowSize = false
                 autoexpManual.checked = true
@@ -1559,6 +1595,12 @@ Item {
 
     }
 
+    function setTriggerMode(){
+        root.stopUpdatePreviewInTriggerMode()
+        seecam130.setStreamMode(See3Cam130.STREAM_TRIGGER)
+        displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document See3CAM_130_Trigger_Mode"))
+    }
+
     function getSerialNumber() {
         uvccamera.getSerialNumber()
         messageDialog.open()
@@ -1582,6 +1624,8 @@ Item {
         seecam130.getAFRectMode()
         seecam130.getFlipMode()
         seecam130.getStreamMode()
+        // Added by Sankari: 17 Apr 2017. To get preview in master mode
+        root.startUpdatePreviewInMasterMode()
         seecam130.getFaceDetectMode()
         seecam130.getSmileDetectMode()
         seecam130.getExposureCompensation()        
@@ -1698,10 +1742,6 @@ Item {
             if(faceDetectEmbedData.checked){
                 displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_130_Face_and_Smile_Detection for more details"))
             }
-        } else{
-            if(faceDetectEmbedData.checked){
-                displayMessageBox(qsTr("Error"), qsTr("Enabling embed data is failed"))
-            }
         }
     }
 
@@ -1750,14 +1790,10 @@ Item {
     Connections{
          target: root
          onMouseRightClicked:{
-             if(afCentered.enabled && afCentered.checked){
-                seecam130.setROIAutoFoucs(See3Cam130.AFCentered, width, height, x, y, afWindowSizeCombo.currentText)
-             }else if(afManual.enabled && afManual.checked){
+             if(afManual.enabled && afManual.checked){
                  seecam130.setROIAutoFoucs(See3Cam130.AFManual, width, height, x, y, afWindowSizeCombo.currentText)
              }
-             if(autoexpFull.enabled && autoexpFull.checked){
-                seecam130.setROIAutoExposure(See3Cam130.AutoExpFull, width, height, x, y, autoExpoWinSizeCombo.currentText)
-             }else if(autoexpManual.enabled && autoexpManual.checked){
+             if(autoexpManual.enabled && autoexpManual.checked){
                 seecam130.setROIAutoExposure(See3Cam130.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
              }
          }
@@ -1766,6 +1802,9 @@ Item {
          }
          onAutoExposureSelected:{
              enableDisableAutoExposureControls(autoExposureSelect)
+         }
+         onEnableFaceRectafterBurst:{
+             seecam130.enableDisableFaceRectangle(true)
          }
     }
 
@@ -1778,11 +1817,13 @@ Item {
          }
          onBeforeRecordVideo:{
              seecam130.enableDisableAFRectangle(false)
+             seecam130.enableDisableFaceRectangle(false)
          }
          onAfterRecordVideo:{
              if(rectEnable.checked){
                 seecam130.enableDisableAFRectangle(true)
              }
+             seecam130.enableDisableFaceRectangle(true)
          }
          onVideoResolutionChanged:{
              getexposureCompFrameRateCtrlTimer.start()

@@ -58,7 +58,6 @@ public:
    bool createFile(QString filename, CodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitRate);
 #endif
    bool closeFile();
-
    int encodeImage(const QImage &);
    bool isOk();
 

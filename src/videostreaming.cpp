@@ -412,7 +412,7 @@ void Videostreaming::capFrame()
                         qImage2.setColorTable(table);
 
                         if(!writer.write(qImage2)) {
-                            emit logCriticalHandle("Error while savingak image:"+writer.errorString());                            
+                            emit logCriticalHandle("Error while saving an image:"+writer.errorString());
                         }
                         else {                            
                             imgSaveSuccessCount++;
@@ -425,7 +425,7 @@ void Videostreaming::capFrame()
                     QImageWriter writer(filename);
 
                     if(!writer.write(qImage3)) {
-                        emit logCriticalHandle("Error while saving image:"+writer.errorString());                                                
+                        emit logCriticalHandle("Error while saving an image:"+writer.errorString());
                     } else {
                         imgSaveSuccessCount++;                        
                     }
@@ -1113,6 +1113,9 @@ void Videostreaming::formatSaveSuccess(uint imgSaveSuccessCount, bool burstFlag)
     }
     // After capturing image need to enable RF rect in See3CAM_130 or See3CAM_30 cam
     emit enableRfRectBackInPreview();
+
+    // After capturing image need to enable face rect in See3CAM_130 cam
+    emit enableFactRectInPreview();
 }
 
 bool Videostreaming::getInterval(struct v4l2_fract &interval)
@@ -1334,14 +1337,12 @@ void Videostreaming::displayEncoderList(){
     if (f.open(QFile::ReadOnly)){
         QTextStream in(&f);
         fileContent.append(in.readAll());
-
-        if( (-1 != fileContent.indexOf("15.10")) || (-1 != fileContent.indexOf("16.04")) || (-1 != fileContent.indexOf("Linux Mint 18")) ){
-            encoders<<"MJPG"<<"H264"<<"VP8";
-            ubuntuVersion = ">=15"; // version >=  15 [ Here 15.10 and 16.04 , Linux Mint 18 ]
-
-        }else if((-1 != fileContent.indexOf("12.04")) || (-1 != fileContent.indexOf("14.04"))){
+        if((-1 != fileContent.indexOf("12.04")) || (-1 != fileContent.indexOf("14.04"))){
             encoders<<"YUY"<<"MJPG"<<"H264"<<"VP8";
-            ubuntuVersion = "<15"; // version less than 15 [ Here 12.04 and 14.04 ]
+            ubuntuVersion = "<15"; // version less than 15 [ Here ubuntu 12.04 and ubuntu 14.04 ]
+        }else{
+            encoders<<"MJPG"<<"H264"<<"VP8";
+            ubuntuVersion = ">=15"; // version >=  15 [ Here ubuntu 15.10 and ubuntu 16.04 , Linux Mint 18, ubuntu 17.04 ]
         }
 
         encoderList.setStringList(encoders);

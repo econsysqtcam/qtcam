@@ -223,6 +223,9 @@
 #define SET_STREAM_MODE_130               0x15
 #define GET_STREAM_MODE_130               0x14
 
+#define ENABLE_DISABLE_MODE_FACE_RECTANGLE_130       0x26
+#define ENABLE_FACE_RECTANGLE_130       0x01
+#define DISABLE_FACE_RECTANGLE_130      0x00
 #define SET_FACE_DETECT_RECT            0x1F
 #define GET_FACE_DETECT_RECT            0x1E
 #define ENABLE_FACE_RECT                0x01

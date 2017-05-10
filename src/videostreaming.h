@@ -437,6 +437,7 @@ signals:
     void rcdStop(QString recordFail);
     void videoRecord(QString fileName);
     void enableRfRectBackInPreview();
+    void enableFactRectInPreview();
 
     // Added by Sankari: 02 Dec 2017
     void stillSkipCount(QString stillResoln, QString videoResoln);

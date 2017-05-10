@@ -195,5 +195,7 @@ public slots:
     bool setFrameRateCtrlValue(uint frameRate);
     bool getFrameRateCtrlValue();
 
+    bool enableDisableFaceRectangle(bool enableFaceRect);
+
 };
 #endif // SEE3CAM_130_H
