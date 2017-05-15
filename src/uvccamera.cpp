@@ -65,6 +65,10 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c151"),CommonEnums::SEE3CAM_CU50);
     cameraEnumMap.insert(econVid + (",c152"),CommonEnums::SEE3CAM_CU51);
     cameraEnumMap.insert(econVid + (",c1d0"),CommonEnums::SEE3CAM_CU130);
+
+    //Added by Sankari : 22 Feb 2017
+    cameraEnumMap.insert(econVid + (",c1d1"),CommonEnums::SEE3CAM_CU135);
+
     cameraEnumMap.insert("04b4,00c3",CommonEnums::CX3_UVC_CAM);
     cameraEnumMap.insert("046d,082d",CommonEnums::HD_PRO_WEBCAM);
     cameraEnumMap.insert(econVid + (",c111"),CommonEnums::ECON_1MP_BAYER_RGB);

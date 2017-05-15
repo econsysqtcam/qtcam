@@ -1114,7 +1114,7 @@ void Videostreaming::formatSaveSuccess(uint imgSaveSuccessCount, bool burstFlag)
     // After capturing image need to enable RF rect in See3CAM_130 or See3CAM_30 cam
     emit enableRfRectBackInPreview();
 
-    // After capturing image need to enable face rect in See3CAM_130 cam
+    // After capturing image need to enable face rect in See3CAM_130, See3CAM_CU30 and See3CAM_CU135 cam
     emit enableFactRectInPreview();
 }
 
@@ -1187,15 +1187,6 @@ void Videostreaming::displayFrame() {
         m_capNotifier = new QSocketNotifier(fd(), QSocketNotifier::Read);
         connect(m_capNotifier, SIGNAL(activated(int)), this, SLOT(capFrame()));
     }
-}
-
-/**
- * @brief Videostreaming::getCurrentFrameRateIntervalDenominator - get current frame interval denominator value [ for ex: denominator "30" for 30 fps ]
- */
-void Videostreaming::getCurrentFrameRateIntervalDenominator(){
-    getInterval(interval);
-    // send the frame interval to qml [ for ex: denominator "30" for 30 fps ]
-    emit frameRateInterval(interval.denominator);
 }
 
 void Videostreaming::stopCapture() {
@@ -1344,7 +1335,6 @@ void Videostreaming::displayEncoderList(){
             encoders<<"MJPG"<<"H264"<<"VP8";
             ubuntuVersion = ">=15"; // version >=  15 [ Here ubuntu 15.10 and ubuntu 16.04 , Linux Mint 18, ubuntu 17.04 ]
         }
-
         encoderList.setStringList(encoders);
     }
 }

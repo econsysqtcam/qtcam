@@ -34,6 +34,7 @@ SOURCES += main.cpp \
     see3cam_130.cpp \
 	see3cam_30.cpp \
 	seecam_81.cpp \
+    see3cam_cu135.cpp \
     see3cam_cu40.cpp
 
 # Installation path
@@ -69,6 +70,7 @@ HEADERS += \
 	common_enums.h \
     see3cam_30.h \
     seecam_81.h \
+    see3cam_cu135.h \
     see3cam_cu40.h
 
 

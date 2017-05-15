@@ -217,9 +217,6 @@ private:
 
 
 public slots:
-	// Added by Sankari : 18 Jan 2017 -  Get frame rate denominator value. [for ex: 1/30 , here denominator = 30 ]
-    void getCurrentFrameRateIntervalDenominator();
-
     // Added by Sankari : 10 Dec 2016
     // To Disable image capture dialog when taking trigger shot in trigger mode for 12cunir camera
     void disableImageCaptureDialog();
@@ -447,9 +444,7 @@ signals:
     void requestToChangeFPSandTakeShot();
 
     // To get FPS list
-    void sendFPSlist(QString fpsList);
-
-    void frameRateInterval(uint currentfpsInterval);
+    void sendFPSlist(QString fpsList);    
 };
 
 #endif // VIDEOSTREAMING_H

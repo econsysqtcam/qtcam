@@ -353,18 +353,6 @@ Rectangle {
             onDefaultFrameInterval:{                
                 videoFrameInterval(frameInterval)
             }
-            // Added by Sankari: 18 Jan 2017
-            // Update current fps index value in UI [combo box] when resolution changed.
-            // search the index containing current fps and set index value.
-            onFrameRateInterval:{
-                fpsList = availableFpslist.split(',')
-                for (var index = 0; index < fpsList.length; index++) {
-                    if(fpsList[index].indexOf(currentfpsInterval) != -1){
-                        videoFrameInterval(index)
-                    }
-                }
-            }
-
             onRcdStop: {
                 recordFailedDialog.title = "Failed"
                 recordFailedDialog.text = recordFail
@@ -711,12 +699,7 @@ Rectangle {
             selectedDeviceEnumValue = selectedDevice;
         }
     }
-
-	// Get frame rate value[for ex: 1/30 means here denominator = 30  
-    function getCurrentFrameRateIntervalDenominatorValue(){
-        vidstreamproperty.getCurrentFrameRateIntervalDenominator()
-    }
-
+	
     // Added by Sankari : Update frame to skip 
     function updateFrametoSkip(stillSkip){
         vidstreamproperty.updateFrameToSkip(stillSkip)
@@ -911,6 +894,8 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/see3cam50/uvc50.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU130) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu130/uvc_cu130.qml").createObject(root)
+        }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU135) { // Added By Sankari : 22 Feb 2017
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu135/uvc_cu135.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam130/uvc_130.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU51) {
@@ -957,6 +942,8 @@ Rectangle {
             case CommonEnums.SEE3CAM_130:
             case CommonEnums.SEE3CAM_30:
 			case CommonEnums.SEE3CAM_81:
+ 			// Added by Sankari : 22 Feb 2017
+            case CommonEnums.SEE3CAM_CU135:
                 camproperty.openHIDDevice(device_box.currentText);
             break;
         }

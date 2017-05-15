@@ -290,11 +290,7 @@ Item {
                                 JS.videoCaptureResolution = output_size_box_Video.currentText.toString();
                                 if(outputSizeBox) {
                                     root.updateFPS(color_comp_box_VideoPin.currentText.toString(), currentText.toString())
-                                    root.updateScenePreview(output_size_box_Video.currentText.toString(), color_comp_box_VideoPin.currentIndex.toString(),frame_rate_box.currentIndex)
-                                    // Added by Sankari: 18 Jan 2017 - Update current fps index value in UI [combo box] when resolution changed. No need to update in preview. Because in preview it is already updated.
-                                    frameRateBox = false
-                                    root.getCurrentFrameRateIntervalDenominatorValue()
-                                    frameRateBox = true
+                                    root.updateScenePreview(output_size_box_Video.currentText.toString(), color_comp_box_VideoPin.currentIndex.toString(),frame_rate_box.currentIndex)      
                                 }
                                 // Added by Sankari: 23 Dec 2016 - To inform video resolution is changed in video capture settings
                                 root.informVideoResoutionChanged()

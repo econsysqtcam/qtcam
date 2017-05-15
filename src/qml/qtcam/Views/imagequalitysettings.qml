@@ -201,6 +201,7 @@ Item {
                         validator: IntValidator {bottom: brightness_Slider.minimumValue; top: brightness_Slider.maximumValue;}
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: brightness_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 brightness_Slider.value = brightness_value.text
@@ -240,6 +241,7 @@ Item {
                         validator: IntValidator {bottom: contrast_Slider.minimumValue; top: contrast_Slider.maximumValue;}
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: contrast_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 contrast_Slider.value = contrast_value.text
@@ -279,6 +281,7 @@ Item {
                         validator: IntValidator {bottom: saturation_Slider.minimumValue; top: saturation_Slider.maximumValue;}
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: saturation_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 saturation_Slider.value = saturation_value.text
@@ -318,6 +321,7 @@ Item {
                         validator: IntValidator {bottom: pan_Slider.minimumValue; top: pan_Slider.maximumValue;}
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: pan_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 pan_Slider.value = pan_value.text
@@ -357,6 +361,7 @@ Item {
                         validator: IntValidator {bottom: tilt_Slider.minimumValue; top: tilt_Slider.maximumValue;}
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: tilt_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 tilt_Slider.value = tilt_value.text
@@ -396,6 +401,7 @@ Item {
                         validator: IntValidator {bottom: zoom_Slider.minimumValue; top: zoom_Slider.maximumValue;}
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: zoom_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 zoom_Slider.value = zoom_value.text
@@ -482,6 +488,7 @@ Item {
                         opacity: white_balance_Slider.enabled ? 1: 0
                         enabled: autoSelect_wb.checked ? false : true
                         style: econTextFieldStyle
+                        maximumLength: white_balance_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 white_balance_Slider.value = wb_value.text
@@ -518,6 +525,7 @@ Item {
                         smooth: true
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: gamma_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 gamma_Slider.value = gamma_value.text
@@ -557,6 +565,7 @@ Item {
                         validator: IntValidator {bottom: sharpness_Slider.minimumValue; top: sharpness_Slider.maximumValue;}
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: sharpness_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 sharpness_Slider.value = sharpness_value.text
@@ -596,6 +605,7 @@ Item {
                         horizontalAlignment: TextInput.AlignHCenter
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: gain_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 gain_Slider.value = gain_value.text
@@ -635,6 +645,7 @@ Item {
                         smooth: true
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: hue_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 hue_Slider.value = hue_value.text
@@ -800,6 +811,7 @@ Item {
                         horizontalAlignment: TextInput.AlignHCenter
                         opacity: 0
                         style:econTextFieldStyle
+                        maximumLength: exposure_Slider.maximumValue.toString().length
                         onTextChanged: {
                              if(exposure_value.text.length > 0){
                                  if(root.selectedDeviceEnumValue == CommonEnums.CX3_UVC_CAM){
@@ -892,6 +904,7 @@ Item {
                         horizontalAlignment: TextInput.AlignHCenter
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: backLight_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 backLight_Slider.value = backLight_value.text
@@ -931,6 +944,7 @@ Item {
                         horizontalAlignment: TextInput.AlignHCenter
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: rawBitsSlider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 rawBitsSlider.value = rawBits_value.text
@@ -1026,6 +1040,7 @@ Item {
                         horizontalAlignment: TextInput.AlignHCenter
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: ledFreqSlider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 ledFreqSlider.value = ledFreq_value.text
@@ -1065,6 +1080,7 @@ Item {
                         horizontalAlignment: TextInput.AlignHCenter
                         opacity: 0
                         style: econTextFieldStyle
+                        maximumLength: focusLogitechSlider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 focusLogitechSlider.value = focusLogitech_value.text
@@ -1184,6 +1200,7 @@ Item {
                         validator: IntValidator {bottom: focus_Slider.minimumValue; top: focus_Slider.maximumValue;}
                         opacity: 0
                         style:econTextFieldStyle
+                        maximumLength: focus_Slider.maximumValue.toString().length
                         onTextChanged: {
                             if(text != "")
                                 focus_Slider.value = focus_value.text

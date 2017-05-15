@@ -36,6 +36,7 @@
 #include "seecam_81.h"
 #include "see3cam_cu40.h"
 #include "see3cam_cu130.h"
+#include "see3cam_cu135.h"
 #include "see3cam_130.h"
 #include "seecam_ar0130.h"
 #include "seecam_cu30.h"
@@ -67,17 +68,21 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_10CUG_Mono>("econ.camera.see3cam10Mono", 1, 0, "See3Cam10Mono");
     qmlRegisterType<See3CAM_80>("econ.camera.see3cam80", 1, 0, "See3Cam80");
 
-    // Added by Sankari : 07 Feb 2017
+  // Added by Sankari : 07 Feb 2017
     qmlRegisterType<See3CAM_30>("econ.camera.see3cam30", 1, 0, "See3Cam30");
 
-    // Added by Sankari: 17 Dec 2016
+ // Added by Sankari: 17 Dec 2016
     qmlRegisterType<See3CAM_81>("econ.camera.see3cam81", 1, 0, "See3Cam81");
+
+    qmlRegisterType<See3CAM_CU50>("econ.camera.see3cam50", 1, 0, "See3Cam50");    
+    qmlRegisterType<See3CAM_CU130>("econ.camera.see3camcu130", 1, 0, "See3CamCu130");
+
+    // Added by Sankari : 22 Feb 2017
+    qmlRegisterType<See3CAM_CU135>("econ.camera.see3camcu135", 1, 0, "See3CamCu135");
 
 // Added by Sankari: 21 Apr 2017
     qmlRegisterType<See3CAM_CU40>("econ.camera.see3camcu40", 1, 0, "See3Camcu40");
 
-    qmlRegisterType<See3CAM_CU50>("econ.camera.see3cam50", 1, 0, "See3Cam50");    
-    qmlRegisterType<See3CAM_CU130>("econ.camera.see3camcu130", 1, 0, "See3CamCu130");
     qmlRegisterType<See3CAM_130>("econ.camera.see3cam130", 1, 0, "See3Cam130");
     qmlRegisterType<See3CAM_CU30>("econ.camera.see3camcu30", 1, 0, "See3Camcu30");
     qmlRegisterType<See3CAM_CU51>("econ.camera.see3cam51", 1, 0, "See3Cam51");
