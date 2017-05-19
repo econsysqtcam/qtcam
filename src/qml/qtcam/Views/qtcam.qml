@@ -1049,6 +1049,7 @@ Rectangle {
         uvc_settings.opacity = 1
         captureBtnEnable(true)
         keyEventFiltering = false
+        vidstreamproperty.enabled = true
     }
 
     // Added by Sankari: 23 Dec 2016 - emit the signal to inform video resolution is changed in video capture settings

@@ -1,3 +1,8 @@
+Qtcam Application - 14.0.1
+----------------------------
+* Fixed issue of not able to capture image using mouse left click in preview area when trying to capture image in trigger mode 
+  then trying to capture image in master mode.
+
 Qtcam Application - 14.0.0
 --------------------------
 * Added support for see3cam_cu135 camera.
