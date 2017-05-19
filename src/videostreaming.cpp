@@ -442,7 +442,9 @@ void Videostreaming::capFrame()
                 doAfterChangeFPSAndShot();
             }
             else {
-                captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
+                if(m_saveImage){
+                    captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
+                }
                 makeSnapShot = false;
                 m_snapShot = false;
                 if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
