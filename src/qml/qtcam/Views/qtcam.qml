@@ -56,7 +56,16 @@ Rectangle {
     property bool m_Snap : true
     property bool stillPreview : false
     property bool webcamKeyAccept: true
-// Added by Sankari: 16 Dec 2016 
+
+    // Added by Sankari : 25 May 2017, the flag to indicate side bar items are opened/closed
+    property bool closeSideBarClicked: false
+
+    // Added by Sankari : 25 May 2017, store the status of capture/record button visiblity[used when closing side bar items]
+    property bool captureButtonVisibleStatus: false
+    property bool videoRecButtonVisibleStatus: false
+    property bool recordStopBtnVisibleStatus: false
+
+    // Added by Sankari: 16 Dec 2016
     property bool webcamKeyTriggerShot: true
     property string statusText
     property string videofileName
@@ -285,6 +294,9 @@ Rectangle {
                 device_box.oldIndex = 0
                 device_box.currentIndex = 0
                 disableImageSettings();
+                // Added by Sankari: 25 May 2017. When device is unplugged, make preview area disabled
+                vidstreamproperty.enabled = false
+
                 if(captureVideoRecordRootObject.recordStopBtnVisible) {
                     statusText = "Saving..."
                     vidstreamproperty.recordStop()
@@ -295,7 +307,6 @@ Rectangle {
                     videoPropertyItemEnable(true)
                     stillPropertyItemEnable(true)
                     device_box.enabled = true
-                    vidstreamproperty.enabled = true
                     device_box.opacity = 1
                     videoRecordBtnVisible(true)
                     uvc_settings.enabled = true
@@ -386,22 +397,27 @@ Rectangle {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 onReleased:
                 {
-                     if (mouse.button == Qt.LeftButton){
-                        if(captureVideoRecordRootObject.captureBtnVisible){
-                            mouseClickCapture()
-                        } else if(captureVideoRecordRootObject.recordBtnVisible){
-                            videoRecordBegin()
-                        } else if(captureVideoRecordRootObject.recordStopBtnVisible){
-                            videoSaveVideo()
+                    if (mouse.button == Qt.LeftButton){
+                        if(closeSideBarClicked){
+                            captureRecordWhenSideBarItemsClosed()
                         }
-                     }
-                     else if(mouse.button == Qt.RightButton){
-                         // passing mouse x,y cororinates, preview width and height
-                         mouseRightClicked(mouse.x, mouse.y, vidstreamproperty.width, vidstreamproperty.height)
-                     }
-                }                
+                        else{
+                            if(captureVideoRecordRootObject.captureBtnVisible){
+                                mouseClickCapture()
+                            } else if(captureVideoRecordRootObject.recordBtnVisible){
+                                videoRecordBegin()
+                            } else if(captureVideoRecordRootObject.recordStopBtnVisible){
+                                videoSaveVideo()
+                            }
+                        }
+                    }else if(mouse.button == Qt.RightButton){
+                        // passing mouse x,y cororinates, preview width and height
+                        mouseRightClicked(mouse.x, mouse.y, vidstreamproperty.width, vidstreamproperty.height)
+                    }
+                }
             }
         }
+
     }
 
     Image {
@@ -423,6 +439,7 @@ Rectangle {
                 open_sideBar.opacity = 1
             }
             onReleased: {
+                closeSideBarClicked = false
                 sideBarItems.visible = true
                 sidebarVisibleStatus(sideBarItems.visible)
                 open_sideBar.visible = false
@@ -681,6 +698,15 @@ Rectangle {
                 }
 
                 onReleased: {
+                    // Added by Sankari : 25 May 2017, set the flag to indicate side bar items are closed
+                    closeSideBarClicked = true
+
+                    // Added by Sankari : 25 May 2017
+                    // Store the last visible status of capture and record buttons when clicking close side bar button
+                    captureButtonVisibleStatus = captureVideoRecordRootObject.captureBtnVisible
+                    videoRecButtonVisibleStatus = captureVideoRecordRootObject.recordBtnVisible
+                    recordStopBtnVisibleStatus = captureVideoRecordRootObject.recordStopBtnVisible
+
                     if(!cameraColumnLayout.visible)
                         selectCameraSettings()
                     sideBarItems.visible = false
@@ -711,14 +737,18 @@ Rectangle {
         keyEventFiltering = true
         vidstreamproperty.enabled = false
         mouseClickCap = true
-        //Added by Sankari : 08 Mar 2017
-        // Disable camera settings/extension settings tab before capturing image
-        imageQualitySettingsEnable(false)
-        videoPropertyItemEnable(false)
-        stillPropertyItemEnable(false)
-        uvc_settings.enabled = false
-        uvc_settings.opacity = 0.5
-        selectCameraSettings()
+        // Added by Sankari : 25 May 2017,
+        // if side bar items are not visible, then enable settings are not needed, after capture image
+        if(!closeSideBarClicked){
+            //Added by Sankari : 08 Mar 2017
+            // Disable camera settings/extension settings tab before capturing image
+            imageQualitySettingsEnable(false)
+            videoPropertyItemEnable(false)
+            stillPropertyItemEnable(false)
+            uvc_settings.enabled = false
+            uvc_settings.opacity = 0.5
+            selectCameraSettings()
+        }
         takeScreenShot(false);
     }
 
@@ -846,7 +876,8 @@ Rectangle {
         keyEventFiltering = true
         uvc_settings.enabled = false
         uvc_settings.opacity = 0.5
-        selectCameraSettings()
+        if(!videoRecButtonVisibleStatus)
+            selectCameraSettings()
     }
 
     function videoSaveVideo() {
@@ -873,6 +904,26 @@ Rectangle {
             cameraSettingsTabEnable(false)
             cameraColumnLayout.visible = false            
             see3cam.visible = true
+        }
+    }
+
+    // Added by Sankari: 25 May 2017
+    // Capture and Record When side bar items closed.
+    function captureRecordWhenSideBarItemsClosed(){
+        if(captureButtonVisibleStatus){
+            mouseClickCapture()
+        } else if(videoRecButtonVisibleStatus){
+            videoRecordBegin()
+            // make record start button visibility false
+            videoRecButtonVisibleStatus = false
+            // make record stop button visibility true
+            recordStopBtnVisibleStatus = true
+        } else if(recordStopBtnVisibleStatus){
+            videoSaveVideo()
+            // make record start button visibility true
+            videoRecButtonVisibleStatus = true
+            // make record stop button visibility true
+            recordStopBtnVisibleStatus = false
         }
     }
 
@@ -1028,6 +1079,15 @@ Rectangle {
     }
 
     Keys.onLeftPressed: {
+        // Added by Sankari : 25 May 2017, set the flag to indicate side bar items are closed
+        closeSideBarClicked = true
+
+        // Added by Sankari : 25 May 2017
+        // Store the last visible status of capture and record buttons when clicking close side bar button
+        captureButtonVisibleStatus = captureVideoRecordRootObject.captureBtnVisible
+        videoRecButtonVisibleStatus = captureVideoRecordRootObject.recordBtnVisible
+        recordStopBtnVisibleStatus = captureVideoRecordRootObject.recordStopBtnVisible
+
         if(!cameraColumnLayout.visible)
             selectCameraSettings()
         sideBarItems.visible = false
@@ -1036,6 +1096,8 @@ Rectangle {
     }
 
     Keys.onRightPressed: {
+        // Added by Sankari : 25 May 2017, set the flag to indicate side bar items are opened
+        closeSideBarClicked = false
         sideBarItems.visible = true
         sidebarVisibleStatus(sideBarItems.visible)
         open_sideBar.visible = false

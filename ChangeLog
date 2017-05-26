@@ -1,3 +1,10 @@
+Qtcam Application - 14.0.2
+----------------------------
+* Fixed bugs:
+  1. Image not captured while 'sidebar hide option' clicked.
+  2. Video Recording started automatically after unplug device and click in preview area.
+  3. Brightness, Pan & Tilt controls minimum values not properly restored in that control text boxes.
+
 Qtcam Application - 14.0.1
 ----------------------------
 * Fixed issue of not able to capture image using mouse left click in preview area when trying to capture image in trigger mode 
