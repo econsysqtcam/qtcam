@@ -1,3 +1,17 @@
+Qtcam Application - 14.0.3
+-----------------------------
+* Added R2 features for see3cam_cu30 camera.
+
+   1. Scene Mode
+   2. ROI control
+   3. Burst Mode
+   4. Q Factor
+   5. Flip controls
+   6. Face Detection
+   7. Smile Detection
+   8. Frame rate control
+   9. Exposure compensation
+
 Qtcam Application - 14.0.2
 ----------------------------
 * Fixed bugs:

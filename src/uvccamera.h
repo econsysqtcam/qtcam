@@ -314,6 +314,12 @@
 #define CAMERA_CONTROL_CU30     0x75
 #define GET_SPECIAL_EFFECT 0x03
 #define SET_SPECIAL_EFFECT 0x04
+#define SET_ORIENTATION_CU30    0x0E
+#define GET_ORIENTATION_CU30    0x0D
+#define SET_ORIENTATION_BOTHFLIP_ENABLE_CU30    0x03
+#define SET_ORIENTATION_HORZFLIP_CU30           0x01
+#define SET_ORIENTATION_VERTFLIP_CU30           0x02
+#define SET_ORIENTATION_BOTHFLIP_DISABLE_CU30   0x00
 
 #define SPECIAL_EFFECT_NORMAL       0x01
 #define SPECIAL_EFFECT_BW           0x04
@@ -321,11 +327,48 @@
 #define SPECIAL_EFFECT_NEGATIVE     0x08
 #define SPECIAL_EFFECT_SKETCH       0x10
 
+#define SET_BURST_LENGTH_CU30       0x0A
+#define GET_BURST_LENGTH_CU30       0x09
+
+#define GET_SCENEMODE_CU30          0x01
+#define SET_SCENEMODE_CU30          0x02
+
+#define GET_Q_FACTOR_CU30           0x0B
+#define SET_Q_FACTOR_CU30           0x0C
+
+#define SET_FRAME_RATE_CU30         0x16
+#define GET_FRAME_RATE_CU30         0x15
+
+#define SET_EXPOSURE_COMPENSATION_CU30  0x14
+#define GET_EXPOSURE_COMPENSATION_CU30  0x13
+
 #define CU30_SUCCESS    0x01
 #define CU30_FAIL       0x00
 
 #define SET_DENOISE_CONTROL  0x06
 #define GET_DENOISE_CONTROL  0x05
+
+#define SET_EXP_ROI_MODE_CU30       0x08
+#define GET_EXP_ROI_MODE_CU30       0x07
+
+#define SET_FACE_DETECT_RECT_CU30            0x10
+#define GET_FACE_DETECT_RECT_CU30            0x0F
+#define ENABLE_FACE_RECT_CU30                0x01
+#define DISABLE_FACE_RECT_CU30               0x00
+#define ENABLE_EMBED_DATA_CU30               0x01
+#define DISABLE_EMBED_DATA_CU30              0x00
+#define ENABLE_OVERLAY_RECT_CU30             0x01
+#define DISABLE_OVERLAY_RECT_CU30            0x00
+
+#define SET_SMILE_DETECTION_CU30             0x12
+#define GET_SMILE_DETECTION_CU30             0x11
+#define ENABLE_SMILE_DETECT_CU30             0x01
+#define DISABLE_SMILE_DETECT_CU30            0x00
+#define SET_TO_DEFAULT_CU30                  0xFF
+
+#define ENABLE_DISABLE_MODE_FACE_RECTANGLE_CU30 0x17
+#define ENABLE_FACE_RECTANGLE_CU30              0x01
+#define DISABLE_FACE_RECTANGLE_CU30             0x00
 
 /* SEE3CAM_CU40 */
 #define CAMERA_CONTROL_CU40         0x77
