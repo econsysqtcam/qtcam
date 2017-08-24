@@ -60,6 +60,10 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c112"),CommonEnums::SEE3CAM_11CUG);
     cameraEnumMap.insert(econVid + (",c113"),CommonEnums::SEE3CAM_12CUNIR);
     cameraEnumMap.insert(econVid + (",c130"),CommonEnums::SEE3CAM_CU30);
+
+    //Added by Sankari : 28 July 2017
+    cameraEnumMap.insert(econVid + (",c120"),CommonEnums::SEE3CAM_CU20);
+
     cameraEnumMap.insert(econVid + (",c030"),CommonEnums::SEE3CAM_30);
     cameraEnumMap.insert(econVid + (",c140"),CommonEnums::SEE3CAM_CU40);
     cameraEnumMap.insert(econVid + (",c151"),CommonEnums::SEE3CAM_CU50);
@@ -1030,4 +1034,50 @@ bool See3CAM_ModeControls::enableTriggerMode()
         return false;
     }
     return true;
+}
+
+
+/**
+ * @brief sendHidCmd - Sending hid command and get reply back
+ * @param outBuf - Buffer that fills to send into camera
+ * @param inBuf  - Buffer to get reply back
+ * @param len    - Buffer length
+ * return true/false
+ * */
+bool uvccamera::sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len)
+{
+    // Write data into camera
+    int ret = write(hid_fd, outBuf, len);
+
+    if (ret < 0) {        
+        perror("write");
+        return false;
+    }
+    struct timeval tv;
+    fd_set rfds;
+
+    FD_ZERO(&rfds);
+    FD_SET(hid_fd, &rfds);
+
+    /* Wait up to 5 seconds. */
+    tv.tv_sec = 5;
+    tv.tv_usec = 0;
+
+    // Monitor read file descriptor for 5 secs
+    if(0 > select(1, &rfds, NULL, NULL, &tv)){
+      perror("select");
+        return false;
+    }
+
+    // Read data from camera
+    int retval = read(hid_fd, inBuf, len);
+
+    if (retval < 0) {
+        perror("read");
+        return false;
+    }
+    else{
+        return true;
+    }
+
 }

@@ -957,6 +957,8 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/see3cam40/uvc40.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU30) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu30/uvc_cu30.qml").createObject(root)
+        } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU20) { // Added By Sankari : 28 Jul 2017
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu20/see3camcu20.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_30) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam30/uvc_30.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.CX3_UVC_CAM) {
@@ -984,6 +986,8 @@ Rectangle {
             case CommonEnums.ECON_1MP_MONOCHROME:
             case CommonEnums.SEE3CAM_11CUG:
             case CommonEnums.SEE3CAM_CU30:
+		// Added by Sankari : 01 Aug 2017
+        case CommonEnums.SEE3CAM_CU20:
             case CommonEnums.SEE3CAM_CU40:
             case CommonEnums.SEE3CAM_CU50:
             case CommonEnums.SEE3CAM_CU51:
@@ -1164,8 +1168,7 @@ Rectangle {
        case CommonEnums.BURST_SHOT:
            vidstreamproperty.makeBurstShot(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText, burstLength)
            break;
-       case CommonEnums.CHANGE_FPS_SHOT:
-           //vidstreamproperty.setStillFPS(videoSettingsRootObject.videoFrameRate)
+       case CommonEnums.CHANGE_FPS_SHOT:          
            vidstreamproperty.changeFPSandTakeShot(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText, fpsIndexToChange)
            break;
        }

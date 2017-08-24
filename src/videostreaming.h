@@ -444,7 +444,7 @@ signals:
     void requestToChangeFPSandTakeShot();
 
     // To get FPS list
-    void sendFPSlist(QString fpsList);    
+    void sendFPSlist(QString fpsList);   
 };
 
 #endif // VIDEOSTREAMING_H
