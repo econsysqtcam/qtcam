@@ -1,3 +1,9 @@
+Qtcam Application - 15.0.1
+-----------------------------
+Changes in See3cam_cu20 camera:
+1. Bug Fix: Manual Exposure is not applied properly in camera preview when clicking default in Image Quality Settings menu.
+2. Some control names are modified in extension unit.
+
 Qtcam Application - 15.0.0
 -----------------------------
 * Added support for see3cam_cu20 camera.

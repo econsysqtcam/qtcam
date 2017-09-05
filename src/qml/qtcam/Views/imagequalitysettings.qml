@@ -80,6 +80,7 @@ Item {
     property bool exposureComboEnable
     property variant exposureOrigAscella: [10, 20, 39, 78, 156, 312, 625, 1250, 2500, 5000, 10000, 20000]
     property int expAscellaTxtFiledValue;
+    property bool exposureSliderSetEnable;
     property var menuitems:[]
 
     // It needs some time to get exposure control correct index value recently set in image quality settings when selecting camera in UI.
@@ -87,7 +88,10 @@ Item {
         id: queryctrlTimer
         interval: 500
         onTriggered: {
+        // Adding flag to skip setting exposure manual value when getting exposure value and update UI and enable back after getting all control values.       
+            exposureSliderSetEnable = false
             root.cameraFilterControls(true)
+            exposureSliderSetEnable = true
             stop()
         }
     }
@@ -803,7 +807,8 @@ Item {
                                 root.changeCameraSettings(exposurecontrolId, exposureValueAscella)
                             }else{
                                 if((exposureCombo.currentText == "Manual Mode") || (root.selectedDeviceEnumValue == CommonEnums.ECON_CX3_RDX_V5680) || (root.selectedDeviceEnumValue == CommonEnums.ECON_CX3_RDX_T9P031) || (root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU40)) {
-                                    root.changeCameraSettings(exposurecontrolId,value.toString())
+                                    if(exposureSliderSetEnable)
+                                         root.changeCameraSettings(exposurecontrolId,value.toString())
                                 }
                             }
                         }
@@ -1757,7 +1762,8 @@ Item {
             }
             exposure_auto.opacity = 1
             exposureCombo.opacity = 1
-            exposureCombo.model = menuitems
+            exposureComboEnable =  false // To avoid set exposure mode in camera when each time calls index changed when setting model
+            exposureCombo.model = menuitems // On index changed is called for every time.
             while(menuitems.pop()){}
             exposureAutoControlId = controlID
             exposureComboEnable =  true

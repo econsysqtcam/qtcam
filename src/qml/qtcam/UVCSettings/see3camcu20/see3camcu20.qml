@@ -141,7 +141,7 @@ Item {
                     RadioButton {
                         id: sensorHdrDlo
                         style:  econRadioButtonStyle
-                        text: qsTr("HDR DLO")
+                        text: qsTr("HDR")
                         exclusiveGroup: sensorInputGroup
                         activeFocusOnPress: true
                         onClicked: {
@@ -196,7 +196,7 @@ Item {
                 }
                 Text {
                     id: specialMode
-                    text: "--- Special Modes ---"
+                    text: "--- Special Effect ---"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -238,7 +238,7 @@ Item {
                 }
                 Text {
                     id: flipMode
-                    text: "--- Flip Modes ---"
+                    text: "--- Flip Mode ---"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -316,12 +316,10 @@ Item {
                             text: "Torch"
                             activeFocusOnPress: true
                             style: econRadioButtonStyle
-                            onClicked: {
-                                defaultValue.enabled = true
+                            onClicked: {                                
                                 see3camcu20.setStrobeMode(See3Camcu20.STROBE_TORCH)
                             }
-                            Keys.onReturnPressed: {
-                                defaultValue.enabled = true
+                            Keys.onReturnPressed: {                                
                                 see3camcu20.setStrobeMode(See3Camcu20.STROBE_TORCH)
                             }
                         }
@@ -386,13 +384,11 @@ Item {
                           opacity: enabled ? 1 : 0.1
                           onClicked: {
                               see3camcu20.setROIAutoExposure(See3Camcu20.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
-                              autoExpoWinSizeCombo.enabled = true
-                              defaultValue.enabled = true
+                              autoExpoWinSizeCombo.enabled = true                              
                           }
                           Keys.onReturnPressed: {
                               see3camcu20.setROIAutoExposure(See3Camcu20.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
-                              autoExpoWinSizeCombo.enabled = true
-                              defaultValue.enabled = true
+                              autoExpoWinSizeCombo.enabled = true                              
                           }
                       }
                 }
@@ -422,8 +418,7 @@ Item {
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
-                    onCurrentIndexChanged: {
-                        defaultValue.enabled = true
+                    onCurrentIndexChanged: {                        
                         if(skipUpdateUIOnExpWindowSize){
                             see3camcu20.setROIAutoExposure(See3Camcu20.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
                         }
@@ -433,7 +428,7 @@ Item {
 
                 Text {
                     id: colourKillValStatusText
-                    text: "--- Colour Kill Status ---"
+                    text: "--- Colour Kill ---"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -452,8 +447,7 @@ Item {
                         style:econSliderStyle
                         minimumValue: colorValMin
                         maximumValue: colorValMax
-                        onValueChanged:  {
-                            defaultValue.enabled = true
+                        onValueChanged:  {                            
                             colorKillTextField.text = colourKillValSlider.value
                             if(skipUpdateUIOnColorKillVal){
                                 see3camcu20.setColourKill(colourKillValSlider.value)
@@ -470,8 +464,7 @@ Item {
                         horizontalAlignment: TextInput.AlignHCenter
                         style: econTextFieldStyle
                         validator: IntValidator {bottom: colourKillValSlider.minimumValue; top: colourKillValSlider.maximumValue}
-                        onTextChanged: {
-                            defaultValue.enabled = true
+                        onTextChanged: {                            
                             if(text.length > 0){
                                 colourKillValSlider.value = colorKillTextField.text
                             }
@@ -511,8 +504,7 @@ Item {
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
-                    onCurrentIndexChanged: {
-                        defaultValue.enabled = true
+                    onCurrentIndexChanged: {                        
                         root.stillBurstLength(burstLengthCombo.currentIndex + 1) // combobox index starts from 0
                         if(skipUpdateUIOnBurstLength){
                             see3camcu20.setBurstLength(burstLengthCombo.currentText)
@@ -552,12 +544,10 @@ Item {
                         text: qsTr("Disable")
                         exclusiveGroup: denoiseControlGroup
                         activeFocusOnPress: true
-                        onClicked: {
-                            defaultValue.enabled = true
+                        onClicked: {                            
                             see3camcu20.setDenoiseCtrlMode(See3Camcu20.DenoiseDisable)
                         }
-                        Keys.onReturnPressed: {
-                            defaultValue.enabled = true
+                        Keys.onReturnPressed: {                            
                             see3camcu20.setDenoiseCtrlMode(See3Camcu20.DenoiseDisable)
                         }
                     }
@@ -582,12 +572,10 @@ Item {
                         text:   qsTr("Auto")
                         exclusiveGroup: lscModeControlGroup
                         activeFocusOnPress: true
-                        onClicked: {
-                            defaultValue.enabled = true
+                        onClicked: {                            
                             see3camcu20.setLSCMode(See3Camcu20.LSC_AUTO)
                         }
                         Keys.onReturnPressed: {
-                            defaultValue.enabled = true
                             see3camcu20.setLSCMode(See3Camcu20.LSC_AUTO)
                         }
                     }
@@ -607,7 +595,7 @@ Item {
                 }
                 Text {
                     id: lscModeManualModeText
-                    text: "Lens Source:"
+                    text: "Light Source:"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -626,8 +614,7 @@ Item {
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
-                    onCurrentIndexChanged: {
-                        defaultValue.enabled = true
+                    onCurrentIndexChanged: {                        
                         if(skipUpdateUIOnLSCMode){
                             setLSCModesBasedOnComboIndexSelection()
                         }
@@ -699,8 +686,7 @@ Item {
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
-                    onCurrentIndexChanged: {
-                        defaultValue.enabled = true
+                    onCurrentIndexChanged: {                        
                         if(skipUpdateUIOnAntiFlickerMode){
                             setAntiFlickerMode()
                         }
@@ -1064,8 +1050,7 @@ Item {
     }
 
     // set anti flicker mode in the camera based on anti flicker index in combobox
-    function setAntiFlickerMode(){
-        defaultValue.enabled = true
+    function setAntiFlickerMode(){        
         if(antiFlickerCombo.currentIndex == 0)
           see3camcu20.setAntiFlickerMode(See3Camcu20.AntiFlicker50Hz)
         else
@@ -1117,6 +1102,7 @@ Item {
             see3camcu20.getAutoExpROIModeAndWindowSize()
             getCurrentValuesFromCamera()
         }
+        defaultValue.enabled = true
     }
 
     function getCurrentValuesFromCamera(){
