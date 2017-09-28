@@ -681,3 +681,8 @@ v4l2_fract v4l2::g_pixel_aspect(unsigned type)
 		return square;
 	return ratio.pixelaspect;
 }
+
+// Setting and getting UVC extension unit control values
+bool v4l2::extQueryCtrl(uvc_xu_control_query &ctrl){
+    return ioctl(UVCIOC_CTRL_QUERY, &ctrl) >= 0;
+}

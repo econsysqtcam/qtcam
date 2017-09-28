@@ -41,7 +41,7 @@
 #include "videoencoder.h"
 #include "h264decoder.h"
 #include "common_enums.h"
-
+#include <linux/uvcvideo.h>
 
 class Videostreaming : public QQuickPaintedItem, public v4l2
 {
@@ -165,7 +165,7 @@ private:
     QImage *m_capImage;    
     QPixmap qImage;
 
-    QString ctrlName, ctrlType, ctrlID, ctrlMaxValue, ctrlMinValue,ctrlDefaultValue;
+    QString ctrlName, ctrlType, ctrlID, ctrlStepSize, ctrlMaxValue, ctrlMinValue,ctrlDefaultValue;
     QString stillSize;
     QString stillOutFormat;
     QString formatType;
@@ -415,13 +415,15 @@ public slots:
 
     void enumerateFPSList();
 
+    // Set the uvc extension control value
+    bool setUvcExtControlValue(struct uvc_xu_control_query xquery);
 
 signals:
     void logDebugHandle(QString _text);
     void logCriticalHandle(QString _text);
     void titleTextChanged(QString _title,QString _text);
     void enableCaptureAndRecord();
-    void newControlAdded(QString ctrlName,QString ctrlType,QString ctrlID,QString ctrlMinValue= "0", QString ctrlMaxValue = "0",QString ctrlDefaultValue="0", QString ctrlHardwareDefault="0");
+    void newControlAdded(QString ctrlName,QString ctrlType,QString ctrlID,QString ctrlStepSize = "0",QString ctrlMinValue= "0", QString ctrlMaxValue = "0",QString ctrlDefaultValue="0", QString ctrlHardwareDefault="0");
     void deviceUnplugged(QString _title,QString _text);    
     void averageFPS(unsigned fps);
     void defaultStillFrameSize(unsigned int outputIndexValue);

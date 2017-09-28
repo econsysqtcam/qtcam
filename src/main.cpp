@@ -43,6 +43,7 @@
 #include "seecam_cu30.h"
 // Added by Sankari : 07 Feb 2017
 #include "see3cam_30.h"
+#include "uvcExtCx3sni.h"
 #include "ascella.h"
 #include "about.h"
 #include "common.h"
@@ -63,6 +64,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<Cameraproperty>("econ.camera.property",1,0,"Camproperty");
     qmlRegisterType<Videostreaming>("econ.camera.stream", 1, 0, "Videostreaming");
     qmlRegisterType<uvccamera>("econ.camera.uvcsettings", 1, 0, "Uvccamera");
+    qmlRegisterType<UVCExtCx3SNI>("econ.camera.uvcExtsettings", 1, 0, "UvcExtcamera");
     qmlRegisterType<See3CAM_11CUG>("econ.camera.see3cam11", 1, 0, "See3Cam11");    
     qmlRegisterType<See3CAM_AR130>("econ.camera.see3camar0130", 1, 0, "See3Camar0130");    
     qmlRegisterType<See3CAM_10CUG_Bayer>("econ.camera.see3cam10Bayer", 1, 0, "See3Cam10Bayer");
@@ -143,6 +145,7 @@ int main(int argc, char *argv[])
 #endif
     viewer.setIcon(icon);
     viewer.setTitle("Qtcam");
-    viewer.showMaximized();
+    //Bug fix: There's no "close,Restore Down,minimize" button on the top of the QTCAM when restore the application
+    viewer.show();
     return app.exec();
 }

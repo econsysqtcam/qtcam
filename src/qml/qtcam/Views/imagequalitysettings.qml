@@ -186,9 +186,8 @@ Item {
                         id: brightness_Slider
                         opacity: enabled ? 1 : 0.1
                         width: 110
-                        stepSize: 1
-                        style:econSliderStyle
-                        onValueChanged:  {
+                        style:econSliderStyle                        
+                        onValueChanged:  {                         
                             if(brightValueChangeProperty) {
                                 root.logInfo("Brightness changed to: "+ value.toString())
                                 root.changeCameraSettings(brightnessControlId,value.toString())
@@ -225,8 +224,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: contrast_Slider
-                        width: 110
-                        stepSize: 1
+                        width: 110                        
                         style:econSliderStyle
                         opacity: enabled ? 1 : 0.1
                         onValueChanged: {
@@ -265,8 +263,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: saturation_Slider
-                        width: 110
-                        stepSize: 1
+                        width: 110                        
                         opacity: enabled ? 1 : 0.1
                         style:econSliderStyle
                         onValueChanged: {
@@ -307,8 +304,7 @@ Item {
                         updateValueWhileDragging: false
                         id: pan_Slider
                         opacity: enabled ? 1 : 0.1
-                        width: 110
-                        stepSize: 3600
+                        width: 110                        
                         style:econSliderStyle
                         onValueChanged:  {
                             if(panValueChangeProperty) {
@@ -348,8 +344,7 @@ Item {
                         updateValueWhileDragging: false
                         id: tilt_Slider
                         opacity: enabled ? 1 : 0.1
-                        width: 110
-                        stepSize: 3600
+                        width: 110                        
                         style:econSliderStyle
                         onValueChanged:  {
                             if(tiltValueChangeProperty) {
@@ -389,8 +384,7 @@ Item {
                         updateValueWhileDragging: false
                         id: zoom_Slider
                         opacity: enabled ? 1 : 0.1
-                        width: 110
-                        stepSize: 1
+                        width: 110                        
                         style:econSliderStyle
                         onValueChanged:  {
                             if(zoomValueChangeProperty) {
@@ -470,8 +464,7 @@ Item {
                         updateValueWhileDragging: false
                         id: white_balance_Slider
                         opacity: enabled ? 1 : 0.1
-                        width: 110
-                        stepSize: 1
+                        width: 110                        
                         style:econSliderStyle
                         onValueChanged: {
                             if(wbValueChangeProperty) {
@@ -516,8 +509,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: gamma_Slider
-                        width: 110
-                        stepSize: 1
+                        width: 110                        
                         opacity: enabled ? 1 : 0.1
                         style:econSliderStyle
                         onValueChanged: {
@@ -554,8 +546,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: sharpness_Slider
-                        width: 110
-                        stepSize: 1
+                        width: 110                        
                         opacity: enabled ? 1 : 0.1
                         style:econSliderStyle
                         onValueChanged: {
@@ -595,8 +586,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: gain_Slider
-                        width: 110
-                        stepSize: 1
+                        width: 110                        
                         opacity: enabled ? 1 : 0.1
                         style:econSliderStyle
                         onValueChanged: {
@@ -636,8 +626,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: hue_Slider
-                        width: 110
-                        stepSize: 1
+                        width: 110                        
                         opacity: enabled ? 1 : 0.1
                         style:econSliderStyle
                         onValueChanged: {
@@ -756,7 +745,7 @@ Item {
                         onCurrentIndexChanged: {
                             if(exposureComboEnable) {
                                 root.selectMenuIndex(exposureAutoControlId,currentIndex)
-                                if(currentText.toString() == "Manual Mode") {
+                                if(currentText.toString() != "Auto Mode") {
                                     root.autoExposureSelected(false)
                                     JS.autoExposureSelected = false
                                     exposure_absolute.opacity = 1
@@ -796,8 +785,7 @@ Item {
                         property var exposureValueAscella
                         updateValueWhileDragging: false
                         id: exposure_Slider
-                        width: 110
-                        stepSize: 1
+                        width: 110                        
                         opacity: enabled ? 1 : 0.1
                         style:econSliderStyle
                         onValueChanged: {
@@ -806,7 +794,7 @@ Item {
                                 exposure_value.text = exposureOrigAscella[value]
                                 root.changeCameraSettings(exposurecontrolId, exposureValueAscella)
                             }else{
-                                if((exposureCombo.currentText == "Manual Mode") || (root.selectedDeviceEnumValue == CommonEnums.ECON_CX3_RDX_V5680) || (root.selectedDeviceEnumValue == CommonEnums.ECON_CX3_RDX_T9P031) || (root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU40)) {
+                                if((exposureCombo.currentText == "Shutter Priority Mode" || exposureCombo.currentText == "Manual Mode") || (root.selectedDeviceEnumValue == CommonEnums.ECON_CX3_RDX_V5680) || (root.selectedDeviceEnumValue == CommonEnums.ECON_CX3_RDX_T9P031) || (root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU40)) {
                                     if(exposureSliderSetEnable)
                                          root.changeCameraSettings(exposurecontrolId,value.toString())
                                 }
@@ -898,8 +886,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: backLight_Slider
-                        width: 110
-                        stepSize: 1
+                        width: 110                        
                         opacity: enabled ? 1 : 0.1
                         style:econSliderStyle
                         onValueChanged: {
@@ -939,8 +926,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: rawBitsSlider
-                        width: 110
-                        stepSize: 1
+                        width: 110                       
                         opacity: enabled ? 1 : 0.1
                         style:econSliderStyle
                         onValueChanged: {
@@ -1036,8 +1022,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: ledFreqSlider
-                        width: 110
-                        stepSize: 1
+                        width: 110                        
                         opacity: enabled ? 1 : 0.1
                         style:econSliderStyle
                         onValueChanged: {
@@ -1077,8 +1062,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: focusLogitechSlider
-                        width: 110
-                        stepSize: 1
+                        width: 110                        
                         opacity: enabled ? 1 : 0.1
                         style:econSliderStyle
                         onValueChanged: {
@@ -1191,8 +1175,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: focus_Slider
-                        width: 110
-                        stepSize: 1
+                        width: 110                       
                         style:econSliderStyle
                         opacity: enabled ? 1 : 0.1
                         onValueChanged: {
@@ -1304,7 +1287,7 @@ Item {
         target:root
         onSetControlValues:
         {
-            setCameraControls(controlName,controlType,controlMinValue,controlMaxValue,controlDefaultValue,controlID);
+            setCameraControls(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID);
         }
     }
     Connections
@@ -1370,17 +1353,17 @@ Item {
         }
 
     }
-    function setCameraControls(controlName,controlType,controlMinValue,controlMaxValue,controlDefaultValue,controlID)
+    function setCameraControls(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID)
     {
         switch(controlType)
         {
         case 0:
             break;
         case 1:
-            imageSettingsFirstLevel(controlName,controlType,controlMinValue,controlMaxValue,controlDefaultValue,controlID);
+            imageSettingsFirstLevel(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID);
             break;
         case 2:
-            imageSettingsSecondLevel(controlName,controlType,controlMinValue,controlMaxValue,controlDefaultValue,controlID);
+            imageSettingsSecondLevel(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID);
             break;
         case 3:
             exposureAutoUIUpdate(controlName,controlID,controlMinValue,controlMaxValue,controlDefaultValue)
@@ -1389,67 +1372,67 @@ Item {
             break;
         }
     }
-    function imageSettingsFirstLevel(controlName,controlType,controlMinValue,controlMaxValue,controlDefaultValue,controlID)
+    function imageSettingsFirstLevel(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID)
     {
         switch(controlName)
         {
             case "Brightness":
-                brightnessUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                brightnessUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Contrast":
-                contrastUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                contrastUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Saturation":
-                saturationUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                saturationUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Pan (Absolute)":
-                panUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                panUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Tilt (Absolute)":
-                tiltUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                tiltUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Zoom, Absolute":
-                zoomUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                zoomUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Hue":
-                hueUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                hueUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "LED1 Mode":
                 ledModeUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
                 break;
             case "White Balance Temperature":
-                whiteBalanceUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                whiteBalanceUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Gamma":
-                gammaUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                gammaUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Gain":
-                gainUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                gainUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Sharpness":
-                sharpnessUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                sharpnessUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Exposure (Absolute)":
-                exposureAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                exposureAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Focus (absolute)":
-                focusAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                focusAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Backlight Compensation":
-                backLightUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                backLightUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Raw bits per pixel":
-                rawBitsUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                rawBitsUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "LED1 Frequency":
-                ledFrequencyUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                ledFrequencyUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "Focus":
-                focusUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                focusUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
         }
     }
-    function imageSettingsSecondLevel(controlName,controlType,controlMinValue,controlMaxValue,controlDefaultValue,controlID)
+    function imageSettingsSecondLevel(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID)
     {
         switch(controlName)
         {
@@ -1470,7 +1453,7 @@ Item {
                 break;
         }
     }
-    function brightnessUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function brightnessUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         brightness.opacity = 1
         brightness_Slider.enabled = true
@@ -1480,9 +1463,9 @@ Item {
         brightness_Slider.minimumValue = controlMinValue
         brightness_Slider.maximumValue = controlMaxValue
         brightness_Slider.value = controlDefaultValue
-        brightness_Slider.stepSize = 1
+        brightness_Slider.stepSize = controlStepSize
     }
-    function contrastUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function contrastUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         contrast.opacity = 1
         contrast_Slider.enabled = true
@@ -1492,8 +1475,9 @@ Item {
         contrast_Slider.minimumValue = controlMinValue
         contrast_Slider.maximumValue = controlMaxValue
         contrast_Slider.value = controlDefaultValue
+        contrast_Slider.stepSize = controlStepSize
     }
-    function saturationUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function saturationUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         saturation.opacity = 1
         saturation_Slider.enabled = true
@@ -1503,8 +1487,9 @@ Item {
         saturation_Slider.minimumValue = controlMinValue
         saturation_Slider.maximumValue = controlMaxValue
         saturation_Slider.value = controlDefaultValue
+        saturation_Slider.stepSize = controlStepSize
     }
-    function panUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function panUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         pan.opacity = 1
         pan_Slider.enabled = true
@@ -1514,8 +1499,9 @@ Item {
         pan_Slider.minimumValue = controlMinValue
         pan_Slider.maximumValue = controlMaxValue
         pan_Slider.value = controlDefaultValue
+        pan_Slider.stepSize = controlStepSize
     }
-    function tiltUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function tiltUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         tilt.opacity = 1
         tilt_Slider.enabled = true
@@ -1525,8 +1511,9 @@ Item {
         tilt_Slider.minimumValue = controlMinValue
         tilt_Slider.maximumValue = controlMaxValue
         tilt_Slider.value = controlDefaultValue
+        tilt_Slider.stepSize = controlStepSize
     }
-    function zoomUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function zoomUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         zoom.opacity = 1
         zoom_Slider.enabled = true
@@ -1536,9 +1523,9 @@ Item {
         zoom_Slider.minimumValue = controlMinValue
         zoom_Slider.maximumValue = controlMaxValue
         zoom_Slider.value = controlDefaultValue
-
+        zoom_Slider.stepSize = controlStepSize
     }
-    function hueUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function hueUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         hue.opacity = 1
         hue_Slider.enabled = true
@@ -1548,7 +1535,7 @@ Item {
         hue_Slider.minimumValue = controlMinValue
         hue_Slider.maximumValue = controlMaxValue
         hue_Slider.value = controlDefaultValue
-
+        hue_Slider.stepSize = controlStepSize
     }
     function ledModeUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
     {
@@ -1559,15 +1546,16 @@ Item {
         ledModeCombo.opacity = 1
         ledModeCombo.currentIndex = controlDefaultValue
     }
-    function whiteBalanceUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function whiteBalanceUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         white_balance.opacity = 1
         whiteBalanceControlId = controlID
         white_balance_Slider.minimumValue = controlMinValue
         white_balance_Slider.maximumValue = controlMaxValue
         white_balance_Slider.value = controlDefaultValue
+        white_balance_Slider.stepSize = controlStepSize
     }
-    function gammaUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function gammaUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         gamma.opacity = 1
         gamma_Slider.enabled = true
@@ -1577,9 +1565,10 @@ Item {
         gamma_Slider.minimumValue = controlMinValue
         gamma_Slider.maximumValue = controlMaxValue
         gamma_Slider.value = controlDefaultValue
+        gamma_Slider.stepSize = controlStepSize
     }
 
-    function gainUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function gainUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         gain.opacity = 1
         gain_Slider.enabled = true
@@ -1589,9 +1578,10 @@ Item {
         gain_Slider.minimumValue = controlMinValue
         gain_Slider.maximumValue = controlMaxValue
         gain_Slider.value = controlDefaultValue
+        gain_Slider.stepSize = controlStepSize
     }
 
-    function sharpnessUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function sharpnessUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         sharpness.opacity = 1
         sharpness_Slider.enabled = true
@@ -1601,8 +1591,9 @@ Item {
         sharpness_Slider.minimumValue = controlMinValue
         sharpness_Slider.maximumValue = controlMaxValue
         sharpness_Slider.value = controlDefaultValue
+        sharpness_Slider.stepSize = controlStepSize
     }
-    function exposureAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function exposureAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         exposure_absolute.opacity = 1
         if((root.selectedDeviceEnumValue === CommonEnums.ECON_CX3_RDX_V5680) || (root.selectedDeviceEnumValue === CommonEnums.ECON_CX3_RDX_T9P031) || (root.selectedDeviceEnumValue === CommonEnums.SEE3CAM_CU40))
@@ -1627,15 +1618,15 @@ Item {
             exposure_Slider.maximumValue = 11
             exposure_Slider.value = exposureOrigAscella.indexOf(controlDefaultValue)
             exposure_value.text = exposureOrigAscella[exposure_Slider.value]
-
         }
         else{
             exposure_Slider.minimumValue = controlMinValue
             exposure_Slider.maximumValue = controlMaxValue
             exposure_Slider.value = controlDefaultValue
+            exposure_Slider.stepSize = controlStepSize
         }
     }
-    function focusAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function focusAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         focusauto.opacity = 1
         if(root.selectedDeviceEnumValue === CommonEnums.ECON_CX3_RDX_V5680) {
@@ -1648,8 +1639,9 @@ Item {
         focus_Slider.minimumValue = controlMinValue
         focus_Slider.maximumValue = controlMaxValue
         focus_Slider.value = controlDefaultValue
+        focus_Slider.stepSize = controlStepSize
     }
-    function backLightUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function backLightUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         backLightCompensation.opacity = 1
         backLight_Slider.enabled = true
@@ -1659,8 +1651,9 @@ Item {
         backLight_Slider.minimumValue = controlMinValue
         backLight_Slider.maximumValue = controlMaxValue
         backLight_Slider.value = controlDefaultValue
+        backLight_Slider.stepSize = controlStepSize
     }
-    function rawBitsUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function rawBitsUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         rawBits.opacity = 1
         rawBitsSlider.enabled = true
@@ -1670,8 +1663,9 @@ Item {
         rawBitsSlider.minimumValue = controlMinValue
         rawBitsSlider.maximumValue = controlMaxValue
         rawBitsSlider.value = controlDefaultValue
+        rawBitsSlider.stepSize = controlStepSize
     }
-    function ledFrequencyUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function ledFrequencyUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         ledFrequency.opacity = 1
         ledFreqSlider.enabled = true
@@ -1681,8 +1675,9 @@ Item {
         ledFreqSlider.minimumValue = controlMinValue
         ledFreqSlider.maximumValue = controlMaxValue
         ledFreqSlider.value = controlDefaultValue
+        ledFreqSlider.stepSize = controlStepSize
     }
-    function focusUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+    function focusUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         focusLogitech.opacity = 1
         focusLogitechSlider.enabled = true
@@ -1692,6 +1687,7 @@ Item {
         focusLogitechSlider.maximumValue = controlMaxValue
         focusLogitechSlider.value = controlDefaultValue
         focusLogitechControlId = controlID
+        focusLogitechSlider.stepSize = controlStepSize
     }
     function whiteBalAutoUIUpdate(controlID,controlDefaultValue)
     {

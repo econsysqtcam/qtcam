@@ -22,6 +22,7 @@
 
 #include <QString>
 #include <linux/videodev2.h>
+#include <linux/uvcvideo.h>
 #include <libv4lconvert.h>
 
 class v4l2
@@ -58,6 +59,7 @@ public:
 
 	bool querycap(v4l2_capability &cap);
 	bool queryctrl(v4l2_queryctrl &qc);
+	bool extQueryCtrl(uvc_xu_control_query &ctrl);
 	bool querymenu(v4l2_querymenu &qm);
 	bool g_tuner(v4l2_tuner &tuner, unsigned index = 0);
 	bool s_tuner(v4l2_tuner &tuner);

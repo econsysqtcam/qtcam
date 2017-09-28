@@ -36,7 +36,8 @@ SOURCES += main.cpp \
 	seecam_81.cpp \
     see3cam_cu135.cpp \
     see3cam_cu40.cpp\
-    see3cam_cu20.cpp
+    see3cam_cu20.cpp\
+    uvcExtCx3sni.cpp
 
 # Installation path
 # target.path =
@@ -73,7 +74,8 @@ HEADERS += \
     seecam_81.h \
     see3cam_cu135.h \
     see3cam_cu40.h\
-    see3cam_cu20.h
+    see3cam_cu20.h\
+    uvcExtCx3sni.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \

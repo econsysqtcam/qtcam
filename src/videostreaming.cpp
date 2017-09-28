@@ -1496,10 +1496,11 @@ void Videostreaming::cameraFilterControls(bool actualValue) {
             ctrlName = (char*)qctrl.name;
             ctrlType = QString::number(qctrl.type,10);
             ctrlID = QString::number(qctrl.id,10);
-            if(actualValue) {
-                emit newControlAdded(ctrlName,ctrlType,ctrlID,QString::number(0,10),QString::number(1,10),getSettings(qctrl.id));
+            ctrlStepSize = QString::number(qctrl.step,10);
+            if(actualValue) {                
+                emit newControlAdded(ctrlName,ctrlType,ctrlID,ctrlStepSize,QString::number(0,10),QString::number(1,10),getSettings(qctrl.id));
             } else {
-                emit newControlAdded(ctrlName,ctrlType,ctrlID,QString::number(0,10),QString::number(1,10),QString::number(qctrl.default_value,10));
+                emit newControlAdded(ctrlName,ctrlType,ctrlID,ctrlStepSize,QString::number(0,10),QString::number(1,10),QString::number(qctrl.default_value,10));
             }
             break;
         case V4L2_CTRL_TYPE_INTEGER:
@@ -1509,10 +1510,11 @@ void Videostreaming::cameraFilterControls(bool actualValue) {
             ctrlMaxValue = QString::number(qctrl.maximum,10);
             ctrlMinValue = QString::number(qctrl.minimum,10);
             ctrlDefaultValue = QString::number(qctrl.default_value,10);
+            ctrlStepSize = QString::number(qctrl.step,10);
             if(actualValue) {
-                emit newControlAdded(ctrlName,ctrlType,ctrlID,ctrlMinValue,ctrlMaxValue,getSettings(qctrl.id));
+                emit newControlAdded(ctrlName,ctrlType,ctrlID,ctrlStepSize,ctrlMinValue,ctrlMaxValue,getSettings(qctrl.id));
             } else {
-                emit newControlAdded(ctrlName,ctrlType,ctrlID,ctrlMinValue,ctrlMaxValue,QString::number(qctrl.default_value,10));
+                emit newControlAdded(ctrlName,ctrlType,ctrlID,ctrlStepSize,ctrlMinValue,ctrlMaxValue,QString::number(qctrl.default_value,10));
             }
             break;
         case V4L2_CTRL_TYPE_MENU:
@@ -1535,9 +1537,9 @@ void Videostreaming::cameraFilterControls(bool actualValue) {
             }
             indexValue =  getSettings(qctrl.id).toInt();
             if(actualValue) {
-                emit newControlAdded(ctrlName,ctrlType,ctrlID,ctrlMinValue,ctrlMaxValue,QString::number(getMenuIndex(qctrl.id,indexValue),10));
+                emit newControlAdded(ctrlName,ctrlType,ctrlID,ctrlStepSize,ctrlMinValue,ctrlMaxValue,QString::number(getMenuIndex(qctrl.id,indexValue),10));
             } else {
-                emit newControlAdded(ctrlName,ctrlType,ctrlID,ctrlMinValue,ctrlMaxValue,QString::number(getMenuIndex(qctrl.id,qctrl.default_value),10));
+                emit newControlAdded(ctrlName,ctrlType,ctrlID,ctrlStepSize,ctrlMinValue,ctrlMaxValue,QString::number(getMenuIndex(qctrl.id,qctrl.default_value),10));
             }
             break;
         case V4L2_CTRL_TYPE_BITMASK:
@@ -1764,4 +1766,18 @@ void Videostreaming::disableImageCaptureDialog(){
  */
 void Videostreaming::disableSavingImage(){
     m_saveImage = false;
+}
+
+/**
+ * @brief Videostreaming::setUvcExtControlValue - pass the xquery structure and set values
+ * @param xquery
+ * @return true/false
+ */
+bool Videostreaming::setUvcExtControlValue(struct uvc_xu_control_query xquery){
+
+    int ret = extQueryCtrl(xquery);
+    if(ret){
+        return true;
+    }    
+    return false;
 }

@@ -85,7 +85,7 @@ Rectangle {
 	signal sidebarVisibleStatus(variant status);
     signal cameraSettingsTabEnable(variant status);
     //Send control values to imagequalitysettings
-    signal setControlValues(string controlName,int controlType,int controlMinValue,int controlMaxValue,int controlDefaultValue,int controlID);
+    signal setControlValues(string controlName,int controlType,int controlMinValue,int controlMaxValue,int controlStepSize, int controlDefaultValue,int controlID);
     //Disable image settings camera controls
     signal disableImageSettings();
     //Visible state for image settings
@@ -121,6 +121,8 @@ Rectangle {
     property int fpsIndexToChange
 
     property var fpsList;
+
+    property variant vidstreamObj: vidstreamproperty
 
     //Video frame interval
     signal videoFrameInterval(int frameInterval)
@@ -174,6 +176,9 @@ Rectangle {
     signal frameSkipCount(var stillResolution, var videoResolution);
 
     signal frameSkipCountWhenFPSChange(var fpsChange);
+
+    // Added by Sankari: 12 sep 2017 - signal to notify the extension tab visibility
+    signal extensionTabVisible(bool visible);
 
     width:Screen.width
     height:Screen.height
@@ -279,7 +284,7 @@ Rectangle {
             }
 
             onNewControlAdded: {
-                setControlValues(ctrlName.toString(),ctrlType,ctrlMinValue,ctrlMaxValue,ctrlDefaultValue,ctrlID);
+                setControlValues(ctrlName.toString(),ctrlType,ctrlMinValue,ctrlMaxValue, ctrlStepSize, ctrlDefaultValue,ctrlID);
             }
 
             onDeviceUnplugged: {
@@ -317,6 +322,7 @@ Rectangle {
                     see3cam.destroy()
                     see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
                     see3cam.visible = !cameraColumnLayout.visible
+                    extensionTabVisible(see3cam.visible)
                 }
             }
 
@@ -814,6 +820,7 @@ Rectangle {
         if(!cameraColumnLayout.visible)
         {
             see3cam.visible = false
+            extensionTabVisible(false)
         }
         cameraColumnLayout.visible = true
         stillChildVisibleState(false)
@@ -904,6 +911,7 @@ Rectangle {
             cameraSettingsTabEnable(false)
             cameraColumnLayout.visible = false            
             see3cam.visible = true
+            extensionTabVisible(true)
         }
     }
 
@@ -963,10 +971,13 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/see3cam30/uvc_30.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.CX3_UVC_CAM) {
             see3cam = Qt.createComponent("../UVCSettings/ascella/cx3-uvc.qml").createObject(root)
-        } else {
+        } else if(selectedDeviceEnumValue == CommonEnums.CX3_SNI_CAM) {
+            see3cam = Qt.createComponent("../UVCSettings/cx3SNI/uvcExtCX3SNI.qml").createObject(root)
+        }else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
         see3cam.visible = false
+        extensionTabVisible(false)
     }
 
     // Added by Sankari : 16 Dec 2016
@@ -987,7 +998,7 @@ Rectangle {
             case CommonEnums.SEE3CAM_11CUG:
             case CommonEnums.SEE3CAM_CU30:
 		// Added by Sankari : 01 Aug 2017
-        case CommonEnums.SEE3CAM_CU20:
+            case CommonEnums.SEE3CAM_CU20:
             case CommonEnums.SEE3CAM_CU40:
             case CommonEnums.SEE3CAM_CU50:
             case CommonEnums.SEE3CAM_CU51:
@@ -1011,6 +1022,7 @@ Rectangle {
         {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
             see3cam.visible = false
+            extensionTabVisible(false)
         }
         //Added below components by Dhurka
         //Status Bar view
@@ -1168,7 +1180,7 @@ Rectangle {
        case CommonEnums.BURST_SHOT:
            vidstreamproperty.makeBurstShot(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText, burstLength)
            break;
-       case CommonEnums.CHANGE_FPS_SHOT:          
+       case CommonEnums.CHANGE_FPS_SHOT:
            vidstreamproperty.changeFPSandTakeShot(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText, fpsIndexToChange)
            break;
        }
