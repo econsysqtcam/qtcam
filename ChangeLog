@@ -1,3 +1,7 @@
+Qtcam Application - 16.0.0
+-----------------------------
+* Added support for CX3-SNI-RDK [ TANIA ] camera.
+
 Qtcam Application - 15.0.1
 -----------------------------
 Changes in See3cam_cu20 camera:

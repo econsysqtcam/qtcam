@@ -60,17 +60,14 @@ Item {
             }
         }
 
-        // Removed setting frame skip count to capture still. Because Uneven exposure issue is fixed in firmware.
 
-        onAutoWhiteBalanceSelected:{           
+        onAutoWhiteBalanceSelected:{
             if(autoWhiteBalanceSelect){
                 awbLock.enabled = true
                 awbLock.opacity = 1
                 awbPresetModeText.opacity = 1
                 awbPresetsCombo.enabled = true
                 awbPresetsCombo.opacity = 1
-                uvcExtCamAccessId.getAWBPresetMode(UvcExtcamera.UVC_GET_CUR)
-                uvcExtCamAccessId.getAWBLock(UvcExtcamera.UVC_GET_CUR)
             }else{
                 awbLock.enabled = false
                 awbLock.opacity = 0.1
@@ -80,17 +77,22 @@ Item {
             }
         }
         onAutoFocusSelected:{
-            getValuesBasedOnAutoFocusSelectionInUVCSettings(autoFocusSelect)
+            extSettingsBasedOnAutoFocusSelectionInUVCSettings(autoFocusSelect)
         }
         onAutoExposureSelected:{
             getValuesBasedOnExposureSelectionInUVCSettings(autoExposureSelect)
         }
         // Update led brightness in UI for every 2 secs only when extension setting extension tab visible
         onExtensionTabVisible:{
-            if(visible)
+            if(visible){
                 geLedStatusTimer.start()
-            else
+                getMinMaxStepSizeValues()
+                getValuesFromCamera(UvcExtcamera.UVC_GET_CUR)
+                getValuesBasedOnAutoFocusSelectionInUVCSettings(JS.autoFocusChecked) // Initially get the auto focus mode in UVC settings and enable/disable controls in extension unit
+            }
+            else{
                 geLedStatusTimer.stop()
+            }
         }
     }
 
@@ -1060,11 +1062,8 @@ Item {
         uvcExtCamAccessId.setCenteredAutoFocusMode();
     }
 
-    function getValuesBasedOnAutoFocusSelectionInUVCSettings(autoFocusChecked){
+    function extSettingsBasedOnAutoFocusSelectionInUVCSettings(autoFocusChecked){
         if(autoFocusChecked){
-            uvcExtCamAccessId.getAutoFocusMode(UvcExtcamera.UVC_GET_CUR)
-            uvcExtCamAccessId.getAFLock(UvcExtcamera.UVC_GET_CUR)
-            uvcExtCamAccessId.getAutoFocusROIMode(UvcExtcamera.UVC_GET_CUR)
             afOff.checked = false
             manualLensPositionCombo.enabled = false
             manualLensPositionCombo.opacity = 0.1
@@ -1090,10 +1089,6 @@ Item {
             }
 
         }else{
-            uvcExtCamAccessId.getManualLensPositionMode(UvcExtcamera.UVC_GET_CUR)
-            uvcExtCamAccessId.getAutoFocusMode(UvcExtcamera.UVC_GET_CUR)
-            uvcExtCamAccessId.getAFLock(UvcExtcamera.UVC_GET_CUR)
-            uvcExtCamAccessId.getAutoFocusROIMode(UvcExtcamera.UVC_GET_CUR)
             afOff.checked = true
             manualLensPositionCombo.enabled = true
             manualLensPositionCombo.opacity = 1
@@ -1273,10 +1268,7 @@ Item {
         }
     }
     Component.onCompleted: {
-        uvcExtCamAccessId.initUVCExtensionUnit(root.vidstreamObj)        
-        getMinMaxStepSizeValues()
-        getValuesFromCamera(UvcExtcamera.UVC_GET_CUR)
-        getValuesBasedOnAutoFocusSelectionInUVCSettings(JS.autoFocusChecked) // Initially get the auto focus mode in UVC settings and enable/disable controls in extension unit                
+        uvcExtCamAccessId.initUVCExtensionUnit(root.vidstreamObj)
     }
     Component.onDestruction:{        
         uvcExtCamAccessId.deInitUVCExtensionUnit()        
