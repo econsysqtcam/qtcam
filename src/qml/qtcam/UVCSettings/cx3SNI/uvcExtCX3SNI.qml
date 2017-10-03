@@ -79,16 +79,17 @@ Item {
         onAutoFocusSelected:{
             extSettingsBasedOnAutoFocusSelectionInUVCSettings(autoFocusSelect)
         }
+
         onAutoExposureSelected:{
-            getValuesBasedOnExposureSelectionInUVCSettings(autoExposureSelect)
         }
+
         // Update led brightness in UI for every 2 secs only when extension setting extension tab visible
         onExtensionTabVisible:{
             if(visible){
                 geLedStatusTimer.start()
                 getMinMaxStepSizeValues()
                 getValuesFromCamera(UvcExtcamera.UVC_GET_CUR)
-                getValuesBasedOnAutoFocusSelectionInUVCSettings(JS.autoFocusChecked) // Initially get the auto focus mode in UVC settings and enable/disable controls in extension unit
+                extSettingsBasedOnAutoFocusSelectionInUVCSettings(JS.autoFocusChecked) // Initially get the auto focus mode in UVC settings and enable/disable controls in extension unit
             }
             else{
                 geLedStatusTimer.stop()
