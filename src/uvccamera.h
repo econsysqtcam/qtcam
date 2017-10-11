@@ -205,6 +205,12 @@
 
 /* SEE3CAM_30 */
 #define CAMERA_CONTROL_30               0x80
+#define GET_SCENEMODE_30                0x01
+#define SET_SCENEMODE_30                0x02
+#define SET_EXPOSURE_COMPENSATION_30    0x1A
+#define GET_EXPOSURE_COMPENSATION_30    0x19
+#define SET_FACE_DETECT_RECT_30         0x16
+#define GET_FACE_DETECT_RECT_30         0x15
 #define GET_AF_MODE_30					0x07
 #define SET_AF_MODE_30					0x08
 #define GET_Q_FACTOR_30                 0x0F
@@ -227,6 +233,17 @@
 #define GET_BURST_LENGTH_30             0x0D
 #define SET_BURST_LENGTH_30             0x0E
 #define SET_TO_DEFAULT_30               0xFF
+#define ENABLE_FACE_RECT_30                0x01
+#define DISABLE_FACE_RECT_30               0x00
+#define ENABLE_EMBED_DATA_30               0x01
+#define DISABLE_EMBED_DATA_30              0x00
+#define ENABLE_OVERLAY_RECT_30             0x01
+#define DISABLE_OVERLAY_RECT_30            0x00
+#define SET_OVERLAY_RECT_MODE_30           0x1D
+#define SET_SMILE_DETECT_30                0x18
+#define GET_SMILE_DETECT_30                0x17
+#define SET_FRAME_RATE_30                  0x1C
+#define GET_FRAME_RATE_30                  0x1B
 
 /* SEE3CAM_130 */
 #define CAMERA_CONTROL_130               0x7B

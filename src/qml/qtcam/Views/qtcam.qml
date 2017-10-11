@@ -191,7 +191,7 @@ Rectangle {
         }
     }
 	Timer {
-        id: recordTimerWithoutAFRect // Record after disabling Auto Focus Rectangle
+        id: recordStartDelayTimer // Record after disabling Auto Focus Rectangle or face rect overlay rectangle
         interval: 1000
         onTriggered: {
             vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath)
@@ -870,8 +870,8 @@ Rectangle {
     function videoRecordBegin() {
         beforeRecordVideo() // signal to do before starting record video
         captureVideoRecordRootObject.videoTimerUpdate(true)
-        if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130){
-            recordTimerWithoutAFRect.start()
+        if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130  || selectedDeviceEnumValue == CommonEnums.SEE3CAM_30){
+            recordStartDelayTimer.start() // some delay is required to disable focus rect / face overlay rect. After that delay need to start record.
         }else{
             vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath)
         }

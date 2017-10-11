@@ -6,7 +6,10 @@
 
 #define DENOISE_MIN 0
 #define DENOISE_MAX 15
-#define SET_COMMAND_TIMEOUT 3000
+#define EXPOSURECOMP_MIN 8000
+#define EXPOSURECOMP_MAX 1000000
+#define SMILE_THRESHOLD_MIN 40
+#define SMILE_THRESHOLD_MAX 75
 
 class See3CAM_30 : public QObject
 {
@@ -17,8 +20,16 @@ private:
     unsigned char g_in_packet_buf[BUFFER_LENGTH];
     uvccamera uvc;
 
+    void initializeBuffers();
+
 public:
     explicit See3CAM_30(QObject *parent = 0);
+
+    enum sceneModes {
+        SCENE_NORMAL = 0x01,
+        SCENE_DOCUMENT = 0x0C
+    };
+    Q_ENUMS(sceneModes)
 
     enum specialEffects {
         EFFECT_NORMAL = 0x01,
@@ -63,9 +74,37 @@ public:
         AFRectEnable = 0x01,
         AFRectDisable = 0x00
     };
-    Q_ENUMS(camAFRectMode)
+    Q_ENUMS(camAFRectMode)    
 
-    static bool setOrientationBackgrndFn(See3CAM_30 *see3cam30obj, bool horzModeSel, bool vertiModeSel);
+    enum camFaceRectMode {
+        FaceRectEnable = 0x01,
+        FaceRectDisable = 0x00
+    };
+    Q_ENUMS(camFaceRectMode)
+
+    enum camFaceDetectEmbedDataMode {
+        FaceDetectEmbedDataEnable = 0x01,
+        FaceDetectEmbedDataDisable = 0x00
+    };
+    Q_ENUMS(camFaceDetectEmbedDataMode)
+
+    enum camFaceDetectOverlayRect {
+        FaceDetectOverlayRectEnable = 0x01,
+        FaceDetectOverlayRectDisable = 0x00
+    };
+    Q_ENUMS(camFaceDetectOverlayRect)
+
+    enum camSmileDetectMode {
+        SmileDetectEnable = 0x01,
+        SmileDetectDisable = 0x00
+    };
+    Q_ENUMS(camSmileDetectMode)
+
+    enum camSmileDetectEmbedDataMode {
+        smileDetectEmbedDataEnable = 0x01,
+        smileDetectEmbedDataDisable = 0x00
+    };
+    Q_ENUMS(camSmileDetectEmbedDataMode)
 
 signals:
     void effectModeChanged(uint effectMode);
@@ -77,6 +116,15 @@ signals:
     void afRectModeChanged(uint afRectMode);
     void burstLengthChanged(uint burstLength);
     void flipMirrorModeChanged(uint flipMirrorMode);
+    void sceneModeChanged(uint sceneMode);
+    void exposureCompValueReceived(uint exposureCompensation);
+    void indicateCommandStatus(QString title, QString text);
+    void indicateSmileThresholdRangeFailure(QString title, QString text);
+    void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
+    void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue);
+    void indicateExposureValueRangeFailure(QString title, QString text);
+    void frameRateChanged(uint frameRateCtrlMode);
+
 
 public slots:
     bool setEffectMode(const specialEffects &specialEffect);    
@@ -91,8 +139,6 @@ public slots:
     bool setQFactor(uint qFactor);
     bool getQFactor();
 
-    bool getOrientation();
-
     bool setROIAutoFoucs(camROIAfMode see3camAfROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
     bool setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
 
@@ -105,8 +151,28 @@ public slots:
     bool setBurstLength(uint burstLength);
     bool getBurstLength();
 
+    bool setSceneMode(sceneModes sceneMode);
+    bool getSceneMode();
+
+    bool setExposureCompensation(unsigned int exposureCompValue);
+    bool getExposureCompensation();
+
+    bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
+    bool getFaceDetectMode();
+
+    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue);
+    bool getSmileDetectMode();
+
+    bool setOrientation(bool horzModeSel, bool vertiModeSel);
+    bool getOrientation();
+
+    bool setFrameRateCtrlValue(uint frameRate);
+    bool getFrameRateCtrlValue();
+
+    bool enableDisableOverlayRect(bool enableOverlayRect);
+
     bool setToDefault();
 
-    void setOrientation(bool horzModeSel, bool vertiModeSel);    
+
 };
 #endif // SEE3CAM_30_H

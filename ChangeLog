@@ -1,3 +1,12 @@
+Qtcam Application - 16.0.1
+-----------------------------
+* Added R2 features for see3cam_30 camera.
+   1. Scene Mode
+   2. Face Detection
+   3. Smile Detection
+   4. Frame rate control
+   5. Exposure compensation
+
 Qtcam Application - 16.0.0
 -----------------------------
 * Added support for CX3-SNI-RDK [ TANIA ] camera.
