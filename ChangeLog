@@ -1,3 +1,7 @@
+Qtcam Application - 16.0.2
+-----------------------------
+* Fixed bug for see3cam_30 camera: Default exposure value is not restored properly when selecting hardware default in ubuntu 16.04 version.
+
 Qtcam Application - 16.0.1
 -----------------------------
 * Added R2 features for see3cam_30 camera.
