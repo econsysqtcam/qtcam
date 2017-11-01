@@ -77,7 +77,6 @@ Item {
 
     property bool powerLineComboEnable
     property bool ledModeComboEnable
-    property bool exposureComboEnable
     property variant exposureOrigAscella: [10, 20, 39, 78, 156, 312, 625, 1250, 2500, 5000, 10000, 20000]
     property int expAscellaTxtFiledValue;
     property bool exposureSliderSetEnable;
@@ -743,9 +742,9 @@ Item {
                             }
                         }
                         onCurrentIndexChanged: {
-                            if(exposureComboEnable) {
                                 root.selectMenuIndex(exposureAutoControlId,currentIndex)
                                 if(currentText.toString() != "Auto Mode") {
+                                    root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())
                                     root.autoExposureSelected(false)
                                     JS.autoExposureSelected = false
                                     exposure_absolute.opacity = 1
@@ -762,7 +761,6 @@ Item {
                                     exposure_value.opacity = 0
                                     exposure_value.enabled = false
                                 }
-                            }
                         }
                     }
                     Image {
@@ -1331,7 +1329,6 @@ Item {
             focusValueChangeProperty = false
             powerLineComboEnable = false
             ledModeComboEnable = false
-            exposureComboEnable = false
         }
     }
     Connections
@@ -1758,11 +1755,9 @@ Item {
             }
             exposure_auto.opacity = 1
             exposureCombo.opacity = 1
-            exposureComboEnable =  false // To avoid set exposure mode in camera when each time calls index changed when setting model
             exposureCombo.model = menuitems // On index changed is called for every time.
             while(menuitems.pop()){}
             exposureAutoControlId = controlID
-            exposureComboEnable =  true
             exposureCombo.currentIndex = controlDefaultValue
             if(exposureCombo.currentIndex == 1){  // 0 - auto mode, 1 - manual mode
                 JS.autoExposureSelected = false
@@ -1773,6 +1768,10 @@ Item {
                 exposure_value.enabled = true
             }else{
                 JS.autoExposureSelected = true
+                exposure_Slider.enabled = false
+                exposure_Slider.opacity = 0.1
+                exposure_value.opacity = 0
+                exposure_value.enabled = false
             }
         }
     }
