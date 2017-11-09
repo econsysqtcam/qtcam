@@ -1,3 +1,16 @@
+Qtcam Application - 16.0.3
+-----------------------------
+* Added R2 features for cu130 camera.
+   1. Flip control
+   2. ROI Auto Exposure
+   3. Exposure compensation
+   4. Denoise
+   5. Burst length
+   6. Q-Factor
+   7. Face Detection
+   8. Smile Detection
+   9. Frame Rate control
+
 Qtcam Application - 16.0.2
 -----------------------------
 * Fixed bug for see3cam_30 camera: Default exposure value is not restored properly when selecting hardware default in ubuntu 16.04 version.
