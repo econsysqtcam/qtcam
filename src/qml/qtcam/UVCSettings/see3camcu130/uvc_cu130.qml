@@ -178,7 +178,7 @@ Item {
                         rowSpacing: 15
                         ExclusiveGroup { id: sceneInputGroup }
                         RadioButton {
-                            id: scene1Button
+                            id: sceneNormal
                             style:  econRadioButtonStyle
                             text:   qsTr("Normal")
                             exclusiveGroup: sceneInputGroup
@@ -191,7 +191,7 @@ Item {
                             }
                         }
                         RadioButton {
-                            id: scene2Button
+                            id: sceneDoc
                             style:  econRadioButtonStyle
                             text: qsTr("Document")
                             exclusiveGroup: sceneInputGroup
@@ -225,7 +225,7 @@ Item {
                         rowSpacing: 15
                         ExclusiveGroup { id: effectInputGroup }
                         RadioButton {
-                            id: effect1Button
+                            id: effectNormal
                             style:  econRadioButtonStyle
                             text: qsTr("Normal")
                             exclusiveGroup: effectInputGroup
@@ -239,7 +239,7 @@ Item {
                         }
 
                         RadioButton {
-                            id: effect2Button
+                            id: effectBW
                             style:  econRadioButtonStyle
                             text: qsTr("Black & White")
                             exclusiveGroup: effectInputGroup
@@ -253,7 +253,7 @@ Item {
                         }
 
                         RadioButton {
-                            id: effect3Button
+                            id: effectGrey
                             style:  econRadioButtonStyle
                             text: qsTr("Grey")
                             exclusiveGroup: effectInputGroup
@@ -267,7 +267,7 @@ Item {
                         }
 
                         RadioButton {
-                            id: effect4Button
+                            id: effectNeg
                             style:  econRadioButtonStyle
                             text: qsTr("Negative")
                             exclusiveGroup: effectInputGroup
@@ -280,7 +280,7 @@ Item {
                             }
                         }
                         RadioButton {
-                            id: effect5Button
+                            id: effectSketch
                             style:  econRadioButtonStyle
                             text: qsTr("Sketch")
                             exclusiveGroup: effectInputGroup
@@ -1301,10 +1301,10 @@ Item {
         switch(mode)
         {
         case See3CamCu130.SCENE_NORMAL :
-            scene1Button.checked = true
+            sceneNormal.checked = true
             break;
         case See3CamCu130.SCENE_DOCUMENT :
-            scene2Button.checked = true
+            sceneDoc.checked = true
             break;
         }
     }
@@ -1316,19 +1316,19 @@ Item {
         switch(mode)
         {
         case See3CamCu130.EFFECT_NORMAL :
-            effect1Button.checked = true
+            effectNormal.checked = true
             break;
         case See3CamCu130.EFFECT_BLACK_WHITE :
-            effect2Button.checked = true
+            effectBW.checked = true
             break;
         case See3CamCu130.EFFECT_GRAY :
-            effect3Button.checked = true
+            effectGrey.checked = true
             break;
         case See3CamCu130.EFFECT_NEGATIVE :
-            effect4Button.checked = true
+            effectNeg.checked = true
             break;
         case See3CamCu130.EFFECT_SKETCH :
-            effect5Button.checked = true
+            effectSketch.checked = true
             break;
         }
     }

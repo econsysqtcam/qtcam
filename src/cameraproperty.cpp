@@ -46,6 +46,9 @@ Cameraproperty::Cameraproperty()
      * @brief connect - This signal is used to send the selected camera enum value to QML for commparision instead of camera name
      */
     connect(&uvccam,SIGNAL(currentlySelectedCameraEnum(CommonEnums::ECameraNames)),this,SLOT(selectedDeviceEnum(CommonEnums::ECameraNames)));
+    // Added by Sankari: To notify user about hid access 
+    // 07 Dec 2017
+    connect(&uvccam,SIGNAL(hidWarningReceived(QString, QString)),this,SLOT(notifyUser(QString, QString)));
 }
 
 Cameraproperty::Cameraproperty(bool enableLog) {
@@ -177,4 +180,10 @@ void Cameraproperty::openHIDDevice(QString deviceName)
 
 void Cameraproperty::closeLibUsbDeviceAscella(){
     uvccam.exitExtensionUnitAscella();
+}
+
+// Added by Sankari: To notify user about warning from uvccamera.cpp
+// 07 Dec 2017
+void Cameraproperty::notifyUser(QString title, QString text){
+    emit notifyUserInfo(title, text);
 }

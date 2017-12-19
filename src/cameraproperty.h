@@ -130,6 +130,10 @@ public slots:
 
     void closeLibUsbDeviceAscella();
 
+    // Added by Sankari: To notify user about warning : This slot will be called when warning from uvccamera.cpp[Ex: hid access needs sudo ]
+    // 07 Dec 2017
+    void notifyUser(QString title, QString text);
+
 signals:
 
     void setFirstCamDevice(int);
@@ -146,6 +150,10 @@ signals:
      * @brief initExtensionUnitSuccess - This signal is used to emit after HID initialization is success
      */
     void initExtensionUnitSuccess();
+
+    // Added by Sankari: To notify user about warning[Ex: hid access from uvccamera.cpp]
+    // 07 Dec 2017
+    void notifyUserInfo(QString title, QString text);
 };
 
 

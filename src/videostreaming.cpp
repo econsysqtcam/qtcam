@@ -171,6 +171,21 @@ void Videostreaming::capFrame()
     buf.m.planes = planes;
     if (!dqbuf_mmap(buf, buftype, again)) {
         closeDevice();
+        // Added by Sankari:19 Dec 2017. 
+        //Bug Fix: 1. Streaming is not available for higher resolution when unplug and plug cu130 camera without closing application 
+        v4l2_requestbuffers reqbufs;
+        if (m_buffers == NULL)
+            return;
+
+        for (uint i = 0; i < m_nbuffers; ++i)
+            for (unsigned p = 0; p < m_buffers[i].planes; p++)
+                if (-1 == munmap(m_buffers[i].start[p], m_buffers[i].length[p]))
+                    perror("munmap");
+
+        // Free all buffers.
+        reqbufs_mmap(reqbufs, V4L2_BUF_TYPE_VIDEO_CAPTURE, 1);  // videobuf workaround
+        reqbufs_mmap(reqbufs, V4L2_BUF_TYPE_VIDEO_CAPTURE, 0);
+
         unsigned char *m_data=NULL;
         QImage tempImage(m_data,320,240,QImage::Format_RGB888);
         qImage = QPixmap::fromImage(tempImage);
@@ -1430,8 +1445,7 @@ void Videostreaming::displayOutputFormat() {
 void Videostreaming::updateFrameInterval(QString pixelFormat, QString frameSize)
 {
     v4l2_frmivalenum frmival;
-    v4l2_fract curr;
-    bool curr_ok, ok;
+    bool ok;
     QStringList tempResList = frameSize.split('x');
     width = tempResList.value(0).toInt();
     height = tempResList.value(1).toInt();
@@ -1448,13 +1462,11 @@ void Videostreaming::updateFrameInterval(QString pixelFormat, QString frameSize)
     availableFPS.clear();    
     if (m_has_interval) {
         m_interval = frmival.discrete;
-        curr_ok = v4l2::get_interval(m_buftype, curr);
+	// Added by Sankari: 07 Dec 2017 - Bugfix - Fps index is not updating properly
+        emit defaultFrameInterval(frmival.index);
         do {
             availableFPS.append(QString::number((double)frmival.discrete.denominator / frmival.discrete.numerator).append(" FPS"));
-            if (curr_ok && frmival.discrete.numerator == curr.numerator && frmival.discrete.denominator == curr.denominator) {                
-                emit defaultFrameInterval(frmival.index);
-                m_interval = frmival.discrete;
-            }
+	    // Removed by Sankari: 07 Dec 2017 - Bugfix - Fps index is not updating properly
         } while (enum_frameintervals(frmival));
     }
     emit logDebugHandle("Available FPS:"+ availableFPS.join(", "));

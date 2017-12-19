@@ -1,3 +1,8 @@
+Qtcam Application - 16.0.4
+-----------------------------
+* Added notification to user that application must be launched using sudo.
+* Bug Fixes: 1. Streaming is not available for higher resolution when unplug and plug cu130 camera without closing application,.
+           2. fps index is not displaying properly in frame rate box when swithing resolution.
 Qtcam Application - 16.0.3
 -----------------------------
 * Added R2 features for cu130 camera.

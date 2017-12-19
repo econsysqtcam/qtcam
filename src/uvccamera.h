@@ -528,6 +528,11 @@ signals:
     void logHandle(QtMsgType,QString);
     void stopPreview(QString);
     void titleTextChanged(QString _title,QString _text);
+
+    // Added by Sankari: To notify user about hid access
+    // 07 Dec 2017
+    void hidWarningReceived(QString _title,QString _text);
+
     void serialNumber(QString serialNumber);
     /**
      * @brief currentlySelectedCameraEnum - This signal is used to emit selected camera enum value to camera property.cpp

@@ -208,6 +208,18 @@ Rectangle {
             close()
         }
     }
+    // Added by Sankari: To notify user about warning
+    // 07 Dec 2017
+    MessageDialog {
+        id: warningDialog
+        icon: StandardIcon.Critical
+        onAccepted: {
+            close()
+        }
+        Component.onCompleted:{
+            close()
+        }
+    }
     MessageDialog {
         id: recordFailedDialog
         icon: StandardIcon.Critical
@@ -317,12 +329,14 @@ Rectangle {
                     uvc_settings.enabled = true
                     uvc_settings.opacity = 1
                 }
-                //When device is unplugged,need to destroy the active camera qml and create default qml file
-                if(see3cam){
-                    see3cam.destroy()
-                    see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
-                    see3cam.visible = !cameraColumnLayout.visible
-                    extensionTabVisible(see3cam.visible)
+                if(sideBarItems.visible){ // only when side bar items visible
+                    //When device is unplugged,need to destroy the active camera qml and create default qml file
+                    if(see3cam){
+                        see3cam.destroy()
+                        see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
+                        see3cam.visible = !cameraColumnLayout.visible
+                        extensionTabVisible(see3cam.visible)
+                    }
                 }
             }
 
@@ -730,6 +744,13 @@ Rectangle {
         {
             selectedDeviceEnumValue = selectedDevice;
         }
+        // Added by Sankari: To notify user about warning
+        // 07 Dec 2017
+        onNotifyUserInfo:{
+            warningDialog.title = qsTr(title)
+            warningDialog.text = qsTr(text)
+            warningDialog.open()
+        }
     }
 	
     // Added by Sankari : Update frame to skip 
@@ -1114,6 +1135,9 @@ Rectangle {
     Keys.onRightPressed: {
         // Added by Sankari : 25 May 2017, set the flag to indicate side bar items are opened
         closeSideBarClicked = false
+        // Added by Sankari : 15 Dec 2017 , when right key pressed, hide extension unit and open camera settings tab
+        see3cam.visible  = false
+        camera_settings.forceActiveFocus()
         sideBarItems.visible = true
         sidebarVisibleStatus(sideBarItems.visible)
         open_sideBar.visible = false

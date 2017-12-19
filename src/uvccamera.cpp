@@ -401,6 +401,11 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
         /* Get Physical Location */
         ret = ioctl(hid_fd, HIDIOCGRAWPHYS(256), buf);
         if (ret < 0) {
+            // Added by Sankari: To notify user about hid access
+            // 07 Dec 2017
+            _title = "Warning";
+            _text = "Unable to access extension unit controls. Please use the command \"sudo qtcam\" while launching application.";
+            emit hidWarningReceived(_title,_text);
             return false;
         }
         QString tempBuf = buf;
