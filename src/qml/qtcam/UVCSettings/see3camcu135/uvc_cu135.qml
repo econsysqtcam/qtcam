@@ -610,8 +610,29 @@ Item {
                 }
 
                 Row{
-                      spacing:90
+                      spacing:38
                       ExclusiveGroup { id: roiExpogroup }
+
+                      // Added by Sankari 13th Sep 2017 : Added Face ROI mode
+                      RadioButton {
+                          exclusiveGroup: roiExpogroup
+                          id: autoexpFace
+                          text: "Face"
+                          activeFocusOnPress: true
+                          style: econRadioButtonStyle
+                          opacity: enabled ? 1 : 0.1
+                          // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
+                          // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
+                          // winSize is required only for manual mode
+                          onClicked: {
+                              seecamcu135.setROIAutoExposure(See3CamCu135.AutoExpFace, 0, 0, 0, 0, 0);
+                              autoExpoWinSizeCombo.enabled = false
+                          }
+                          Keys.onReturnPressed: {
+                              seecamcu135.setROIAutoExposure(See3CamCu135.AutoExpFace, 0, 0, 0, 0, 0);
+                              autoExpoWinSizeCombo.enabled = false
+                          }
+                      }
                       RadioButton {
                           exclusiveGroup: roiExpogroup
                           id: autoexpFull
@@ -1063,12 +1084,14 @@ Item {
         if(autoExposureSelect){
             autoexpManual.enabled = true
             autoexpFull.enabled = true
+            autoexpFace.enabled = true
             if(autoexpManual.checked)
                 autoExpoWinSizeCombo.enabled = true
-            if(autoexpFull.checked)
+            if(autoexpFull.checked || autoexpFace.checked)
                 autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 1
             autoexpFull.opacity = 1
+            autoexpFace.opacity = 1
             exposureCompValue.enabled = true
             exposureCompValue.opacity = 1
             exposureCompSet.enabled = true
@@ -1077,9 +1100,11 @@ Item {
         }else{
             autoexpManual.enabled = false
             autoexpFull.enabled = false
+            autoexpFace.enabled = false
             autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 0.1
             autoexpFull.opacity = 0.1
+            autoexpFace.opacity = 0.1
             exposureCompValue.enabled = false
             exposureCompValue.opacity = 0.1
             exposureCompSet.enabled = false
@@ -1190,6 +1215,35 @@ Item {
         }
     }
 
+    // current ROI auto exposure mode
+    function currentROIAutoExposureMode(roiMode, winSize){
+        switch(roiMode){
+        case See3CamCu135.AutoExpFace:
+            autoexpFace.checked = true
+            autoExpoWinSizeCombo.enabled = false
+            break
+        case See3CamCu135.AutoExpFull:
+            autoexpFull.checked = true
+            autoExpoWinSizeCombo.enabled = false
+            break
+        case See3CamCu135.AutoExpManual:
+            skipUpdateUIOnExpWindowSize = false
+            autoexpManual.checked = true
+            // If window size is got from camera is 0 then set window size to 1 in UI
+            if(winSize == 0){
+                autoExpoWinSizeCombo.currentIndex = 0
+            }else
+                autoExpoWinSizeCombo.currentIndex = winSize-1
+            break
+        case See3CamCu135.AutoExpDisabled:
+            autoexpFace.enabled = false
+            autoexpFull.enabled = false
+            autoexpManual.enabled = false
+            autoExpoWinSizeCombo.enabled = false
+            break
+        }
+    }
+
     Uvccamera {
         id: uvccamera
         onTitleTextChanged: {
@@ -1251,19 +1305,7 @@ Item {
             burstLengthCombo.currentIndex = burstLength - 1
         }
         onRoiAutoExpMode:{
-            if(roiMode == See3CamCu135.AutoExpFull){
-                autoexpFull.checked = true
-				autoExpoWinSizeCombo.currentIndex = winSize-1
-            }else if(roiMode == See3CamCu135.AutoExpManual){
-                skipUpdateUIOnExpWindowSize = false
-                autoexpManual.checked = true
-                autoExpoWinSizeCombo.currentIndex = winSize-1                
-            }
-            else if(roiMode == See3CamCu135.AutoExpDisabled){
-                autoexpFull.enabled = false
-                autoexpManual.enabled = false
-                autoExpoWinSizeCombo.enabled = false
-            }
+            currentROIAutoExposureMode(roiMode, winSize)
         }
         onExposureCompValue:{
             exposureCompValue.text = exposureCompensation

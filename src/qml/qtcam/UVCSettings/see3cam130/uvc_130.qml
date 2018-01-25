@@ -681,8 +681,29 @@ Item {
             }
 
             Row{
-                  spacing:90
+                  spacing:38
                   ExclusiveGroup { id: roiExpogroup }
+
+                  // Added by Sankari 13th Sep 2017 : Added Face ROI mode
+                  RadioButton {
+                      exclusiveGroup: roiExpogroup
+                      id: autoexpFace
+                      text: "Face"
+                      activeFocusOnPress: true
+                      style: econRadioButtonStyle
+                      opacity: enabled ? 1 : 0.1
+                      // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
+                      // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
+                      // winSize is required only for manual mode
+                      onClicked: {
+                          seecam130.setROIAutoExposure(See3Cam130.AutoExpFace, 0, 0, 0, 0, 0);
+                          autoExpoWinSizeCombo.enabled = false
+                      }
+                      Keys.onReturnPressed: {
+                          seecam130.setROIAutoExposure(See3Cam130.AutoExpFace, 0, 0, 0, 0, 0);
+                          autoExpoWinSizeCombo.enabled = false
+                      }
+                  }
                   RadioButton {
                       exclusiveGroup: roiExpogroup
                       id: autoexpFull
@@ -1323,19 +1344,7 @@ Item {
             }
         }
         onRoiAutoExpModeValue:{
-            if(roiMode == See3Cam130.AutoExpFull){                
-                autoexpFull.checked = true                
-                autoExpoWinSizeCombo.currentIndex = winSize-1
-            }else if(roiMode == See3Cam130.AutoExpManual){
-                skipUpdateUIOnExpWindowSize = false
-                autoexpManual.checked = true
-                autoExpoWinSizeCombo.currentIndex = winSize-1
-            }
-            else if(roiMode == See3Cam130.AutoExpDisabled){
-                autoexpFull.enabled = false
-                autoexpManual.enabled = false
-                autoExpoWinSizeCombo.enabled = false
-            }
+            currentROIAutoExposureMode(roiMode, winSize)
         }
         onBurstLengthValue:{
             skipUpdateUIOnBurstLength = false
@@ -1595,6 +1604,35 @@ Item {
 
     }
 
+    // current ROI auto exposure mode
+    function currentROIAutoExposureMode(roiMode, winSize){
+        switch(roiMode){
+            case See3Cam130.AutoExpFace:
+                autoexpFace.checked = true
+                autoExpoWinSizeCombo.enabled = false
+                break
+            case See3Cam130.AutoExpFull:
+                autoexpFull.checked = true
+                autoExpoWinSizeCombo.enabled = false
+                break
+            case See3Cam130.AutoExpManual:
+                skipUpdateUIOnExpWindowSize = false
+                autoexpManual.checked = true
+                // If window size is got from camera is 0 then set window size to 1 in UI
+                if(winSize == 0){
+                    autoExpoWinSizeCombo.currentIndex = 0
+                }else
+                    autoExpoWinSizeCombo.currentIndex = winSize-1
+                break
+            case See3Cam130.AutoExpDisabled:
+                autoexpFace.enabled = false
+                autoexpFull.enabled = false
+                autoexpManual.enabled = false
+                autoExpoWinSizeCombo.enabled = false
+                break
+        }
+    }
+
     function setTriggerMode(){
         root.stopUpdatePreviewInTriggerMode()
         seecam130.setStreamMode(See3Cam130.STREAM_TRIGGER)
@@ -1761,12 +1799,14 @@ Item {
         if(autoExposureSelect){
             autoexpManual.enabled = true
             autoexpFull.enabled = true
+            autoexpFace.enabled = true
             if(autoexpManual.checked)
                 autoExpoWinSizeCombo.enabled = true
-            if(autoexpFull.checked)
+            if(autoexpFull.checked || autoexpFace.checked)
                 autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 1
             autoexpFull.opacity = 1
+            autoexpFace.opacity = 1
             exposureCompValue.enabled = true
             exposureCompValue.opacity = 1
             exposureCompSet.enabled = true
@@ -1775,9 +1815,11 @@ Item {
         }else{
             autoexpManual.enabled = false
             autoexpFull.enabled = false
+            autoexpFace.enabled = false
             autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 0.1
             autoexpFull.opacity = 0.1
+            autoexpFace.opacity = 0.1
             exposureCompValue.enabled = false
             exposureCompValue.opacity = 0.1
             exposureCompSet.enabled = false

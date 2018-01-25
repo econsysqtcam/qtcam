@@ -10,6 +10,73 @@
 #define SMILE_THRESHOLD_MAX 75
 #define DEFAULT_SMILE_THRESHOLD 40
 
+#define SET_DENOISE_CONTROL  0x06
+#define GET_DENOISE_CONTROL  0x05
+
+/* SEE3CAM_130 */
+#define CAMERA_CONTROL_130               0x7B
+#define GET_SCENEMODE_130				0x01
+#define SET_SCENEMODE_130				0x02
+#define GET_SPECIALEFFECT_130			0x03
+#define SET_SPECIALEFFECT_130			0x04
+#define GET_DENOISE_130					0x05
+#define SET_DENOISE_130					0x06
+#define GET_AF_MODE_130					0x07
+#define SET_AF_MODE_130					0x08
+#define GET_AF_ROI_MODE_130				0x09
+#define SET_AF_ROI_MODE_130				0x0A
+#define GET_EXP_ROI_MODE_130			0x0B
+#define SET_EXP_ROI_MODE_130			0x0C
+#define GET_BURST_LENGTH_130			0x0D
+#define SET_BURST_LENGTH_130			0x0E
+#define GET_HDR_MODE_130				0x0F
+#define SET_HDR_MODE_130				0x10
+#define GET_Q_FACTOR_130				0x11
+#define SET_Q_FACTOR_130				0x12
+#define ENABLE_DISABLE_MODE_AF_RECTANGLE_130     0x13
+#define GET_AF_RECT_MODE                0x16
+#define ENABLE_AF_RECTANGLE_130     0x01
+#define DISABLE_AF_RECTANGLE_130     0x00
+#define SET_TO_DEFAULT                0x17
+#define MANUAL_ROI_AF_130             0x02
+#define MANUAL_ROI_EXP_130			  0x02
+#define SET_FLIP_MODE_130                 0x19
+#define GET_FLIP_MODE_130                 0x18
+#define FLIP_ENABLE                   0x01
+#define FLIP_DISABLE                  0x00
+#define SET_HORZ_FLIP_MODE_130             0x00
+#define SET_VERT_FLIP_MODE_130             0x01
+
+#define SET_STREAM_MODE_130               0x15
+#define GET_STREAM_MODE_130               0x14
+
+#define ENABLE_DISABLE_MODE_FACE_RECTANGLE_130       0x26
+#define ENABLE_FACE_RECTANGLE_130       0x01
+#define DISABLE_FACE_RECTANGLE_130      0x00
+#define SET_FACE_DETECT_RECT            0x1F
+#define GET_FACE_DETECT_RECT            0x1E
+#define ENABLE_FACE_RECT                0x01
+#define DISABLE_FACE_RECT               0x00
+#define ENABLE_EMBED_DATA               0x01
+#define DISABLE_EMBED_DATA              0x00
+#define ENABLE_OVERLAY_RECT             0x01
+#define DISABLE_OVERLAY_RECT            0x00
+#define FACE_RECT_SUCCESS               0x01
+#define FACE_RECT_FAIL                  0x00
+
+#define SET_SMILE_DETECTION             0x21
+#define GET_SMILE_DETECTION             0x20
+#define ENABLE_SMILE_DETECT             0x01
+#define DISABLE_SMILE_DETECT            0x00
+#define SMILE_DETECT_SUCCESS            0x01
+#define SMILE_DETECT_FAIL               0x00
+
+#define SET_EXPOSURE_COMPENSATION       0x23
+#define GET_EXPOSURE_COMPENSATION       0x22
+
+#define SET_FRAME_RATE_130              0x25
+#define GET_FRAME_RATE_130              0x24
+
 class See3CAM_130 : public QObject
 {
     Q_OBJECT
@@ -18,6 +85,8 @@ private:
     unsigned char g_out_packet_buf[BUFFER_LENGTH];
     unsigned char g_in_packet_buf[BUFFER_LENGTH];
     uvccamera uvc;
+
+    void initializeBuffers();
 
 public:
     explicit See3CAM_130(QObject *parent = 0);
@@ -60,6 +129,7 @@ public:
     Q_ENUMS(camROIAfMode)
 
     enum camROIAutoExpMode {
+        AutoExpFace = 0x00,
         AutoExpFull = 0x01,
         AutoExpManual = 0x02,
         AutoExpDisabled = 0x03

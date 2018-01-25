@@ -1,3 +1,7 @@
+Qtcam Application - 16.0.5
+-----------------------------
+* Added face ROI support in See3cam_cu135 and See3Cam130 camera.
+
 Qtcam Application - 16.0.4
 -----------------------------
 * Added notification to user that application must be launched using sudo.

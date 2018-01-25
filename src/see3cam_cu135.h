@@ -30,6 +30,63 @@
 #define SMILE_THRESHOLD_MAX 75
 #define DEFAULT_SMILE_THRESHOLD 40
 
+/* SEE3CAM_CU135 */
+#define CAMERA_CONTROL_CU135             0x81
+
+#define SET_SPECIAL_EFFECT_MODE_CU135    0x04
+#define GET_SPECIAL_EFFECT_MODE_CU135    0x03
+
+#define SET_SCENE_MODE_CU135             0x02
+#define GET_SCENE_MODE_CU135             0x01
+
+#define SET_DENOISE_CONTROL_CU135        0x06
+#define GET_DENOISE_CONTROL_CU135        0x05
+
+#define GET_Q_FACTOR_CU135               0x0D
+#define SET_Q_FACTOR_CU135				 0x0E
+
+#define SET_HDR_MODE_CU135				 0x0C
+#define GET_HDR_MODE_CU135				 0x0B
+
+#define SET_STREAM_MODE_CU135            0x11
+#define GET_STREAM_MODE_CU135            0x0F
+
+#define SET_BURST_LENGTH_CU135           0x0A
+#define GET_BURST_LENGTH_CU135           0x09
+
+#define SET_ORIENTATION_CU135            0x14
+#define GET_ORIENTATION_CU135            0x13
+
+#define SET_EXPOSURE_COMPENSATION_CU135  0x1A
+#define GET_EXPOSURE_COMPENSATION_CU135  0x19
+
+#define SET_EXP_ROI_MODE_CU135                     0x08
+#define GET_EXP_ROI_MODE_CU135                     0x07
+
+#define SET_FRAME_RATE_CU135                       0x1C
+#define GET_FRAME_RATE_CU135                       0x1B
+
+#define SET_FACE_DETECT_CU135                      0x16
+#define GET_FACE_DETECT_CU135                      0x15
+#define ENABLE_FACE_RECT_CU135                     0x01
+#define DISABLE_FACE_RECT_CU135                    0x00
+#define ENABLE_EMBED_DATA_CU135                    0x01
+#define DISABLE_EMBED_DATA_CU135                   0x00
+#define ENABLE_OVERLAY_RECT_CU135                  0x01
+#define DISABLE_OVERLAY_RECT_CU135                 0x00
+
+#define SET_SMILE_DETECTION_CU135                  0x18
+#define GET_SMILE_DETECTION_CU135                  0x17
+#define ENABLE_SMILE_DETECT_CU135                  0x01
+#define DISABLE_SMILE_DETECT_CU135                 0x00
+
+#define ENABLE_FACE_RECTANGLE_CU135               0x01
+#define DISABLE_FACE_RECTANGLE_CU135              0x00
+#define ENABLE_DISABLE_MODE_FACE_RECTANGLE_CU135       0x10
+
+#define SET_TO_DEFAULT_CU135                       0x12
+
+
 class See3CAM_CU135 : public QObject
 {
     Q_OBJECT
@@ -38,6 +95,8 @@ private:
     unsigned char g_out_packet_buf[BUFFER_LENGTH];
     unsigned char g_in_packet_buf[BUFFER_LENGTH];
     uvccamera uvc;
+
+    void initializeBuffers();
 
 public:
     explicit See3CAM_CU135(QObject *parent = 0);
@@ -72,6 +131,7 @@ public:
     Q_ENUMS(camStreamMode)
 
     enum camROIAutoExpMode {
+        AutoExpFace = 0x00,
         AutoExpFull = 0x01,
         AutoExpManual = 0x02,
         AutoExpDisabled = 0x03
@@ -158,7 +218,7 @@ public slots:
     bool setStreamMode(camStreamMode streamMode);
     bool getStreamMode();
 
-    void setOrientation(bool horzModeSel, bool vertiModeSel);
+    bool setOrientation(bool horzModeSel, bool vertiModeSel);
     bool getOrientation();
 
     bool setBurstLength(uint burstLength);
