@@ -1,3 +1,7 @@
+Qtcam Application - 16.0.7
+-----------------------------
+* Added exposure compensation feature in see3cam_cu20 camera.
+
 Qtcam Application - 16.0.6
 -----------------------------
 * Fixed delay in launching Qtcam application.

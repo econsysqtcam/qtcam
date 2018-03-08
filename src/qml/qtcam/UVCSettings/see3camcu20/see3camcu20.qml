@@ -33,6 +33,11 @@ Item {
     property bool skipUpdateUIOnBurstLength: false
     property bool skipUpdateUIOnAntiFlickerMode:false
     property bool skipUpdateUIOnLSCMode: false
+    property bool skipUpdateUIOnExpComp: false
+    property bool setButtonClicked: false
+    property int expCompMinValue : 1
+    property int expCompMaxValue : 60
+    property bool autoExposureMode: true
 
     width:240
     height:720
@@ -45,6 +50,15 @@ Item {
         interval: 2000
         onTriggered: {
             see3camcu20.getAutoExpROIModeAndWindowSize()
+        }
+    }
+
+    Timer{
+        id:exposureCompensationTimer
+        interval: 500
+        repeat: false
+        onTriggered: {
+            see3camcu20.getExposureCompensation()
         }
     }
 
@@ -73,8 +87,17 @@ Item {
                see3camcu20.setROIAutoExposure(See3Camcu20.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
             }
         }
-
+        onVideoResolutionChanged:{
+            exposureCompensationTimer.start()
+        }
+        onPreviewFPSChanged:{
+            exposureCompensationTimer.start()
+        }
+        onVideoColorSpaceChanged:{
+            see3camcu20.getExposureCompensation()
+        }
         onAutoExposureSelected:{
+            autoExposureMode = autoExposureSelect
             if(autoExposureSelect){
                 autoexpManual.enabled = true
                 autoexpCentered.enabled = true
@@ -84,14 +107,25 @@ Item {
                     autoExpoWinSizeCombo.enabled = false
                 autoexpManual.opacity = 1
                 autoexpCentered.opacity = 1
+                if(sensorStandard.checked){
+                    exposureCompSlider.enabled = true
+                    exposureCompSlider.opacity  = 1
+                    exposureCompTextValue.opacity = 1
+                }else if(sensorHdrDlo.checked){
+                    exposureCompSlider.enabled = false
+                    exposureCompSlider.opacity  = 0.1
+                    exposureCompTextValue.opacity = 0.1
+                }
             }else{
                 autoexpManual.enabled = false
                 autoexpCentered.enabled = false
                 autoExpoWinSizeCombo.enabled = false
+                exposureCompSlider.enabled = false
                 autoexpManual.opacity = 0.1
                 autoexpCentered.opacity = 0.1
+                exposureCompSlider.opacity = 0.1
+                exposureCompTextValue.opacity = 0.1
             }
-
             autoExpROITimer.start()
         }
     }
@@ -104,7 +138,7 @@ Item {
         height: 500
         style: econscrollViewStyle
         Item {
-            height: 1300
+            height: 1350
             ColumnLayout{
                 x:2
                 y:5
@@ -130,12 +164,10 @@ Item {
                         exclusiveGroup: sensorInputGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            defaultValue.enabled = true
-                            see3camcu20.setSensorMode(See3Camcu20.SENSOR_STANDARD)
+                            sensorStandardModeSelected()
                         }
                         Keys.onReturnPressed: {
-                            defaultValue.enabled = true
-                            see3camcu20.setSensorMode(See3Camcu20.SENSOR_STANDARD)
+                            sensorStandardModeSelected()
                         }
                     }
                     RadioButton {
@@ -145,10 +177,10 @@ Item {
                         exclusiveGroup: sensorInputGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            see3camcu20.setSensorMode(See3Camcu20.SENSOR_HDR_DLO)
+                            sensorHDRModeSelected()
                         }
                         Keys.onReturnPressed: {
-                            see3camcu20.setSensorMode(See3Camcu20.SENSOR_HDR_DLO)
+                            sensorHDRModeSelected()
                         }
                     }
                 }
@@ -425,6 +457,52 @@ Item {
                         skipUpdateUIOnExpWindowSize = true
                     }
                 }
+                // Added by Sankari: 14 Feb 2018 - Added exposure compensation
+
+                Text {
+                    id: exposureCompTextTitle
+                    text: "--- Exposure Compensation ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                Row{
+                    spacing:35
+                    Slider {
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        id: exposureCompSlider
+                        opacity: enabled ? 1 : 0.1
+                        width: 150
+                        stepSize: 1
+                        style:econSliderStyle
+                        minimumValue: expCompMinValue
+                        maximumValue: expCompMaxValue
+                        onValueChanged:  {
+                            exposureCompTextValue.text = exposureCompSlider.value
+                            if(skipUpdateUIOnExpComp){
+                                see3camcu20.setExposureCompensation(exposureCompTextValue.text)
+                            }
+                            skipUpdateUIOnExpComp = true
+                        }
+                    }
+                    TextField {
+                        id: exposureCompTextValue
+                        text: exposureCompSlider.value
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        enabled: false
+                        opacity: exposureCompSlider.enabled ? 1 : 0.1
+                        style: econTextFieldStyle
+                        onTextChanged: {
+                        }
+                    }
+                }
 
                 Text {
                     id: colourKillValStatusText
@@ -464,11 +542,6 @@ Item {
                         horizontalAlignment: TextInput.AlignHCenter
                         style: econTextFieldStyle
                         validator: IntValidator {bottom: colourKillValSlider.minimumValue; top: colourKillValSlider.maximumValue}
-                        onTextChanged: {                            
-                            if(text.length > 0){
-                                colourKillValSlider.value = colorKillTextField.text
-                            }
-                        }
                     }
                 }
                 Text {
@@ -919,8 +992,14 @@ Item {
         onSensorModeReceived:{
             if(sensorMode == See3Camcu20.SENSOR_STANDARD){
                 sensorStandard.checked = true
+                exposureCompSlider.enabled = true
+                exposureCompSlider.opacity = 1
+                exposureCompTextValue.opacity = 1
             }else if(sensorMode == See3Camcu20.SENSOR_HDR_DLO){
                 sensorHdrDlo.checked = true
+                exposureCompSlider.enabled = false
+                exposureCompSlider.opacity = 0.1
+                exposureCompTextValue.opacity = 0.1
             }
         }
         onCameraModeReceived:{
@@ -976,6 +1055,11 @@ Item {
         onSetdefaultValueFailed:{
             displayMessageBox(qsTr("Failure"), qsTr("Setting default value is failed"))
         }
+        onExposureCompValue:{
+            skipUpdateUIOnExpComp = false
+            exposureCompSlider.value = exposureCompensation
+            skipUpdateUIOnExpComp = true
+        }
     }
 
     function displayMessageBox(title, text){
@@ -983,6 +1067,31 @@ Item {
         messageDialog.text = qsTr(text)
         messageDialog.open()
     }
+
+    function sensorStandardModeSelected(){
+        see3camcu20.setSensorMode(See3Camcu20.SENSOR_STANDARD)
+        defaultValue.enabled = true
+        if(autoExposureMode){
+            exposureCompSlider.enabled = true
+            exposureCompSlider.opacity = 1
+            exposureCompTextValue.opacity = 1
+        }else{
+            exposureCompSlider.enabled = false
+            exposureCompSlider.opacity = 0.1
+            exposureCompTextValue.opacity = 0.1
+        }
+    }
+
+    function sensorHDRModeSelected(){
+        see3camcu20.setSensorMode(See3Camcu20.SENSOR_HDR_DLO)
+        defaultValue.enabled = true
+        exposureCompSlider.enabled = false
+        exposureCompSlider.opacity = 0.1
+        exposureCompTextValue.opacity = 0.1
+    }
+
+
+
 
     function currentLSCMode(Mode){
         skipUpdateUIOnLSCMode = false
@@ -1112,6 +1221,7 @@ Item {
         see3camcu20.getOrientation()
         see3camcu20.getStrobeMode()
         see3camcu20.getColourKill()
+        see3camcu20.getExposureCompensation()
         see3camcu20.getBurstLength()
         see3camcu20.getAntiFlickerMode()
         see3camcu20.getDenoiseCtrlMode()

@@ -224,6 +224,73 @@ bool See3CAM_CU20::getSpecialMode()
 }
 
 /**
+ * @brief See3CAM_CU20::setExposureCompensation
+ * param - exposureCompensation value
+ * @return true/false
+ */
+bool See3CAM_CU20::setExposureCompensation(unsigned int exposureCompValue){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU20; /* camera id */
+    g_out_packet_buf[2] = SET_EXPOSURE_COMPENSATION_CU20; /* set exposure compensation command  */
+    g_out_packet_buf[3] = exposureCompValue;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU20 &&
+            g_in_packet_buf[1] == SET_EXPOSURE_COMPENSATION_CU20 &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_CU135::getExposureCompensation - getting exposure compensation
+ * @return true/false
+ */
+bool See3CAM_CU20::getExposureCompensation(){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU20; /* camera id */
+    g_out_packet_buf[2] = GET_EXPOSURE_COMPENSATION_CU20; /* get exposure compensation command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU20 &&
+            g_in_packet_buf[1] == GET_EXPOSURE_COMPENSATION_CU20 &&
+            g_in_packet_buf[6] == GET_SUCCESS) {
+            exposureCompValue(g_in_packet_buf[2]);
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * @brief See3CAM_CU20::setOrientation
  * @param horzModeSel - select/deselect horizontal flip mode
  * @param vertiModeSel - select/deselect vertical flip mode

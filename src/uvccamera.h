@@ -413,31 +413,6 @@
 #define FP_DISABLE					0x00
 #define FP_APPLYMAX					0x03
 
-// See3cam_cu20 camera
-#define CAMERA_CONTROL_CU20         0x86
-#define GET_SENSOR_MODE_CU20        0x01
-#define SET_SENSOR_MODE_CU20        0x02
-#define GET_CAMERA_MODE_CU20        0x03
-#define SET_CAMERA_MODE_CU20        0x04
-#define SET_SPECIAL_MODE_CU20       0x08
-#define GET_SPECIAL_MODE_CU20       0x07
-#define GET_ORIENTATION_CU20        0x09
-#define SET_ORIENTATION_CU20        0x0A
-#define SET_STROBEMODE_CU20         0x0C
-#define GET_STROBEMODE_CU20         0x0B
-#define SET_AE_ROI_MODE_CU20        0x06
-#define GET_AE_ROI_MODE_CU20        0x05
-#define SET_COLORKILLVAL_CU20       0x0E
-#define GET_COLORKILLVAL_CU20       0x0D
-#define SET_BURSTLENGTH_CU20        0x10
-#define GET_BURSTLENGTH_CU20        0x0F
-#define SET_ANTIFLICKER_CU20        0x12
-#define GET_ANTIFLICKER_CU20        0x11
-#define SET_DENOISE_MODE_CU20       0x16
-#define GET_DENOISE_MODE_CU20       0x15
-#define SET_LSCMODE_CU20            0x14
-#define GET_LSCMODE_CU20            0x13
-#define SET_TO_DEFAULT_CU20         0xFF
 
 class uvccamera: public QObject
 {
