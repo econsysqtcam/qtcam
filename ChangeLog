@@ -1,3 +1,8 @@
+Qtcam Application - 16.0.8
+-----------------------------
+* Added face ROI and flash control features in See3cam_cu30 camera.
+* Fixed issue of not enabling settings in side bar when clicking capture button when See3cam_cu20 camera in trigger mode.
+
 Qtcam Application - 16.0.7
 -----------------------------
 * Added exposure compensation feature in see3cam_cu20 camera.

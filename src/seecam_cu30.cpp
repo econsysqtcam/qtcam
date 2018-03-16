@@ -31,57 +31,32 @@ See3CAM_CU30::See3CAM_CU30(QObject *parent) :
  */
 bool See3CAM_CU30::setEffectMode(const specialEffects &specialEffect)
 {
+
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    //Initialize buffers
+    initializeBuffers();
 
-    //Set the Report Number
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* set camera control code */
     g_out_packet_buf[2] = SET_SPECIAL_EFFECT; /* set special effect code */
     g_out_packet_buf[3] = specialEffect; /* set special effect */
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            perror("read");
-        } else {
-            if (g_in_packet_buf[6]==SET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==SET_SPECIAL_EFFECT &&
-                g_in_packet_buf[2]==specialEffect &&
-                g_in_packet_buf[6]==SET_SUCCESS) {
-                    timeout=false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SET_SPECIAL_EFFECT &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 /**
@@ -91,62 +66,31 @@ bool See3CAM_CU30::setEffectMode(const specialEffects &specialEffect)
  */
 bool See3CAM_CU30::setDenoiseValue(int deNoiseVal)
 {
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
 
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
+    //Initialize buffers
+    initializeBuffers();
 
-    if(DENOISE_MIN <= deNoiseVal || DENOISE_MAX >= deNoiseVal)
-    {
-        //Initialize the buffer
-        memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-        //Set the Report Number
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* set camera control code */
+    g_out_packet_buf[2] = SET_DENOISE_CONTROL; /* set denoise control code */
+    g_out_packet_buf[3] = deNoiseVal; /* set denoise value */
 
-        g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* set camera control code */
-        g_out_packet_buf[2] = SET_DENOISE_CONTROL; /* set denoise control code */
-        g_out_packet_buf[3] = deNoiseVal; /* set denoise value */
-
-        ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-        if (ret < 0) {
-            perror("write");
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
-        }
-        /* Read the Status code from the device */
-        start = uvc.getTickCount();
-        while(timeout)
-        {
-            /* Get a report from the device */
-            ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-            if (ret < 0) {
-                perror("read");
-            } else {
-                if (g_in_packet_buf[6]==SET_FAIL) {
-                    return false;
-                } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                    g_in_packet_buf[1]==SET_DENOISE_CONTROL &&
-                    g_in_packet_buf[2]==deNoiseVal &&
-                    g_in_packet_buf[6]==SET_SUCCESS) {
-                        timeout=false;
-                }
-            }
-            end = uvc.getTickCount();
-            if(end - start > TIMEOUT)
-            {
-                timeout = false;
-                return false;
-            }
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SET_DENOISE_CONTROL &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            return true;
         }
     }
-    else
-    {
-        return false;
-    }
-    return true;
+    return false;
 }
 
 /**
@@ -155,56 +99,31 @@ bool See3CAM_CU30::setDenoiseValue(int deNoiseVal)
  */
 bool See3CAM_CU30::getEffectMode()
 {
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-        bool timeout = true;
-        int ret =0;
-        unsigned int start, end = 0;
 
-        uint effectMode;
-        //Initialize the buffer
-        memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-        //Set the Report Number
-        g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* set camera control code */
-        g_out_packet_buf[2] = GET_SPECIAL_EFFECT; /* get special effect code */
+    //Initialize buffers
+    initializeBuffers();
 
-        ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* set camera control code */
+    g_out_packet_buf[2] = GET_SPECIAL_EFFECT; /* get special effect code */
 
-        if (ret < 0) {
-            perror("write");
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==GET_SPECIAL_EFFECT &&
+            g_in_packet_buf[6]==GET_SUCCESS) {\
+            emit sendEffectMode(g_in_packet_buf[2]);
+            return true;
         }
-
-        /* Read the Status code from the device */
-        start = uvc.getTickCount();
-
-        while(timeout)
-        {
-            /* Get a report from the device */
-            ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-            if (ret < 0) {
-                perror("read");
-            } else {
-                if (g_in_packet_buf[6]==GET_FAIL) {
-                    return false;
-                } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                    g_in_packet_buf[1]==GET_SPECIAL_EFFECT &&
-                    g_in_packet_buf[6]==GET_SUCCESS) {
-                        effectMode = g_in_packet_buf[2];
-                        emit sendEffectMode(effectMode);
-                        timeout = false;
-                }
-            }
-            end = uvc.getTickCount();
-            if(end - start > TIMEOUT)
-            {
-                timeout = false;
-                return false;
-            }
-        }
-        return true;
+    }
+    return false;
 }
 
 /**
@@ -213,57 +132,31 @@ bool See3CAM_CU30::getEffectMode()
  */
 bool See3CAM_CU30::getDenoiseValue()
 {
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    uint denoiseValue;
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-    //Set the Report Number
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* set camera control code */
     g_out_packet_buf[2] = GET_DENOISE_CONTROL; /* get denoise code */
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-
-        if (ret < 0) {
-            perror("read");
-        } else {
-            if (g_in_packet_buf[6]==GET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==GET_DENOISE_CONTROL &&
-                g_in_packet_buf[6]==GET_SUCCESS) {
-                    denoiseValue = g_in_packet_buf[2];
-                    emit sendDenoiseValue(denoiseValue);
-                    timeout = false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==GET_DENOISE_CONTROL &&
+            g_in_packet_buf[6]==GET_SUCCESS) {\
+            emit sendDenoiseValue(g_in_packet_buf[2]);
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 /**
@@ -272,56 +165,31 @@ bool See3CAM_CU30::getDenoiseValue()
  */
 bool See3CAM_CU30::getSceneMode()
 {
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    uint sceneMode = 0;
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-    //Set the Report Number
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
     g_out_packet_buf[2] = GET_SCENEMODE_CU30; /* get scene mode command */
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6] == GET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==GET_SCENEMODE_CU30 &&
-                g_in_packet_buf[6]==GET_SUCCESS) {
-                    sceneMode = g_in_packet_buf[2];                    
-                    emit sceneModeValue(sceneMode);
-                    timeout = false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==GET_SCENEMODE_CU30 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {\
+            emit sceneModeValue(g_in_packet_buf[2]);
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 
@@ -331,57 +199,31 @@ bool See3CAM_CU30::getSceneMode()
  */
 bool See3CAM_CU30::setSceneMode(const sceneModes &sceneMode)
 {
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    //Initialize buffers
+    initializeBuffers();
 
-    //Set the Report Number
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* Camera control id */
     g_out_packet_buf[2] = SET_SCENEMODE_CU30; /* Set scene mode command */
     g_out_packet_buf[3] = sceneMode; /* Scene mode to set */
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==SET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==SET_SCENEMODE_CU30 &&
-                g_in_packet_buf[2]==sceneMode &&
-                g_in_packet_buf[6]==SET_SUCCESS) {                
-                timeout = false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SET_SCENEMODE_CU30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 /**
@@ -396,6 +238,12 @@ bool See3CAM_CU30::setSceneMode(const sceneModes &sceneMode)
  */
 bool See3CAM_CU30::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize)
 {
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
     //((Input - InputLow) / (InputHigh - InputLow)) * (OutputHigh - OutputLow) + OutputLow // map resolution width and height -  0 to 255
 
     double outputLow = 0;
@@ -410,18 +258,10 @@ bool See3CAM_CU30::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, u
     double inputYCord = yCord;
     int outputYCord = ((inputYCord - inputYLow) / (inputYHigh - inputYLow)) * (outputHigh - outputLow) + outputLow;
 
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
+    //Initialize buffers
+    initializeBuffers();
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-
-    //Set the Report Number
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
     g_out_packet_buf[2] = SET_EXP_ROI_MODE_CU30; /* set exposure ROI command */
     g_out_packet_buf[3] = see3camAutoexpROIMode; /* exposure ROI mode to set */
@@ -432,41 +272,17 @@ bool See3CAM_CU30::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, u
         g_out_packet_buf[6] = winSize.toUInt(); // window size
     }
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==SET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]== SET_EXP_ROI_MODE_CU30 &&
-                g_in_packet_buf[2]==see3camAutoexpROIMode &&
-                g_in_packet_buf[6]==SET_SUCCESS) {
-                    timeout=false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SET_EXP_ROI_MODE_CU30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 
@@ -475,58 +291,32 @@ bool See3CAM_CU30::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, u
  * return true - success /false - failure
  */
 bool See3CAM_CU30::getAutoExpROIModeAndWindowSize(){
+
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
-    uint roiMode, windowSize = 0;
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-    //Set the Report Number
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
     g_out_packet_buf[2] = GET_EXP_ROI_MODE_CU30; /* get exposure ROI mode  */
 
-    ret = write(uvccamera::hid_fd , g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==GET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==GET_EXP_ROI_MODE_CU30 &&
-                g_in_packet_buf[6]==GET_SUCCESS) {
-                    roiMode = g_in_packet_buf[2];                    
-                    windowSize = g_in_packet_buf[5];                    
-                    emit roiAutoExpModeValue(roiMode, windowSize);
-                    timeout = false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==GET_EXP_ROI_MODE_CU30 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {
+            emit roiAutoExpModeValue(g_in_packet_buf[2], g_in_packet_buf[5]);
+            return true;
         }
     }
-    return true;
-
+    return false;
 }
 
 /**
@@ -536,56 +326,31 @@ bool See3CAM_CU30::getAutoExpROIModeAndWindowSize(){
  */
 bool See3CAM_CU30::setBurstLength(uint burstLength){
 
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    //Initialize buffers
+    initializeBuffers();
 
-    //Set the Report Number
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
     g_out_packet_buf[2] = SET_BURST_LENGTH_CU30; /* set burst length command */
     g_out_packet_buf[3] = burstLength; /* burst length value to set */
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
 
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==SET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==SET_BURST_LENGTH_CU30 &&
-                g_in_packet_buf[2]==burstLength &&
-                g_in_packet_buf[6]==SET_SUCCESS) {
-                    timeout=false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SET_BURST_LENGTH_CU30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 /**
@@ -594,56 +359,31 @@ bool See3CAM_CU30::setBurstLength(uint burstLength){
  */
 bool See3CAM_CU30::getBurstLength()
 {
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    uint burstLength = 1;
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-    //Set the Report Number
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
-    g_out_packet_buf[2] = GET_BURST_LENGTH_CU30; /* get burst length command */
+    g_out_packet_buf[2] = GET_BURST_LENGTH_CU30; /* get burst length mode  */
 
-    ret = write(uvccamera::hid_fd , g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==GET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==GET_BURST_LENGTH_CU30 &&
-                g_in_packet_buf[6]==GET_SUCCESS) {
-                    burstLength = g_in_packet_buf[2];
-                    emit burstLengthValue(burstLength);
-                    timeout = false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==GET_BURST_LENGTH_CU30 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {\
+            emit burstLengthValue(g_in_packet_buf[2]);
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 /**
@@ -652,57 +392,31 @@ bool See3CAM_CU30::getBurstLength()
  * return true - success /false - failure
  */
 bool See3CAM_CU30::setQFactor(uint qFactor){
-
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    //Initialize buffers
+    initializeBuffers();
 
-    //Set the Report Number
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
     g_out_packet_buf[2] = SET_Q_FACTOR_CU30; /* set qfactor command */
     g_out_packet_buf[3] = qFactor; /* qfactor value */
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
 
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==SET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==SET_Q_FACTOR_CU30 &&
-                g_in_packet_buf[2]==qFactor &&
-                g_in_packet_buf[6]==SET_SUCCESS) {
-                    timeout=false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SET_Q_FACTOR_CU30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 /**
@@ -711,91 +425,49 @@ bool See3CAM_CU30::setQFactor(uint qFactor){
  */
 bool See3CAM_CU30::getQFactor()
 {
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    uint qFactor;
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-    //Set the Report Number
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
     g_out_packet_buf[2] = GET_Q_FACTOR_CU30; /* get qFactor value */
 
-    ret = write(uvccamera::hid_fd , g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==GET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==GET_Q_FACTOR_CU30 &&
-                g_in_packet_buf[6]==GET_SUCCESS) {
-                    qFactor = g_in_packet_buf[2];
-                    emit qFactorValue(qFactor);
-                    timeout = false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==GET_Q_FACTOR_CU30 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {\
+            emit qFactorValue(g_in_packet_buf[2]);
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 
 /**
  * @brief See3CAM_CU30::setOrientation - Setting orientation
 */
-void See3CAM_CU30::setOrientation(bool horzModeSel, bool vertiModeSel)
+bool See3CAM_CU30::setOrientation(bool horzModeSel, bool vertiModeSel)
 {
-    QtConcurrent::run(setOrientationBackgrndFn, this, horzModeSel, vertiModeSel);
-}
-
-
-/**
- * @brief See3CAM_CU30::setOrientationBackgrndFn - Setting orientation
- * @param see3cam30obj object of the class
- * @param horzModeSel
- * @param vertiModeSel
- * @return true/false
- */
-bool See3CAM_CU30::setOrientationBackgrndFn(See3CAM_CU30 *see3camcu30obj, bool horzModeSel, bool vertiModeSel){
-    unsigned char g_out_packet_buf[BUFFER_LENGTH];
-    unsigned char g_in_packet_buf[BUFFER_LENGTH];
-
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    //Initialize buffers
+    initializeBuffers();
 
-    //Set the Report Number
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera control for see3cam_30 camera */
     g_out_packet_buf[2] = SET_ORIENTATION_CU30; /* set flip mode for 30 camera */
     if(horzModeSel && vertiModeSel){
@@ -807,41 +479,21 @@ bool See3CAM_CU30::setOrientationBackgrndFn(See3CAM_CU30 *see3camcu30obj, bool h
     }else
         g_out_packet_buf[3] = SET_ORIENTATION_BOTHFLIP_DISABLE_CU30; /* both flip disable */
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = see3camcu30obj->uvc.getTickCount();
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==SET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                      g_in_packet_buf[1]==SET_ORIENTATION_CU30 &&
-                      g_in_packet_buf[3]==SET_SUCCESS) {
-                timeout = false;
-            }
-        }
-        end = see3camcu30obj->uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SET_ORIENTATION_CU30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            return true;
         }
     }
-    return true;
+    return false;
 }
+
+
+
 
 /**
  * @brief See3CAM_CU30::getOrientation - getting flip mode from the camera
@@ -849,56 +501,32 @@ bool See3CAM_CU30::setOrientationBackgrndFn(See3CAM_CU30 *see3camcu30obj, bool h
  */
 bool See3CAM_CU30::getOrientation()
 {
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    uint flipMirrorMode;
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-    //Set the Report Number
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera control id */
     g_out_packet_buf[2] = GET_ORIENTATION_CU30; /* Get orientation command */
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
 
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==GET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==GET_ORIENTATION_CU30 &&
-                g_in_packet_buf[6]==GET_SUCCESS) {
-                    flipMirrorMode = g_in_packet_buf[2];
-                    emit flipMirrorModeChanged(flipMirrorMode);
-                    timeout = false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){        
+        if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==GET_ORIENTATION_CU30 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {\
+            emit flipMirrorModeChanged(g_in_packet_buf[2]);
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 /**
@@ -908,54 +536,31 @@ bool See3CAM_CU30::getOrientation()
  */
 bool See3CAM_CU30::setFrameRateCtrlValue(uint frameRate)
 {
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
 
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
+    //Initialize buffers
+    initializeBuffers();
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* set camera control code */
     g_out_packet_buf[2] = SET_FRAME_RATE_CU30; /* set framerate control code */
     g_out_packet_buf[3] = frameRate; /* set framerate value */
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            perror("read");
-        } else {
-            if (g_in_packet_buf[6]==SET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==SET_FRAME_RATE_CU30 &&
-                g_in_packet_buf[2]==frameRate &&
-                g_in_packet_buf[6]==SET_SUCCESS) {
-                timeout=false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SET_FRAME_RATE_CU30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 /**
@@ -964,58 +569,33 @@ bool See3CAM_CU30::setFrameRateCtrlValue(uint frameRate)
  */
 bool See3CAM_CU30::getFrameRateCtrlValue()
 {
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    uint frameRateCtrlValue;
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-    //Set the Report Number
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* set camera control code */
     g_out_packet_buf[2] = GET_FRAME_RATE_CU30; /* get frame rate code */
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-
-        if (ret < 0) {
-            perror("read");
-        } else {
-            if (g_in_packet_buf[6]==GET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==GET_FRAME_RATE_CU30 &&
-                g_in_packet_buf[6]==GET_SUCCESS) {
-                    frameRateCtrlValue = g_in_packet_buf[2];
-                    emit frameRateCtrlValueReceived(frameRateCtrlValue);
-                    timeout = false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==GET_FRAME_RATE_CU30 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {\
+            emit frameRateCtrlValueReceived(g_in_packet_buf[2]);
+            return true;
         }
     }
-    return true;
+    return false;
 }
+
 
 /**
  * @brief See3CAM_CU30::setExposureCompensation - setting exposure compensation
@@ -1027,18 +607,17 @@ bool See3CAM_CU30::setExposureCompensation(unsigned int exposureCompValue){
         emit indicateExposureValueRangeFailure("Failure", "Given exposure compensation value is invalid");
         return false;
     }
+
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    //Initialize buffers
+    initializeBuffers();
 
-    //Set the Report Number
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
     g_out_packet_buf[2] = SET_EXPOSURE_COMPENSATION_CU30; /* set exposure compensation command */
     g_out_packet_buf[3] = (u_int8_t)((exposureCompValue & 0xFF000000) >> 24);
@@ -1046,43 +625,19 @@ bool See3CAM_CU30::setExposureCompensation(unsigned int exposureCompValue){
     g_out_packet_buf[5] = (u_int8_t)((exposureCompValue & 0x0000FF00) >> 8);
     g_out_packet_buf[6] = (u_int8_t)((exposureCompValue & 0x000000FF) >> 0);
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==SET_FAIL) {
-                emit indicateCommandStatus("Failure", "Failed to set exposure compensation value");
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==SET_EXPOSURE_COMPENSATION_CU30 &&
-                g_in_packet_buf[6]==SET_SUCCESS) {
-                emit indicateCommandStatus("Success", "Exposure compensation value is set successfully");
-                timeout=false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            emit indicateCommandStatus("Failure", "Failed to set exposure compensation value");
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SET_EXPOSURE_COMPENSATION_CU30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            emit indicateCommandStatus("Success", "Exposure compensation value is set successfully");
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 
@@ -1091,61 +646,37 @@ bool See3CAM_CU30::setExposureCompensation(unsigned int exposureCompValue){
  * @return true/false
  */
 bool See3CAM_CU30::getExposureCompensation(){
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0, exposureCompValue;
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    //Initialize buffers
+    initializeBuffers();
 
-    //Set the Report Number
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
-    g_out_packet_buf[2] = GET_EXPOSURE_COMPENSATION_CU30; /* get exposure compensation command */
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* set camera control code */
+    g_out_packet_buf[2] = GET_EXPOSURE_COMPENSATION_CU30; /* get exposure compensation code */
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
+    unsigned int exposureCompValue;
 
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==GET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==GET_EXPOSURE_COMPENSATION_CU30 &&
-                g_in_packet_buf[6]==GET_SUCCESS) {
-                exposureCompValue = (((u_int8_t)g_in_packet_buf[2]) << 24)
-                                    | (((u_int8_t)g_in_packet_buf[3]) << 16)
-                                    | (((u_int8_t)g_in_packet_buf[4]) << 8)
-                                    | (((u_int8_t)g_in_packet_buf[5]) << 0);
-                exposureCompValueReceived(exposureCompValue);
-                timeout=false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==GET_EXPOSURE_COMPENSATION_CU30 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {\
+            exposureCompValue = (((u_int8_t)g_in_packet_buf[2]) << 24)
+                                | (((u_int8_t)g_in_packet_buf[3]) << 16)
+                                | (((u_int8_t)g_in_packet_buf[4]) << 8)
+                                | (((u_int8_t)g_in_packet_buf[5]) << 0);
+            emit exposureCompValueReceived(exposureCompValue);
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 /**
@@ -1156,18 +687,17 @@ bool See3CAM_CU30::getExposureCompensation(){
  * @return true/false
  */
 bool See3CAM_CU30::setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect){
+
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    //Initialize buffers
+    initializeBuffers();
 
-    //Set the Report Number
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
     g_out_packet_buf[2] = SET_FACE_DETECT_RECT_CU30; /* set face detect Rect command */
 
@@ -1186,41 +716,17 @@ bool See3CAM_CU30::setFaceDetectionRect(bool enableFaceDetectRect, bool embedDat
     else
         g_out_packet_buf[5] = DISABLE_OVERLAY_RECT_CU30; /* disable overlay rect */
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==SET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==SET_FACE_DETECT_RECT_CU30 &&
-                g_in_packet_buf[6]==SET_SUCCESS) {
-                    timeout=false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SET_FACE_DETECT_RECT_CU30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 /**
@@ -1229,58 +735,31 @@ bool See3CAM_CU30::setFaceDetectionRect(bool enableFaceDetectRect, bool embedDat
  */
 bool See3CAM_CU30::getFaceDetectMode()
 {
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    uint faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect;
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-    //Set the Report Number
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
     g_out_packet_buf[2] = GET_FACE_DETECT_RECT_CU30; /* get face detect mode command */
 
-    ret = write(uvccamera::hid_fd , g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==GET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==GET_FACE_DETECT_RECT_CU30 &&
-                g_in_packet_buf[6]==GET_SUCCESS) {
-                    faceDetectMode = g_in_packet_buf[2];
-                    faceDetectEmbedDataValue = g_in_packet_buf[3];
-                    faceDetectOverlayRect = g_in_packet_buf[4];
-                    emit faceDetectModeValue(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect);                   
-                    timeout = false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==GET_FACE_DETECT_RECT_CU30 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {\
+            emit faceDetectModeValue(g_in_packet_buf[2], g_in_packet_buf[3], g_in_packet_buf[4]);
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 
@@ -1292,26 +771,22 @@ bool See3CAM_CU30::getFaceDetectMode()
  * @return true/false
  */
 bool See3CAM_CU30::setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue){
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-
     if((SMILE_THRESHOLD_MIN > thresholdValue || SMILE_THRESHOLD_MAX < thresholdValue) && enableSmileDetect){
         emit indicateSmileThresholdRangeFailure("Failure", "Given smile detection threshold value is invalid.");
         return false;
     }
 
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
+    //Initialize buffers
+    initializeBuffers();
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-
-    //Set the Report Number
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
-    g_out_packet_buf[2] = SET_SMILE_DETECTION_CU30; /* set smile detect command */
+    g_out_packet_buf[2] = SET_SMILE_DETECTION_CU30; /* set face detect Rect command */
 
     if(enableSmileDetect)
         g_out_packet_buf[3] = ENABLE_SMILE_DETECT_CU30; /* enable smile detect */
@@ -1325,43 +800,19 @@ bool See3CAM_CU30::setSmileDetection(bool enableSmileDetect, bool embedData, uin
     else
         g_out_packet_buf[5] = DISABLE_EMBED_DATA_CU30; /* disable embed data */
 
-
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==SET_FAIL) {
-                emit indicateCommandStatus("Failure", "Failed to set smile detection threshold");
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==SET_SMILE_DETECTION_CU30 &&
-                g_in_packet_buf[6]==SET_SUCCESS) {
-                emit indicateCommandStatus("Success", "Smile detection threshold is set successfully");
-                timeout=false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            emit indicateCommandStatus("Failure", "Failed to set smile detection threshold");
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SET_SMILE_DETECTION_CU30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            emit indicateCommandStatus("Success", "Smile detection threshold is set successfully");
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 
@@ -1371,59 +822,31 @@ bool See3CAM_CU30::setSmileDetection(bool enableSmileDetect, bool embedData, uin
  */
 bool See3CAM_CU30::getSmileDetectMode()
 {
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    uint smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue;
+    //Initialize buffers
+    initializeBuffers();
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-    //Set the Report Number
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* Camera control id */
     g_out_packet_buf[2] = GET_SMILE_DETECTION_CU30; /* Get smile detection */
 
-    ret = write(uvccamera::hid_fd , g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-    while(timeout)
-    {
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==GET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==GET_SMILE_DETECTION_CU30 &&
-                g_in_packet_buf[6]==GET_SUCCESS) {
-                    smileDetectMode = g_in_packet_buf[2];
-                    smileDetectThresholdValue = g_in_packet_buf[3];
-                    smileDetectEmbedDataValue = g_in_packet_buf[4];
-                    emit smileDetectModeValue(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue);
-                    timeout = false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==GET_SMILE_DETECTION_CU30 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {\
+            emit smileDetectModeValue(g_in_packet_buf[2], g_in_packet_buf[3], g_in_packet_buf[4]);
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 /**
@@ -1432,57 +855,30 @@ bool See3CAM_CU30::getSmileDetectMode()
  */
 bool See3CAM_CU30::setToDefault(){
 
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    //Initialize buffers
+    initializeBuffers();
 
-    //Set the Report Number
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
-    g_out_packet_buf[2] = SET_TO_DEFAULT_CU30; /* set to default */
+    g_out_packet_buf[2] = SET_TO_DEFAULT_CU30; /* set to default command */
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
-        return false;
-    }
-
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
-
-
-    while(timeout)
-    {
-
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==SET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130 &&
-                g_in_packet_buf[1]==SET_TO_DEFAULT_CU30 &&
-                g_in_packet_buf[6]==SET_SUCCESS) {
-                    timeout=false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SET_TO_DEFAULT_CU30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 
@@ -1494,19 +890,16 @@ bool See3CAM_CU30::setToDefault(){
  */
 bool See3CAM_CU30::enableDisableFaceRectangle(bool enableFaceRect){
 
+    // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    bool timeout = true;
-    int ret =0;
-    unsigned int start, end = 0;
-    uint inputFaceRectMode = ENABLE_FACE_RECTANGLE_CU30;
 
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    //Initialize buffers
+    initializeBuffers();
 
-    //Set the Report Number
+    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera id */
     g_out_packet_buf[2] = ENABLE_DISABLE_MODE_FACE_RECTANGLE_CU30; /* pass enable/disable command */
     if(enableFaceRect)
@@ -1514,42 +907,89 @@ bool See3CAM_CU30::enableDisableFaceRectangle(bool enableFaceRect){
     else
         g_out_packet_buf[3] = DISABLE_FACE_RECTANGLE_CU30; /* disable auto focus rect */
 
-    inputFaceRectMode = g_out_packet_buf[3];
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==ENABLE_DISABLE_MODE_FACE_RECTANGLE_CU30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            return true;
+        }
+    }
+    return false;
+}
 
-    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
-
-    if (ret < 0) {
-        perror("write");
+/**
+ * @brief See3CAM_CU30::setFlashState - setting flash mode to the camera
+ * return true - success /false - failure
+ */
+bool See3CAM_CU30::setFlashState(flashStateValues flashMode)
+{
+    if(uvccamera::hid_fd < 0)
+    {
         return false;
     }
 
-    /* Read the Status code from the device */
-    start = uvc.getTickCount();
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
 
-    while(timeout)
-    {
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* set camera control code */
+    g_out_packet_buf[2] = SETFLASH_STATUS_CU30; /* set flash status command code */
+    g_out_packet_buf[3] = flashMode; /* set flash state [off/torch/storbe] */
 
-        /* Get a report from the device */
-        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
-
-        if (ret < 0) {
-            //perror("read");
-        } else {
-            if (g_in_packet_buf[6]==SET_FAIL) {                
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
-                g_in_packet_buf[1]==ENABLE_DISABLE_MODE_FACE_RECTANGLE_CU30 &&
-                g_in_packet_buf[2]==inputFaceRectMode &&
-                g_in_packet_buf[6]==SET_SUCCESS) {                
-                    timeout=false;
-            }
-        }
-        end = uvc.getTickCount();
-        if(end - start > TIMEOUT)
-        {
-            timeout = false;
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==SETFLASH_STATUS_CU30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {
+            return true;
         }
     }
-    return true;
+    return false;
+}
+
+
+/**
+ * @brief See3CAM_CU30::getFlashState - getting flash state from the camera
+ * return true - success /false - failure
+ */
+bool See3CAM_CU30::getFlashState()
+{
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    memset(g_in_packet_buf, 0x00, sizeof(g_in_packet_buf));
+
+    //Set the Report Number
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU30; /* camera control id */
+    g_out_packet_buf[2] = GETFLASH_STATUS_CU30; /* get strobe mode */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30 &&
+            g_in_packet_buf[1]==GETFLASH_STATUS_CU30 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {
+            emit flashModeValue(g_in_packet_buf[2]);
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_CU30::initializeBuffers - Initialize input and output buffers
+ */
+void See3CAM_CU30::initializeBuffers(){
+
+    //Initialize input and output buffers
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    memset(g_in_packet_buf, 0x00, sizeof(g_in_packet_buf));
 }

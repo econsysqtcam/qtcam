@@ -62,12 +62,28 @@ Item {
         }
     }
 
+    Timer {
+        id: enableSettings
+        interval: 3000
+        onTriggered: {
+            root.enableAllSettingsTab()
+            stop()
+        }
+    }
+
     Connections
     {
         target: root
         onTakeScreenShot:
         {
             root.imageCapture(CommonEnums.BURST_SHOT);
+            // Added by Sankari: 16 Mar 2018
+            // Disable saving image when trigger mode is selected initially and capturing image then switch to master mode
+            if(cameraModeSlave.checked){
+               root.disableSaveImage()
+               // In trigger mode, if frames are not coming then after 3 seconds enable all settings
+               enableSettings.start()
+            }
         }
         onGetVideoPinStatus:
         {
