@@ -419,6 +419,10 @@ public slots:
     bool setUvcExtControlValue(struct uvc_xu_control_query xquery);
 
 signals:
+    // Added by Sankari: 12 Feb 2018
+    // Get the bus info details and send to qml for selected camera
+    void pciDeviceBus(QString businfo);
+
     void logDebugHandle(QString _text);
     void logCriticalHandle(QString _text);
     void titleTextChanged(QString _title,QString _text);

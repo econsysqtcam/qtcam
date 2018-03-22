@@ -107,6 +107,15 @@ void Videostreaming::setDevice(QString deviceName) {
         m_convertData = v4lconvert_create(fd());
         m_buftype= V4L2_BUF_TYPE_VIDEO_CAPTURE;
         openSuccess = true;
+
+        // Added by Sankari: 12 Feb 2018
+        // Get the bus info details and send to qml for selected camera
+        struct v4l2_capability querycapability;
+        if (querycap(querycapability)) {
+            QString bus(reinterpret_cast< char* >(querycapability.bus_info));
+            qDebug()<<"Bus info"<<bus;
+            emit pciDeviceBus(bus);
+        }
     } else {
         emit logCriticalHandle("Device Opening Failed - "+deviceName);
     }

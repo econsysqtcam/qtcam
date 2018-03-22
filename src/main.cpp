@@ -45,6 +45,7 @@
 #include "see3cam_30.h"
 #include "uvcExtCx3sni.h"
 #include "ascella.h"
+#include "keyEventReceive.h"
 #include "about.h"
 #include "common.h"
 #include "common_enums.h"
@@ -63,6 +64,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     qmlRegisterType<Cameraproperty>("econ.camera.property",1,0,"Camproperty");
     qmlRegisterType<Videostreaming>("econ.camera.stream", 1, 0, "Videostreaming");
+    qmlRegisterType<CamKeyEventReceive>("econ.camera.keyEvent", 1, 0, "KeyEventRecv");
     qmlRegisterType<uvccamera>("econ.camera.uvcsettings", 1, 0, "Uvccamera");
     qmlRegisterType<UVCExtCx3SNI>("econ.camera.uvcExtsettings", 1, 0, "UvcExtcamera");
     qmlRegisterType<See3CAM_11CUG>("econ.camera.see3cam11", 1, 0, "See3Cam11");    

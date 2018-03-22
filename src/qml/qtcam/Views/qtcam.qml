@@ -26,6 +26,7 @@ import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.1
 import econ.camera.property 1.0
 import econ.camera.stream 1.0
+import econ.camera.keyEvent 1.0
 import "../JavaScriptFiles/tempValue.js" as JS
 import cameraenum 1.0
 
@@ -81,6 +82,9 @@ Rectangle {
     property variant stillSettingsRootObject
     property variant videoSettingsRootObject
     property variant captureVideoRecordRootObject
+
+    property variant pciBusCamDetails
+
     //Disabling side bar controls - Added below by Dhurka
 	signal sidebarVisibleStatus(variant status);
     signal cameraSettingsTabEnable(variant status);
@@ -270,6 +274,11 @@ Rectangle {
         Videostreaming {
             id: vidstreamproperty
             focus: true
+            // Added by Sankari:12 Feb 2018 - Get the Pci bus info for selected camera
+            onPciDeviceBus:{
+                pciBusCamDetails = businfo
+            }
+
             onTitleTextChanged:{
                 vidstreamproperty.enabled = true
                 captureBtnEnable(true)
@@ -300,10 +309,14 @@ Rectangle {
             }
 
             onDeviceUnplugged: {
+                // Added by Sankari:12 Feb 2018 - Get the Pci bus info for selected camera
+                keyEvent.stopGetKeyFromCamera()
+
                 captureBtnEnable(false)
                 videoRecordBtnEnable(false)
                 keyEventFiltering = true
                 statusText = ""
+                messageDialog.visible = false
                 messageDialog.title = _title.toString()
                 messageDialog.text = _text.toString()
                 messageDialog.open()
@@ -526,6 +539,10 @@ Rectangle {
                 if(currentIndex.toString() != "-1" && currentIndex.toString() != "0") {                    
                     if(oldIndex!=currentIndex) {
                         oldIndex = currentIndex
+
+                        // Added by Sankari: 12 Feb 2018 : stop Getting key from camera.
+                        keyEvent.stopGetKeyFromCamera()
+
                         //Added by Dhurka - 20th Oct 2016
                         cameraControlPropertyChange();
                         // Added by Sankari: 20 Apr 2017 - If we unplug and plug the camera, the video color space is not updated properly
@@ -552,7 +569,10 @@ Rectangle {
                         //Added by Dhurka - 20th Oct 2016
                         disableImageSettings()
                         //Added by Dhurka - Here commonly open HID device instead of open every QML file - 17th Oct 2016
-                        openHIDDevice(selectedDeviceEnumValue);                        
+                        openHIDDevice(selectedDeviceEnumValue);
+
+                        // Added by Sankari: 12 Feb 2018 - open camera key event file node using pci bus info.
+                        camproperty.openEventNode(pciBusCamDetails)
                         updateFPS(stillSettingsRootObject.stillClorComboValue, stillSettingsRootObject.stillOutputTextValue)
                         vidstreamproperty.startAgain()                        
                         vidstreamproperty.width = stillSettingsRootObject.stillOutputTextValue.split("x")[0].toString()
@@ -568,6 +588,9 @@ Rectangle {
                         vidstreamproperty.masterModeEnabled()
                         createExtensionUnitQml(selectedDeviceEnumValue)
                         getStillImageFormats();
+
+                        // Added by Sankari: 12 Feb 2018 - initialize a socket notifier to get key from camera.
+                        keyEvent.initializeToGetKey();
                     }
                 }
                 else {
@@ -750,6 +773,18 @@ Rectangle {
             warningDialog.title = qsTr(title)
             warningDialog.text = qsTr(text)
             warningDialog.open()
+        }
+    }
+
+    // Added by Sankari: 12 Feb 2018 - Get the event from keyEventReceive.cpp
+    KeyEventRecv{
+        id: keyEvent
+        onCameraTriggerKeyReleased:{
+            m_Snap = false
+            takeScreenShot(true);
+        }
+        onCameraTriggerKeyPressed: {
+
         }
     }
 	
@@ -1091,26 +1126,14 @@ Rectangle {
         }
         camproperty.closeLibUsbDeviceAscella()
         setMasterMode();
+        // Added by Sankari: 12 Feb 2018 - stop Getting key from camera.
+        keyEvent.stopGetKeyFromCamera()
     }    
 
     Keys.onReleased: {
         if(event.key === Qt.Key_I) {
             if((!keyEventFiltering)) {
                 mouseClickCapture()
-            }
-        } else if(event.key === Qt.Key_WebCam){            
-            m_Snap = false
-            if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_12CUNIR){
-                takeScreenShot(true);
-                event.accepted = true
-            }
-            else{                
-                if(webcamKeyAccept) {                    
-                    //Take screen shot for camera in the corressponding qml
-                    takeScreenShot(true);
-                    webcamKeyAccept = false
-                }
-                event.accepted = true
             }
         }
     }

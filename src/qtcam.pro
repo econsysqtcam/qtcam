@@ -37,7 +37,8 @@ SOURCES += main.cpp \
     see3cam_cu135.cpp \
     see3cam_cu40.cpp\
     see3cam_cu20.cpp\
-    uvcExtCx3sni.cpp
+    uvcExtCx3sni.cpp \
+    keyEventReceive.cpp
 
 # Installation path
 # target.path =
@@ -75,25 +76,45 @@ HEADERS += \
     see3cam_cu135.h \
     see3cam_cu40.h\
     see3cam_cu20.h\
-    uvcExtCx3sni.h
+    uvcExtCx3sni.h \
+    keyEventReceive.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
                 /usr/include \
                 /usr/include/libusb-1.0
 
+UNAME_MACHINE_32BIT = $$system(dpkg --print-architecture | grep -o "i386")
+UNAME_MACHINE_64BIT = $$system(dpkg --print-architecture | grep -o "amd64")
 
+contains(UNAME_MACHINE_64BIT, amd64):{
+    message("x86_64 bit libs")
+    LIBS += -lv4l2 -lv4lconvert \
+        -lavutil \
+        -lavcodec \
+        -lavformat \
+        -lswscale \
+        -ludev \
+        -lusb \
+        -lusb-1.0 \
+        -L/usr/lib/ -lturbojpeg \
+        -L/usr/lib/x86_64-linux-gnu/ -levdev
+}
 
-LIBS += -lv4l2 -lv4lconvert \
+contains(UNAME_MACHINE_32BIT, i386):{
+    message("x86_32 bit libs")
+    LIBS += -lv4l2 -lv4lconvert \
         -lavutil \
         -lavcodec \
         -lavformat \
         -lswscale \
         -ludev \
         -lusb-1.0 \
-        -L/usr/lib/ -lturbojpeg
+        -L/usr/lib/ -lturbojpeg \
+        -L/usr/lib/i386-linux-gnu/ -levdev
+}
 
-
+QMAKE_CXX += -ggdb
 QMAKE_CFLAGS_THREAD = -D__STDC_CONSTANT_MACROS      #For Ubuntu 12.04 compilation
 QMAKE_CXXFLAGS_THREAD = -D__STDC_CONSTANT_MACROS    #For Ubuntu 12.04 compilation
 

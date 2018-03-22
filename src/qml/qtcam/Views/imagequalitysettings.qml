@@ -822,6 +822,7 @@ Item {
                         onTextChanged: {
                              if(exposure_value.text.length > 0){
                                  if(root.selectedDeviceEnumValue == CommonEnums.CX3_UVC_CAM){
+                                 maximumLength = 5
                                  expLocalval1 = text.toString()
                                  expLocalVal = expLocalval1
                                  for(var i=0; i<exposureOrigAscella.length; i++){
@@ -831,11 +832,11 @@ Item {
                                          break
                                      }
                                  }
-                                 if(i == exposureOrigAscella.length){
+                                 /*if(i == exposureOrigAscella.length){
                                      messageDialog.title = qsTr("Failure")
                                      messageDialog.text = qsTr("Invalid exposure value")
                                      messageDialog.open()
-                                 }
+                                 }*/
                                  }
                                  else{
                                      exposure_Slider.value = exposure_value.text

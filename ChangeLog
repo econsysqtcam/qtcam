@@ -1,3 +1,7 @@
+Qtcam Application - 16.0.9
+-----------------------------
+* Fixed issue of not able to capture images when external trigger button is pressed.
+
 Qtcam Application - 16.0.8
 -----------------------------
 * Added face ROI and flash control features in See3cam_cu30 camera.

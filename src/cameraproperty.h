@@ -58,6 +58,7 @@ public:
 
     static QStringListModel modelCam;
     static bool saveLog;
+    static int event_fd;
 
 private:
     QDir qDir;
@@ -133,6 +134,9 @@ public slots:
     // Added by Sankari: To notify user about warning : This slot will be called when warning from uvccamera.cpp[Ex: hid access needs sudo ]
     // 07 Dec 2017
     void notifyUser(QString title, QString text);
+
+     // open event node file path  - open device event path file Ex: /dev/input/by-path/pci-0000:00:1a.0-usb-0:1.4:1.0-event
+    void openEventNode(QString businfo);
 
 signals:
 
