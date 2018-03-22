@@ -95,7 +95,6 @@ contains(UNAME_MACHINE_64BIT, amd64):{
         -lavformat \
         -lswscale \
         -ludev \
-        -lusb \
         -lusb-1.0 \
         -L/usr/lib/ -lturbojpeg \
         -L/usr/lib/x86_64-linux-gnu/ -levdev
