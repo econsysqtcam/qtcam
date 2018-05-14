@@ -86,6 +86,8 @@ INCLUDEPATH +=  $$PWD/v4l2headers/include \
 
 UNAME_MACHINE_32BIT = $$system(dpkg --print-architecture | grep -o "i386")
 UNAME_MACHINE_64BIT = $$system(dpkg --print-architecture | grep -o "amd64")
+BOARD_ARM64 = $$system(dpkg --print-architecture | grep -o "arm64")
+
 
 contains(UNAME_MACHINE_64BIT, amd64):{
     message("x86_64 bit libs")
@@ -111,6 +113,19 @@ contains(UNAME_MACHINE_32BIT, i386):{
         -lusb-1.0 \
         -L/usr/lib/ -lturbojpeg \
         -L/usr/lib/i386-linux-gnu/ -levdev
+}
+
+contains(BOARD_ARM64, arm64):{
+    message("Arm64 libs")
+    LIBS += -lv4l2 -lv4lconvert \
+        -lavutil \
+        -lavcodec \
+        -lavformat \
+        -lswscale \
+        -ludev \
+        -lusb-1.0 \
+        -L/usr/lib/ -lturbojpeg \
+        -L/usr/lib/aarch64-linux-gnu/ -levdev
 }
 
 QMAKE_CXX += -ggdb
