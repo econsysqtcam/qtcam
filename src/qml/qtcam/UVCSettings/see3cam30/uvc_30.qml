@@ -1237,12 +1237,12 @@ Item {
             smileThreshold.text = smileDetectThresholdValue
             if(smileDetectMode == See3Cam30.SmileDetectEnable){
                 smileDetectEnable.checked = true
-                if(smileDetectEmbedDataValue == See3Cam30.smileDetectEmbedDataEnable){
+                if(smileDetectEmbedDataValue == See3Cam30.SmileDetectEmbedDataEnable){
                     smileDetectEmbedData.checked = true
                 }
             }else if(smileDetectMode == See3Cam30.SmileDetectDisable){
                 smileDetectDisable.checked = true
-                if(smileDetectEmbedDataValue == See3Cam30.smileDetectEmbedDataEnable){
+                if(smileDetectEmbedDataValue == See3Cam30.SmileDetectEmbedDataEnable){
                     smileDetectEmbedData.checked = true
                 }else{
                     smileDetectEmbedData.checked = false

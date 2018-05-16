@@ -1297,12 +1297,12 @@ Item {
             smileThreshold.text = smileDetectThresholdValue
             if(smileDetectMode == See3Cam130.SmileDetectEnable){
                 smileDetectEnable.checked = true
-                if(smileDetectEmbedDataValue == See3Cam130.smileDetectEmbedDataEnable){
+                if(smileDetectEmbedDataValue == See3Cam130.SmileDetectEmbedDataEnable){
                     smileDetectEmbedData.checked = true
                 }
             }else if(smileDetectMode == See3Cam130.SmileDetectDisable){
                 smileDetectDisable.checked = true
-                if(smileDetectEmbedDataValue == See3Cam130.smileDetectEmbedDataEnable){
+                if(smileDetectEmbedDataValue == See3Cam130.SmileDetectEmbedDataEnable){
                     smileDetectEmbedData.checked = true
                 }else{
                     smileDetectEmbedData.checked = false

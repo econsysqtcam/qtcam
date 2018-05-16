@@ -1341,12 +1341,12 @@ Item {
             smileThreshold.text = smileDetectThresholdValue
             if(smileDetectMode == See3CamCu135.SmileDetectEnable){
                 smileDetectEnable.checked = true
-                if(smileDetectEmbedDataValue == See3CamCu135.smileDetectEmbedDataEnable){
+                if(smileDetectEmbedDataValue == See3CamCu135.SmileDetectEmbedDataEnable){
                     smileDetectEmbedData.checked = true
                 }
             }else if(smileDetectMode == See3CamCu135.SmileDetectDisable){
                 smileDetectDisable.checked = true
-                if(smileDetectEmbedDataValue == See3CamCu135.smileDetectEmbedDataEnable){
+                if(smileDetectEmbedDataValue == See3CamCu135.SmileDetectEmbedDataEnable){
                     smileDetectEmbedData.checked = true
                 }else{
                     smileDetectEmbedData.checked = false

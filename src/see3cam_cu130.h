@@ -185,8 +185,8 @@ public:
     Q_ENUMS(camSmileDetectMode)
 
     enum camSmileDetectEmbedDataMode {
-        smileDetectEmbedDataEnable = 0x01,
-        smileDetectEmbedDataDisable = 0x00
+        SmileDetectEmbedDataEnable = 0x01,
+        SmileDetectEmbedDataDisable = 0x00
     };
     Q_ENUMS(camSmileDetectEmbedDataMode)
 

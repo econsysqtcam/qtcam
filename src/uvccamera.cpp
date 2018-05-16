@@ -151,7 +151,7 @@ int uvccamera::findEconDevice(QString parameter)
                     "usb_device");
         if (!pdev) {
             emit logHandle(QtCriticalMsg,"Unable to find parent usb device.");
-	    return -1;
+	    continue;
         }
 
         /* From here, we can call get_sysattr_value() for each file
