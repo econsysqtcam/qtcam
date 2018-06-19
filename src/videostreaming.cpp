@@ -113,7 +113,6 @@ void Videostreaming::setDevice(QString deviceName) {
         struct v4l2_capability querycapability;
         if (querycap(querycapability)) {
             QString bus(reinterpret_cast< char* >(querycapability.bus_info));
-            qDebug()<<"Bus info"<<bus;
             emit pciDeviceBus(bus);
         }
     } else {

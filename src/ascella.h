@@ -31,6 +31,7 @@ class ASCELLA: public QObject {
     Q_ENUMS(camLimitMaxFRMode)
     Q_ENUMS(camColorMode)
     Q_ENUMS(camBinnResizeMode)
+    Q_ENUMS(camQFactorMode)
 
 private:
     unsigned char g_out_packet_buf[ASCELLA_BUFLEN];
@@ -78,6 +79,12 @@ public:
         Binned = 1,
         Resized = 2
     };
+
+    enum camQFactorMode {
+        QFactorAuto = 0x01,
+        QFactorManual = 0x00
+    };
+
 
 signals:
     void logHandle(QtMsgType,QString);
@@ -133,9 +140,11 @@ signals:
 
     void setBinnResizeSelect(QString binResizeSelect);
     void setCurbinnResizeSelect(QString binResizeSelect);
+    void setCurrentQfactorMode(QString curqFactorValue, camQFactorMode curqFactorMode);
 
     void setBinnResizeEnableDisable(QString mode);
     void setCurrbinnResizeEnableDisable(QString mode);
+    void qfactorAutoEnable();
 
 public slots:
     /**
@@ -236,6 +245,8 @@ public slots:
      * @brief setLedValueWithExternalHwButton
      */
    // void setLedValueWithExternalHwButton();
+
+    void setQFactor(camQFactorMode qFactorMode, QString qFactorValue);
 
     /**
      * @brief getFirmwareVersion

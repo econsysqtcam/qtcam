@@ -422,6 +422,44 @@ void ASCELLA::setBinnedResizedMode(camBinnResizeMode mode){
 
 }
 
+void ASCELLA::setQFactor(camQFactorMode qFactorMode, QString qFactorValue){
+
+    int bytesSent;
+
+    if(uvccamera::handle == NULL){
+        emit logHandle(QtCriticalMsg, "setQFactor: Handle is Null");
+        return void();
+    }
+
+    if(qFactorMode == QFactorAuto || qFactorMode == QFactorManual){
+        memset(g_out_packet_buf, 0x00, ASCELLA_BUFLEN);
+
+        g_out_packet_buf[1] = CX3UVC_SET_QFACTOR;
+        g_out_packet_buf[2] = qFactorMode;
+        g_out_packet_buf[3] = (unsigned char)qFactorValue.toUInt();
+
+        bytesSent = libusb_control_transfer(uvccamera::handle,
+                                            0x21,
+                                            0x09,
+                                            0x200,
+                                            0x2,
+                                            g_out_packet_buf,
+                                            ASCELLA_BUFLEN,
+                                            ASCELLA_TIMEOUT);
+
+        if(0 > bytesSent){
+            emit logHandle(QtCriticalMsg, "setQFactor: libusb_control_transfer set command failed");
+            return void();
+        }
+    }
+    else{
+        emit logHandle(QtCriticalMsg, "setQFactor: setQFactor is not in range");
+        return void();
+    }
+
+}
+
+
 #if 0
 void ASCELLA::setRollValue(QString rollValue){
     int bytesSent;
@@ -515,6 +553,10 @@ void ASCELLA::setDefaultValues(){
     emit setAfAreaCenterMode();
     usleep(50000);
 
+    /* Enabling qfactor auto mode */
+    emit qfactorAutoEnable();
+    usleep(50000);
+
 }
 
 void ASCELLA::getDefaultValues(u_int8_t *pDefaultValue){
@@ -576,6 +618,8 @@ void ASCELLA::getDefaultValues(u_int8_t *pDefaultValue){
     pDefaultValue[18] = 0x01; //18 - 0x01 //B&W: Previous B&W Fix Threshold Value
     pDefaultValue[19] = g_in_packet_buf[20]; //19 - Enable binning/resize; 0 for disable, 1 for enable
     pDefaultValue[20] = g_in_packet_buf[21]; //20 - 1 for binning, 2 for resize
+    pDefaultValue[21] = g_in_packet_buf[29]; //29: - 1	 Jpeg Compression Auto Control: 1 for Enable, 0 for disable
+    pDefaultValue[22] = g_in_packet_buf[30]; //30: - 97	 Jpeg Compression Q-Factor: 1-97
 }
 
 
@@ -699,14 +743,15 @@ void ASCELLA::getCurrentValues(u_int8_t *pCurrentValue){
     // pCurrentValue[19] - enable binning/resizing
     // pCurrentValue[20] - select binn or resize mode
     // pCurrentValue[21 - 27] -  firmware version
-    for(int j = 0;j < 18 ; j++){
-        pCurrentValue[i++] = g_in_packet_buf[11 + j];
+    // pCurrentValue[29 - 30] -  Jpeg Compression mode and value
+    for(int j = 0;j < 38 ; j++){
+        pCurrentValue[i++] = g_in_packet_buf[11 + j];        
     }
 }
 
 
 void ASCELLA::setCurrentValues(QString vidResolution){
-    u_int8_t currentValue[30], noiseValue;
+    u_int8_t currentValue[45], noiseValue, qFactorValue;
     u_int16_t position = 0;
     QString curPosition, ledCurBrightness;
     int vidWidth, vidHeight;
@@ -820,11 +865,21 @@ void ASCELLA::setCurrentValues(QString vidResolution){
     QString binResizeSelect = QString::number(currentValue[20]);
     emit setCurbinnResizeSelect(binResizeSelect);
 
+    /* Qfactor */
+    qFactorValue = currentValue[30];
+    QString qFactorValueString = QString::number(qFactorValue);
+
+    if(currentValue[29] == QFactorAuto){ // auto
+        emit setCurrentQfactorMode(qFactorValueString, QFactorAuto);
+    }else {
+        QString qFactorValueString = QString::number(qFactorValue);
+        emit setCurrentQfactorMode(qFactorValueString, QFactorManual);
+    }
 }
 
 
 void ASCELLA::getFirmwareVersion(){
-    u_int8_t currentValue[30];
+    u_int8_t currentValue[45];
 
     emit logHandle(QtDebugMsg,"Firmware version:");
     _title = tr("Firmware Version");

@@ -16,6 +16,8 @@ Item {
     property int vidWidth;
     property int vidHeight;
     property bool settingWhenUpdateUI: true
+    property int qfactorMin: 1
+    property int qfactorMax: 97
 
     // Added by Sankari: 12 Jan 2017
     // Not getting correct current values from camera for binned / resized mode. So delay 1sec is added
@@ -1007,6 +1009,90 @@ Item {
                     }
                 }
             }
+            Row{
+                 Text {
+                     id: qFactorGrpTxt
+                     text: "        --- QFactor mode ---"
+                     font.pixelSize: 14
+                     font.family: "Ubuntu"
+                     color: "#ffffff"
+                     smooth: true
+                     opacity: 0.50196078431373
+                 }
+            }
+            Row{
+                spacing:25
+                ExclusiveGroup { id: qFactorgrp }
+                RadioButton {
+                    exclusiveGroup: qFactorgrp
+                    id: qFactorAuto
+                    text: "Auto"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked:{
+                        ascella.setQFactor(Ascella.QFactorAuto, "0x00");
+                    }
+                    onCheckedChanged:{
+                        if(checked && settingWhenUpdateUI){                            
+                            ascella.setQFactor(Ascella.QFactorAuto, "0x00");
+                        }
+                    }
+                    Keys.onReturnPressed: {
+                    }
+                }
+                RadioButton {
+                    exclusiveGroup: qFactorgrp
+                    id: qFactorManual
+                    text: "Manual"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked: {
+                        ascella.setQFactor(Ascella.QFactorManual, qFactorvalue.text);                         
+                    }
+                    Keys.onReturnPressed: {
+
+                    }
+                }
+
+            }
+            Row{
+                spacing:25
+                Slider {
+                    activeFocusOnPress: true
+                    updateValueWhileDragging: false
+                    id: qFactorSlider
+                    enabled: qFactorManual.checked ? 1 : 0
+                    opacity: enabled ? 1 : 0.1
+                    width: 150
+                    stepSize: 1
+                    style:econSliderStyle
+                    minimumValue: qfactorMin
+                    maximumValue: qfactorMax
+                    onValueChanged:  {
+                        qFactorvalue.text = qFactorSlider.value
+                        if(settingWhenUpdateUI){
+                            ascella.setQFactor(Ascella.QFactorManual, qFactorvalue.text)                            
+                        }
+                    }
+                }
+                TextField {
+                    id: qFactorvalue
+                    text: qFactorSlider.value
+                    font.pixelSize: 10
+                    font.family: "Ubuntu"
+                    smooth: true
+                    horizontalAlignment: TextInput.AlignHCenter
+                    enabled: false
+                    opacity: qFactorManual.checked ? 1 : 0.1
+                    style: econTextFieldStyle
+                    validator: IntValidator {bottom: qFactorSlider.minimumValue; top: qFactorSlider.maximumValue}
+                    onTextChanged: {
+                        if(text != ""){
+                            qFactorSlider.value = qFactorvalue.text
+                        }
+                    }
+                }
+            }
             RowLayout{
                 Image {
                     id: hideImage1
@@ -1161,6 +1247,12 @@ Item {
             settingWhenUpdateUI = true
             reduceNoiseAuto.checked = true
         }
+
+        onQfactorAutoEnable:{
+            settingWhenUpdateUI = true
+            qFactorAuto.checked = true
+        }
+
         onNormalSceneModeEnable:{
             settingWhenUpdateUI = true
             scenenormal.checked = true
@@ -1263,6 +1355,18 @@ Item {
             settingWhenUpdateUI = false
             reduceNoiseFixvalue.text = curNoiseValue
         }
+
+        onSetCurrentQfactorMode:{
+            if(curqFactorMode == Ascella.QFactorAuto){
+                qFactorAuto.checked = true
+            }else if(curqFactorMode == Ascella.QFactorManual){
+                qFactorManual.checked = true
+            }
+            settingWhenUpdateUI = false
+            qFactorSlider.value = curqFactorValue
+            qFactorvalue.text = curqFactorValue
+        }
+
         onSetCurSceneMode:{
             if(curSceneMode == Ascella.SceneNormal){
                 scenenormal.checked = true

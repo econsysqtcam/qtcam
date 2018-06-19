@@ -1,3 +1,7 @@
+Qtcam Application - 16.0.10
+-----------------------------
+* Added QFactor control in ascella camera[extension unit].
+
 Qtcam Application - 16.0.9
 -----------------------------
 * Fixed issue of not able to capture images when external trigger button is pressed.
