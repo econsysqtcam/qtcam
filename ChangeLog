@@ -1,3 +1,7 @@
+Qtcam Application - 16.0.11
+-----------------------------
+* Fixed issue of "preview turns into white" when clicking image quality settings and hardware default in see3cam_11cug camera.
+
 Qtcam Application - 16.0.10
 -----------------------------
 * Added QFactor control in ascella camera[extension unit].

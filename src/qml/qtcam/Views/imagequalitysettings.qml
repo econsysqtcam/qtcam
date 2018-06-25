@@ -1748,6 +1748,7 @@ Item {
             menuitems.pop() //Control Name should be removed
             powerLine.opacity = 1
             powerLineCombo.opacity = 1
+	    powerLineComboEnable =  false	    // To avoid setting power line freq when get the control values 
             powerLineCombo.model = menuitems
             powerLineCombo.currentIndex = controlDefaultValue
             while(menuitems.pop()){}
@@ -1763,6 +1764,7 @@ Item {
             }
             exposure_auto.opacity = 1
             exposureCombo.opacity = 1
+	    exposureComboEnable = false // To avoid setting exposure when get the control values 
             exposureCombo.model = menuitems // On index changed is called for every time.
             while(menuitems.pop()){}
             exposureAutoControlId = controlID

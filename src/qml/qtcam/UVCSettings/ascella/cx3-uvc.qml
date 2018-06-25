@@ -1004,7 +1004,7 @@ Item {
                     validator: IntValidator {bottom: applyMaxFrameRateSlider.minimumValue; top: applyMaxFrameRateSlider.maximumValue}
                     onTextChanged: {
                        if(text != ""){
-                           applyMaxFrameRateSlider.value = applyMaxFrameRatevalue.text                           
+                           applyMaxFrameRateSlider.value = applyMaxFrameRatevalue.text
                        }
                     }
                 }
@@ -1337,7 +1337,7 @@ Item {
                 colorModeBw.checked = true
             }
         }
-        onSetCurrentBwMode:{            
+        onSetCurrentBwMode:{
             settingWhenUpdateUI = false
             if(curBWMode == "0"){
                 colorModeBwAuto.checked = true
