@@ -11,6 +11,63 @@
 #define SMILE_THRESHOLD_MIN 40
 #define SMILE_THRESHOLD_MAX 75
 
+/* SEE3CAM_30 */
+#define CAMERA_CONTROL_30               0x80
+#define GET_SCENEMODE_30                0x01
+#define SET_SCENEMODE_30                0x02
+#define SET_EXPOSURE_COMPENSATION_30    0x1A
+#define GET_EXPOSURE_COMPENSATION_30    0x19
+#define SET_FACE_DETECT_RECT_30         0x16
+#define GET_FACE_DETECT_RECT_30         0x15
+#define GET_AF_MODE_30					0x07
+#define SET_AF_MODE_30					0x08
+#define GET_Q_FACTOR_30                 0x0F
+#define SET_Q_FACTOR_30                 0x10
+#define SET_ORIENTATION_30              0x12
+#define GET_ORIENTATION_30              0x11
+#define SET_ORIENTATION_HORZFLIP_30     0x01
+#define SET_ORIENTATION_VERTFLIP_30     0x02
+#define SET_ORIENTATION_BOTHFLIP_ENABLE_30      0x03
+#define SET_ORIENTATION_BOTHFLIP_DISABLE_30     0x00
+#define GET_ORIENTATION_30              0x11
+#define GET_AF_ROI_MODE_30				0x09
+#define SET_AF_ROI_MODE_30				0x0A
+#define SET_EXP_ROI_MODE_30             0x0C
+#define GET_EXP_ROI_MODE_30             0x0B
+#define GET_AF_RECT_MODE_30             0x13
+#define SET_AF_RECT_MODE_30             0x14
+#define ENABLE_AF_RECTANGLE_30          0x01
+#define DISABLE_AF_RECTANGLE_30         0x00
+#define GET_BURST_LENGTH_30             0x0D
+#define SET_BURST_LENGTH_30             0x0E
+#define SET_TO_DEFAULT_30               0xFF
+#define ENABLE_FACE_RECT_30                0x01
+#define DISABLE_FACE_RECT_30               0x00
+#define ENABLE_EMBED_DATA_30               0x01
+#define DISABLE_EMBED_DATA_30              0x00
+#define ENABLE_OVERLAY_RECT_30             0x01
+#define DISABLE_OVERLAY_RECT_30            0x00
+#define SET_OVERLAY_RECT_MODE_30           0x1D
+#define SET_SMILE_DETECT_30                0x18
+#define GET_SMILE_DETECT_30                0x17
+#define SET_FRAME_RATE_30                  0x1C
+#define GET_FRAME_RATE_30                  0x1B
+#define SETFLASH_STATUS_30                 0x1F
+#define GETFLASH_STATUS_30                 0x1E
+#define SET_DENOISE_CONTROL 		  0x06
+#define GET_DENOISE_CONTROL  		0x05
+#define GET_SPECIAL_EFFECT 		0x03
+#define SET_SPECIAL_EFFECT 		0x04
+#define ENABLE_EMBED_DATA               0x01
+#define DISABLE_EMBED_DATA              0x00
+#define ENABLE_SMILE_DETECT             0x01
+#define DISABLE_SMILE_DETECT            0x00
+#define DENOISE_MIN 0
+#define DENOISE_MAX 15
+
+#define ENABLE_SMILE_TRIGGER_30 0x01
+#define DISABLE_SMILE_TRIGGER_30 0x00
+
 class See3CAM_30 : public QObject
 {
     Q_OBJECT
@@ -106,6 +163,13 @@ public:
     };
     Q_ENUMS(camSmileDetectEmbedDataMode)
 
+    enum camSmileTriggerMode {
+        SmileTriggerModeEnable = 0x01,
+        SmileTriggerModeDisable = 0x00
+    };
+    Q_ENUMS(camSmileTriggerMode)
+
+
 signals:
     void effectModeChanged(uint effectMode);
     void denoiseValueChanged(uint denoiseValue);
@@ -121,7 +185,7 @@ signals:
     void indicateCommandStatus(QString title, QString text);
     void indicateSmileThresholdRangeFailure(QString title, QString text);
     void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
-    void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue);
+    void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue, uint smileTriggerMode);
     void indicateExposureValueRangeFailure(QString title, QString text);
     void frameRateChanged(uint frameRateCtrlMode);
 
@@ -160,7 +224,7 @@ public slots:
     bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
     bool getFaceDetectMode();
 
-    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue);
+    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue, bool smileTriggerMode);
     bool getSmileDetectMode();
 
     bool setOrientation(bool horzModeSel, bool vertiModeSel);

@@ -803,9 +803,10 @@ bool See3CAM_CU130::getFaceDetectMode()
  * @param enableSmileDetect - enable / disable smile detect
  * @param embedData - Enable / Disable embed data
  * @param thresholdValue - smile threshold value
+ * @param smileTrigger - Capture image on smile
  * @return true/false
  */
-bool See3CAM_CU130::setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue){
+bool See3CAM_CU130::setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue, bool smileTrigger){
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -834,6 +835,12 @@ bool See3CAM_CU130::setSmileDetection(bool enableSmileDetect, bool embedData, ui
         g_out_packet_buf[5] = ENABLE_EMBED_DATA_CU130; /* enable embed data */
     else
         g_out_packet_buf[5] = DISABLE_EMBED_DATA_CU130; /* disable embed data */
+
+    if(smileTrigger)
+        g_out_packet_buf[6] = ENABLE_SMILE_TRIGGER_CU130; /* enable smile trigger  */
+    else
+        g_out_packet_buf[6] = DISABLE_SMILE_TRIGGER_CU130; /* disable smile trigger */
+
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -876,7 +883,7 @@ bool See3CAM_CU130::getSmileDetectMode()
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU130 &&
             g_in_packet_buf[1]==GET_SMILE_DETECTION_CU130 &&
             g_in_packet_buf[6]==GET_SUCCESS) {\
-            emit smileDetectModeValue(g_in_packet_buf[2], g_in_packet_buf[3], g_in_packet_buf[4]);
+            emit smileDetectModeValue(g_in_packet_buf[2], g_in_packet_buf[3], g_in_packet_buf[4], g_in_packet_buf[5]);
             return true;
         }
     }

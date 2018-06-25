@@ -21,6 +21,17 @@
 #define SEECAM_CU51_H
 #include "uvccamera.h"
 
+/* SEE3CAM_CU51 */
+
+#define GET_EXPOSURE_VALUE	0x01
+#define SET_EXPOSURE_VALUE	0x02
+#define TRIGGER_STILL_CAPTURE	0x03
+#define GET_TORCH_LEVEL_51	0x04
+#define SET_TORCH_LEVEL_51	0x05
+
+#define EXP_FAIL		0x00
+#define EXP_SUCCESS		0x01
+
 class See3CAM_CU51:public QObject {
     Q_OBJECT
 private:

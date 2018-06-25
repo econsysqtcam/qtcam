@@ -59,6 +59,8 @@
 #define DISABLE_FACE_RECT               0x00
 #define ENABLE_EMBED_DATA               0x01
 #define DISABLE_EMBED_DATA              0x00
+#define ENABLE_SMILE_TRIGGER_130        0x01
+#define DISABLE_SMILE_TRIGGER_130        0x00
 #define ENABLE_OVERLAY_RECT             0x01
 #define DISABLE_OVERLAY_RECT            0x00
 #define FACE_RECT_SUCCESS               0x01
@@ -76,6 +78,7 @@
 
 #define SET_FRAME_RATE_130              0x25
 #define GET_FRAME_RATE_130              0x24
+
 
 class See3CAM_130 : public QObject
 {
@@ -191,6 +194,11 @@ public:
     };
     Q_ENUMS(camSmileDetectEmbedDataMode)
 
+    enum camSmileTriggerMode {
+        SmileTriggerModeEnable = 0x01,
+        SmileTriggerModeDisable = 0x00
+    };
+    Q_ENUMS(camSmileTriggerMode)
 
 signals:
      void sceneModeValue(uint sceneMode);
@@ -206,7 +214,7 @@ signals:
      void flipModeValue(uint flipMode, uint flipEnableDisableMode);
      void streamModeValue(uint streamMode);
      void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
-     void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue);
+     void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue, uint smileTriggerModeValue);
      void exposureCompValueReceived(uint exposureCompensation);
      void frameRateCtrlValueReceived(uint frameRateCtrlValue);
      void indicateCommandStatus(QString title, QString text);
@@ -256,7 +264,7 @@ public slots:
     bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
     bool getFaceDetectMode();
 
-    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue);
+    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue, bool smileTrigger);
     bool getSmileDetectMode();
 
     bool setExposureCompensation(unsigned int exposureCompValue);

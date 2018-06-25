@@ -23,6 +23,13 @@
 #include <QObject>
 #include "uvccamera.h"
 
+/* SEE3CAM_CU40 */
+#define CAMERA_CONTROL_CU40         0x77
+#define SETFLASH_STATUS_CU40        0x02
+#define GETFLASH_STATUS_CU40        0x01
+#define GET_FAIL_CU40		0x01
+#define GET_SUCCESS_CU40	0x00
+
 class See3CAM_CU40 : public QObject
 {
     Q_OBJECT

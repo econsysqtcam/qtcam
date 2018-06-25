@@ -39,7 +39,7 @@ public:
 
 signals:
     void cameraTriggerKeyPressed();
-    void cameraTriggerKeyReleased();
+    void cameraTriggerKeyReceived();
 
 public slots:
     // initialize a socket notifier to get key from camera

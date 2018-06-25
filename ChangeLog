@@ -1,6 +1,12 @@
 Qtcam Application - 16.0.11
 -----------------------------
 * Fixed issue of "preview turns into white" when clicking image quality settings and hardware default in see3cam_11cug camera.
+* Added smile trigger support for following list of cameras
+    See3cam_30
+    See3cam_cu130
+    See3cam_130
+    See3cam_cu135
+    See3cam_cu30
 
 Qtcam Application - 16.0.10
 -----------------------------

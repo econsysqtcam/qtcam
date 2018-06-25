@@ -1043,10 +1043,10 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
-                        seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)
+                        seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                     }
                     Keys.onReturnPressed: {
-                        seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)
+                        seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                     }
                 }
                 RadioButton {
@@ -1056,10 +1056,10 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
-                        seecam130.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text)
+                        seecam130.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                     }
                     Keys.onReturnPressed: {
-                        seecam130.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text)
+                        seecam130.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                     }
                 }
             }
@@ -1101,13 +1101,13 @@ Item {
                     onClicked: {
                         smileThresholdSet.enabled = false
                         setButtonClicked = true
-                        seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)
+                        seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                         smileThresholdSet.enabled = true
                     }
                     Keys.onReturnPressed: {
                         smileThresholdSet.enabled = false
                         setButtonClicked = true
-                        seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)
+                        seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                         smileThresholdSet.enabled = true
                     }
                 }
@@ -1126,6 +1126,24 @@ Item {
                     }
                     Keys.onReturnPressed: {
                         enableSmileDetectEmbedData()
+                    }
+                }
+            }
+
+            Row{
+                spacing: 5
+                CheckBox {
+                    id: smileTrigger
+                    activeFocusOnPress : true
+                    text: "Smile Trigger"
+                    style: econCheckBoxStyle
+                    enabled: smileDetectEnable.checked ? true : false
+                    opacity: enabled ? 1 : 0.1
+                    onClicked:{
+                        seecam130.setSmileDetection(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                    }
+                    Keys.onReturnPressed: {
+                        seecam130.setSmileDetection(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                     }
                 }
             }
@@ -1300,12 +1318,20 @@ Item {
                 if(smileDetectEmbedDataValue == See3Cam130.SmileDetectEmbedDataEnable){
                     smileDetectEmbedData.checked = true
                 }
+                if(smileTriggerModeValue == See3Cam130.SmileTriggerModeEnable){
+                    smileTrigger.checked = true
+                }
             }else if(smileDetectMode == See3Cam130.SmileDetectDisable){
                 smileDetectDisable.checked = true
                 if(smileDetectEmbedDataValue == See3Cam130.SmileDetectEmbedDataEnable){
                     smileDetectEmbedData.checked = true
                 }else{
                     smileDetectEmbedData.checked = false
+                }
+                if(smileTriggerModeValue == See3Cam130.SmileTriggerModeEnable){
+                    smileTrigger.checked = true
+                }else{
+                    smileTrigger.checked = false
                 }
             }
         }
@@ -1785,8 +1811,7 @@ Item {
 
     function enableSmileDetectEmbedData(){
         setButtonClicked = false
-	seecam130.getSmileDetectMode()
-        if(seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)){
+        if(seecam130.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)){
             if(smileDetectEmbedData.checked){
                 messageDialog.title = qsTr("Status")
                 messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_130_Face_and_Smile_Detection for more details")

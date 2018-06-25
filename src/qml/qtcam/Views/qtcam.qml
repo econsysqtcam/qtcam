@@ -779,13 +779,10 @@ Rectangle {
     // Added by Sankari: 12 Feb 2018 - Get the event from keyEventReceive.cpp
     KeyEventRecv{
         id: keyEvent
-        onCameraTriggerKeyReleased:{
+        onCameraTriggerKeyReceived:{
             m_Snap = false
             takeScreenShot(true);
-        }
-        onCameraTriggerKeyPressed: {
-
-        }
+        }       
     }
 	
     // Added by Sankari : Update frame to skip 

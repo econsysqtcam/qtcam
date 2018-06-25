@@ -72,6 +72,10 @@
 #define DISABLE_FACE_RECT_CU135                    0x00
 #define ENABLE_EMBED_DATA_CU135                    0x01
 #define DISABLE_EMBED_DATA_CU135                   0x00
+
+#define ENABLE_SMILE_TRIGGER_CU135                 0x01
+#define DISABLE_SMILE_TRIGGER_CU135                0x00
+
 #define ENABLE_OVERLAY_RECT_CU135                  0x01
 #define DISABLE_OVERLAY_RECT_CU135                 0x00
 
@@ -195,7 +199,7 @@ signals:
      void indicateCommandStatus(QString title, QString text);
      void frameRateCtrlValue(uint frameRateVal);
      void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
-     void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue);
+     void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue, uint smileTriggerModeValue);
      void indicateSmileThresholdRangeFailure(QString title, QString text);
      void indicateExposureValueRangeFailure(QString title, QString text);
 
@@ -236,7 +240,7 @@ public slots:
     bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
     bool getFaceDetectMode();
 
-    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue);
+    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue, bool smileTrigger);
     bool getSmileDetectMode();
 
     bool enableDisableFaceRectangle(bool enableRFRect);

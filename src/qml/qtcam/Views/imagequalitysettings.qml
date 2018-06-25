@@ -748,7 +748,7 @@ Item {
 				if(exposureComboEnable){
 					root.selectMenuIndex(exposureAutoControlId,currentIndex)
 		                        if(currentText.toString() != "Auto Mode") {
-		                            root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())
+		                            root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())					    
 		                            root.autoExposureSelected(false)
 		                            JS.autoExposureSelected = false
 		                            exposure_absolute.opacity = 1

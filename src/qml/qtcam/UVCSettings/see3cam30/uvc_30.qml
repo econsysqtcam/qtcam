@@ -801,10 +801,10 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
-                        see3cam30.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)
+                        see3cam30.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
                     }
                     Keys.onReturnPressed: {
-                        see3cam30.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)
+                        see3cam30.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
                     }
                 }
                 RadioButton {
@@ -814,10 +814,10 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
-                        see3cam30.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text)
+                        see3cam30.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
                     }
                     Keys.onReturnPressed: {
-                        see3cam30.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text)
+                        see3cam30.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
                     }
                 }
             }
@@ -878,6 +878,24 @@ Item {
                     }
                     Keys.onReturnPressed: {
                         enableSmileDetectEmbedData()
+                    }
+                }
+            }
+
+            Row{
+                spacing: 5
+                CheckBox {
+                    id: smileTriggerMode
+                    activeFocusOnPress : true
+                    text: "Smile Trigger"
+                    style: econCheckBoxStyle
+                    enabled: smileDetectEnable.checked ? true : false
+                    opacity: enabled ? 1 : 0.1
+                    onClicked:{
+                        see3cam30.setSmileDetection(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
+                    }
+                    Keys.onReturnPressed: {
+                        see3cam30.setSmileDetection(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
                     }
                 }
             }
@@ -1233,21 +1251,8 @@ Item {
                 see3cam30.getExposureCompensation()
             }
         }
-        onSmileDetectModeValue:{            
-            smileThreshold.text = smileDetectThresholdValue
-            if(smileDetectMode == See3Cam30.SmileDetectEnable){
-                smileDetectEnable.checked = true
-                if(smileDetectEmbedDataValue == See3Cam30.SmileDetectEmbedDataEnable){
-                    smileDetectEmbedData.checked = true
-                }
-            }else if(smileDetectMode == See3Cam30.SmileDetectDisable){
-                smileDetectDisable.checked = true
-                if(smileDetectEmbedDataValue == See3Cam30.SmileDetectEmbedDataEnable){
-                    smileDetectEmbedData.checked = true
-                }else{
-                    smileDetectEmbedData.checked = false
-                }
-            }
+        onSmileDetectModeValue:{
+            updateSmileDetectModeUI(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerMode)
         }
         onFaceDetectModeValue:{
             if(faceDetectMode == See3Cam30.FaceRectEnable){
@@ -1318,6 +1323,31 @@ Item {
         messageDialog.title = qsTr(title)
         messageDialog.text = qsTr(text)
         messageDialog.open()
+    }
+
+    function updateSmileDetectModeUI(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerModeValue){
+        smileThreshold.text = smileDetectThresholdValue
+        if(smileDetectMode == See3Cam30.SmileDetectEnable){
+            smileDetectEnable.checked = true
+            if(smileDetectEmbedDataValue == See3Cam30.SmileDetectEmbedDataEnable){
+                smileDetectEmbedData.checked = true
+            }
+            if(smileTriggerModeValue == See3Cam30.SmileTriggerModeEnable){
+                smileTriggerMode.checked = true
+            }
+        }else if(smileDetectMode == See3Cam30.SmileDetectDisable){
+            smileDetectDisable.checked = true
+            if(smileDetectEmbedDataValue == See3Cam30.SmileDetectEmbedDataEnable){
+                smileDetectEmbedData.checked = true
+            }else{
+                smileDetectEmbedData.checked = false
+            }
+            if(smileTriggerModeValue == See3Cam30.SmileTriggerModeEnable){
+                smileTriggerMode.checked = true
+            }else{
+                smileTriggerMode.checked = false
+            }
+        }
     }
 
     // current scene mode
@@ -1503,7 +1533,7 @@ Item {
     function setSmileDetection(){
         smileThresholdSet.enabled = false
         setButtonClicked = true
-        see3cam30.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)
+        see3cam30.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
         smileThresholdSet.enabled = true
     }
 
@@ -1524,8 +1554,7 @@ Item {
 
     function enableSmileDetectEmbedData(){
         setButtonClicked = false
-        see3cam30.getSmileDetectMode()
-        if(see3cam30.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text)){
+        if(see3cam30.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)){
             if(smileDetectEmbedData.checked){
                 messageDialog.title = qsTr("Status")
                 messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_30_Face_and_Smile_Detection for more details")

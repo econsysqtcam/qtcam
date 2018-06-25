@@ -52,13 +52,9 @@ void CamKeyEventReceive::doKeyReceived()
     }
 
     for (unsigned int i = 0; i < rd / sizeof(struct input_event); i++){
-        if(ev[i].code == KEY_CAMERA && ev[i].value == 1){            
-            qDebug()<<"KEY_CAMERA: Key pressed";
-            emit cameraTriggerKeyPressed();
-
-        }else if(ev[i].code == KEY_CAMERA && ev[i].value == 0){            
-            qDebug()<<"KEY_CAMERA: Key released";
-            emit cameraTriggerKeyReleased();
+        if(ev[i].code == KEY_CAMERA){
+            qDebug()<<"KEY_CAMERA: Key received";
+            emit cameraTriggerKeyReceived();
         }
     }
 }

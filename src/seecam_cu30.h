@@ -82,6 +82,9 @@
 #define GET_SMILE_DETECTION_CU30             0x11
 #define ENABLE_SMILE_DETECT_CU30             0x01
 #define DISABLE_SMILE_DETECT_CU30            0x00
+#define ENABLE_SMILE_TRIGGER_CU30            0x01
+#define DISABLE_SMILE_TRIGGER_CU30           0x00
+
 #define SET_TO_DEFAULT_CU30                  0xFF
 
 #define ENABLE_DISABLE_MODE_FACE_RECTANGLE_CU30 0x17
@@ -168,6 +171,12 @@ public:
     };
     Q_ENUMS(camSmileDetectEmbedDataMode)
 
+    enum camSmileTriggerMode {
+        SmileTriggerModeEnable = 0x01,
+        SmileTriggerModeDisable = 0x00
+    };
+    Q_ENUMS(camSmileTriggerMode)
+
    enum flashStateValues{
         FLASHMODE_OFF = 0x00,
         FLASHMODE_TORCH = 0x01,
@@ -189,7 +198,7 @@ signals:
     void indicateExposureValueRangeFailure(QString title, QString text);
     void exposureCompValueReceived(uint exposureCompensation);
     void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
-    void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue);
+    void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue, uint smileTriggerMode);
     void flashModeValue(uint flashMode);
 
 public slots:
@@ -223,7 +232,7 @@ public slots:
     bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
     bool getFaceDetectMode();
 
-    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue);
+    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue, bool smileTrigger);
     bool getSmileDetectMode();
 
     bool enableDisableFaceRectangle(bool enableFaceRect);

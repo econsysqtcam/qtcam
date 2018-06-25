@@ -6,7 +6,31 @@
 #include <QtConcurrentRun>
 #include "uvccamera.h"
 
+/* SEE3CAM_81 */
 #define CMD_TIMEOUT_81CAM 3000
+#define CAMERA_CONTROL_81			0x7C
+#define SETSPECIALEFFECT_81			0x09
+#define GETSPECIALEFFECT_81			0x08
+#define GETFLIPMIRRORSTATUS_81			0x0A
+#define SETFLIPMIRRORSTATUS_81			0x0B
+#define GET_AF_ROI_MODE_81                      0x13
+#define SET_AF_ROI_MODE_81                  	0x14
+#define SET_AF_ROI_MODE_COORDINATES_81      	0x16
+#define SET_FOCUS_MODE_81                       0x02
+#define GET_FOCUS_POSITION_81			0x03
+#define SET_FOCUS_POSITION_81			0x04
+#define GPIO_OPERATION_81			0x20
+#define GPIO_GET_LEVEL_81			0x01
+#define GPIO_SET_LEVEL_81			0x02
+#define GET_INPUT_GPIO_LEVEL_81 		0x04
+#define SET_TO_DEFAULT_CAM81        	    	0x0C
+
+#define GETSTROBE_STATUS			0x06
+#define SETSTROBE_STATUS			0x07
+#define GETFOCUS_STATUS 			0x05
+
+#define GET_FAIL_CAM81                      	0x01
+#define GET_SUCCESS_CAM81                   	0x00
 
 class See3CAM_81: public QObject {
     Q_OBJECT

@@ -968,9 +968,10 @@ bool See3CAM_30::getFaceDetectMode()
  * @param enableSmileDetect - enable / disable smile detect
  * @param embedData - Enable / Disable embed data
  * @param thresholdValue - smile threshold value
+ * @param smile trigger mode - to capture image when smile trigger option is enbled
  * @return true/false
  */
-bool See3CAM_30::setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue){
+bool See3CAM_30::setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue, bool smileTriggerMode){
     if(uvccamera::hid_fd < 0)
     {
         return false;
@@ -999,6 +1000,11 @@ bool See3CAM_30::setSmileDetection(bool enableSmileDetect, bool embedData, uint 
     else
         g_out_packet_buf[5] = DISABLE_EMBED_DATA; /* disable embed data */
 
+    if(smileTriggerMode)
+        g_out_packet_buf[6] = ENABLE_SMILE_TRIGGER_30; /* enable smile trigger  */
+    else
+        g_out_packet_buf[6] = DISABLE_SMILE_TRIGGER_30; /* disable smile trigger */
+
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==SET_FAIL) {
@@ -1025,7 +1031,7 @@ bool See3CAM_30::getSmileDetectMode()
         return false;
     }
 
-    uint smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue;
+    uint smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerMode;
 
     //Initialize the buffer
     initializeBuffers();
@@ -1044,7 +1050,8 @@ bool See3CAM_30::getSmileDetectMode()
             smileDetectMode = g_in_packet_buf[2];
             smileDetectThresholdValue = g_in_packet_buf[3];
             smileDetectEmbedDataValue = g_in_packet_buf[4];
-            emit smileDetectModeValue(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue);
+            smileTriggerMode = g_in_packet_buf[5];
+            emit smileDetectModeValue(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerMode);
             return true;
         }
     }

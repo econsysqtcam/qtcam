@@ -22,6 +22,30 @@
 
 #include "uvccamera.h"
 
+/* Ascella camera */
+#define ASCELLA_VID 0x04b4
+#define ASCELLA_PID 0x00c3
+#define ASCELLA_BUFLEN 64
+#define ASCELLA_TIMEOUT 1000
+#define ASCELLA_DEFAULT_MAXFRAMERATE 119
+
+#define LEDSTATUS_MODE				0xF031
+#define LED_BRIGHTNESS				0xF033
+#define AUTOEXPOSURE				0xF022
+#define AUTOFOCUSMODE				0xF041
+#define SKIPFOCUSMODE				0xF040
+#define COLORMODE					0xF051
+#define CM_BLACKWHITE				0xF058
+#define NOISE_REDUCTION				0xF059
+#define SCENEMODE					0xF018
+#define LIMITFRAMERATE				0xF02F
+
+#define SCENEMODE_NORMAL			0x00
+#define SCENEMODE_DOCUMENTSCANNER		0x20
+#define FP_DISABLE					0x00
+#define FP_APPLYMAX					0x03
+#define CX3UVC_SET_QFACTOR 			0x14
+
 class ASCELLA: public QObject {
     Q_OBJECT
     Q_ENUMS(camLedMode)
