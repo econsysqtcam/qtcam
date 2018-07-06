@@ -53,9 +53,7 @@ Item {
         onTakeScreenShot:
         {	  
 	   if(webcamKey){
-                  console.log("disable face overlay rect");
 		 if(nilecamcu30.enableDisableFaceRectangle(false)){
-		  console.log("image capture -burst sshot")
 		  root.imageCapture(CommonEnums.BURST_SHOT);
 		}
 	   }
@@ -1471,11 +1469,8 @@ Item {
          }
          onEnableFaceRectafterBurst:{	   
 	    webcamKey = false
-	    console.log("webcam key false")
 	    if(nilecamcu30.enableDisableFaceRectangle(true)){
-		console.log("enable face rectangle")
 	    	webcamKey = true  
-	    	console.log("webcam key true")
 	    }
 	   
          }
