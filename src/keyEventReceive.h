@@ -38,7 +38,6 @@ public:
     QSocketNotifier *m_capKeyNotifier;
 
 signals:
-    void cameraTriggerKeyPressed();
     void cameraTriggerKeyReceived();
 
 public slots:

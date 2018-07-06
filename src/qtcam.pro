@@ -38,7 +38,8 @@ SOURCES += main.cpp \
     see3cam_cu40.cpp\
     see3cam_cu20.cpp\
     uvcExtCx3sni.cpp \
-    keyEventReceive.cpp
+    keyEventReceive.cpp \
+    nilecam_cu30.cpp
 
 # Installation path
 # target.path =
@@ -77,7 +78,8 @@ HEADERS += \
     see3cam_cu40.h\
     see3cam_cu20.h\
     uvcExtCx3sni.h \
-    keyEventReceive.h
+    keyEventReceive.h \
+    nilecam_cu30.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \

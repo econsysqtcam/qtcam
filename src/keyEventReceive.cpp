@@ -23,6 +23,7 @@
 // Added by Sankari : 12 Feb 2018
 CamKeyEventReceive::CamKeyEventReceive()
 {
+    m_capKeyNotifier = NULL;
 
 }
 

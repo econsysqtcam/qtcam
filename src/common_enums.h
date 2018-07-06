@@ -45,7 +45,8 @@ public:
 		// Added by Sankari - 28 Jul 2017
         SEE3CAM_CU20,
         // Added by Sankari - 13 June 2017
-        CX3_SNI_CAM
+        CX3_SNI_CAM,
+	NILECAM_CU30
 
     }ECameraNames;
     //Enum for capture shot type

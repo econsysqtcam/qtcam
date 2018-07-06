@@ -89,9 +89,13 @@ Item {
         id: queryctrlTimer
         interval: 500
         onTriggered: {
-        // Adding flag to skip setting exposure manual value when getting exposure value and update UI and enable back after getting all control values.       
+        // Adding flag to skip setting exposure auto and manual value when getting exposure value and update UI and enable back after getting all control values.       
             exposureSliderSetEnable = false
+	    exposureComboEnable = false
+
             root.cameraFilterControls(true)
+
+            exposureComboEnable = true
             exposureSliderSetEnable = true
             stop()
         }
@@ -798,8 +802,9 @@ Item {
                                 root.changeCameraSettings(exposurecontrolId, exposureValueAscella)
                             }else{
                                 if((exposureCombo.currentText == "Shutter Priority Mode" || exposureCombo.currentText == "Manual Mode") || (root.selectedDeviceEnumValue == CommonEnums.ECON_CX3_RDX_V5680) || (root.selectedDeviceEnumValue == CommonEnums.ECON_CX3_RDX_T9P031) || (root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU40)) {
-                                    if(exposureSliderSetEnable)
+                                    if(exposureSliderSetEnable){
                                          root.changeCameraSettings(exposurecontrolId,value.toString())
+					}
                                 }
                             }
                         }
@@ -1764,7 +1769,6 @@ Item {
             }
             exposure_auto.opacity = 1
             exposureCombo.opacity = 1
-	    exposureComboEnable = false // To avoid setting exposure when get the control values 
             exposureCombo.model = menuitems // On index changed is called for every time.
             while(menuitems.pop()){}
             exposureAutoControlId = controlID
@@ -1783,7 +1787,6 @@ Item {
                 exposure_value.opacity = 0
                 exposure_value.enabled = false
             }
-	    exposureComboEnable = true
         }
     }
 
@@ -1935,7 +1938,10 @@ Item {
             focusLogitechValueChangeProperty = true
             focusValueChangeProperty = true
             video_capture_filter_Child.visible = true
+	    // To avoid setting exposure when get the control values 
+	    exposureComboEnable = false
             root.enableCameraControls();
+	    exposureComboEnable = true
         } else {
             video_capture_filter_Child.visible = false
             video_capture_filter_Child.focus = false
