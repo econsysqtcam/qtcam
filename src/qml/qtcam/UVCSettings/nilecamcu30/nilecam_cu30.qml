@@ -45,20 +45,34 @@ Item {
     property bool setButtonClicked: false
     property bool skipUpdateUIOnDenoise: false	
     property var mcuFirmwareVersion;
-    property bool webcamKey: true
+    property bool smileTriggerCapture: true
+
+    Timer {
+        id: burstShotTimer
+        interval: 1000
+        onTriggered: {
+            root.imageCapture(CommonEnums.BURST_SHOT);
+            stop()
+        }
+    }
+
 
     Connections
     {
         target: root
         onTakeScreenShot:
-        {	  
-	   if(webcamKey){
-		 if(nilecamcu30.enableDisableFaceRectangle(false)){
-		  root.imageCapture(CommonEnums.BURST_SHOT);
-		}
-	   }
-
-	}
+        {
+            if(!isWebKeyPressed){ // mouse click
+                nilecamcu30.enableDisableFaceRectangle(false)
+                burstShotTimer.start()
+            }else{
+                if(smileTriggerCapture){
+                    if(nilecamcu30.enableDisableFaceRectangle(false)){
+                        root.imageCapture(CommonEnums.BURST_SHOT);
+                    }
+                }
+            }
+        }
         onGetVideoPinStatus:
         {
             root.enableVideoPin(true);
@@ -73,7 +87,7 @@ Item {
             root.insertStillImageFormat(stillImageFormat);
         }
 	onFrameSkipCount:{
-            nilecamcu30.setStillSkipCount() 
+            nilecamcu30.setStillSkipCount(stillOutFormat)
         }
 
     }
@@ -1467,12 +1481,11 @@ Item {
          onAutoExposureSelected:{
              enableDisableAutoExposureControls(autoExposureSelect)
          }
-         onEnableFaceRectafterBurst:{	   
-	    webcamKey = false
-	    if(nilecamcu30.enableDisableFaceRectangle(true)){
-	    	webcamKey = true  
-	    }
-	   
+         onEnableFaceRectafterBurst:{
+             smileTriggerCapture = false
+             if(nilecamcu30.enableDisableFaceRectangle(true)){
+                 smileTriggerCapture = true
+             }
          }
          onBeforeRecordVideo:{
             nilecamcu30.enableDisableFaceRectangle(false)

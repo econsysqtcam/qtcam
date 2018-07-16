@@ -1,3 +1,8 @@
+Qtcam Application - 17.0.1
+-----------------------------
+* Fixed issue of displaying face rectangle in captured image when preview and still are in same format and resolution [ NileCAM_CU30 ].
+* Fixed issue of capturing images in smile trigger when recording video [ Smile trigger supported cameras ].
+
 Qtcam Application - 17.0.0
 -----------------------------
 * Added support for NileCAM_CU30_USB camera.

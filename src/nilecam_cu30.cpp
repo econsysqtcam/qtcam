@@ -1020,8 +1020,8 @@ bool NILECAM_CU30::readMCUFirmwareVersion(){
     return false;
 }
 
-void NILECAM_CU30::setStillSkipCount(){
-    uint frameToSkip;    
+void NILECAM_CU30::setStillSkipCount(QString stillOutFomat){
+    uint frameToSkip;
 
     frameToSkip = 1;
 

@@ -443,7 +443,7 @@ signals:
     void enableFactRectInPreview();
 
     // Added by Sankari: 02 Dec 2017
-    void stillSkipCount(QString stillResoln, QString videoResoln);
+    void stillSkipCount(QString stillResoln, QString videoResoln, QString stillOutFormat);
 
     void stillSkipCountWhenFPSChange(bool fpsChange);
 

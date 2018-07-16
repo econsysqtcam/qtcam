@@ -931,7 +931,7 @@ void Videostreaming::updateFrameToSkip(uint stillSkip){
 void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     captureTime.start();
 	// Added by Sankari : to set still skip
-    emit stillSkipCount(stillSize, lastPreviewSize);
+    emit stillSkipCount(stillSize, lastPreviewSize, stillOutFormat);
     m_snapShot = true;
     m_burstShot = false;
     m_burstNumber = 1;
@@ -1009,7 +1009,7 @@ void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
     m_burstNumber = 1;
 
     // emit signal to set still skip count
-    emit stillSkipCount(stillSize, lastPreviewSize);
+    emit stillSkipCount(stillSize, lastPreviewSize, stillOutFormat);
 
     /* cu40 - IR image in bmp format */
     if(imgFormatType == "IR data(8bit BMP)"){
@@ -1095,7 +1095,7 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
     m_snapShot = false;
 
     // emit signal to set still skip count
-    emit stillSkipCount(stillSize, lastPreviewSize);
+    emit stillSkipCount(stillSize, lastPreviewSize, stillOutFormat);
 
     getFileName(filePath, imgFormatType);    
     m_burstLength = burstLength; // no of shots to take

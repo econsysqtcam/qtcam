@@ -118,6 +118,9 @@ Rectangle {
     // To check mouse click capture function is called
     property bool mouseClickCap: false
 
+    // To disable capture by smile trigger key or external key is pressed when recording video
+    property bool disableCaptureImage: false
+
     // Avaialble FPS list
     property string availableFpslist
 
@@ -177,7 +180,7 @@ Rectangle {
     signal stillResolutionChanged(var stillResolution, var stillFormat);
 
     // Added by Sankari: 3 Jan 2016
-    signal frameSkipCount(var stillResolution, var videoResolution);
+    signal frameSkipCount(var stillResolution, var videoResolution, var stillOutFormat);
 
     signal frameSkipCountWhenFPSChange(var fpsChange);
 
@@ -413,7 +416,7 @@ Rectangle {
             }
 
             onStillSkipCount:{                
-                frameSkipCount(stillResoln, videoResoln);
+                frameSkipCount(stillResoln, videoResoln, stillOutFormat);
             }
 
             onStillSkipCountWhenFPSChange:{
@@ -591,6 +594,9 @@ Rectangle {
 
                         // Added by Sankari: 12 Feb 2018 - initialize a socket notifier to get key from camera.
                         keyEvent.initializeToGetKey();
+
+                        // Initially enable capture image when external keyevent is occured.
+                        disableCaptureImage =  false
                     }
                 }
                 else {
@@ -781,8 +787,10 @@ Rectangle {
         id: keyEvent
         onCameraTriggerKeyReceived:{
             m_Snap = false
-            takeScreenShot(true);
-        }       
+            if(!disableCaptureImage){ // disable capture by smile trigger key or external key is pressed when recording video
+                takeScreenShot(true)
+            }
+        }        
     }
 	
     // Added by Sankari : Update frame to skip 
@@ -922,6 +930,10 @@ Rectangle {
 
     function videoRecordBegin() {
         beforeRecordVideo() // signal to do before starting record video
+
+        // disable capture image when smile trigger key or external camera key when recording video
+        disableCaptureImage = true
+
         captureVideoRecordRootObject.videoTimerUpdate(true)
         if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130  || selectedDeviceEnumValue == CommonEnums.SEE3CAM_30){
             recordStartDelayTimer.start() // some delay is required to disable focus rect / face overlay rect. After that delay need to start record.
@@ -943,6 +955,10 @@ Rectangle {
     function videoSaveVideo() {
         statusText = "Saving..."
         vidstreamproperty.recordStop()
+
+        // enable capture image when smile trigger key or external camera key once recording video is finished
+        disableCaptureImage = false
+
         captureVideoRecordRootObject.videoTimerUpdate(false)
         messageDialog.title = qsTr("Saved")
         messageDialog.text = qsTr("Video saved in the location:"+videofileName)

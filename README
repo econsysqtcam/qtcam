@@ -43,6 +43,9 @@ TODOS:
 3. Optimize the CPU usage - v4lconvert library is consuming the high cpu usage.
 4. Enhance the application by sending the captured data over the network.
 5. Add support for audio recording.
+Limitations
+***********
+   During resolution switch, it is recommended to switch to next resolution only after preview appears for previous resolution switch.
 
 Known Issues/Bugs:
 ******************
@@ -54,4 +57,6 @@ Known Issues/Bugs:
 6. In Ascella camera, Led blink is getting off when led state is in manual in UI[extension settings] after launching and closing application continuously for several times.
 7. In Ascella camera, Limit max frame rate in extension settings is not updating properly in camera after launching and closing application continuously for several times.
 8. In Ascella camera, When Black and white mode is set in UI[Extension settings], it reflects black and white mode in camera. Inconsistently, after launching and closing application continuously for several times, it is changed to normal effect mode.
-9. Inconsistently external trigger keys are not coming to application. In that time, not able to capture images in See3Cam_12CUNIR camera. 
+9. Inconsistently external trigger keys are not coming to application. In that time, not able to capture images when external key pressed and during smile trigger capture.
+10.During resolution switch, it is recommended to switch to next resolution only after preview appears for previous resolution switch in NileCAM_CU30_USB camera.
+  

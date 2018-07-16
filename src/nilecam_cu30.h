@@ -76,6 +76,9 @@
 
 #define CAMERA_MCUFWVERSION_NILECAM_CU30               0x43
 
+#define STILL_YUYV_FORMAT                             0x00
+#define STILL_MJPG_FORMAT                             0x01
+
 class NILECAM_CU30 : public QObject
 {
     Q_OBJECT
@@ -226,7 +229,7 @@ public slots:
 
     bool restoreDefaultNileCam();
     bool readMCUFirmwareVersion();
-    void setStillSkipCount();
+    void setStillSkipCount(QString stillOutFomat);
 
 };
 #endif // NILECAM_CU30_H
