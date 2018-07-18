@@ -22,7 +22,7 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.0
 import QtQuick.Dialogs 1.1
 import econ.camera.uvcsettings 1.0
-import econ.camera.nilecamcu30 1.0
+import econ.camera.nilecam30usb 1.0
 import QtQuick.Layouts 1.1
 import cameraenum 1.0
 
@@ -63,11 +63,11 @@ Item {
         onTakeScreenShot:
         {
             if(!isWebKeyPressed){ // mouse click
-                nilecamcu30.enableDisableFaceRectangle(false)
+                nilecam30usb.enableDisableFaceRectangle(false)
                 burstShotTimer.start()
             }else{
                 if(smileTriggerCapture){
-                    if(nilecamcu30.enableDisableFaceRectangle(false)){
+                    if(nilecam30usb.enableDisableFaceRectangle(false)){
                         root.imageCapture(CommonEnums.BURST_SHOT);
                     }
                 }
@@ -87,7 +87,7 @@ Item {
             root.insertStillImageFormat(stillImageFormat);
         }
 	onFrameSkipCount:{
-            nilecamcu30.setStillSkipCount(stillOutFormat)
+            nilecam30usb.setStillSkipCount(stillOutFormat)
         }
 
     }
@@ -97,7 +97,7 @@ Item {
         id: getAutoExpsoureControlValues
         interval: 500
         onTriggered: {
-            nilecamcu30.getExpRoiModeNileCam()
+            nilecam30usb.getExpRoiModeNileCam30USB()
             stop()
         }
     }
@@ -106,8 +106,8 @@ Item {
         id: getexposureCompFrameRateCtrlTimer
         interval: 500
         onTriggered: {
-            nilecamcu30.getExposureCompensationNileCam()
-            nilecamcu30.getFrameRateValueNileCam()
+            nilecam30usb.getExposureCompensationNileCam30USB()
+            nilecam30usb.getFrameRateValueNileCam30USB()
             stop()
         }
     }
@@ -163,10 +163,10 @@ Item {
                     exclusiveGroup: sceneInputGroup
                     activeFocusOnPress: true
                     onClicked: {
-                        nilecamcu30.setSceneModeNileCam(NileCamcu30.SCENE_NORMAL)
+                        nilecam30usb.setSceneModeNileCam30USB(NileCam30usb.SCENE_NORMAL)
                     }
                     Keys.onReturnPressed: {
-                        nilecamcu30.setSceneModeNileCam(NileCamcu30.SCENE_NORMAL)
+                        nilecam30usb.setSceneModeNileCam30USB(NileCam30usb.SCENE_NORMAL)
                     }
                 }
                 RadioButton {
@@ -176,10 +176,10 @@ Item {
                     exclusiveGroup: sceneInputGroup
                     activeFocusOnPress: true
                     onClicked: {                        
-                        nilecamcu30.setSceneModeNileCam(NileCamcu30.SCENE_DOCUMENT)
+                        nilecam30usb.setSceneModeNileCam30USB(NileCam30usb.SCENE_DOCUMENT)
                     }
                     Keys.onReturnPressed: {                        
-                        nilecamcu30.setSceneModeNileCam(NileCamcu30.SCENE_DOCUMENT)
+                        nilecam30usb.setSceneModeNileCam30USB(NileCam30usb.SCENE_DOCUMENT)
                     }
 
                 }
@@ -212,10 +212,10 @@ Item {
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
                     onClicked: {
-                        nilecamcu30.setSpecialEffectsNileCam(NileCamcu30.EFFECT_NORMAL)
+                        nilecam30usb.setSpecialEffectsNileCam30USB(NileCam30usb.EFFECT_NORMAL)
                     }
                     Keys.onReturnPressed:  {
-                        nilecamcu30.setSpecialEffectsNileCam(NileCamcu30.EFFECT_NORMAL)
+                        nilecam30usb.setSpecialEffectsNileCam30USB(NileCam30usb.EFFECT_NORMAL)
                     }
                 }
                 RadioButton {
@@ -225,10 +225,10 @@ Item {
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
                     onClicked: {                        
-                        nilecamcu30.setSpecialEffectsNileCam(NileCamcu30.EFFECT_BLACK_WHITE)
+                        nilecam30usb.setSpecialEffectsNileCam30USB(NileCam30usb.EFFECT_BLACK_WHITE)
                     }
                     Keys.onReturnPressed: {                        
-                        nilecamcu30.setSpecialEffectsNileCam(NileCamcu30.EFFECT_BLACK_WHITE)
+                        nilecam30usb.setSpecialEffectsNileCam30USB(NileCam30usb.EFFECT_BLACK_WHITE)
                     }
                 }
                 RadioButton {
@@ -238,10 +238,10 @@ Item {
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
                     onClicked: {                        
-                        nilecamcu30.setSpecialEffectsNileCam(NileCamcu30.EFFECT_GREYSCALE)
+                        nilecam30usb.setSpecialEffectsNileCam30USB(NileCam30usb.EFFECT_GREYSCALE)
                     }
                     Keys.onReturnPressed: {                        
-                        nilecamcu30.setSpecialEffectsNileCam(NileCamcu30.EFFECT_GREYSCALE)
+                        nilecam30usb.setSpecialEffectsNileCam30USB(NileCam30usb.EFFECT_GREYSCALE)
                     }
                 }
                 RadioButton {
@@ -251,10 +251,10 @@ Item {
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
                     onClicked: {                        
-                        nilecamcu30.setSpecialEffectsNileCam(NileCamcu30.EFFECT_SKETCH)
+                        nilecam30usb.setSpecialEffectsNileCam30USB(NileCam30usb.EFFECT_SKETCH)
                     }
                     Keys.onReturnPressed: {                        
-                        nilecamcu30.setSpecialEffectsNileCam(NileCamcu30.EFFECT_SKETCH)
+                        nilecam30usb.setSpecialEffectsNileCam30USB(NileCam30usb.EFFECT_SKETCH)
                     }
                 }
                 RadioButton {
@@ -264,10 +264,10 @@ Item {
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
                     onClicked: {                        
-                        nilecamcu30.setSpecialEffectsNileCam(NileCamcu30.EFFECT_NEGATIVE)
+                        nilecam30usb.setSpecialEffectsNileCam30USB(NileCam30usb.EFFECT_NEGATIVE)
                     }
                     Keys.onReturnPressed: {                        
-                        nilecamcu30.setSpecialEffectsNileCam(NileCamcu30.EFFECT_NEGATIVE)
+                        nilecam30usb.setSpecialEffectsNileCam30USB(NileCam30usb.EFFECT_NEGATIVE)
                     }
                 }
             }
@@ -297,15 +297,15 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     opacity: enabled ? 1 : 0.1
-                    // setExpRoiModeNileCam() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
+                    // setExpRoiModeNileCam30USB() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
                     // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
                     // winSize is required only for manual mode
                     onClicked: {
-                        nilecamcu30.setExpRoiModeNileCam(NileCamcu30.AutoExpFace, 0, 0, 0, 0, 0);
+                        nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpFace, 0, 0, 0, 0, 0);
                         autoExpoWinSizeCombo.enabled = false
                     }
                     Keys.onReturnPressed: {
-                        nilecamcu30.setExpRoiModeNileCam(NileCamcu30.AutoExpFace, 0, 0, 0, 0, 0);
+                        nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpFace, 0, 0, 0, 0, 0);
                         autoExpoWinSizeCombo.enabled = false
                     }
                   }
@@ -316,15 +316,15 @@ Item {
                       activeFocusOnPress: true
                       style: econRadioButtonStyle
                       opacity: enabled ? 1 : 0.1
-                      // setExpRoiModeNileCam() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
+                      // setExpRoiModeNileCam30USB() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
                       // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
                       // winSize is required only for manual mode
                       onClicked: {
-                          nilecamcu30.setExpRoiModeNileCam(NileCamcu30.AutoExpFull, 0, 0, 0, 0, 0);
+                          nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpFull, 0, 0, 0, 0, 0);
                           autoExpoWinSizeCombo.enabled = false
                       }
                       Keys.onReturnPressed: {
-                          nilecamcu30.setExpRoiModeNileCam(NileCamcu30.AutoExpFull, 0, 0, 0, 0, 0);
+                          nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpFull, 0, 0, 0, 0, 0);
                           autoExpoWinSizeCombo.enabled = false
                       }
                   }
@@ -336,11 +336,11 @@ Item {
                       style: econRadioButtonStyle
                       opacity: enabled ? 1 : 0.1
                       onClicked: {                          
-                          nilecamcu30.setExpRoiModeNileCam(NileCamcu30.AutoExpManual, 0, 0, 0, 0, 0);
+                          nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpManual, 0, 0, 0, 0, 0);
                           autoExpoWinSizeCombo.enabled = true
                       }
                       Keys.onReturnPressed: {                          
-                          nilecamcu30.setExpRoiModeNileCam(NileCamcu30.AutoExpManual, 0, 0, 0, 0, 0);
+                          nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpManual, 0, 0, 0, 0, 0);
                           autoExpoWinSizeCombo.enabled = true
                       }
                   }
@@ -365,7 +365,7 @@ Item {
                 style: econComboBoxStyle
                 onCurrentIndexChanged: {                    
                     if(skipUpdateUIOnExpWindowSize){
-                        nilecamcu30.setExpRoiModeNileCam(NileCamcu30.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
+                        nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
                     }
                     skipUpdateUIOnExpWindowSize = true
                 }
@@ -450,7 +450,7 @@ Item {
                     onValueChanged:  {
                         deNoiseTextField.text = deNoiseSlider.value
 			if(skipUpdateUIOnDenoise){
-                        	nilecamcu30.setDenoiseValueNileCam(deNoiseSlider.value)
+                        	nilecam30usb.setDenoiseValueNileCam30USB(deNoiseSlider.value)
 			}
 			skipUpdateUIOnDenoise = true
                     }
@@ -510,7 +510,7 @@ Item {
                 onCurrentIndexChanged: {
                     root.stillBurstLength(burstLengthCombo.currentIndex + 1) // combobox index starts from 0
                     if(skipUpdateUIOnBurstLength){
-                        nilecamcu30.setBurstLengthNileCam(burstLengthCombo.currentText)
+                        nilecam30usb.setBurstLengthNileCam30USB(burstLengthCombo.currentText)
                     }
                     skipUpdateUIOnBurstLength = true                    
                 }
@@ -543,7 +543,7 @@ Item {
                     onValueChanged:  {
                         qFactorTextField.text = qFactorSlider.value                        
                         if(skipUpdateUIQFactor){
-                            nilecamcu30.setQFactorNileCam(qFactorSlider.value)
+                            nilecam30usb.setQFactorNileCam30USB(qFactorSlider.value)
                         }
                         skipUpdateUIQFactor = true
                     }
@@ -591,7 +591,7 @@ Item {
                     onValueChanged:  {
                         frameRateTextField.text = frameRateSlider.value
                         if(skipUpdateUIFrameRate){
-                            nilecamcu30.setFrameRateValueNileCam(frameRateSlider.value)
+                            nilecam30usb.setFrameRateValueNileCam30USB(frameRateSlider.value)
                         }
                         skipUpdateUIFrameRate = true                        
                     }
@@ -633,10 +633,10 @@ Item {
                     text: "Horizontal"
                     style: econCheckBoxStyle
                     onClicked:{
-                        nilecamcu30.setFlipModeNileCam(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                        nilecam30usb.setFlipModeNileCam30USB(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                     }
                     Keys.onReturnPressed: {
-                        nilecamcu30.setFlipModeNileCam(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                        nilecam30usb.setFlipModeNileCam30USB(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                     }
                 }
                 CheckBox {
@@ -645,10 +645,10 @@ Item {
                     text: "Vertical"
                     style: econCheckBoxStyle
                     onClicked:{
-                        nilecamcu30.setFlipModeNileCam(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                        nilecam30usb.setFlipModeNileCam30USB(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                     }
                     Keys.onReturnPressed: {
-                        nilecamcu30.setFlipModeNileCam(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                        nilecam30usb.setFlipModeNileCam30USB(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                     }
                 }
             }
@@ -673,10 +673,10 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
-                        nilecamcu30.setFaceDetectionRectNileCam(true, faceDetectEmbedData.checked, overlayRect.checked)
+                        nilecam30usb.setFaceDetectionRectNileCam30USB(true, faceDetectEmbedData.checked, overlayRect.checked)
                     }
                     Keys.onReturnPressed: {
-                        nilecamcu30.setFaceDetectionRectNileCam(true, faceDetectEmbedData.checked, overlayRect.checked)
+                        nilecam30usb.setFaceDetectionRectNileCam30USB(true, faceDetectEmbedData.checked, overlayRect.checked)
                     }
                 }
                 RadioButton {
@@ -686,10 +686,10 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
-                        nilecamcu30.setFaceDetectionRectNileCam(false, faceDetectEmbedData.checked, overlayRect.checked)
+                        nilecam30usb.setFaceDetectionRectNileCam30USB(false, faceDetectEmbedData.checked, overlayRect.checked)
                     }
                     Keys.onReturnPressed: {
-                        nilecamcu30.setFaceDetectionRectNileCam(false, faceDetectEmbedData.checked, overlayRect.checked)
+                        nilecam30usb.setFaceDetectionRectNileCam30USB(false, faceDetectEmbedData.checked, overlayRect.checked)
                     }
                 }
             }
@@ -717,10 +717,10 @@ Item {
                     enabled: faceRectEnable.checked ? true : false
                     opacity: enabled ? 1 : 0.1
                     onClicked:{
-                        nilecamcu30.setFaceDetectionRectNileCam(faceRectEnable.checked, faceDetectEmbedData.checked, checked)
+                        nilecam30usb.setFaceDetectionRectNileCam30USB(faceRectEnable.checked, faceDetectEmbedData.checked, checked)
                     }
                     Keys.onReturnPressed: {
-                        nilecamcu30.setFaceDetectionRectNileCam(faceRectEnable.checked, faceDetectEmbedData.checked, checked)
+                        nilecam30usb.setFaceDetectionRectNileCam30USB(faceRectEnable.checked, faceDetectEmbedData.checked, checked)
                     }
                 }
             }
@@ -744,10 +744,10 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
-                        nilecamcu30.setSmileDetectionStateNileCam(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked )
+                        nilecam30usb.setSmileDetectionStateNileCam30USB(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked )
                     }
                     Keys.onReturnPressed: {
-                        nilecamcu30.setSmileDetectionStateNileCam(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                        nilecam30usb.setSmileDetectionStateNileCam30USB(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                     }
                 }
                 RadioButton {
@@ -757,10 +757,10 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
-                        nilecamcu30.setSmileDetectionStateNileCam(false, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                        nilecam30usb.setSmileDetectionStateNileCam30USB(false, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                     }
                     Keys.onReturnPressed: {
-                        nilecamcu30.setSmileDetectionStateNileCam(false, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                        nilecam30usb.setSmileDetectionStateNileCam30USB(false, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                     }
                 }
             }
@@ -834,10 +834,10 @@ Item {
                     enabled: smileDetectEnable.checked ? true : false
                     opacity: enabled ? 1 : 0.1
                     onClicked:{
-                        nilecamcu30.setSmileDetectionStateNileCam(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                        nilecam30usb.setSmileDetectionStateNileCam30USB(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                     }
                     Keys.onReturnPressed: {
-                        nilecamcu30.setSmileDetectionStateNileCam(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                        nilecam30usb.setSmileDetectionStateNileCam30USB(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                     }
                 }
 	    }
@@ -868,10 +868,10 @@ Item {
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {
-                            nilecamcu30.setFlashNileCam(NileCamcu30.FLASHMODE_STROBE)
+                            nilecam30usb.setFlashNileCam30USB(NileCam30usb.FLASHMODE_STROBE)
                         }
                         Keys.onReturnPressed: {
-                            nilecamcu30.setFlashNileCam(NileCamcu30.FLASHMODE_STROBE)
+                            nilecam30usb.setFlashNileCam30USB(NileCam30usb.FLASHMODE_STROBE)
                         }
                     }
                 }
@@ -884,10 +884,10 @@ Item {
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {
-                            nilecamcu30.setFlashNileCam(NileCamcu30.FLASHMODE_TORCH)
+                            nilecam30usb.setFlashNileCam30USB(NileCam30usb.FLASHMODE_TORCH)
                         }
                         Keys.onReturnPressed: {
-                            nilecamcu30.setFlashNileCam(NileCamcu30.FLASHMODE_TORCH)
+                            nilecam30usb.setFlashNileCam30USB(NileCam30usb.FLASHMODE_TORCH)
                         }
                     }
                 }
@@ -900,10 +900,10 @@ Item {
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {
-                            nilecamcu30.setFlashNileCam(NileCamcu30.FLASHMODE_OFF)
+                            nilecam30usb.setFlashNileCam30USB(NileCam30usb.FLASHMODE_OFF)
                         }
                         Keys.onReturnPressed: {
-                            nilecamcu30.setFlashNileCam(NileCamcu30.FLASHMODE_OFF)
+                            nilecam30usb.setFlashNileCam30USB(NileCam30usb.FLASHMODE_OFF)
                         }
                     }
                 }
@@ -1138,26 +1138,26 @@ Item {
     }
 
 
-    NileCamcu30 {
-        id: nilecamcu30
+    NileCam30usb {
+        id: nilecam30usb
         onFlashModeValue:{
             currentFlashMode(flashMode)
         }
         onSendEffectMode:{
             switch(effectMode){
-            case NileCamcu30.EFFECT_NORMAL:
+            case NileCam30usb.EFFECT_NORMAL:
                 rdoEffectNormal.checked = true
                 break;
-            case NileCamcu30.EFFECT_BLACK_WHITE:
+            case NileCam30usb.EFFECT_BLACK_WHITE:
                 rdoEffectBW.checked = true
                 break;
-            case NileCamcu30.EFFECT_GREYSCALE:
+            case NileCam30usb.EFFECT_GREYSCALE:
                 rdoEffectGreyScale.checked = true
                 break;
-            case NileCamcu30.EFFECT_SKETCH:
+            case NileCam30usb.EFFECT_SKETCH:
                 rdoEffectSketch.checked = true
                 break;
-            case NileCamcu30.EFFECT_NEGATIVE:
+            case NileCam30usb.EFFECT_NEGATIVE:
                 rdoEffectNegative.checked = true
                 break;
             }
@@ -1212,14 +1212,14 @@ Item {
             if(setButtonClicked){
                 displayMessageBox(title, text)
                 setButtonClicked = false
-                nilecamcu30.getExposureCompensationNileCam()
+                nilecam30usb.getExposureCompensationNileCam30USB()
             }
         }
         onIndicateSmileThresholdRangeFailure:{
             if(setButtonClicked){
                 displayMessageBox(title, text)
                 setButtonClicked = false
-                nilecamcu30.getSmileDetectionStateNileCam()
+                nilecam30usb.getSmileDetectionStateNileCam30USB()
             }
         }
 	onMcuFirmwareVersionReceived:{
@@ -1244,15 +1244,15 @@ Item {
     // current ROI auto exposure mode
     function currentROIAutoExposureMode(roiMode, winSize){       
         switch(roiMode){
-            case NileCamcu30.AutoExpFace:
+            case NileCam30usb.AutoExpFace:
                 autoexpFace.checked = true
                 autoExpoWinSizeCombo.enabled = false
                 break
-            case NileCamcu30.AutoExpFull:
+            case NileCam30usb.AutoExpFull:
                 autoexpFull.checked = true
                 autoExpoWinSizeCombo.enabled = false
                 break
-            case NileCamcu30.AutoExpManual:
+            case NileCam30usb.AutoExpManual:
                 skipUpdateUIOnExpWindowSize = false
                 autoexpManual.checked = true
                 // If window size is got from camera is 0 then set window size to 1 in UI
@@ -1261,7 +1261,7 @@ Item {
                 }else
                     autoExpoWinSizeCombo.currentIndex = winSize-1
                 break
-            case NileCamcu30.AutoExpDisabled:
+            case NileCam30usb.AutoExpDisabled:
                 autoexpFace.enabled = false
                 autoexpFull.enabled = false
                 autoexpManual.enabled = false
@@ -1272,13 +1272,13 @@ Item {
 
     function currentFlashMode(mode){
         switch(mode){
-        case NileCamcu30.FLASHMODE_TORCH:
+        case NileCam30usb.FLASHMODE_TORCH:
             flashModeTorch.checked = true
             break;
-        case NileCamcu30.FLASHMODE_STROBE:
+        case NileCam30usb.FLASHMODE_STROBE:
             flashModeStrobe.checked = true
             break;
-        case NileCamcu30.FLASHMODE_OFF:
+        case NileCam30usb.FLASHMODE_OFF:
             flashModeOff.checked = true
             break;
         }
@@ -1288,19 +1288,19 @@ Item {
     {
         switch(mode)
         {
-            case NileCamcu30.FLIP_ON_MIRROR_ON:
+            case NileCam30usb.FLIP_ON_MIRROR_ON:
                  flipCtrlVertical.checked = true
                  flipCtrlHorizotal.checked = true
                 break;
-            case NileCamcu30.FLIP_OFF_MIRROR_ON:
+            case NileCam30usb.FLIP_OFF_MIRROR_ON:
                 flipCtrlVertical.checked = true
                 flipCtrlHorizotal.checked = false
                 break;
-            case NileCamcu30.FLIP_ON_MIRROR_OFF:
+            case NileCam30usb.FLIP_ON_MIRROR_OFF:
                  flipCtrlVertical.checked = false
                  flipCtrlHorizotal.checked = true
                 break;
-            case NileCamcu30.FLIP_OFF_MIRROR_OFF:
+            case NileCam30usb.FLIP_OFF_MIRROR_OFF:
                 flipCtrlVertical.checked = false
                 flipCtrlHorizotal.checked = false
                 break;
@@ -1309,22 +1309,22 @@ Item {
 
     function updateSmileDetectModeUI(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerModeValue){
         smileThreshold.text = smileDetectThresholdValue
-        if(smileDetectMode == NileCamcu30.SmileDetectEnable){
+        if(smileDetectMode == NileCam30usb.SmileDetectEnable){
             smileDetectEnable.checked = true
-            if(smileDetectEmbedDataValue == NileCamcu30.SmileDetectEmbedDataEnable){
+            if(smileDetectEmbedDataValue == NileCam30usb.SmileDetectEmbedDataEnable){
                 smileDetectEmbedData.checked = true
             }
-	    if(smileTriggerModeValue == NileCamcu30.SmileTriggerModeEnable){
+	    if(smileTriggerModeValue == NileCam30usb.SmileTriggerModeEnable){
                 smileTrigger.checked = true
 	    } 
-        }else if(smileDetectMode == NileCamcu30.SmileDetectDisable){
+        }else if(smileDetectMode == NileCam30usb.SmileDetectDisable){
             smileDetectDisable.checked = true
-            if(smileDetectEmbedDataValue == NileCamcu30.SmileDetectEmbedDataEnable){
+            if(smileDetectEmbedDataValue == NileCam30usb.SmileDetectEmbedDataEnable){
                 smileDetectEmbedData.checked = true
             }else{
                 smileDetectEmbedData.checked = false
             }
-	    if(smileTriggerModeValue == NileCamcu30.SmileTriggerModeEnable){
+	    if(smileTriggerModeValue == NileCam30usb.SmileTriggerModeEnable){
                 smileTrigger.checked = true
             }else{
                 smileTrigger.checked = false
@@ -1333,22 +1333,22 @@ Item {
     }
 
     function updateFaceDetectModeUI(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect){        
-        if(faceDetectMode == NileCamcu30.FaceRectEnable){
+        if(faceDetectMode == NileCam30usb.FaceRectEnable){
             faceRectEnable.checked = true
-            if(faceDetectEmbedDataValue == NileCamcu30.FaceDetectEmbedDataEnable){
+            if(faceDetectEmbedDataValue == NileCam30usb.FaceDetectEmbedDataEnable){
                 faceDetectEmbedData.checked = true
             }
-            if(faceDetectOverlayRect == NileCamcu30.FaceDetectOverlayRectEnable){
+            if(faceDetectOverlayRect == NileCam30usb.FaceDetectOverlayRectEnable){
                 overlayRect.checked = true
             }
-        }else if(faceDetectMode == NileCamcu30.FaceRectDisable){
+        }else if(faceDetectMode == NileCam30usb.FaceRectDisable){
             faceRectDisable.checked = true
-            if(faceDetectEmbedDataValue == NileCamcu30.FaceDetectEmbedDataEnable){
+            if(faceDetectEmbedDataValue == NileCam30usb.FaceDetectEmbedDataEnable){
                 faceDetectEmbedData.checked = true
             }else{
                 faceDetectEmbedData.checked = false
             }
-            if(faceDetectOverlayRect == NileCamcu30.FaceDetectOverlayRectEnable){
+            if(faceDetectOverlayRect == NileCam30usb.FaceDetectOverlayRectEnable){
                 overlayRect.checked = true
             }else{
                 overlayRect.checked = false
@@ -1357,9 +1357,9 @@ Item {
     }
 
     function enableFaceDetectEmbedData(){
-        if(nilecamcu30.setFaceDetectionRectNileCam(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){
+        if(nilecam30usb.setFaceDetectionRectNileCam30USB(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){
             if(faceDetectEmbedData.checked){
-                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document NileCam_CU30_Face_and_Smile_Detection for more details"))
+                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document NileCAM30_USB_Face_and_Smile_Detection for more details"))
             }
         }        
     }
@@ -1367,23 +1367,23 @@ Item {
     function exposureCompSetButtonClicked(){
         exposureCompSet.enabled = false
         setButtonClicked = true
-        nilecamcu30.setExposureCompensationNileCam(exposureCompValue.text)
+        nilecam30usb.setExposureCompensationNileCam30USB(exposureCompValue.text)
         exposureCompSet.enabled = true        
     }
 
     function smileThresholdSetButtonClicked(){
         smileThresholdSet.enabled = false
         setButtonClicked = true
-        nilecamcu30.setSmileDetectionStateNileCam(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+        nilecam30usb.setSmileDetectionStateNileCam30USB(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
         smileThresholdSet.enabled = true        
     }
 
     function enableSmileDetectEmbedData(){
         setButtonClicked = false        
-        if(nilecamcu30.setSmileDetectionStateNileCam(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)){
+        if(nilecam30usb.setSmileDetectionStateNileCam30USB(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)){
             if(smileDetectEmbedData.checked){
                 messageDialog.title = qsTr("Status")
-                messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document NileCam_CU30_Face_and_Smile_Detection for more details")
+                messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document NileCAM30_USB_Face_and_Smile_Detection for more details")
                 messageDialog.open()
             }
         }        
@@ -1427,17 +1427,17 @@ Item {
     {
         switch(mode)
         {
-            case NileCamcu30.SCENE_NORMAL:
+            case NileCam30usb.SCENE_NORMAL:
                 sceneNormal.checked = true
                 break;
-            case NileCamcu30.SCENE_DOCUMENT:
+            case NileCam30usb.SCENE_DOCUMENT:
                 sceneDoc.checked = true
                 break;
         }
     }
 
     function readMCUFirmwareVersion(){
-	nilecamcu30.readMCUFirmwareVersion()
+	nilecam30usb.readMCUFirmwareVersion()
     }
 
     function getFirmwareVersion() {
@@ -1451,31 +1451,31 @@ Item {
 
     function setDefaultValues(){
         defaultValue.enabled = false //To avoid multiple clicks over Default button
-        nilecamcu30.restoreDefaultNileCam()
+        nilecam30usb.restoreDefaultNileCam30USB()
         getCameraValues()
         defaultValue.enabled = true
     }
 
     function getCameraValues(){
-        nilecamcu30.getSpecialEffectsNileCam()
-        nilecamcu30.getDenoiseValueNileCam()
-        nilecamcu30.getSceneModeNileCam()
-        nilecamcu30.getExpRoiModeNileCam()
-        nilecamcu30.getBurstLengthNileCam()
-        nilecamcu30.getQFactorNileCam()
-        nilecamcu30.getFlipModeNileCam()
-        nilecamcu30.getFrameRateValueNileCam()
-        nilecamcu30.getExposureCompensationNileCam()
-        nilecamcu30.getFaceDetectionRectNileCam()
-        nilecamcu30.getSmileDetectionStateNileCam()
-    	nilecamcu30.getFlashNileCam()
+        nilecam30usb.getSpecialEffectsNileCam30USB()
+        nilecam30usb.getDenoiseValueNileCam30USB()
+        nilecam30usb.getSceneModeNileCam30USB()
+        nilecam30usb.getExpRoiModeNileCam30USB()
+        nilecam30usb.getBurstLengthNileCam30USB()
+        nilecam30usb.getQFactorNileCam30USB()
+        nilecam30usb.getFlipModeNileCam30USB()
+        nilecam30usb.getFrameRateValueNileCam30USB()
+        nilecam30usb.getExposureCompensationNileCam30USB()
+        nilecam30usb.getFaceDetectionRectNileCam30USB()
+        nilecam30usb.getSmileDetectionStateNileCam30USB()
+    	nilecam30usb.getFlashNileCam30USB()
     }
 
     Connections{
          target: root
          onMouseRightClicked:{
              if(autoexpManual.enabled && autoexpManual.checked){
-                nilecamcu30.setExpRoiModeNileCam(NileCamcu30.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
+                nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
              }
          }
          onAutoExposureSelected:{
@@ -1483,15 +1483,15 @@ Item {
          }
          onEnableFaceRectafterBurst:{
              smileTriggerCapture = false
-             if(nilecamcu30.enableDisableFaceRectangle(true)){
+             if(nilecam30usb.enableDisableFaceRectangle(true)){
                  smileTriggerCapture = true
              }
          }
          onBeforeRecordVideo:{
-            nilecamcu30.enableDisableFaceRectangle(false)
+            nilecam30usb.enableDisableFaceRectangle(false)
          }
          onAfterRecordVideo:{
-            nilecamcu30.enableDisableFaceRectangle(true)
+            nilecam30usb.enableDisableFaceRectangle(true)
          }
          onVideoResolutionChanged:{
              getexposureCompFrameRateCtrlTimer.start()

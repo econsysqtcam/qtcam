@@ -1042,8 +1042,8 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/ascella/cx3-uvc.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.CX3_SNI_CAM) {
             see3cam = Qt.createComponent("../UVCSettings/cx3SNI/uvcExtCX3SNI.qml").createObject(root)
-        }else if(selectedDeviceEnumValue == CommonEnums.NILECAM_CU30) {
-            see3cam = Qt.createComponent("../UVCSettings/nilecamcu30/nilecam_cu30.qml").createObject(root)
+        }else if(selectedDeviceEnumValue == CommonEnums.NILECAM30_USB) {
+            see3cam = Qt.createComponent("../UVCSettings/nilecam30usb/nilecam30_usb.qml").createObject(root)
         }else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
@@ -1081,7 +1081,7 @@ Rectangle {
 			case CommonEnums.SEE3CAM_81:
  			// Added by Sankari : 22 Feb 2017
             case CommonEnums.SEE3CAM_CU135:
-            case CommonEnums.NILECAM_CU30:
+            case CommonEnums.NILECAM30_USB:
                 camproperty.openHIDDevice(device_box.currentText);
             break;
         }

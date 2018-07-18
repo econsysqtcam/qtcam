@@ -46,7 +46,7 @@
 #include "uvcExtCx3sni.h"
 #include "ascella.h"
 #include "keyEventReceive.h"
-#include "nilecam_cu30.h"
+#include "nilecam30_usb.h"
 #include "about.h"
 #include "common.h"
 #include "common_enums.h"
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<See3CAM_130>("econ.camera.see3cam130", 1, 0, "See3Cam130");
     qmlRegisterType<See3CAM_CU30>("econ.camera.see3camcu30", 1, 0, "See3Camcu30");
-    qmlRegisterType<NILECAM_CU30>("econ.camera.nilecamcu30", 1, 0, "NileCamcu30");
+    qmlRegisterType<NILECAM30_USB>("econ.camera.nilecam30usb", 1, 0, "NileCam30usb");
 
     // Added by Sankari: 27 July 2017
     qmlRegisterType<See3CAM_CU20>("econ.camera.see3camcu20", 1, 0, "See3Camcu20");
