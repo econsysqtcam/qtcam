@@ -121,8 +121,9 @@ void Cameraproperty::openEventNode(QString businfo){ //open device event path fi
                     {  // camera device is present
                         break;
                     }else{
-			// close event file opened not related to camera device
+            	// close event file opened not related to camera device
                         ::close(event_fd);
+                        event_fd = -1;
                     }
                 }else{
                     qDebug()<<"Cant open the file /dev/input/event<"<<deviceEventCount;

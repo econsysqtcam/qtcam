@@ -78,22 +78,9 @@ Item {
         interval: 1000
         onTriggered: {
             root.imageCapture(CommonEnums.BURST_SHOT);
-            // Added by Sankari: 20 Apr 2017
-            // Disable saving image when trigger mode is selected initially and capturing image then switch to master mode
-            if(streamTrigger.checked)
-                root.disableSaveImage()
             stop()
         }
     }
-
-    Timer {
-            id: enableSettings
-            interval: 3000
-            onTriggered: {
-                root.enableAllSettingsTab()
-                stop()
-            }
-        }
 
     Connections
     {
@@ -101,11 +88,7 @@ Item {
         onTakeScreenShot:
         {
             seecamcu135.enableDisableFaceRectangle(false)
-            burstShotTimer.start()
-            // In trigger mode, if frames are not coming then after 3 seconds enable all settings
-            if(streamTrigger.checked){
-               enableSettings.start()
-            }
+            burstShotTimer.start()            
         }
         onGetVideoPinStatus:
         {
@@ -497,13 +480,10 @@ Item {
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked:{
-                            root.startUpdatePreviewInMasterMode()
-                            seecamcu135.setStreamMode(See3CamCu135.STREAM_MASTER)                            
+                            setMasterMode()
                         }
                         Keys.onReturnPressed: {
-                            root.startUpdatePreviewInMasterMode()
-                            seecamcu135.setStreamMode(See3CamCu135.STREAM_MASTER)
-
+                            setMasterMode()
                         }
                     }
                     RadioButton {
@@ -1065,12 +1045,16 @@ Item {
         messageDialog.open()
     }
 
+    function setMasterMode(){
+        seecamcu135.setStreamMode(See3CamCu135.STREAM_MASTER)
+        root.captureBtnEnable(true)
+        root.videoRecordBtnEnable(true)
+    }
+
     // set to default values
     function setToDefaultValues(){
         seecamcu135.setToDefault()
-        getValuesFromCamera()
-        // Added by Sankari: 24 Apr 2017. To get preview in master mode
-        root.startUpdatePreviewInMasterMode()
+        getValuesFromCamera()        
     }
 
     // Enable Face detect embed data
@@ -1187,7 +1171,8 @@ Item {
 
     // set trigger stream mode
     function setTriggerMode(){
-        root.stopUpdatePreviewInTriggerMode()
+        root.captureBtnEnable(false)
+        root.videoRecordBtnEnable(false)
         seecamcu135.setStreamMode(See3CamCu135.STREAM_TRIGGER)        
         displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document See3CAM_CU135_Trigger_Mode"))
     }
@@ -1306,8 +1291,12 @@ Item {
         onStreamModeValue:{
             if(streamMode == See3CamCu135.STREAM_MASTER){
                 streamMaster.checked = true
+                root.captureBtnEnable(true)
+                root.videoRecordBtnEnable(true)
             }else if(streamMode == See3CamCu135.STREAM_TRIGGER){
                 streamTrigger.checked = true
+                root.captureBtnEnable(false)
+                root.videoRecordBtnEnable(false)
                 messageDialog.title = "Trigger Mode"
                 messageDialog.text = "Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document."
                 messageDialog.open()

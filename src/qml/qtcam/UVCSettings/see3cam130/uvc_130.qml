@@ -40,10 +40,6 @@ Item {
             seecam130.enableDisableAFRectangle(false)
             seecam130.enableDisableFaceRectangle(false)
             burstShotTimer.start()
-            // In trigger mode, if frames are not coming then after 3 seconds enable all settings
-            if(streamTrigger.checked){
-                enableSettings.start()
-            }
         }
         onGetVideoPinStatus:
         {
@@ -65,22 +61,9 @@ Item {
         interval: 1000
         onTriggered: {
             root.imageCapture(CommonEnums.BURST_SHOT);
-            // Added by Sankari: 20 Apr 2017
-            // Disable saving image when trigger mode is selected initially and capturing image then switch to master mode
-            if(streamTrigger.checked)
-                root.disableSaveImage()
             stop()
         }
-    }
-
-    Timer {
-        id: enableSettings
-        interval: 3000
-        onTriggered: {
-            root.enableAllSettingsTab()
-            stop()
-        }
-    }
+    }    
 
     Timer {
         id: getCamValuesTimer
@@ -595,12 +578,10 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
-                        root.startUpdatePreviewInMasterMode()
-                        seecam130.setStreamMode(See3Cam130.STREAM_MASTER)
+                        setMasterMode()
                     }
-                    Keys.onReturnPressed: {
-                        root.startUpdatePreviewInMasterMode()
-                        seecam130.setStreamMode(See3Cam130.STREAM_MASTER)
+                    Keys.onReturnPressed: {                        
+                        setMasterMode()
                     }
                 }
                 RadioButton {
@@ -614,12 +595,7 @@ Item {
                     }
                     Keys.onReturnPressed: {
                         setTriggerMode()
-                    }
-                    onFocusChanged: {
-                        // Disable saving image when focus is changed from trigger mode to master mode
-                        // or changing to any other camera if it is m_saveImage flag set as true to avoid saving image.
-                       root.disableSaveImage()
-                    }
+                    }                   
                 }
             }
             Text {
@@ -1389,11 +1365,14 @@ Item {
            updateFlipMode(flipMode, flipEnableDisableMode)
         }
         onStreamModeValue:{
-            if(streamMode == See3Cam130.STREAM_MASTER){
+            if(streamMode == See3Cam130.STREAM_MASTER){                
                 streamMaster.checked = true
-
+                root.captureBtnEnable(true)
+                root.videoRecordBtnEnable(true)
             }else if(streamMode == See3Cam130.STREAM_TRIGGER){
                 streamTrigger.checked = true
+                root.captureBtnEnable(false)
+                root.videoRecordBtnEnable(false)
                 displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document."))
             }
         }
@@ -1659,8 +1638,16 @@ Item {
         }
     }
 
+    function setMasterMode(){
+        seecam130.setStreamMode(See3Cam130.STREAM_MASTER)
+        console.log("set master mode")
+        root.captureBtnEnable(true)
+        root.videoRecordBtnEnable(true)
+    }
+
     function setTriggerMode(){
-        root.stopUpdatePreviewInTriggerMode()
+        root.captureBtnEnable(false)
+        root.videoRecordBtnEnable(false)
         seecam130.setStreamMode(See3Cam130.STREAM_TRIGGER)
         displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document See3CAM_130_Trigger_Mode"))
     }

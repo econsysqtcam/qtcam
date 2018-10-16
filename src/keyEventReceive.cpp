@@ -32,6 +32,7 @@ CamKeyEventReceive::CamKeyEventReceive()
  */
 void CamKeyEventReceive::initializeToGetKey(){
     m_capKeyNotifier = new QSocketNotifier(camPropObj.event_fd, QSocketNotifier::Read);
+    m_capKeyNotifier->setEnabled(true);
     connect(m_capKeyNotifier, SIGNAL(activated(int)), this, SLOT(doKeyReceived()));
 }
 
@@ -67,6 +68,7 @@ void CamKeyEventReceive::stopGetKeyFromCamera(){
     // Close already existing fd
     if(camPropObj.event_fd > 0){
         ::close(camPropObj.event_fd);
+        camPropObj.event_fd = -1;
     }
 
     // Delete created socket notifier to get key from camera
