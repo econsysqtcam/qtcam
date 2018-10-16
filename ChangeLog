@@ -1,3 +1,7 @@
+Qtcam Application - 17.0.2
+--------------------------
+* Changed trigger mode as stream[preview] mode in see3cam_cu135 and see3cam_130 camera.
+
 Qtcam Application - 17.0.1
 --------------------------
 * Renamed NileCAM_CU30 as NileCAM30_USB camera.
