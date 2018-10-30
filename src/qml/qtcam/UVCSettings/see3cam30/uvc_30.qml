@@ -1606,9 +1606,9 @@ Item {
          }
          onTakeScreenShot:
          {
-             see3cam30.enableDisableAFRectangle(false)
-             see3cam30.enableDisableOverlayRect(false)
-             burstShotTimer.start()
+             if(see3cam30.enableDisableOverlayRect(false)){
+		root.imageCapture(CommonEnums.BURST_SHOT);
+	     }
          }
          onGetVideoPinStatus:
          {

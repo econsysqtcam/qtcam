@@ -46,8 +46,9 @@ Item {
         target: root
         onTakeScreenShot:
         {
-            seecamcu130.enableDisableFaceRectangle(false)
-            burstShotTimer.start()
+	      if(seecamcu130.enableDisableFaceRectangle(false)){
+              	root.imageCapture(CommonEnums.BURST_SHOT);
+              }            
         }
         onGetVideoPinStatus:
         {

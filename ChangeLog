@@ -1,3 +1,7 @@
+Qtcam Application - 17.0.3
+--------------------------
+* Fixed issue of face rectangle is shown in captured image.
+
 Qtcam Application - 17.0.2
 --------------------------
 * Changed trigger mode as stream[preview] mode in see3cam_cu135 and see3cam_130 camera.
