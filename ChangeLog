@@ -1,3 +1,9 @@
+Qtcam Application - 17.0.4
+--------------------------
+* Fixed issue of zoom Default Zoom value does not change for other resolution
+* Fixed issue of zoom is not reflected in preview when
+clicking hardware default.
+
 Qtcam Application - 17.0.3
 --------------------------
 * Fixed issue of face rectangle is shown in captured image.
