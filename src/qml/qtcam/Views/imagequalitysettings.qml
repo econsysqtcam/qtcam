@@ -75,6 +75,7 @@ Item {
     property bool ledFreqValueChangeProperty
     property bool focusLogitechValueChangeProperty
     property bool focusValueChangeProperty
+    property bool focusAutoChangeProperty
     property bool usb3speed: false
 
     property bool powerLineComboEnable
@@ -1283,6 +1284,7 @@ Item {
             ledFreqValueChangeProperty = false
             focusLogitechValueChangeProperty = false
             focusValueChangeProperty = false
+	    focusAutoChangeProperty = false
             powerLineComboEnable = false
 	    // Skip doing things when exposure combo index changed calls when no selection of any camera
 	    exposureComboEnable = false
@@ -1870,6 +1872,7 @@ Item {
             ledFreqValueChangeProperty = true
             focusLogitechValueChangeProperty = true
             focusValueChangeProperty = true
+	    focusAutoChangeProperty = true
             video_capture_filter_Child.visible = true
 	    // To avoid setting exposure when get the control values 
 	    exposureComboEnable = false
