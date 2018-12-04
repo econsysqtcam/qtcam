@@ -84,6 +84,7 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c081"),CommonEnums::SEE3CAM_81);
     cameraEnumMap.insert("04b4,0035",CommonEnums::CX3_SNI_CAM); // Cypress Semiconductor Corp : CX3-SNI front and rear camera
     cameraEnumMap.insert(econVid + (",c132"),CommonEnums::NILECAM30_USB);
+    cameraEnumMap.insert(econVid + (",c154"),CommonEnums::SEE3CAM_CU55);
 }
 
 unsigned int uvccamera::getTickCount()
@@ -211,9 +212,24 @@ int uvccamera::findEconDevice(QString parameter)
 void uvccamera::currentlySelectedDevice(QString deviceName)
 {
     deviceName.remove(QRegExp("[\n\t\r]"));
-    if(pidVidMap.contains(deviceName))
-    {
-        QString selectedCameraVidPid = pidVidMap.value(deviceName);
+
+    bool deviceFound = false;
+    QString originalDeviceName;
+    // Added by Sankari: To fix string name and hid initialization issue: Check the camera name selected is having substring
+    // in pidvidmap product name
+    QMap<QString, QString>::iterator pidvidmapIterator;
+    for (pidvidmapIterator = pidVidMap.begin(); pidvidmapIterator != pidVidMap.end(); ++pidvidmapIterator)
+    {       
+        if(deviceName.contains(pidvidmapIterator.key()))
+        {
+            deviceFound = true;
+            originalDeviceName = pidvidmapIterator.key();
+        }
+    }
+
+    if(deviceFound)
+    {        
+        QString selectedCameraVidPid = pidVidMap.value(originalDeviceName);
         //Convert the vid,pid value in the cameraEnum map as lower case and compare with the selected Vid,pid
         QMap<QString, CommonEnums::ECameraNames>::iterator mapIterator;
         selectedDeviceEnum = CommonEnums::NONE;
@@ -374,6 +390,18 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
         emit logHandle(QtCriticalMsg,"cameraName not passed as parameter\n");
         return false;
     }
+    QString originalDeviceName;
+
+    QMap<QString, QString>::iterator pidvidmapIterator;
+    for (pidvidmapIterator = pidVidMap.begin(); pidvidmapIterator != pidVidMap.end(); ++pidvidmapIterator)
+    {
+        if(cameraName.contains(pidvidmapIterator.key()))
+        {
+            originalDeviceName = pidvidmapIterator.key();
+
+        }
+    }
+
     if(hid_fd >= 0)
     {
         close(hid_fd);
@@ -391,12 +419,11 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
     struct hidraw_devinfo info;
     struct hidraw_report_descriptor rpt_desc;
 
-
     /* Open the Device with non-blocking reads. In real life,
            don't use a hard coded path; use libudev instead. */
-    QMap<QString, QString>::const_iterator ii = cameraMap.find(cameraName);
+    QMap<QString, QString>::const_iterator ii = cameraMap.find(originalDeviceName);
     openNode = "";
-    while (ii != cameraMap.end() && ii.key() == cameraName) {
+    while (ii != cameraMap.end() && ii.key() == originalDeviceName) {
         hid_fd = open(ii.value().toLatin1().data(), O_RDWR|O_NONBLOCK);
         memset(buf, 0x0, sizeof(buf));
         /* Get Physical Location */

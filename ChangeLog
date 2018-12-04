@@ -1,3 +1,11 @@
+Qtcam Application - 18.0.0
+--------------------------
+* Added support for see3cam_55 camera.
+* Fixed issue of not able to access extension unit when camera name received via
+“udev” and “v4l2” are different.[Ex:Tania, See3cam_80 cameras]
+* Fixed issue of sending command to set uvc control values when selecting the
+camera.
+
 Qtcam Application - 17.0.4
 --------------------------
 * Fixed issue of zoom Default Zoom value does not change for other resolution

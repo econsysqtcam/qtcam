@@ -46,7 +46,10 @@ public:
         SEE3CAM_CU20,
         // Added by Sankari - 13 June 2017
         CX3_SNI_CAM,
-	NILECAM30_USB
+
+        NILECAM30_USB,
+
+        SEE3CAM_CU55  // SEE3CAM_AR0521
 
     }ECameraNames;
     //Enum for capture shot type
