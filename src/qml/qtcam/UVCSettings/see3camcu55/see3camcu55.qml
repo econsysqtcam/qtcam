@@ -43,14 +43,24 @@ Item {
     property bool skipUpdateUIQFactor : false
     property bool skipUpdateUIFrameRate: false
     property bool setButtonClicked: false
+    property bool smileTriggerCapture: true
 
     Connections
     {
         target: root
         onTakeScreenShot:
-        {
-            see3camcu55.enableDisableFaceRectangle(false)
-            burstShotTimer.start()
+        {           
+	    if(!isWebKeyPressed){ // mouse click
+                see3camcu55.enableDisableFaceRectangle(false)
+                burstShotTimer.start()
+            }else{
+                if(smileTriggerCapture){
+                    if(see3camcu55.enableDisableFaceRectangle(false)){
+                        root.imageCapture(CommonEnums.BURST_SHOT);
+                    }
+                }
+            }
+
         }
         onGetVideoPinStatus:
         {
@@ -121,54 +131,7 @@ Item {
         ColumnLayout{
             x:2
             y:5
-            spacing:20
-
-            Text {
-            id: scene_mode
-            text: "--- Scene Mode ---"
-            font.pixelSize: 14
-            font.family: "Ubuntu"
-            color: "#ffffff"
-            smooth: true
-            Layout.alignment: Qt.AlignCenter
-            opacity: 0.50196078431373
-            }
-
-
-            Grid {
-                columns: 2
-                spacing: 50
-
-                ExclusiveGroup { id: sceneInputGroup }
-                RadioButton {
-                    id: sceneNormal
-                    style:  econRadioButtonStyle
-                    text:   qsTr("Normal")
-                    exclusiveGroup: sceneInputGroup
-                    activeFocusOnPress: true
-                    onClicked: {
-                        see3camcu55.setSceneMode(See3camCu55.SCENE_NORMAL)
-                    }
-                    Keys.onReturnPressed: {
-                        see3camcu55.setSceneMode(See3camCu55.SCENE_NORMAL)
-                    }
-                }
-                RadioButton {
-                    id: sceneDoc
-                    style:  econRadioButtonStyle
-                    text: qsTr("Document")
-                    exclusiveGroup: sceneInputGroup
-                    activeFocusOnPress: true
-                    onClicked: {                        
-                        see3camcu55.setSceneMode(See3camCu55.SCENE_DOCUMENT)
-                    }
-                    Keys.onReturnPressed: {                        
-                        see3camcu55.setSceneMode(See3camCu55.SCENE_DOCUMENT)
-                    }
-
-                }
-
-            }
+            spacing:20           
             Row{
                 Layout.alignment: Qt.AlignCenter
                 Text {
@@ -1148,10 +1111,7 @@ Item {
         }
         onSendDenoiseValue:{
             deNoiseSlider.value = denoiseValue
-        }
-        onSceneModeValue: {
-            currentSceneMode(sceneMode)
-        }
+        }        
         onQFactorValue:{
           skipUpdateUIQFactor = false
           qFactorSlider.value = qFactor
@@ -1398,19 +1358,7 @@ Item {
         }
         getAutoExpsoureControlValues.start()
     }
-
-    function currentSceneMode(mode)
-    {
-        switch(mode)
-        {
-            case See3camCu55.SCENE_NORMAL:
-                sceneNormal.checked = true
-                break;
-            case See3camCu55.SCENE_DOCUMENT:
-                sceneDoc.checked = true
-                break;
-        }
-    }
+    
 
     function getFirmwareVersion() {
         uvccamera.getFirmWareVersion()
@@ -1431,7 +1379,6 @@ Item {
     function getCameraValues(){
         see3camcu55.getEffectMode()
         see3camcu55.getDenoiseValue()
-        see3camcu55.getSceneMode()
         see3camcu55.getAutoExpROIModeAndWindowSize()
         see3camcu55.getBurstLength()
         see3camcu55.getQFactor()
@@ -1453,8 +1400,11 @@ Item {
          onAutoExposureSelected:{
              enableDisableAutoExposureControls(autoExposureSelect)
          }
-         onEnableFaceRectafterBurst:{
-           see3camcu55.enableDisableFaceRectangle(true)
+         onEnableFaceRectafterBurst:{           
+	     smileTriggerCapture = false
+             if(see3camcu55.enableDisableFaceRectangle(true)){
+                 smileTriggerCapture = true
+             }
          }
          onBeforeRecordVideo:{
             see3camcu55.enableDisableFaceRectangle(false)

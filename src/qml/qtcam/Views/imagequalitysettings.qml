@@ -1126,6 +1126,7 @@ Item {
                                         root.changeCameraSettings(focusControlAutoId,0)
                                     }
                                 }
+				focusAutoChangeProperty = true
                             }
                         }
                     }
