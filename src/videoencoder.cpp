@@ -215,7 +215,6 @@ bool VideoEncoder::closeFile()
     return true;
 }
 
-
 /**
    \brief Encode one frame
 

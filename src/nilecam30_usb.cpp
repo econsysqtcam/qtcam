@@ -320,7 +320,7 @@ bool NILECAM30_USB::getExpRoiModeNileCam30USB(){
 }
 
 /**
- * @brief See3CAM_130::setBurstLengthNileCam - set burst length in camera
+ * @brief NILECAM30_USB::setBurstLengthNileCam - set burst length in camera
  * @param burstLength - burst length - no of images to be taken.
  * return true - success /false - failure
  */
@@ -642,7 +642,7 @@ bool NILECAM30_USB::setExposureCompensationNileCam30USB(unsigned int exposureCom
 
 
 /**
- * @brief See3CAM_130::getExposureCompensationNileCam - getting exposure compensation
+ * @brief NILECAM30_USB::getExposureCompensationNileCam - getting exposure compensation
  * @return true/false
  */
 bool NILECAM30_USB::getExposureCompensationNileCam30USB(){

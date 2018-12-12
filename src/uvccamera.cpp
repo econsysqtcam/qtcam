@@ -81,6 +81,7 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",d052"),CommonEnums::ECON_CX3_RDX_V5680);
     cameraEnumMap.insert(econVid + (",c080"),CommonEnums::ECON_8MP_CAMERA);
     cameraEnumMap.insert(econVid + (",c0d0"),CommonEnums::SEE3CAM_130);
+    cameraEnumMap.insert(econVid + (",c0d3"),CommonEnums::SEE3CAM_130A);
     cameraEnumMap.insert(econVid + (",c081"),CommonEnums::SEE3CAM_81);
     cameraEnumMap.insert("04b4,0035",CommonEnums::CX3_SNI_CAM); // Cypress Semiconductor Corp : CX3-SNI front and rear camera
     cameraEnumMap.insert(econVid + (",c132"),CommonEnums::NILECAM30_USB);

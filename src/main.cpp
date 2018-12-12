@@ -38,6 +38,7 @@
 #include "see3cam_cu130.h"
 #include "see3cam_cu135.h"
 #include "see3cam_130.h"
+#include "see3cam_130A.h"
 #include "see3cam_cu20.h"
 #include "seecam_ar0130.h"
 #include "seecam_cu30.h"
@@ -91,6 +92,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_CU40>("econ.camera.see3camcu40", 1, 0, "See3Camcu40");
 
     qmlRegisterType<See3CAM_130>("econ.camera.see3cam130", 1, 0, "See3Cam130");
+    qmlRegisterType<See3CAM_130A>("econ.camera.see3cam130A", 1, 0, "See3Cam130A");
     qmlRegisterType<See3CAM_CU30>("econ.camera.see3camcu30", 1, 0, "See3Camcu30");
     qmlRegisterType<NILECAM30_USB>("econ.camera.nilecam30usb", 1, 0, "NileCam30usb");
     qmlRegisterType<See3CAM_CU55>("econ.camera.see3camcu55", 1, 0, "See3camCu55");

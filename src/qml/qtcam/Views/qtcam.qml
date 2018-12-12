@@ -1026,6 +1026,8 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu135/uvc_cu135.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam130/uvc_130.qml").createObject(root)
+        }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130A) {
+            see3cam = Qt.createComponent("../UVCSettings/see3cam130A/uvc_130A.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU51) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam51/uvc51.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_12CUNIR) {
@@ -1079,6 +1081,7 @@ Rectangle {
             case CommonEnums.SEE3CAM_12CUNIR:
             case CommonEnums.ECON_8MP_CAMERA:
             case CommonEnums.SEE3CAM_130:
+            case CommonEnums.SEE3CAM_130A:
             case CommonEnums.SEE3CAM_30:
 			case CommonEnums.SEE3CAM_81:
  			// Added by Sankari : 22 Feb 2017
