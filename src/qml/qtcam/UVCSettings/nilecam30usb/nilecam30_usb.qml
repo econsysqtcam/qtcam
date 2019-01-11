@@ -45,7 +45,6 @@ Item {
     property bool setButtonClicked: false
     property bool skipUpdateUIOnDenoise: false	
     property var mcuFirmwareVersion;
-    property bool smileTriggerCapture: true
 
     Timer {
         id: burstShotTimer
@@ -66,11 +65,8 @@ Item {
                 nilecam30usb.enableDisableFaceRectangle(false)
                 burstShotTimer.start()
             }else{
-                if(smileTriggerCapture){
-                    if(nilecam30usb.enableDisableFaceRectangle(false)){
-                        root.imageCapture(CommonEnums.BURST_SHOT);
-                    }
-                }
+                nilecam30usb.enableDisableFaceRectangle(false)
+            	root.imageCapture(CommonEnums.BURST_SHOT);                    
             }
         }
         onGetVideoPinStatus:
@@ -289,27 +285,7 @@ Item {
                 spacing:38
                 ExclusiveGroup { id: roiExpogroup }
 
-                // Added by Sankari 13th Sep 2017 : Added Face ROI mode
                 RadioButton {
-                    exclusiveGroup: roiExpogroup
-                    id: autoexpFace
-                    text: "Face"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    opacity: enabled ? 1 : 0.1
-                    // setExpRoiModeNileCam30USB() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
-                    // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
-                    // winSize is required only for manual mode
-                    onClicked: {
-                        nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpFace, 0, 0, 0, 0, 0);
-                        autoExpoWinSizeCombo.enabled = false
-                    }
-                    Keys.onReturnPressed: {
-                        nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpFace, 0, 0, 0, 0, 0);
-                        autoExpoWinSizeCombo.enabled = false
-                    }
-                  }
-                  RadioButton {
                       exclusiveGroup: roiExpogroup
                       id: autoexpFull
                       text: "Full"
@@ -744,10 +720,10 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
-                        nilecam30usb.setSmileDetectionStateNileCam30USB(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked )
+                        nilecam30usb.setSmileDetectionStateNileCam30USB(true, smileDetectEmbedData.checked)
                     }
                     Keys.onReturnPressed: {
-                        nilecam30usb.setSmileDetectionStateNileCam30USB(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                        nilecam30usb.setSmileDetectionStateNileCam30USB(true, smileDetectEmbedData.checked)
                     }
                 }
                 RadioButton {
@@ -757,56 +733,14 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
-                        nilecam30usb.setSmileDetectionStateNileCam30USB(false, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                        nilecam30usb.setSmileDetectionStateNileCam30USB(false, smileDetectEmbedData.checked)
                     }
                     Keys.onReturnPressed: {
-                        nilecam30usb.setSmileDetectionStateNileCam30USB(false, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                        nilecam30usb.setSmileDetectionStateNileCam30USB(false, smileDetectEmbedData.checked)
                     }
                 }
             }
-            Row{
-                spacing: 14
-                Text {
-                    id: smileThresholdText
-                    text: "Threshold value[40-75]"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    width: 80
-                    wrapMode: Text.WordWrap
-                    opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
-                }
-                TextField {
-                    id: smileThreshold
-                    font.pixelSize: 10
-                    font.family: "Ubuntu"
-                    smooth: true
-                    horizontalAlignment: TextInput.AlignHCenter
-                    enabled: (smileDetectEnable.enabled && smileDetectEnable.checked) ? true : false
-                    opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
-                    style: econTextFieldStyle
-                    implicitHeight: 25
-                    implicitWidth: 70
-                    validator: IntValidator {bottom: 40; top: 75}
-                }
-                Button {
-                    id: smileThresholdSet
-                    activeFocusOnPress : true
-                    text: "Set"
-                    style: econButtonStyle
-                    enabled: (smileDetectEnable.enabled && smileDetectEnable.checked) ? true : false
-                    opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
-                    implicitHeight: 25
-                    implicitWidth: 60
-                    onClicked: {
-                        smileThresholdSetButtonClicked()
-                    }
-                    Keys.onReturnPressed: {
-                        smileThresholdSetButtonClicked()
-                    }
-                }
-            }
+            
             Row{
                 spacing: 5
                 CheckBox {
@@ -824,23 +758,7 @@ Item {
                     }
                 }
             }
-	    Row{
-                spacing: 5
-                CheckBox {
-                    id: smileTrigger
-                    activeFocusOnPress : true
-                    text: "Smile Trigger"
-                    style: econCheckBoxStyle
-                    enabled: smileDetectEnable.checked ? true : false
-                    opacity: enabled ? 1 : 0.1
-                    onClicked:{
-                        nilecam30usb.setSmileDetectionStateNileCam30USB(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
-                    }
-                    Keys.onReturnPressed: {
-                        nilecam30usb.setSmileDetectionStateNileCam30USB(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
-                    }
-                }
-	    }
+	    
             Text{
                 id: flashCtrlText
                 x: 85
@@ -1187,7 +1105,7 @@ Item {
             updateFaceDetectModeUI(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect)
         }
         onSmileDetectModeValue:{
-            updateSmileDetectModeUI(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerMode)
+            updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue)
         }
 
         onFlipMirrorModeChanged:{
@@ -1215,14 +1133,7 @@ Item {
                 nilecam30usb.getExposureCompensationNileCam30USB()
             }
         }
-        onIndicateSmileThresholdRangeFailure:{
-            if(setButtonClicked){
-                displayMessageBox(title, text)
-                setButtonClicked = false
-                nilecam30usb.getSmileDetectionStateNileCam30USB()
-            }
-        }
-	onMcuFirmwareVersionReceived:{
+        onMcuFirmwareVersionReceived:{
 		mcuFirmwareVersion = mcuFwVersion
 	}
 	onUpdateFrameToSkipfromCam:{
@@ -1244,10 +1155,6 @@ Item {
     // current ROI auto exposure mode
     function currentROIAutoExposureMode(roiMode, winSize){       
         switch(roiMode){
-            case NileCam30usb.AutoExpFace:
-                autoexpFace.checked = true
-                autoExpoWinSizeCombo.enabled = false
-                break
             case NileCam30usb.AutoExpFull:
                 autoexpFull.checked = true
                 autoExpoWinSizeCombo.enabled = false
@@ -1262,7 +1169,6 @@ Item {
                     autoExpoWinSizeCombo.currentIndex = winSize-1
                 break
             case NileCam30usb.AutoExpDisabled:
-                autoexpFace.enabled = false
                 autoexpFull.enabled = false
                 autoexpManual.enabled = false
                 autoExpoWinSizeCombo.enabled = false
@@ -1307,29 +1213,20 @@ Item {
         }
     }
 
-    function updateSmileDetectModeUI(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerModeValue){
-        smileThreshold.text = smileDetectThresholdValue
+    function updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue){
         if(smileDetectMode == NileCam30usb.SmileDetectEnable){
             smileDetectEnable.checked = true
             if(smileDetectEmbedDataValue == NileCam30usb.SmileDetectEmbedDataEnable){
                 smileDetectEmbedData.checked = true
             }
-	    if(smileTriggerModeValue == NileCam30usb.SmileTriggerModeEnable){
-                smileTrigger.checked = true
-	    } 
-        }else if(smileDetectMode == NileCam30usb.SmileDetectDisable){
+	}else if(smileDetectMode == NileCam30usb.SmileDetectDisable){
             smileDetectDisable.checked = true
             if(smileDetectEmbedDataValue == NileCam30usb.SmileDetectEmbedDataEnable){
                 smileDetectEmbedData.checked = true
             }else{
                 smileDetectEmbedData.checked = false
             }
-	    if(smileTriggerModeValue == NileCam30usb.SmileTriggerModeEnable){
-                smileTrigger.checked = true
-            }else{
-                smileTrigger.checked = false
-	    }
-        }
+	}
     }
 
     function updateFaceDetectModeUI(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect){        
@@ -1370,17 +1267,10 @@ Item {
         nilecam30usb.setExposureCompensationNileCam30USB(exposureCompValue.text)
         exposureCompSet.enabled = true        
     }
-
-    function smileThresholdSetButtonClicked(){
-        smileThresholdSet.enabled = false
-        setButtonClicked = true
-        nilecam30usb.setSmileDetectionStateNileCam30USB(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
-        smileThresholdSet.enabled = true        
-    }
-
+   
     function enableSmileDetectEmbedData(){
         setButtonClicked = false        
-        if(nilecam30usb.setSmileDetectionStateNileCam30USB(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)){
+        if(nilecam30usb.setSmileDetectionStateNileCam30USB(true, smileDetectEmbedData.checked)){
             if(smileDetectEmbedData.checked){
                 messageDialog.title = qsTr("Status")
                 messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document NileCAM30_USB_Face_and_Smile_Detection for more details")
@@ -1393,14 +1283,12 @@ Item {
         if(autoExposureSelect){
             autoexpManual.enabled = true
             autoexpFull.enabled = true
-            autoexpFace.enabled = true
             if(autoexpManual.checked)
                 autoExpoWinSizeCombo.enabled = true
-            if(autoexpFull.checked || autoexpFace.checked)
+            if(autoexpFull.checked)
                 autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 1
             autoexpFull.opacity = 1
-            autoexpFace.opacity = 1
             exposureCompValue.enabled = true
             exposureCompValue.opacity = 1
             exposureCompSet.enabled = true
@@ -1409,11 +1297,9 @@ Item {
         }else{
             autoexpManual.enabled = false
             autoexpFull.enabled = false
-            autoexpFace.enabled = false
             autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 0.1
             autoexpFull.opacity = 0.1
-            autoexpFace.opacity = 0.1
             exposureCompValue.enabled = false
             exposureCompValue.opacity = 0.1
             exposureCompSet.enabled = false
@@ -1482,10 +1368,7 @@ Item {
              enableDisableAutoExposureControls(autoExposureSelect)
          }
          onEnableFaceRectafterBurst:{
-             smileTriggerCapture = false
-             if(nilecam30usb.enableDisableFaceRectangle(true)){
-                 smileTriggerCapture = true
-             }
+             nilecam30usb.enableDisableFaceRectangle(true)
          }
          onBeforeRecordVideo:{
             nilecam30usb.enableDisableFaceRectangle(false)

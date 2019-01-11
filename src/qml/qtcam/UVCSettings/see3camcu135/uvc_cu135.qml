@@ -594,26 +594,6 @@ Item {
                       spacing:38
                       ExclusiveGroup { id: roiExpogroup }
 
-                      // Added by Sankari 13th Sep 2017 : Added Face ROI mode
-                      RadioButton {
-                          exclusiveGroup: roiExpogroup
-                          id: autoexpFace
-                          text: "Face"
-                          activeFocusOnPress: true
-                          style: econRadioButtonStyle
-                          opacity: enabled ? 1 : 0.1
-                          // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
-                          // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
-                          // winSize is required only for manual mode
-                          onClicked: {
-                              seecamcu135.setROIAutoExposure(See3CamCu135.AutoExpFace, 0, 0, 0, 0, 0);
-                              autoExpoWinSizeCombo.enabled = false
-                          }
-                          Keys.onReturnPressed: {
-                              seecamcu135.setROIAutoExposure(See3CamCu135.AutoExpFace, 0, 0, 0, 0, 0);
-                              autoExpoWinSizeCombo.enabled = false
-                          }
-                      }
                       RadioButton {
                           exclusiveGroup: roiExpogroup
                           id: autoexpFull
@@ -873,10 +853,10 @@ Item {
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked:{                            
-                            seecamcu135.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                            seecamcu135.setSmileDetection(true, smileDetectEmbedData.checked)
                         }
                         Keys.onReturnPressed: {                            
-                            seecamcu135.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                            seecamcu135.setSmileDetection(true, smileDetectEmbedData.checked)
                         }
                     }
                     RadioButton {
@@ -886,59 +866,10 @@ Item {
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {                            
-                            seecamcu135.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                            seecamcu135.setSmileDetection(false, smileDetectEmbedData.checked)
                         }
                         Keys.onReturnPressed: {                            
-                            seecamcu135.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
-                        }
-                    }
-                }
-                Row{
-                    spacing: 14
-                    Text {
-                        id: smileThresholdText
-                        text: "Threshold value[40-75]"
-                        font.pixelSize: 14
-                        font.family: "Ubuntu"
-                        color: "#ffffff"
-                        smooth: true
-                        width: 80
-                        wrapMode: Text.WordWrap
-                        opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
-                    }
-                    TextField {
-                        id: smileThreshold
-                        font.pixelSize: 10
-                        font.family: "Ubuntu"
-                        smooth: true
-                        horizontalAlignment: TextInput.AlignHCenter
-                        enabled: (smileDetectEnable.enabled && smileDetectEnable.checked) ? true : false
-                        opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
-                        style: econTextFieldStyle
-                        implicitHeight: 25
-                        implicitWidth: 70
-                        validator: IntValidator {bottom: 40; top: 75}
-                    }
-                    Button {
-                        id: smileThresholdSet
-                        activeFocusOnPress : true
-                        text: "Set"
-                        style: econButtonStyle
-                        enabled: (smileDetectEnable.enabled && smileDetectEnable.checked) ? true : false
-                        opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
-                        implicitHeight: 25
-                        implicitWidth: 60
-                        onClicked: {
-                            smileThresholdSet.enabled = false
-                            setButtonClicked = true
-                            seecamcu135.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
-                            smileThresholdSet.enabled = true
-                        }
-                        Keys.onReturnPressed: {
-                            smileThresholdSet.enabled = false
-                            setButtonClicked = true
-                            seecamcu135.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
-                            smileThresholdSet.enabled = true
+                            seecamcu135.setSmileDetection(false, smileDetectEmbedData.checked)
                         }
                     }
                 }
@@ -959,24 +890,7 @@ Item {
                         }
                     }
                 }
-                Row{
-                    spacing: 5
-                    CheckBox {
-                        id: smileTrigger
-                        activeFocusOnPress : true
-                        text: "Smile Trigger"
-                        style: econCheckBoxStyle
-                        enabled: smileDetectEnable.checked ? true : false
-                        opacity: enabled ? 1 : 0.1
-                        onClicked:{
-                            seecamcu135.setSmileDetection(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
-                        }
-                        Keys.onReturnPressed: {
-                            seecamcu135.setSmileDetection(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
-                        }
-                    }
-                }
-
+               
                 Row{
                     Layout.alignment: Qt.AlignCenter
                     Button {
@@ -1072,7 +986,7 @@ Item {
     // enable smile detect embed data
     function enableSmileDetectEmbedData(){
         setButtonClicked = false
-        if(seecamcu135.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)){
+        if(seecamcu135.setSmileDetection(true, smileDetectEmbedData.checked)){
             if(smileDetectEmbedData.checked){
                 messageDialog.title = qsTr("Status")
                 messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_CU135_Face_and_Smile_Detection for more details")
@@ -1086,14 +1000,12 @@ Item {
         if(autoExposureSelect){
             autoexpManual.enabled = true
             autoexpFull.enabled = true
-            autoexpFace.enabled = true
             if(autoexpManual.checked)
                 autoExpoWinSizeCombo.enabled = true
-            if(autoexpFull.checked || autoexpFace.checked)
+            if(autoexpFull.checked)
                 autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 1
             autoexpFull.opacity = 1
-            autoexpFace.opacity = 1
             exposureCompValue.enabled = true
             exposureCompValue.opacity = 1
             exposureCompSet.enabled = true
@@ -1102,11 +1014,9 @@ Item {
         }else{
             autoexpManual.enabled = false
             autoexpFull.enabled = false
-            autoexpFace.enabled = false
             autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 0.1
             autoexpFull.opacity = 0.1
-            autoexpFace.opacity = 0.1
             exposureCompValue.enabled = false
             exposureCompValue.opacity = 0.1
             exposureCompSet.enabled = false
@@ -1221,10 +1131,6 @@ Item {
     // current ROI auto exposure mode
     function currentROIAutoExposureMode(roiMode, winSize){
         switch(roiMode){
-        case See3CamCu135.AutoExpFace:
-            autoexpFace.checked = true
-            autoExpoWinSizeCombo.enabled = false
-            break
         case See3CamCu135.AutoExpFull:
             autoexpFull.checked = true
             autoExpoWinSizeCombo.enabled = false
@@ -1239,7 +1145,6 @@ Item {
                 autoExpoWinSizeCombo.currentIndex = winSize-1
             break
         case See3CamCu135.AutoExpDisabled:
-            autoexpFace.enabled = false
             autoexpFull.enabled = false
             autoexpManual.enabled = false
             autoExpoWinSizeCombo.enabled = false
@@ -1345,14 +1250,10 @@ Item {
             }
         }
         onSmileDetectModeValue:{
-            smileThreshold.text = smileDetectThresholdValue
             if(smileDetectMode == See3CamCu135.SmileDetectEnable){
                 smileDetectEnable.checked = true
                 if(smileDetectEmbedDataValue == See3CamCu135.SmileDetectEmbedDataEnable){
                     smileDetectEmbedData.checked = true
-                }
-                if(smileTriggerModeValue == See3CamCu135.SmileTriggerModeEnable){
-                    smileTrigger.checked = true
                 }
             }else if(smileDetectMode == See3CamCu135.SmileDetectDisable){
                 smileDetectDisable.checked = true
@@ -1360,11 +1261,6 @@ Item {
                     smileDetectEmbedData.checked = true
                 }else{
                     smileDetectEmbedData.checked = false
-                }
-                if(smileTriggerModeValue == See3CamCu135.SmileTriggerModeEnable){
-                    smileTrigger.checked = true
-                }else{
-                    smileTrigger.checked = false
                 }
             }
         }
@@ -1383,14 +1279,7 @@ Item {
             }
         }
 
-        onIndicateSmileThresholdRangeFailure:{
-            if(setButtonClicked){
-                displayMessageBox(title, text)
-                setButtonClicked = false
-                seecamcu135.getSmileDetectMode()
-            }
-        }
-    }
+      }
 
     Component {
         id: econCheckBoxStyle

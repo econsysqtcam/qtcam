@@ -766,20 +766,15 @@ bool NILECAM30_USB::getFaceDetectionRectNileCam30USB()
  * @brief NILECAM30_USB::setSmileDetectionStateNileCam - setting smile detection rectangle
  * @param enableSmileDetect - enable / disable smile detect
  * @param embedData - Enable / Disable embed data
- * @param thresholdValue - smile threshold value
  * @return true/false
  */
-bool NILECAM30_USB::setSmileDetectionStateNileCam30USB(bool enableSmileDetect, bool embedData, uint thresholdValue,  bool smileTrigger){
+bool NILECAM30_USB::setSmileDetectionStateNileCam30USB(bool enableSmileDetect, bool embedData){
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
-    if((SMILE_THRESHOLD_MIN > thresholdValue || SMILE_THRESHOLD_MAX < thresholdValue) && enableSmileDetect){
-        emit indicateSmileThresholdRangeFailure("Failure", "Given smile detection threshold value is invalid.");
-        return false;
-    }
-
+  
     //Initialize buffers
     initializeBuffers();
 
@@ -792,18 +787,12 @@ bool NILECAM30_USB::setSmileDetectionStateNileCam30USB(bool enableSmileDetect, b
     else
         g_out_packet_buf[3] = DISABLE_SMILE_DETECT_NILECAM30_USB; /* disable smile detect */
 
-    g_out_packet_buf[4] = thresholdValue; // Setting threshold value
 
     if(embedData)
         g_out_packet_buf[5] = ENABLE_EMBED_DATA_NILECAM30_USB; /* enable embed data */
     else
         g_out_packet_buf[5] = DISABLE_EMBED_DATA_NILECAM30_USB; /* disable embed data */
 
-    if(smileTrigger)
-        g_out_packet_buf[6] = ENABLE_SMILE_TRIGGER_NILECAM30_USB; /* enable smile trigger  */
-    else
-        g_out_packet_buf[6] = DISABLE_SMILE_TRIGGER_NILECAM30_USB; /* disable smile trigger */
-    
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==SET_FAIL) {
@@ -846,7 +835,7 @@ bool NILECAM30_USB::getSmileDetectionStateNileCam30USB()
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_NILECAM30_USB &&
             g_in_packet_buf[1]==GET_SMILE_DETECTION_NILECAM30_USB &&
             g_in_packet_buf[6]==GET_SUCCESS) {\
-            emit smileDetectModeValue(g_in_packet_buf[2], g_in_packet_buf[3], g_in_packet_buf[4], g_in_packet_buf[5]);
+            emit smileDetectModeValue(g_in_packet_buf[2], g_in_packet_buf[4]);
             return true;
         }
     }

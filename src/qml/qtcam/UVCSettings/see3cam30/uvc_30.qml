@@ -801,10 +801,10 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
-                        see3cam30.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
+                        see3cam30.setSmileDetection(true, smileDetectEmbedData.checked)
                     }
                     Keys.onReturnPressed: {
-                        see3cam30.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
+                        see3cam30.setSmileDetection(true, smileDetectEmbedData.checked)
                     }
                 }
                 RadioButton {
@@ -814,56 +814,14 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
-                        see3cam30.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
+                        see3cam30.setSmileDetection(false, smileDetectEmbedData.checked)
                     }
                     Keys.onReturnPressed: {
-                        see3cam30.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
+                        see3cam30.setSmileDetection(false, smileDetectEmbedData.checked)
                     }
                 }
             }
-            Row{
-                spacing: 14
-                Text {
-                    id: smileThresholdText
-                    text: "Threshold value[40-75]"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    width: 80
-                    wrapMode: Text.WordWrap
-                    opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
-                }
-                TextField {
-                    id: smileThreshold
-                    font.pixelSize: 10
-                    font.family: "Ubuntu"
-                    smooth: true
-                    horizontalAlignment: TextInput.AlignHCenter
-                    enabled: (smileDetectEnable.enabled && smileDetectEnable.checked) ? true : false
-                    opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
-                    style: econTextFieldStyle
-                    implicitHeight: 25
-                    implicitWidth: 70
-                    validator: IntValidator {bottom: 40; top: 75}
-                }
-                Button {
-                    id: smileThresholdSet
-                    activeFocusOnPress : true
-                    text: "Set"
-                    style: econButtonStyle
-                    enabled: (smileDetectEnable.enabled && smileDetectEnable.checked) ? true : false
-                    opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
-                    implicitHeight: 25
-                    implicitWidth: 60
-                    onClicked: {
-                        setSmileDetection()
-                    }
-                    Keys.onReturnPressed: {
-                        setSmileDetection()
-                    }
-                }
-            }
+            
             Row{
                 spacing: 5
                 CheckBox {
@@ -881,25 +839,7 @@ Item {
                     }
                 }
             }
-
-            Row{
-                spacing: 5
-                CheckBox {
-                    id: smileTriggerMode
-                    activeFocusOnPress : true
-                    text: "Smile Trigger"
-                    style: econCheckBoxStyle
-                    enabled: smileDetectEnable.checked ? true : false
-                    opacity: enabled ? 1 : 0.1
-                    onClicked:{
-                        see3cam30.setSmileDetection(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
-                    }
-                    Keys.onReturnPressed: {
-                        see3cam30.setSmileDetection(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
-                    }
-                }
-            }
-
+            
             Text {
                 id: frameRateText
                 text: "--- Frame Rate Control ---"
@@ -1252,7 +1192,7 @@ Item {
             }
         }
         onSmileDetectModeValue:{
-            updateSmileDetectModeUI(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerMode)
+            updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue)
         }
         onFaceDetectModeValue:{
             if(faceDetectMode == See3Cam30.FaceRectEnable){
@@ -1277,14 +1217,7 @@ Item {
                 }
             }
         }
-        onIndicateSmileThresholdRangeFailure:{
-            if(setButtonClicked){
-                displayMessageBox(title, text)
-                setButtonClicked = false
-                see3cam30.getSmileDetectMode()
-            }
-        }
-
+        
     }
 
     Uvccamera {
@@ -1325,15 +1258,11 @@ Item {
         messageDialog.open()
     }
 
-    function updateSmileDetectModeUI(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerModeValue){
-        smileThreshold.text = smileDetectThresholdValue
+    function updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue){
         if(smileDetectMode == See3Cam30.SmileDetectEnable){
             smileDetectEnable.checked = true
             if(smileDetectEmbedDataValue == See3Cam30.SmileDetectEmbedDataEnable){
                 smileDetectEmbedData.checked = true
-            }
-            if(smileTriggerModeValue == See3Cam30.SmileTriggerModeEnable){
-                smileTriggerMode.checked = true
             }
         }else if(smileDetectMode == See3Cam30.SmileDetectDisable){
             smileDetectDisable.checked = true
@@ -1342,12 +1271,7 @@ Item {
             }else{
                 smileDetectEmbedData.checked = false
             }
-            if(smileTriggerModeValue == See3Cam30.SmileTriggerModeEnable){
-                smileTriggerMode.checked = true
-            }else{
-                smileTriggerMode.checked = false
-            }
-        }
+         }
     }
 
     // current scene mode
@@ -1531,10 +1455,8 @@ Item {
     }
 
     function setSmileDetection(){
-        smileThresholdSet.enabled = false
         setButtonClicked = true
-        see3cam30.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)
-        smileThresholdSet.enabled = true
+        see3cam30.setSmileDetection(true, smileDetectEmbedData.checked)
     }
 
     function setExposureCompensation(){
@@ -1554,7 +1476,7 @@ Item {
 
     function enableSmileDetectEmbedData(){
         setButtonClicked = false
-        if(see3cam30.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTriggerMode.checked)){
+        if(see3cam30.setSmileDetection(true, smileDetectEmbedData.checked)){
             if(smileDetectEmbedData.checked){
                 messageDialog.title = qsTr("Status")
                 messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_30_Face_and_Smile_Detection for more details")

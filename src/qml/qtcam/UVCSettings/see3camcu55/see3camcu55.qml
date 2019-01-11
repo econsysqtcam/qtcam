@@ -43,7 +43,6 @@ Item {
     property bool skipUpdateUIQFactor : false
     property bool skipUpdateUIFrameRate: false
     property bool setButtonClicked: false
-    property bool smileTriggerCapture: true
 
     Connections
     {
@@ -53,14 +52,7 @@ Item {
 	    if(!isWebKeyPressed){ // mouse click
                 see3camcu55.enableDisableFaceRectangle(false)
                 burstShotTimer.start()
-            }else{
-                if(smileTriggerCapture){
-                    if(see3camcu55.enableDisableFaceRectangle(false)){
-                        root.imageCapture(CommonEnums.BURST_SHOT);
-                    }
-                }
             }
-
         }
         onGetVideoPinStatus:
         {
@@ -235,27 +227,7 @@ Item {
             Row{
                 spacing:38
                 ExclusiveGroup { id: roiExpogroup }
-
-                // Added by Sankari 13th Sep 2017 : Added Face ROI mode
-                RadioButton {
-                    exclusiveGroup: roiExpogroup
-                    id: autoexpFace
-                    text: "Face"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    opacity: enabled ? 1 : 0.1
-                    // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
-                    // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
-                    // winSize is required only for manual mode
-                    onClicked: {
-                        see3camcu55.setROIAutoExposure(See3camCu55.AutoExpFace, 0, 0, 0, 0, 0);
-                        autoExpoWinSizeCombo.enabled = false
-                    }
-                    Keys.onReturnPressed: {
-                        see3camcu55.setROIAutoExposure(See3camCu55.AutoExpFace, 0, 0, 0, 0, 0);
-                        autoExpoWinSizeCombo.enabled = false
-                    }
-                  }
+                
                   RadioButton {
                       exclusiveGroup: roiExpogroup
                       id: autoexpFull
@@ -688,10 +660,10 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
-                        see3camcu55.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                        see3camcu55.setSmileDetection(true, smileDetectEmbedData.checked)
                     }
                     Keys.onReturnPressed: {
-                        see3camcu55.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                        see3camcu55.setSmileDetection(true, smileDetectEmbedData.checked)
                     }
                 }
                 RadioButton {
@@ -701,56 +673,14 @@ Item {
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
-                        see3camcu55.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                        see3camcu55.setSmileDetection(false, smileDetectEmbedData.checked)
                     }
                     Keys.onReturnPressed: {
-                        see3camcu55.setSmileDetection(false, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
+                        see3camcu55.setSmileDetection(false, smileDetectEmbedData.checked)
                     }
                 }
             }
-            Row{
-                spacing: 14
-                Text {
-                    id: smileThresholdText
-                    text: "Threshold value[40-75]"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    width: 80
-                    wrapMode: Text.WordWrap
-                    opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
-                }
-                TextField {
-                    id: smileThreshold
-                    font.pixelSize: 10
-                    font.family: "Ubuntu"
-                    smooth: true
-                    horizontalAlignment: TextInput.AlignHCenter
-                    enabled: (smileDetectEnable.enabled && smileDetectEnable.checked) ? true : false
-                    opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
-                    style: econTextFieldStyle
-                    implicitHeight: 25
-                    implicitWidth: 70
-                    validator: IntValidator {bottom: 40; top: 75}
-                }
-                Button {
-                    id: smileThresholdSet
-                    activeFocusOnPress : true
-                    text: "Set"
-                    style: econButtonStyle
-                    enabled: (smileDetectEnable.enabled && smileDetectEnable.checked) ? true : false
-                    opacity: (smileDetectEnable.enabled && smileDetectEnable.checked) ? 1 : 0.1
-                    implicitHeight: 25
-                    implicitWidth: 60
-                    onClicked: {
-                        smileThresholdSetButtonClicked()
-                    }
-                    Keys.onReturnPressed: {
-                        smileThresholdSetButtonClicked()
-                    }
-                }
-            }
+            
             Row{
                 spacing: 5
                 CheckBox {
@@ -765,23 +695,6 @@ Item {
                     }
                     Keys.onReturnPressed: {
                         enableSmileDetectEmbedData()                        
-                    }
-                }
-            }
-            Row{
-                spacing: 5
-                CheckBox {
-                    id: smileTrigger
-                    activeFocusOnPress : true
-                    text: "Smile Trigger"
-                    style: econCheckBoxStyle
-                    enabled: smileDetectEnable.checked ? true : false
-                    opacity: enabled ? 1 : 0.1
-                    onClicked:{                       
-                        see3camcu55.setSmileDetection(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
-                    }
-                    Keys.onReturnPressed: {
-                        see3camcu55.setSmileDetection(smileDetectEnable.checked, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
                     }
                 }
             }
@@ -1125,7 +1038,7 @@ Item {
             updateFaceDetectModeUI(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect)
         }
         onSmileDetectModeValue:{            
-            updateSmileDetectModeUI(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerMode)
+            updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue)
         }
 
         onFlipMirrorModeChanged:{
@@ -1153,14 +1066,7 @@ Item {
                 see3camcu55.getExposureCompensation()
             }
         }
-        onIndicateSmileThresholdRangeFailure:{
-            if(setButtonClicked){
-                displayMessageBox(title, text)
-                setButtonClicked = false
-                see3camcu55.getSmileDetectMode()
-            }
-        }
-    }
+     }
 
 
     Component.onCompleted:{        
@@ -1175,10 +1081,6 @@ Item {
     // current ROI auto exposure mode
     function currentROIAutoExposureMode(roiMode, winSize){       
         switch(roiMode){
-            case See3camCu55.AutoExpFace:
-                autoexpFace.checked = true
-                autoExpoWinSizeCombo.enabled = false
-                break
             case See3camCu55.AutoExpFull:
                 autoexpFull.checked = true
                 autoExpoWinSizeCombo.enabled = false
@@ -1193,7 +1095,6 @@ Item {
                     autoExpoWinSizeCombo.currentIndex = winSize-1
                 break
             case See3camCu55.AutoExpDisabled:
-                autoexpFace.enabled = false
                 autoexpFull.enabled = false
                 autoexpManual.enabled = false
                 autoExpoWinSizeCombo.enabled = false
@@ -1238,18 +1139,14 @@ Item {
         }
     }
 
-      function updateSmileDetectModeUI(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerModeValue){
-	smileThreshold.text = smileDetectThresholdValue
+      function updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue){
         if(smileDetectMode == See3camCu55.SmileDetectEnable){
             smileDetectEnable.checked = true
             if(smileDetectEmbedDataValue == See3camCu55.SmileDetectEmbedDataEnable){
                 smileDetectEmbedData.checked = true
             }else{
 		 smileDetectEmbedData.checked = false
-	    }
-        if(smileTriggerModeValue == See3camCu55.SmileTriggerModeEnable){
-                smileTrigger.checked = true
-            }	
+	    }        
         }else if(smileDetectMode == See3camCu55.SmileDetectDisable){
             smileDetectDisable.checked = true
             if(smileDetectEmbedDataValue == See3camCu55.SmileDetectEmbedDataEnable){
@@ -1258,13 +1155,7 @@ Item {
                 smileDetectEmbedData.checked = false
             }
 
-        if(smileTriggerModeValue == See3camCu55.SmileTriggerModeEnable){
-                smileTrigger.checked = true
-            }else{
-                smileTrigger.checked = false
-            }
-
-	}
+        }
 
     }
 
@@ -1306,17 +1197,10 @@ Item {
         see3camcu55.setExposureCompensation(exposureCompValue.text)
         exposureCompSet.enabled = true        
     }
-
-    function smileThresholdSetButtonClicked(){
-        smileThresholdSet.enabled = false
-        setButtonClicked = true
-        see3camcu55.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)
-        smileThresholdSet.enabled = true        
-    }
-
+    
     function enableSmileDetectEmbedData(){
         setButtonClicked = false
-        if(see3camcu55.setSmileDetection(true, smileDetectEmbedData.checked, smileThreshold.text, smileTrigger.checked)){
+        if(see3camcu55.setSmileDetection(true, smileDetectEmbedData.checked)){
             if(smileDetectEmbedData.checked){
                 messageDialog.title = qsTr("Status")
                 messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_CU55_Face_and_Smile_Detection for more details")
@@ -1329,14 +1213,12 @@ Item {
         if(autoExposureSelect){
             autoexpManual.enabled = true
             autoexpFull.enabled = true
-            autoexpFace.enabled = true
             if(autoexpManual.checked)
                 autoExpoWinSizeCombo.enabled = true
-            if(autoexpFull.checked || autoexpFace.checked)
+            if(autoexpFull.checked)
                 autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 1
             autoexpFull.opacity = 1
-            autoexpFace.opacity = 1
             exposureCompValue.enabled = true
             exposureCompValue.opacity = 1
             exposureCompSet.enabled = true
@@ -1345,11 +1227,9 @@ Item {
         }else{
             autoexpManual.enabled = false
             autoexpFull.enabled = false
-            autoexpFace.enabled = false
             autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 0.1
             autoexpFull.opacity = 0.1
-            autoexpFace.opacity = 0.1
             exposureCompValue.enabled = false
             exposureCompValue.opacity = 0.1
             exposureCompSet.enabled = false
@@ -1401,10 +1281,7 @@ Item {
              enableDisableAutoExposureControls(autoExposureSelect)
          }
          onEnableFaceRectafterBurst:{           
-	     smileTriggerCapture = false
-             if(see3camcu55.enableDisableFaceRectangle(true)){
-                 smileTriggerCapture = true
-             }
+             see3camcu55.enableDisableFaceRectangle(true)             
          }
          onBeforeRecordVideo:{
             see3camcu55.enableDisableFaceRectangle(false)

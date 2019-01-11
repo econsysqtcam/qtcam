@@ -6,9 +6,6 @@
 #define DENOISE_MAX 15
 #define EXPOSURECOMP_MIN 8000
 #define EXPOSURECOMP_MAX 1000000
-#define SMILE_THRESHOLD_MIN 40
-#define SMILE_THRESHOLD_MAX 75
-#define DEFAULT_SMILE_THRESHOLD 40
 
 #define SET_DENOISE_CONTROL  0x06
 #define GET_DENOISE_CONTROL  0x05
@@ -195,12 +192,6 @@ public:
     };
     Q_ENUMS(camSmileDetectEmbedDataMode)
 
-    enum camSmileTriggerMode {
-        SmileTriggerModeEnable = 0x01,
-        SmileTriggerModeDisable = 0x00
-    };
-    Q_ENUMS(camSmileTriggerMode)
-
     enum flipMirrorControls{
         FLIP_OFF_MIRROR_OFF = 0x00,
         FLIP_ON_MIRROR_OFF  = 0x01,
@@ -222,12 +213,11 @@ signals:
      void afRectModeValue(uint afRectMode);     
      void streamModeValue(uint streamMode);
      void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
-     void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue, uint smileTriggerModeValue);
+     void smileDetectModeValue(uint smileDetectMode, uint smileDetectEmbedDataValue);
      void exposureCompValueReceived(uint exposureCompensation);
      void frameRateCtrlValueReceived(uint frameRateCtrlValue);
      void indicateCommandStatus(QString title, QString text);
      void flipMirrorModeChanged(uint flipMirrorMode);
-     void indicateSmileThresholdRangeFailure(QString title, QString text);
      void indicateExposureValueRangeFailure(QString title, QString text);
 
 public slots:
@@ -272,7 +262,7 @@ public slots:
     bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
     bool getFaceDetectMode();
 
-    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue, bool smileTrigger);
+    bool setSmileDetection(bool enableSmileDetect, bool embedData);
     bool getSmileDetectMode();
 
     bool setExposureCompensation(unsigned int exposureCompValue);

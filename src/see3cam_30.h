@@ -163,13 +163,6 @@ public:
     };
     Q_ENUMS(camSmileDetectEmbedDataMode)
 
-    enum camSmileTriggerMode {
-        SmileTriggerModeEnable = 0x01,
-        SmileTriggerModeDisable = 0x00
-    };
-    Q_ENUMS(camSmileTriggerMode)
-
-
 signals:
     void effectModeChanged(uint effectMode);
     void denoiseValueChanged(uint denoiseValue);
@@ -185,7 +178,7 @@ signals:
     void indicateCommandStatus(QString title, QString text);
     void indicateSmileThresholdRangeFailure(QString title, QString text);
     void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
-    void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue, uint smileTriggerMode);
+    void smileDetectModeValue(uint smileDetectMode, uint smileDetectEmbedDataValue);
     void indicateExposureValueRangeFailure(QString title, QString text);
     void frameRateChanged(uint frameRateCtrlMode);
 
@@ -224,7 +217,7 @@ public slots:
     bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
     bool getFaceDetectMode();
 
-    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue, bool smileTriggerMode);
+    bool setSmileDetection(bool enableSmileDetect, bool embedData);
     bool getSmileDetectMode();
 
     bool setOrientation(bool horzModeSel, bool vertiModeSel);

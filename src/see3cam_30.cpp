@@ -967,21 +967,15 @@ bool See3CAM_30::getFaceDetectMode()
  * @brief See3CAM_30::setSmileDetection - setting smile detection rectangle
  * @param enableSmileDetect - enable / disable smile detect
  * @param embedData - Enable / Disable embed data
- * @param thresholdValue - smile threshold value
- * @param smile trigger mode - to capture image when smile trigger option is enbled
  * @return true/false
  */
-bool See3CAM_30::setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue, bool smileTriggerMode){
+bool See3CAM_30::setSmileDetection(bool enableSmileDetect, bool embedData){
     if(uvccamera::hid_fd < 0)
     {
         return false;
     }
 
-    if((SMILE_THRESHOLD_MIN > thresholdValue || SMILE_THRESHOLD_MAX < thresholdValue) && enableSmileDetect){        
-        emit indicateSmileThresholdRangeFailure("Failure", "Given smile detection threshold value is invalid.");
-        return false;
-    }
-
+   
     initializeBuffers();
 
     //Set the Report Number
@@ -993,27 +987,18 @@ bool See3CAM_30::setSmileDetection(bool enableSmileDetect, bool embedData, uint 
     else
         g_out_packet_buf[3] = DISABLE_SMILE_DETECT; /* disable smile detect */
 
-    g_out_packet_buf[4] = thresholdValue; // Setting threshold value
-
     if(embedData)
         g_out_packet_buf[5] = ENABLE_EMBED_DATA; /* enable embed data */
     else
         g_out_packet_buf[5] = DISABLE_EMBED_DATA; /* disable embed data */
-
-    if(smileTriggerMode)
-        g_out_packet_buf[6] = ENABLE_SMILE_TRIGGER_30; /* enable smile trigger  */
-    else
-        g_out_packet_buf[6] = DISABLE_SMILE_TRIGGER_30; /* disable smile trigger */
-
+  
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==SET_FAIL) {
-            emit indicateCommandStatus("Failure", "Failed to set smile detection threshold");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_30 &&
             g_in_packet_buf[1]==SET_SMILE_DETECT_30 &&
             g_in_packet_buf[6]==SET_SUCCESS) {\
-            emit indicateCommandStatus("Success", "Smile detection threshold is set successfully");
             return true;
         }
     }
@@ -1031,7 +1016,7 @@ bool See3CAM_30::getSmileDetectMode()
         return false;
     }
 
-    uint smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerMode;
+    uint smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue;
 
     //Initialize the buffer
     initializeBuffers();
@@ -1048,10 +1033,8 @@ bool See3CAM_30::getSmileDetectMode()
             g_in_packet_buf[1]==GET_SMILE_DETECT_30 &&
             g_in_packet_buf[6]==GET_SUCCESS) {\
             smileDetectMode = g_in_packet_buf[2];
-            smileDetectThresholdValue = g_in_packet_buf[3];
             smileDetectEmbedDataValue = g_in_packet_buf[4];
-            smileTriggerMode = g_in_packet_buf[5];
-            emit smileDetectModeValue(smileDetectMode, smileDetectThresholdValue, smileDetectEmbedDataValue, smileTriggerMode);
+            emit smileDetectModeValue(smileDetectMode,  smileDetectEmbedDataValue);
             return true;
         }
     }

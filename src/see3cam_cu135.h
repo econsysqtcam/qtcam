@@ -199,8 +199,7 @@ signals:
      void indicateCommandStatus(QString title, QString text);
      void frameRateCtrlValue(uint frameRateVal);
      void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
-     void smileDetectModeValue(uint smileDetectMode, uint smileDetectThresholdValue, uint smileDetectEmbedDataValue, uint smileTriggerModeValue);
-     void indicateSmileThresholdRangeFailure(QString title, QString text);
+     void smileDetectModeValue(uint smileDetectMode, uint smileDetectEmbedDataValue);
      void indicateExposureValueRangeFailure(QString title, QString text);
 
 public slots:
@@ -240,7 +239,7 @@ public slots:
     bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
     bool getFaceDetectMode();
 
-    bool setSmileDetection(bool enableSmileDetect, bool embedData, uint thresholdValue, bool smileTrigger);
+    bool setSmileDetection(bool enableSmileDetect, bool embedData);
     bool getSmileDetectMode();
 
     bool enableDisableFaceRectangle(bool enableRFRect);
