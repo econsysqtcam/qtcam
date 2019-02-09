@@ -26,7 +26,7 @@ else:{
 QT += widgets concurrent multimedia
 TARGET = Qtcam
 
-CONFIG += release
+CONFIG += c++14 release
 
 # Additional import path used to resolve QML modules in Creator's code model
 QML_IMPORT_PATH =
@@ -179,9 +179,10 @@ HEADERS += \
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
-                /usr/include \
+                /usr/include/ffmpeg \
                 /usr/include/libusb-1.0
 
+# why not use QMAKE_HOST.arch
 UNAME_MACHINE_32BIT = $$system(dpkg --print-architecture | grep -o "i386")
 UNAME_MACHINE_64BIT = $$system(dpkg --print-architecture | grep -o "amd64")
 BOARD_ARM64 = $$system(dpkg --print-architecture | grep -o "arm64")
@@ -194,7 +195,7 @@ QMAKE_CXXFLAGS += -std=c++11
 
 contains(UNAME_MACHINE_64BIT, amd64):{
     message("x86_64 bit libs")
-    LIBS += -lv4l2 -lv4lconvert \       
+    LIBS += -lv4l2 -lv4lconvert \
         -lavutil \
         -lavcodec \
         -lavformat \
