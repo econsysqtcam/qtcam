@@ -357,11 +357,6 @@ Rectangle {
                 enableFaceRectafterBurst()
             }
 
-            // Enable Face detection rect in preview
-            onEnableFactRectInPreview:{
-                enableFaceRectafterBurst()
-            }
-
             onNewControlAdded: {
                 setControlValues(ctrlName.toString(),ctrlType,ctrlMinValue,ctrlMaxValue, ctrlStepSize, ctrlDefaultValue,ctrlID);
             }
