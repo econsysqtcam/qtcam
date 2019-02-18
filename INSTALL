@@ -65,40 +65,38 @@ In addition to that, we collected some other useful  information related to the 
 
 In order to run Qtcam application, your system must have:
 
-1. Qt 5.2.1
-2. Operating System: Linux (Tested on Ubuntu 12.04, 14.04, 15.10, 16.04 versions)
+1. Qt 5.5.1
+2. Operating System: Linux (Tested on Ubuntu 12.04, 14.04, 16.04 versions)
 
 3.2. Dependencies
 
 To run the Qtcam application your system should meet the following dependencies.
 
-3.2.1. Install Qt5.2.1 framework
+3.2.1. Install Qt5.5.1 framework
 
 Initially download the Qt package from the below link as per your system requirement,
-For 32 Bit - http://download.qt.io/archive/qt/5.2/5.2.1/qt-opensource-linux-x86-5.2.1.run
-For 64 Bit - http://download.qt.io/archive/qt/5.2/5.2.1/qt-opensource-linux-x64-5.2.1.run
+For 32 Bit - http://download.qt.io/archive/qt/5.5/5.5.1/qt-opensource-linux-x86-5.5.1.run
+For 64 Bit - http://download.qt.io/archive/qt/5.5/5.5.1/qt-opensource-linux-x64-5.5.1.run
+
 
 To configure Qt, If permission is not given for user set it by using chmod command.
 
-# chmod u+x  qt-opensource-linux-x86-5.2.1.run
+# chmod u+x  qt-opensource-linux-x86-5.5.1.run
 (or)
-# chmod u+x  qt-opensource-linux-x64-5.2.1.run
+# chmod u+x  qt-opensource-linux-x64-5.5.1.run
 Then double click the downloaded binary and install it to your local system.
 
 3.2.2. Run following command to install following list of dependency packages
  In ubuntu 12,
- $ sudo apt-get install libv4l-dev libgl1-mesa-dev libglu1-mesa-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libresample1-dev  libudev-dev libavcodec-extra-53 libjpeg-turbo8-dev libusb-1.0-0-dev
+ $ sudo apt-get install libv4l-dev qt55base qt55declarative libgl1-mesa-dev libglu1-mesa-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libresample1-dev libudev-dev libavcodec-extra-53 libjpeg-turbo8-dev libusb-1.0-0-dev libusb-dev libevdev-dev libpulse-dev qt55multimedia
  $ sudo apt-add-repository ppa:qtcam/precise
- $ sudo apt-get install qt52base qt52declarative qt52-meta-full
+ $ sudo apt-get install qt55-meta-full
 
  In ubuntu 14,
- $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra-54  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin
-
- In ubuntu 15.10,
- $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin
+ $ sudo apt-get install libv4l-dev qt55base qt55declarative libavcodec-dev libgl1-mesa-dev libglu1-mesa-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra-54 libjpeg-turbo8-dev libusb-1.0-0-dev libusb-dev libevdev-dev  libpulse-dev qt55multimedia qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin qt55-meta-full
 
  In ubuntu 16.04,
- $ sudo apt-get install libv4l-dev qt5-default libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra  qtdeclarative5-dev libusb-1.0-0-dev libjpeg-turbo8-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin
+ $ sudo apt-get install libv4l-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra qt5-default qtdeclarative5-dev freeglut3 freeglut3-dev libjpeg-turbo8-dev libusb-1.0-0-dev libusb-dev libevdev-dev libpulse-dev qtmultimedia5-dev qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin qtdeclarative5-qtmultimedia-plugin
 
  
 
@@ -110,7 +108,7 @@ You can build your application in two ways
 
 3.3.1 Using Qt Creator:
 1. Open the project in your Qt creator.
-2. Provide your qmake path in the Tool->Options.(/home/@user/Qt5.2.1/5.2.1/gcc_64/bin/qmake)
+2. Provide your qmake path in the Tool->Options.(/home/@user/Qt5.5.1/5.5.1/gcc_64/bin/qmake)
 3. Set LAUNCHPAD macro in common.h to 0 in "src" directory.
 4. Right click in your project, click qmake.
 5. Right click in your project, click build
@@ -120,7 +118,7 @@ You can build your application in two ways
 1.  Goto your git clone path.
 2.  cd src/
 3.  Set LAUNCHPAD macro in common.h to 0.
-4.  qmake,(For example, /home/@user/Qt5.2.1/5.2.1/gcc_64/bin/qmake)
+4.  qmake,(For example, /home/@user/Qt5.5.1/5.5.1/gcc_64/bin/qmake)
 5.  make clean
 6.  make
 7.  Execute the application.
@@ -143,12 +141,7 @@ $ sudo apt-add-repository ppa:qtcam/precise
 $ sudo apt-get update
 $ sudo apt-get install qtcam
 
-4.1.3 Ubuntu 15.10 [ Note: The source code build support is not available from Dec 2016 for wily[15.10] in launchpad . So finally built Qtcam application version is 11.0.1 for wily distribution ]
-$ sudo apt-add-repository ppa:qtcam/wily
-$ sudo apt-get update
-$ sudo apt-get install qtcam
-
-4.1.2 Ubuntu 16.04
+4.1.3 Ubuntu 16.04
 $ sudo apt-add-repository ppa:qtcam/xenial
 $ sudo apt-get update
 $ sudo apt-get install qtcam
