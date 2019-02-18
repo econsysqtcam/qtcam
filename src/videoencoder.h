@@ -45,6 +45,25 @@ extern "C" {
 #endif
 
 }
+//audio
+#define MAX_DELAYED_FRAMES 50
+#define VIDEO_FRAME_RATE_HEADER_OFFSET 112
+
+struct AVIStreamHeader {
+    uint32_t  fccType;
+    uint32_t  fccHandler;
+    uint32_t  dwFlags;
+    uint32_t  dwPriority;
+    uint32_t  dwInitialFrames;
+    uint32_t  dwScale;
+    uint32_t  dwRate;
+    uint32_t  dwStart;
+    uint32_t  dwLength;
+    uint32_t  dwSuggestedBufferSize;
+    uint32_t  dwQuality;
+    uint32_t  dwSampleSize;
+} __attribute__((__packed__));
+
 
 class VideoEncoder
 {
@@ -52,28 +71,59 @@ class VideoEncoder
 public:
    VideoEncoder();
    virtual ~VideoEncoder();
+
+   AVOutputFormat *pOutputFormat;
+   bool ok;
+
+ 
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
-   bool createFile(QString filename, AVCodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitRate);
+   bool createFile(QString filename, AVCodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitRate,  int audioDeviceIndex, int sampleRate, int channels);
 #else
-   bool createFile(QString filename, CodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitRate);
+   bool createFile(QString filename, CodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitRate,  int audioDeviceIndex, int sampleRate, int channels);
 #endif
+
+   // audio
+    int open_audio(AVStream *st);
+
+    unsigned int getTickCount();
+
+#if LIBAVCODEC_VER_AT_LEAST(54,25)
+    AVStream* add_audio_stream(AVFormatContext *oc, enum AVCodecID codec_id, int sampleRate, int channels);
+#else
+    AVStream* add_audio_stream(AVFormatContext *oc, enum CodecID codec_id, int sampleRate, int channels);
+#endif    
+    int check_sample_fmt(AVCodec *codec, enum AVSampleFormat sample_fmt);
+    int encodeAudio(void *);       
+
    bool closeFile();
-   int encodeImage(const QImage &);
+   int encodeImage(uint8_t *buffer, bool rgbaBuffer);
    bool isOk();
 
-protected:
-      unsigned Width,Height;
-      unsigned Bitrate;
-      unsigned Gop;
-      bool ok;
-      int i;
+// Added by Sankari : 8 Oct 2018
+/**
+   \brief Write h264 one frame
 
-      // FFmpeg stuff
-      AVFormatContext *pFormatCtx;
-      AVOutputFormat *pOutputFormat;
-      AVCodecContext *pCodecCtx;
-      AVStream *pVideoStream;
-      AVCodec *pCodec;
+   @param : buffer - raw h264 buffer
+   @param : bytesused - bytes in buffer
+**/
+   int writeH264Image(void *buffer, int bytesUsed);
+protected:
+    unsigned Width,Height;
+    unsigned Bitrate;
+    unsigned Gop;
+    int i, j;
+
+    unsigned int recordStopTimeInMilliSec;
+    unsigned int recordStartTimeInMilliSec;
+
+    int frameCount;
+
+    // FFmpeg stuff
+    AVFormatContext *pFormatCtx;
+
+    AVCodecContext *pCodecCtx,*pAudioCodecCtx;
+    AVStream *pVideoStream, *pAudioStream;
+    AVCodec *pCodec;
 
       // Frame data
       AVFrame *ppicture;
@@ -87,17 +137,36 @@ protected:
       // Conversion
       SwsContext *img_convert_ctx;
 
-      // Packet
-      AVPacket pkt;
+    // Packet
+    AVPacket pkt, audioPkt;
 
       QString fileName;
       QString tempExtensionCheck;
-      unsigned getWidth();
-      unsigned getHeight();
-      bool isSizeValid();
+
+    //audio
+    int audio_outbuf_size;
+    int audio_input_frame_size;
+    u_int8_t *samples;
+    u_int8_t *audio_outbuf;
+
+    AVCodec *paudioCodec;
+    AVFrame *pAudioFrame;
+
+    int index_of_df;
+    int flushed_buffers;
+    int flush_delayed_frames;
+    int flush_done;
+    int delayed_frames;
+    int tempPts;
+    int delayed_pts[MAX_DELAYED_FRAMES];
+    
+    unsigned getWidth();
+    unsigned getHeight();
+    bool isSizeValid();
 
       void initVars();
       bool initCodec();
+      
 
       // Alloc/free the output buffer
       bool initOutputBuf();
@@ -109,8 +178,7 @@ protected:
 
       // Frame conversion
       bool convertImage(const QImage &img);
-      bool convertImage_sws(const QImage &img);
-
+      bool convertImage_sws(uint8_t *buffer, bool rgbBufferformat);
 };
 #endif // VideoEncoder_H
 

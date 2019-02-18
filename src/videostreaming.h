@@ -21,10 +21,6 @@
 
 #ifndef VIDEOSTREAMING_H
 #define VIDEOSTREAMING_H
-
-#include <QQuickPaintedItem>
-#include <QImage>
-#include <QPainter>
 #include <QTimer>
 #include <QDateTime>
 #include <QSocketNotifier>
@@ -40,12 +36,108 @@
 #include "v4l2-api.h"
 #include "videoencoder.h"
 #include "h264decoder.h"
+#include "audioinput.h"
 #include "common_enums.h"
 #include <linux/uvcvideo.h>
 
-class Videostreaming : public QQuickPaintedItem, public v4l2
+#include <QtQuick/QQuickItem>
+#include <QtGui/QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
+#include <QMutex>
+
+class FrameRenderer : public QObject, protected QOpenGLFunctions
 {
     Q_OBJECT
+public:
+    FrameRenderer();
+    ~FrameRenderer();
+
+    void setT(qreal t) { m_t = t; }
+    void setViewportSize(const QSize &size) { m_viewportSize = size; }
+    void setWindow(QQuickWindow *window) { m_window = window; }
+
+    /**
+     * @brief FrameRenderer::calculateViewportWidth - calculate view port width to maintain aspect ratio
+     * @param vidResolutionWidth - video preview resolution width
+     * @param vidResolutionHeight - video preview resolution height
+     * @param windowHeight - window renderbackground area height
+     * @param *x - to store x position
+     * @param *y - to store y position
+     * @param *destWindowWidth - to store target window viewport width
+     * @param *destWindowHeight - to store target window viewport height 
+     */
+    void calculateViewport(int vidResolutionWidth, int  vidResolutionHeight, int windowHeight, int windowWidth, int *x, int *y, int *destWindowWidth, int *destWindowHeight);
+
+    // Draw RGBA buffer
+    void drawRGBBUffer();
+
+    // Convert YUYV  to RGB and draw
+    void drawYUYVBUffer();
+
+    // opengl context
+    QOpenGLContext *m_context;
+
+    // yuv buffers
+    uint8_t *yBuffer;
+    uint8_t *uBuffer;
+    uint8_t *vBuffer;
+    uint8_t *yuvBuffer;
+
+    // rgba buffer
+    unsigned char *rgbaDestBuffer;
+    uint8_t renderBufferFormat;
+
+    __u32 videoResolutionwidth;
+    __u32 videoResolutionHeight;
+
+    bool gotFrame;
+
+    QMutex renderMutex; // mutex to use in rendering - rgba
+    QMutex renderyuyvMutex; // mutex to use in rendering yuyv   
+
+signals:
+     void ybufferchanged(uint8_t);
+
+public slots:
+    void paint();
+
+    // spilit yuyv buffer to y,u,v buffer
+    void fillBuffer();
+
+public:
+    QSize m_viewportSize;
+    int previewBgrdAreaHeight;
+    int previewBgrdAreaWidth;
+
+    bool sidebarAvailable; // left sidebar items [settings] availability in UI
+    int sidebarWidth;      // left side bar width
+    bool updateStop;
+
+    // shader programs
+    QOpenGLShaderProgram *m_programRGB; // RGBA shader
+    QOpenGLShaderProgram *m_programYUYV; // YUYV shader
+
+private:    
+    qreal m_t;
+
+    QQuickWindow *m_window;
+
+    // texture coodinates
+    int mPositionLoc;
+    int mTexCoordLoc;
+
+    // uinform location
+    GLint samplerLocY;
+    GLint samplerLocU;
+    GLint samplerLocV;
+
+    GLint samplerLocRGB;
+};
+
+class Videostreaming :  public QQuickItem, public v4l2
+{
+    Q_OBJECT
+    Q_PROPERTY(qreal t READ t WRITE setT NOTIFY tChanged)
 public:
     struct buffer {
         unsigned planes;
@@ -53,8 +145,11 @@ public:
         size_t  length[VIDEO_MAX_PLANES];
     };
     Videostreaming();
-    ~Videostreaming();
-    void paint(QPainter *painter);
+    ~Videostreaming();   
+    
+    qreal t() const { return m_t; }
+    void setT(qreal t);
+    void fillRenderBuffer();
 
     QString fileName;
 
@@ -64,15 +159,22 @@ public:
     static QStringListModel fpsList;    
     static QStringListModel encoderList;
 
-    void setFrame(unsigned char *data);
     void displayFrame();
-    bool setBuffer(unsigned char *buf, unsigned size);
 
-    /* cu130 camera - MPEG high frame rate */
-    int jpegDecode(unsigned char **pic, unsigned char *buf, unsigned long bytesUsed);
-    int decomp(unsigned char **jpegbuf,
-                                unsigned long *jpegsize, unsigned char *dstbuf, int w, int h,
-                                int jpegqual, int tilew, int tileh,unsigned char **pic);
+   unsigned char *tempSrcBuffer;
+
+
+    // prepare target buffer for rendering from input buffer.
+    bool prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 bytesUsed);
+
+    // save captured image files
+    bool saveRawFile(void *inputBuffer, int buffersize);    
+    bool saveIRImage();
+
+    static int jpegDecode(Videostreaming *obj, unsigned char **pic, unsigned char *buf, unsigned long bytesUsed);
+    static int decomp(Videostreaming *obj, unsigned char **jpegbuf,
+                                   unsigned long *jpegsize, unsigned char *dstbuf, int w, int h,
+                                   int jpegqual, int tilew, int tileh,unsigned char **pic);
     double getTimeInSecs(void);
     void freeBuffer(unsigned char *ptr);
 
@@ -97,7 +199,12 @@ public:
     QString lastFPSValue;
 
     VideoEncoder  *videoEncoder;
-    H264Decoder *h264Decode;    
+    VideoEncoder  videoEncoderObj;
+    H264Decoder *h264Decode;
+    AudioInput audioinput;
+    audio_buff_t *audio_buffer_data;
+    bool audiorecordStart;
+    QMutex recordMutex;
 
     /* Jpeg decode */
     int doyuv;
@@ -111,6 +218,12 @@ public:
     uint frameToSkip;
 
 private:
+    qreal m_t;
+    FrameRenderer *m_renderer;
+
+    uint8_t *yuyvBuffer;
+    uint8_t *yuv420pdestBuffer;
+    unsigned short int *bayerIRBuffer;
 
     __u32 m_pixelformat;
     __u32 m_width, m_height;
@@ -156,14 +269,13 @@ private:
     struct v4l2_fract interval;
     struct v4l2_format m_capSrcFormat;
     struct v4l2_format m_capDestFormat;
+    v4l2_format copy;
 
     struct v4lconvert_data *m_convertData;
     struct buffer *m_buffers;
 
-    QImage snapShotImage;
-    QPixmap qStaticImage;
-    QImage *m_capImage;    
-    QPixmap qImage;
+    QImage *m_capImage;   
+  
 
     QString ctrlName, ctrlType, ctrlID, ctrlStepSize, ctrlMaxValue, ctrlMinValue,ctrlDefaultValue;
     QString stillSize;
@@ -186,6 +298,9 @@ private:
     uint m_nbuffers;    
     static int deviceNumber;
     static QString camDeviceName;
+
+    unsigned char  *y16BayerDestBuffer;
+    bool y16BayerFormat;
  /**
      * @brief currentlySelectedCameraEnum - This contains currently selected camera enum value
      */
@@ -199,6 +314,10 @@ private:
 
     // Added by Sankari  - 10 Nov 2016 - To decide whether to save image or not
     bool m_saveImage;
+
+    unsigned int imgSaveSuccessCount;
+
+    bool frameSkip;
 
     QString getSettings(unsigned int);
     void getFrameRates();
@@ -215,9 +334,21 @@ private:
     void setImageFormatType(QString imgFormatType);
     QString getImageFormatType();
 
+private slots:
+    void handleWindowChanged(QQuickWindow *win); 
 
 public slots:
-    // Added by Sankari : 10 Dec 2016
+
+    void sync();
+    void cleanup();   
+    void setPreviewBgrndArea(int width, int height, bool sidebarAvailable);
+    void enumerateAudioProperties();
+    void setChannelCount(uint index);
+    void setSampleRate(uint index);
+    void stopUpdatePreview();
+
+
+     // Added by Sankari : 10 Dec 2016
     // To Disable image capture dialog when taking trigger shot in trigger mode for 12cunir camera
     void disableImageCaptureDialog();
 
@@ -358,7 +489,7 @@ public slots:
     void lastPreviewResolution(QString resolution,QString format);
     // Added by Sankari - To maintain last set framerate
     void lastFPS(QString fps);
-    void formatSaveSuccess(uint imgSaveSuccessCount, bool burstFlag);
+    void formatSaveSuccess(bool burstFlag);
     void updateFrameInterval(QString pixelFormat, QString frameSize);
 
     /**
@@ -367,13 +498,8 @@ public slots:
      */
     void frameIntervalChanged(int idx);
 
-    /**
-     * @brief This function should be called to update the preview
-     * @param img - image displayed in the preview
-     */
-    void updateFrame(QImage img);
-
-    /**
+    void recordVideo();
+      /**
      * @brief To begin video recording this function should be called
      * @param videoEncoderType - Encoder types are video codecs, Currently four codecs are used as follows
      * 1. RAW VIDEO
@@ -384,8 +510,9 @@ public slots:
      * 1. avi
      * 2. mkv
      * @param fileLocation - Location where the recorded file is saved
+     * @param - audioDeviceIndex  - audio device index
      */
-    void recordBegin(int videoEncoderType, QString videoFormatType, QString fileLocation);
+    void recordBegin(int videoEncoderType, QString videoFormatType, QString fileLocation, int audioDeviceIndex, int channels);
 
     /**
      * @brief This function should be called to stop the video recording
@@ -418,7 +545,14 @@ public slots:
     // Set the uvc extension control value
     bool setUvcExtControlValue(struct uvc_xu_control_query xquery);
 
+    void doEncodeAudio();
+
 signals:
+    // from qml file , rendering animation duration t changed
+    void tChanged();
+
+    void captureVideo();
+
     // Added by Sankari: 12 Feb 2018
     // Get the bus info details and send to qml for selected camera
     void pciDeviceBus(QString businfo);
@@ -450,7 +584,7 @@ signals:
     void requestToChangeFPSandTakeShot();
 
     // To get FPS list
-    void sendFPSlist(QString fpsList);   
+    void sendFPSlist(QString fpsList);
 };
 
 #endif // VIDEOSTREAMING_H

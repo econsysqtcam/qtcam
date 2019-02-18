@@ -60,6 +60,7 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c112"),CommonEnums::SEE3CAM_11CUG);
     cameraEnumMap.insert(econVid + (",c113"),CommonEnums::SEE3CAM_12CUNIR);
     cameraEnumMap.insert(econVid + (",c130"),CommonEnums::SEE3CAM_CU30);
+    cameraEnumMap.insert(econVid + (",c133"),CommonEnums::SEE3CAMPLUS_CU30);
 
     //Added by Sankari : 28 July 2017
     cameraEnumMap.insert(econVid + (",c120"),CommonEnums::SEE3CAM_CU20);
@@ -85,7 +86,8 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c081"),CommonEnums::SEE3CAM_81);
     cameraEnumMap.insert("04b4,0035",CommonEnums::CX3_SNI_CAM); // Cypress Semiconductor Corp : CX3-SNI front and rear camera
     cameraEnumMap.insert(econVid + (",c132"),CommonEnums::NILECAM30_USB);
-    cameraEnumMap.insert(econVid + (",c154"),CommonEnums::SEE3CAM_CU55);
+    cameraEnumMap.insert(econVid + (",c123"),CommonEnums::ECAM22_USB); // h264 camera
+    cameraEnumMap.insert(econVid + (",c154"),CommonEnums::SEE3CAM_CU55);    
 }
 
 unsigned int uvccamera::getTickCount()

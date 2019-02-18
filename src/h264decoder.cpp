@@ -102,9 +102,65 @@ bool H264Decoder::initH264Decoder(unsigned width, unsigned height)
 }
 
 
+void H264Decoder::yu12_to_yuyv(u_int8_t *out, u_int8_t *in, int width, int height)
+{
+    uint8_t *py;
+    uint8_t *pu;
+    uint8_t *pv;
+
+    int linesize = width * 2;
+    int uvlinesize = width / 2;
+
+    py=in;
+    pu=py+(width*height);
+    pv=pu+(width*height/4);
+
+    int h=0;
+    int huv=0;
+
+    for(h=0;h<height;h+=2)
+    {
+        int wy = 0;
+        int wuv = 0;
+        int offset = h * linesize;
+        int offset1 = (h + 1) * linesize;
+        int offsety = h * width;
+        int offsety1 = (h + 1) * width;
+        int offsetuv = huv * uvlinesize;
+        int w = 0;
+
+        for(w=0;w<linesize;w+=4)
+        {
+            /*y00*/
+            out[w + offset] = py[wy + offsety];
+            /*u0*/
+            out[(w + 1) + offset] = pu[wuv + offsetuv];
+            /*y01*/
+            out[(w + 2) + offset] = py[(wy + 1) + offsety];
+            /*v0*/
+            out[(w + 3) + offset] = pv[wuv + offsetuv];
+
+            /*y10*/
+            out[w + offset1] = py[wy + offsety1];
+            /*u0*/
+            out[(w + 1) + offset1] = pu[wuv + offsetuv];
+            /*y11*/
+            out[(w + 2) + offset1] = py[(wy + 1) + offsety1];
+            /*v0*/
+            out[(w + 3) + offset1] = pv[wuv + offsetuv];
+
+            wuv++;
+            wy+=2;
+        }
+        huv++;
+    }
+}
+
 int H264Decoder::decodeH264(u_int8_t *outBuf, u_int8_t *inBuf, int bufSize)
 {
     AVPacket avpkt;
+
+    av_init_packet(&avpkt);
 
     avpkt.size = bufSize;
     avpkt.data = inBuf;

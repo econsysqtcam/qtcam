@@ -81,6 +81,7 @@ Rectangle {
     property variant imageSettingsRootObject
     property variant stillSettingsRootObject
     property variant videoSettingsRootObject
+    property variant audioSettingsRootObject
     property variant captureVideoRecordRootObject
 
     property variant pciBusCamDetails
@@ -98,12 +99,28 @@ Rectangle {
     signal cameraControlPropertyChange();
     property bool videoCaptureChildVisible : false;
     property bool stillCaptureChildVisible: false
+    property bool audioCaptureChildVisible: false
+    property bool videoSettingsChildVisible: false    
+
+
+    //video scrollview visible height
+    property int videoPropHeight
+
+    property int audioPropertyYValue
+
+    property int audioDeviceIndex
+    property int audioChannel
+    property int audioSampleRate
+
     //Still properties
     signal stillChildVisibleState(bool visibleStatus)
     //Enable or disable still property item
     signal stillPropertyItemEnable(bool enableStatus)
+    //Enable or disable audio property item
+    signal audioPropertyItemEnable(bool enableStatus)
     //Insert Still image formats
-    signal insertStillImageFormat(var stillFormat);
+    signal insertStillImageFormat(var stillFormat);    
+    signal insertChannelFormats(var channels);
     //Set index of color combox in still property
     signal setColorComboOutputIndex(bool isColorCombo,int indexValue)
     //Image format Y value in the still property
@@ -114,6 +131,7 @@ Rectangle {
     property int defaultImageFormatYValue : 215
     //Default still format y pos value
     property int defaultStillPropertyYValue : 240
+    property int defaultVideoPropertyYValue : 275
 
     // To check mouse click capture function is called
     property bool mouseClickCap: false
@@ -146,6 +164,7 @@ Rectangle {
     signal getStillPropertyPositionValues();
     //Update video menu position to move up and down
     signal updateVideoMenuPosition();
+    signal updateAudioMenuPosition();
     //Add Auto mode menu item in the image quality settings tab
     signal addAutoModeMenuItem();
 
@@ -187,6 +206,8 @@ Rectangle {
     // Added by Sankari: 12 sep 2017 - signal to notify the extension tab visibility
     signal extensionTabVisible(bool visible);
 
+    signal cameraSelected();
+
     width:Screen.width
     height:Screen.height
     focus: true
@@ -201,7 +222,7 @@ Rectangle {
         id: recordStartDelayTimer // Record after disabling Auto Focus Rectangle or face rect overlay rectangle
         interval: 1000
         onTriggered: {
-            vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath)
+            vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, audioDeviceIndex, audioChannel)
             stop()
         }
     }
@@ -234,6 +255,7 @@ Rectangle {
             statusText = "Recording Failed..."
             videoPropertyItemEnable(true)
             stillPropertyItemEnable(true)
+            audioPropertyItemEnable(true)
             device_box.enabled = true
             vidstreamproperty.enabled = true
             device_box.opacity = 1
@@ -250,33 +272,58 @@ Rectangle {
     Image {
         id: layer_0
         source: "images/layer_0.png"
-        x: sideBarItems.visible ? 268 : 0
+        x: sideBarItems.visible ? parent.width*0.15 : 0
         y: 0
         opacity: 1
-        width: sideBarItems.visible ? parent.width - 268 : parent.width
-        height: parent.height - statusBarRootObject.statusBarHeight
+        width: sideBarItems.visible ? parent.width * 0.85 : parent.width
+        height: parent.height - statusBarRootObject.statusBarHeight+5
     }
 
-    ScrollView {
-        id: previewer
-        anchors.centerIn: layer_0
-        width: vidstreamproperty.width < (sideBarItems.visible ? parent.width - 268 : parent.width) ? vidstreamproperty.width + 20 : sideBarItems.visible ? parent.width - 268 : parent.width
-        height: vidstreamproperty.height < layer_0.height ? (vidstreamproperty.height) : (parent.height - statusBarRootObject.statusBarHeight)
-        style: ScrollViewStyle {
-            scrollToClickedPosition: true
-            scrollBarBackground: Image {
-                source: styleData.horizontal? "images/Horizontal_Scroll_base.png" : "images/Vertical_Scroll_base.png"
-            }
-            incrementControl: Image {
-                source: styleData.horizontal? "images/Horizontal_right_arrow.png" : "images/Vertical_down_arrow.png"
-            }
-            decrementControl: Image {
-                source: styleData.horizontal? "images/Horizontal_left_arrow.png" : "images/Vertical_top_arrow.png"
+     Rectangle{
+        id: previewBgrndArea
+        color: "#000000"
+        x: layer_0.x
+        anchors.left: layer_0.left
+        anchors.leftMargin: sideBarItems.visible ? parent.width*0.15 : 0
+        width: sideBarItems.visible ? parent.width * 0.85 : parent.width
+        height: layer_0.height
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onReleased:
+            {
+                if (mouse.button == Qt.LeftButton){
+                    if(closeSideBarClicked){
+                        captureRecordWhenSideBarItemsClosed()
+                    }
+                    else{
+                        if(captureVideoRecordRootObject.captureBtnVisible){
+                            mouseClickCapture()
+                        } else if(captureVideoRecordRootObject.recordBtnVisible){
+                            videoRecordBegin()
+                        } else if(captureVideoRecordRootObject.recordStopBtnVisible){
+                            videoSaveVideo()
+                        }
+                    }
+                }else if(mouse.button == Qt.RightButton){
+                    // passing mouse x,y cororinates, preview width and height
+                    mouseRightClicked(mouse.x, mouse.y, vidstreamproperty.width, vidstreamproperty.height)
+                }
             }
         }
+
+   
         Videostreaming {
             id: vidstreamproperty
             focus: true
+
+	    SequentialAnimation on t {
+                    id:seqAni
+                    NumberAnimation { to: 1; duration: 16; easing.type: Easing.InQuad }
+                    NumberAnimation { to: 0; duration: 16; easing.type: Easing.OutQuad }
+                    loops: Animation.Infinite
+                    running: false
+            }
             // Added by Sankari:12 Feb 2018 - Get the Pci bus info for selected camera
             onPciDeviceBus:{
                 pciBusCamDetails = businfo
@@ -296,10 +343,18 @@ Rectangle {
                     //Enable camera settings/extension settings tab after capturing image
                     enableAllSettingsTab()
                     mouseClickCap = false
-                }
+                }                
+                seqAni.start()
+                vidstreamproperty.stopUpdatePreview()
+
             }
             onEnableRfRectBackInPreview:{
                 afterBurst() // signal to do anything need to do after capture continuous[burst] shots.
+            }
+
+            // Enable Face detection rect in preview
+            onEnableFactRectInPreview:{
+                enableFaceRectafterBurst()
             }
 
             // Enable Face detection rect in preview
@@ -314,7 +369,7 @@ Rectangle {
             onDeviceUnplugged: {
                 // Added by Sankari:12 Feb 2018 - Get the Pci bus info for selected camera
                 keyEvent.stopGetKeyFromCamera()
-
+                seqAni.stop()
                 captureBtnEnable(false)
                 videoRecordBtnEnable(false)
                 keyEventFiltering = true
@@ -339,6 +394,7 @@ Rectangle {
                     messageDialog.open()
                     videoPropertyItemEnable(true)
                     stillPropertyItemEnable(true)
+                    audioPropertyItemEnable(true)
                     device_box.enabled = true
                     device_box.opacity = 1
                     videoRecordBtnVisible(true)
@@ -479,6 +535,8 @@ Rectangle {
                 sideBarItems.visible = true
                 sidebarVisibleStatus(sideBarItems.visible)
                 open_sideBar.visible = false
+		// set preview background area. param1:width, param2: height, param3: sidebar visibility true/false
+                vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, true)
             }
         }
     }
@@ -488,7 +546,7 @@ Rectangle {
             id: side_bar_bg
             source: "images/side_bar_bg.png"
             x: -3
-            y: -3
+            y: -5
             height: root.height+5
             opacity: 1
         }
@@ -541,11 +599,18 @@ Rectangle {
             onCurrentIndexChanged: {
                 if(currentIndex.toString() != "-1" && currentIndex.toString() != "0") {                    
                     if(oldIndex!=currentIndex) {
+			seqAni.running = true
+                        seqAni.start()
+                        vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, true)
+
                         oldIndex = currentIndex
 
                         // Added by Sankari: 12 Feb 2018 : stop Getting key from camera.
                         keyEvent.stopGetKeyFromCamera()
 
+                        enumerateAudioSettings();
+
+                        cameraSelected()
                         //Added by Dhurka - 20th Oct 2016
                         cameraControlPropertyChange();
                         // Added by Sankari: 20 Apr 2017 - If we unplug and plug the camera, the video color space is not updated properly
@@ -761,6 +826,8 @@ Rectangle {
                     sideBarItems.visible = false
                     sidebarVisibleStatus(sideBarItems.visible)
                     open_sideBar.visible = true
+		    // set preview backgrond area. param1:width, param2: height, param3: sidebar visibility true/false
+                    vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, false)                    
                 }
             }
         }
@@ -792,6 +859,21 @@ Rectangle {
             }
         }        
     }
+
+
+    function enumerateAudioSettings(){
+        vidstreamproperty.enumerateAudioProperties()
+    }
+
+    function setSampleRate(sampleRate){
+        audioSampleRate = sampleRate
+        vidstreamproperty.setSampleRate(sampleRate)
+    }
+
+    function setChannelCount(channel){
+        audioChannel = channel
+        vidstreamproperty.setChannelCount(channel)
+    }
 	
     // Added by Sankari : Update frame to skip 
     function updateFrametoSkip(stillSkip){
@@ -812,6 +894,7 @@ Rectangle {
             imageQualitySettingsEnable(false)
             videoPropertyItemEnable(false)
             stillPropertyItemEnable(false)
+            audioPropertyItemEnable(false)
             uvc_settings.enabled = false
             uvc_settings.opacity = 0.5
             selectCameraSettings()
@@ -824,9 +907,15 @@ Rectangle {
         if (!vidFormatChanged){            
             vidstreamproperty.width = str.toString().split("x")[0].toString()
             vidstreamproperty.height = str.toString().split("x")[1].toString()
+        }      
+        vidstreamproperty.stopCapture()        
+        if(vidFormatChanged){
+            vidstreamproperty.lastPreviewResolution(vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString(),format)         
+            JS.videoCaptureResolution = vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString()
+        }else{
+            vidstreamproperty.lastPreviewResolution(str,format)                       
         }
-        vidstreamproperty.stopCapture()
-        vidstreamproperty.lastPreviewResolution(str,format)
+
         // Added by Sankari: 04 Jan 2017 -  store last fps index
         vidstreamproperty.lastFPS(fps)
         vidstreamproperty.vidCapFormatChanged(format)
@@ -938,10 +1027,11 @@ Rectangle {
         if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130  || selectedDeviceEnumValue == CommonEnums.SEE3CAM_30){
             recordStartDelayTimer.start() // some delay is required to disable focus rect / face overlay rect. After that delay need to start record.
         }else{
-            vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath)
+            vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, audioDeviceIndex, audioChannel)
         }
         videoPropertyItemEnable(false)
         stillPropertyItemEnable(false)
+        audioPropertyItemEnable(false)
         device_box.enabled = false
         device_box.opacity = 0.5
         videoRecordBtnVisible(false)
@@ -950,6 +1040,10 @@ Rectangle {
         uvc_settings.opacity = 0.5
         if(!videoRecButtonVisibleStatus)
             selectCameraSettings()
+    }
+
+    function audioDeviceSelected(currentIndex){        
+        audioDeviceIndex = currentIndex;
     }
 
     function videoSaveVideo() {
@@ -965,6 +1059,7 @@ Rectangle {
         messageDialog.open()
         videoPropertyItemEnable(true)
         stillPropertyItemEnable(true)
+        audioPropertyItemEnable(true)
         device_box.enabled = true
         vidstreamproperty.enabled = true
         device_box.opacity = 1
@@ -1036,6 +1131,8 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/see3cam40/uvc40.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU30) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu30/uvc_cu30.qml").createObject(root)
+        }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAMPLUS_CU30) {
+            see3cam = Qt.createComponent("../UVCSettings/see3campluscu30/uvc_pluscu30.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU20) { // Added By Sankari : 28 Jul 2017
             see3cam = Qt.createComponent("../UVCSettings/see3camcu20/see3camcu20.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_30) {
@@ -1046,6 +1143,8 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/cx3SNI/uvcExtCX3SNI.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.NILECAM30_USB) {
             see3cam = Qt.createComponent("../UVCSettings/nilecam30usb/nilecam30_usb.qml").createObject(root)
+        }else if(selectedDeviceEnumValue == CommonEnums.ECAM22_USB) {
+            see3cam = Qt.createComponent("../UVCSettings/h264cam/h264camExt.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU55) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu55/see3camcu55.qml").createObject(root)
         }else {
@@ -1072,6 +1171,7 @@ Rectangle {
             case CommonEnums.ECON_1MP_MONOCHROME:
             case CommonEnums.SEE3CAM_11CUG:
             case CommonEnums.SEE3CAM_CU30:
+            case CommonEnums.SEE3CAMPLUS_CU30:
 		// Added by Sankari : 01 Aug 2017
             case CommonEnums.SEE3CAM_CU20:
             case CommonEnums.SEE3CAM_CU40:
@@ -1134,6 +1234,11 @@ Rectangle {
         {
             videoSettingsRootObject = videoViewComponent.createObject(root,{"imageFormatY" : imageFormatYValue,"stillPropertyY" : stillPropertyYValue});
         }
+        /*var AudioViewComponent = Qt.createComponent("audiocapturesettings.qml")
+        if (AudioViewComponent.status === Component.Ready)
+        {
+            audioSettingsRootObject = AudioViewComponent.createObject(root,{"imageFormatY" : imageFormatYValue,"stillPropertyY" : stillPropertyYValue});
+        }*/
         //Capture and Video recording
         var captureVideoRecordComponent = Qt.createComponent("captureandvideorecord.qml")
         if (captureVideoRecordComponent.status === Component.Ready)
@@ -1192,6 +1297,7 @@ Rectangle {
         imageQualitySettingsEnable(true)
         videoPropertyItemEnable(true)
         stillPropertyItemEnable(true)
+        audioPropertyItemEnable(true)
         uvc_settings.enabled = true
         uvc_settings.opacity = 1
         captureBtnEnable(true)
@@ -1236,7 +1342,8 @@ Rectangle {
     }
    //for taking snap shot
    function imageCapture(shotType)
-   {       
+   {
+       seqAni.stop()       
        vidstreamproperty.setStillVideoSize(stillSettingsRootObject.stillOutputTextValue, stillSettingsRootObject.stillColorComboIndexValue)
        switch(shotType)
        {
@@ -1293,6 +1400,7 @@ Rectangle {
            stillPropertyYValue = defaultStillPropertyYValue
        }
        updateVideoMenuPosition();
+       updateAudioMenuPosition();
    }
    function enableVideoPin(videoPinEnable)
    {

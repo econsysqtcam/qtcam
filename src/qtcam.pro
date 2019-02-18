@@ -3,7 +3,7 @@ folder_01.source = qml/qtcam
 folder_01.target = qml
 DEPLOYMENTFOLDERS = folder_01
 
-QT += widgets concurrent
+QT += widgets concurrent multimedia
 TARGET = Qtcam
 
 CONFIG += release
@@ -40,8 +40,11 @@ SOURCES += main.cpp \
     uvcExtCx3sni.cpp \
     keyEventReceive.cpp \
     nilecam30_usb.cpp \
+    h264camera.cpp \
     see3cam_cu55.cpp \
-    see3cam_130A.cpp
+    see3cam_130A.cpp \
+    audioinput.cpp \
+    seecamplus_cu30.cpp
 
 # Installation path
 # target.path =
@@ -82,8 +85,12 @@ HEADERS += \
     uvcExtCx3sni.h \
     keyEventReceive.h \
     nilecam30_usb.h \
+    h264camera.h \
     see3cam_cu55.h \
-    see3cam_130A.h
+    see3cam_130A.h \
+    audioinput.h \
+    seecamplus_cu30.h
+
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
                 /usr/include \
@@ -96,14 +103,15 @@ BOARD_ARM64 = $$system(dpkg --print-architecture | grep -o "arm64")
 
 contains(UNAME_MACHINE_64BIT, amd64):{
     message("x86_64 bit libs")
-    LIBS += -lv4l2 -lv4lconvert \
+    LIBS += -lv4l2 -lv4lconvert \       
         -lavutil \
         -lavcodec \
         -lavformat \
         -lswscale \
         -ludev \
         -lusb-1.0 \
-        -L/usr/lib/ -lturbojpeg \
+        -lpulse \
+        -L/usr/lib/ -lturbojpeg \        
         -L/usr/lib/x86_64-linux-gnu/ -levdev
 }
 
@@ -116,6 +124,7 @@ contains(UNAME_MACHINE_32BIT, i386):{
         -lswscale \
         -ludev \
         -lusb-1.0 \
+        -lpulse \
         -L/usr/lib/ -lturbojpeg \
         -L/usr/lib/i386-linux-gnu/ -levdev
 }
@@ -129,11 +138,12 @@ contains(BOARD_ARM64, arm64):{
         -lswscale \
         -ludev \
         -lusb-1.0 \
+        -lpulse \
         -L/usr/lib/ -lturbojpeg \
         -L/usr/lib/aarch64-linux-gnu/ -levdev
 }
 
-QMAKE_CXX += -ggdb
+#QMAKE_CXX += -ggdb
 QMAKE_CFLAGS_THREAD = -D__STDC_CONSTANT_MACROS      #For Ubuntu 12.04 compilation
 QMAKE_CXXFLAGS_THREAD = -D__STDC_CONSTANT_MACROS    #For Ubuntu 12.04 compilation
 

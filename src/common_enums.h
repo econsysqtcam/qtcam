@@ -24,6 +24,7 @@ public:
         SEE3CAM_11CUG,
         SEE3CAM_12CUNIR,
         SEE3CAM_CU30,
+        SEE3CAMPLUS_CU30,
         SEE3CAM_CU40,
         SEE3CAM_CU50,
         SEE3CAM_CU51,
@@ -48,10 +49,10 @@ public:
         SEE3CAM_CU20,
         // Added by Sankari - 13 June 2017
         CX3_SNI_CAM,
-
         NILECAM30_USB,
-
-        SEE3CAM_CU55  // SEE3CAM_AR0521
+	// Added by Sankari - 11 Dec 2018
+        ECAM22_USB,
+    SEE3CAM_CU55  // SEE3CAM_AR0521
 
     }ECameraNames;
     //Enum for capture shot type
@@ -63,6 +64,14 @@ public:
         CHANGE_FPS_SHOT
     }ECaptureShotType;
 
+   // Added by Sankari - 02 Dec 2018 - render shader program usage
+    typedef enum
+    {
+        RGB_BUFFER_RENDER = 1, // rgba
+        YUYV_BUFFER_RENDER
+    }ERenderBuffer;
+	
+    Q_ENUMS(ERenderBuffer)
     Q_ENUMS(ECameraNames)
 	Q_ENUMS(ECaptureShotType)
 };

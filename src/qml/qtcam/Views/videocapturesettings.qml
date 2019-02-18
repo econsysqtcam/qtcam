@@ -114,6 +114,12 @@ Item {
 
             Item {
                 height: video_location.y + 85
+
+                onVisibleChanged:
+                {
+                    root.videoSettingsChildVisible = visible
+                }
+
                 GridLayout {
                     id: videoCapturePropertyGrid
                     columns: 1
@@ -598,6 +604,10 @@ Item {
             messageDialog.text = qsTr("Video Capture Settings is disabled in trigger Mode")
             messageDialog.open()
         }
+    }
+
+    Component.onCompleted: {
+        root.videoPropHeight = video_Capture_property_Child.height        
     }
 }
 

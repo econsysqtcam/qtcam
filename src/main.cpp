@@ -42,13 +42,16 @@
 #include "see3cam_cu20.h"
 #include "seecam_ar0130.h"
 #include "seecam_cu30.h"
+#include "seecamplus_cu30.h"
 #include "see3cam_cu55.h"
 // Added by Sankari : 07 Feb 2017
 #include "see3cam_30.h"
 #include "uvcExtCx3sni.h"
+#include "audioinput.h"
 #include "ascella.h"
 #include "keyEventReceive.h"
 #include "nilecam30_usb.h"
+#include "h264camera.h"
 #include "about.h"
 #include "common.h"
 #include "common_enums.h"
@@ -94,16 +97,21 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_130>("econ.camera.see3cam130", 1, 0, "See3Cam130");
     qmlRegisterType<See3CAM_130A>("econ.camera.see3cam130A", 1, 0, "See3Cam130A");
     qmlRegisterType<See3CAM_CU30>("econ.camera.see3camcu30", 1, 0, "See3Camcu30");
+    qmlRegisterType<See3CAMPLUS_CU30>("econ.camera.see3campluscu30", 1, 0, "See3CamPluscu30");
     qmlRegisterType<NILECAM30_USB>("econ.camera.nilecam30usb", 1, 0, "NileCam30usb");
     qmlRegisterType<See3CAM_CU55>("econ.camera.see3camcu55", 1, 0, "See3camCu55");
 
     // Added by Sankari: 27 July 2017
     qmlRegisterType<See3CAM_CU20>("econ.camera.see3camcu20", 1, 0, "See3Camcu20");
-    qmlRegisterType<See3CAM_CU51>("econ.camera.see3cam51", 1, 0, "See3Cam51");
+    qmlRegisterType<See3CAM_CU51>("econ.camera.see3cam51", 1, 0, "See3Cam51");    
+    // Added by Sankari - 5 Oct 2018
+    qmlRegisterType<H264Camera>("econ.camera.h264cam", 1, 0, "H264camera"); //ecam22_usb 
     qmlRegisterType<ASCELLA>("econ.camera.ascella", 1, 0, "Ascella");
     qmlRegisterType<See3CAM_Control>("econ.camera.see3camControl", 1, 0, "See3CamCtrl");
     qmlRegisterType<See3CAM_GPIOControl>("econ.camera.see3camGpioControl", 1, 0, "See3CamGpio");
     qmlRegisterType<AboutPage>("econ.camera.about", 1, 0, "AboutPage");
+
+    qmlRegisterType<AudioInput>("econ.camera.audioinput", 1, 0, "Audioinput");
     //Added by Dhurka - 13th Oct 2016
     /**
      * @brief qmlRegisterType<CommonEnums> - Access the ENUM list to QML
@@ -129,11 +137,15 @@ int main(int argc, char *argv[])
     viewer.rootContext()->setContextProperty("camModels", &camProperty.modelCam);
 
     Videostreaming vs;
+    AudioInput audio;
     viewer.rootContext()->setContextProperty("resolutionModel", &vs.resolution);
     viewer.rootContext()->setContextProperty("stillOutputFormatModel", &vs.stillOutputFormat);
     viewer.rootContext()->setContextProperty("videoOutputFormatModel", &vs.videoOutputFormat);
     viewer.rootContext()->setContextProperty("fpsAvailable", &vs.fpsList);
     viewer.rootContext()->setContextProperty("encodersModel", &vs.encoderList);
+    viewer.rootContext()->setContextProperty("audioinputDevModel", &audio.audioinputDeviceList);
+    viewer.rootContext()->setContextProperty("audioSupportedFormatList", &audio.audiosupportedFmtListModel);
+    viewer.rootContext()->setContextProperty("audioChannelCountModel", &audio.audioChannelCountModel);
     viewer.rootContext()->setContextProperty("SystemPictureFolder",QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).first());
     viewer.rootContext()->setContextProperty("SystemVideoFolder",QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first());
 #if LAUNCHPAD

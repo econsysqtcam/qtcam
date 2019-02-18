@@ -42,6 +42,7 @@ public:
    void closeFile();
    bool initH264Decoder(unsigned width,unsigned height);
    int decodeH264(uint8_t *out_buf, uint8_t *in_buf, int buf_size);
+   void yu12_to_yuyv(u_int8_t *out, u_int8_t *in, int width, int height);
 
 protected:
       AVCodecContext *pH264CodecCtx;

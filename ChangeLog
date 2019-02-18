@@ -1,3 +1,9 @@
+Qtcam Application - 20.0.0
+--------------------------
+* Added support for eCAM22_USB camera.
+* Rendering method is moved from QPainter to Opengl.
+* Avoid usage of v4lconvert for rendering frame.
+
 Qtcam Application - 19.0.1
 --------------------------
 * Removed face exposure ROI, smile trigger and smile threshold configuration.

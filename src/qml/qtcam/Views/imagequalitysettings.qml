@@ -443,6 +443,8 @@ Item {
                                     root.autoWhiteBalanceSelected(false)
                                     if(wbAutoChangeProperty){
                                         root.changeCameraSettings(whiteBalanceControl_auto_Id,0)
+					// When click hardware default, selecting manual whitebalance, set to default wb.
+					root.changeCameraSettings(whiteBalanceControlId,white_balance_Slider.value.toString())
                                     }
                                     if(root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM){
                                         white_balance_Slider.opacity = 1
