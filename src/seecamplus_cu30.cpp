@@ -763,6 +763,84 @@ bool See3CAMPLUS_CU30::getFaceDetectMode()
 }
 
 /**
+ * @brief See3CAMPLUS_CU30::setSmileDetection - setting smile detection rectangle
+ * @param enableSmileDetect - enable / disable smile detect
+ * @param embedData - Enable / Disable embed data
+ * @return true/false
+ */
+bool See3CAMPLUS_CU30::setSmileDetection(bool enableSmileDetect, bool embedData){
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU30PLUS; /* camera id */
+    g_out_packet_buf[2] = SET_SMILE_DETECTION_CU30PLUS; /* set face detect Rect command */
+
+    if(enableSmileDetect)
+        g_out_packet_buf[3] = ENABLE_SMILE_DETECT_CU30PLUS; /* enable smile detect */
+    else
+        g_out_packet_buf[3] = DISABLE_SMILE_DETECT_CU30PLUS; /* disable smile detect */
+
+    if(embedData)
+        g_out_packet_buf[5] = ENABLE_EMBED_DATA_CU30PLUS; /* enable embed data */
+    else
+        g_out_packet_buf[5] = DISABLE_EMBED_DATA_CU30PLUS; /* disable embed data */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30PLUS &&
+            g_in_packet_buf[1]==SET_SMILE_DETECTION_CU30PLUS &&
+            g_in_packet_buf[6]==SET_SUCCESS) {\
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief See3CAMPLUS_CU30::getSmileDetectMode - get smile detect mode[ disable/enable ] from camera
+ * return true - success /false - failure
+ */
+bool See3CAMPLUS_CU30::getSmileDetectMode()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU30PLUS; /* Camera control id */
+    g_out_packet_buf[2] = GET_SMILE_DETECTION_CU30PLUS; /* Get smile detection */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU30PLUS &&
+            g_in_packet_buf[1]==GET_SMILE_DETECTION_CU30PLUS &&
+            g_in_packet_buf[6]==GET_SUCCESS) {\
+            emit smileDetectModeValue(g_in_packet_buf[2], g_in_packet_buf[4]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
  * @brief See3CAMPLUS_CU30::setToDefault - set all the values to default in camera
  * @return true/false
  */

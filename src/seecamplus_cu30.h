@@ -82,8 +82,7 @@
 #define GET_SMILE_DETECTION_CU30PLUS             0x11
 #define ENABLE_SMILE_DETECT_CU30PLUS             0x01
 #define DISABLE_SMILE_DETECT_CU30PLUS            0x00
-#define ENABLE_SMILE_TRIGGER_CU30PLUS            0x01
-#define DISABLE_SMILE_TRIGGER_CU30PLUS           0x00
+
 
 #define SET_TO_DEFAULT_CU30PLUS                  0xFF
 
@@ -166,6 +165,18 @@ public:
     };
     Q_ENUMS(flashStateValues)
 
+   enum camSmileDetectMode {
+       SmileDetectEnable = 0x01,
+       SmileDetectDisable = 0x00
+   };
+   Q_ENUMS(camSmileDetectMode)
+
+   enum camSmileDetectEmbedDataMode {
+       SmileDetectEmbedDataEnable = 0x01,
+       SmileDetectEmbedDataDisable = 0x00
+   };
+   Q_ENUMS(camSmileDetectEmbedDataMode)
+
 signals:
     void sendEffectMode(uint effectMode);
     void sendDenoiseValue(uint denoiseValue);
@@ -175,12 +186,12 @@ signals:
     void qFactorValue(uint qFactor);
     void flipMirrorModeChanged(uint flipMirrorMode);
     void frameRateCtrlValueReceived(uint frameRateCtrlValue);
-    void indicateCommandStatus(QString title, QString text);
-    void indicateSmileThresholdRangeFailure(QString title, QString text);
+    void indicateCommandStatus(QString title, QString text);    
     void indicateExposureValueRangeFailure(QString title, QString text);
     void exposureCompValueReceived(uint exposureCompensation);
     void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);    
     void flashModeValue(uint flashMode);
+    void smileDetectModeValue(uint smileDetectMode, uint smileDetectEmbedDataValue);
 
 public slots:
     bool setEffectMode(const specialEffects &specialEffect);
@@ -217,6 +228,9 @@ public slots:
 
     bool setFlashState(flashStateValues flashMode);
     bool getFlashState();
+
+    bool setSmileDetection(bool enableSmileDetect, bool embedData);
+    bool getSmileDetectMode();
 
     bool setToDefault();
 };

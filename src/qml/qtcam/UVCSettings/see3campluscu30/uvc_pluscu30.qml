@@ -684,7 +684,64 @@ Item {
                         see3camcu30Plus.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, checked)
                     }
                 }
-            }            
+            }
+            Text {
+                id: smileDetectionText
+                text: "--- Smile Detection ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                spacing: 62
+                ExclusiveGroup { id: smileDetectGroup }
+                RadioButton {
+                    exclusiveGroup: smileDetectGroup
+                    id: smileDetectEnable
+                    text: "Enable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked:{
+                        see3camcu30Plus.setSmileDetection(true, smileDetectEmbedData.checked)
+                    }
+                    Keys.onReturnPressed: {
+                        see3camcu30Plus.setSmileDetection(true, smileDetectEmbedData.checked)
+                    }
+                }
+                RadioButton {
+                    exclusiveGroup: smileDetectGroup
+                    id:smileDetectDisable
+                    text: "Disable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked: {
+                        see3camcu30Plus.setSmileDetection(false, smileDetectEmbedData.checked)
+                    }
+                    Keys.onReturnPressed: {
+                        see3camcu30Plus.setSmileDetection(false, smileDetectEmbedData.checked)
+                    }
+                }
+            }
+            Row{
+                spacing: 5
+                CheckBox {
+                    id: smileDetectEmbedData
+                    activeFocusOnPress : true
+                    text: "Embed Data"
+                    style: econCheckBoxStyle
+                    enabled: smileDetectEnable.checked ? true : false
+                    opacity: enabled ? 1 : 0.1
+                    onClicked:{
+                        enableSmileDetectEmbedData()
+                    }
+                    Keys.onReturnPressed: {
+                        enableSmileDetectEmbedData()
+                    }
+                }
+            }
             Text{
                 id: flashCtrlText
                 x: 85
@@ -1027,6 +1084,11 @@ Item {
         onFaceDetectModeValue:{
             updateFaceDetectModeUI(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect)
         }
+
+        onSmileDetectModeValue:{
+            updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue)
+        }
+
         onFlipMirrorModeChanged:{
             currentFlipMirrorMode(flipMirrorMode)
         }
@@ -1150,6 +1212,24 @@ Item {
         }
     }
 
+    function updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue){
+        if(smileDetectMode == See3CamPluscu30.SmileDetectEnable){
+            smileDetectEnable.checked = true
+            if(smileDetectEmbedDataValue == See3CamPluscu30.SmileDetectEmbedDataEnable){
+                smileDetectEmbedData.checked = true
+            }else{
+                smileDetectEmbedData.checked = false
+            }
+        }else if(smileDetectMode == See3CamPluscu30.SmileDetectDisable){
+            smileDetectDisable.checked = true
+            if(smileDetectEmbedDataValue == See3CamPluscu30.SmileDetectEmbedDataEnable){
+                smileDetectEmbedData.checked = true
+            }else{
+                smileDetectEmbedData.checked = false
+            }
+        }
+    }
+
     function enableFaceDetectEmbedData(){
         if(see3camcu30Plus.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){
             if(faceDetectEmbedData.checked){
@@ -1163,6 +1243,17 @@ Item {
         setButtonClicked = true
         see3camcu30Plus.setExposureCompensation(exposureCompValue.text)
         exposureCompSet.enabled = true        
+    }
+
+    function enableSmileDetectEmbedData(){
+        setButtonClicked = false
+        if(see3camcu30Plus.setSmileDetection(true, smileDetectEmbedData.checked)){
+            if(smileDetectEmbedData.checked){
+                messageDialog.title = qsTr("Status")
+                messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM+_CU30_Face_and_Smile_Detection for more details")
+                messageDialog.open()
+            }
+        }
     }
 
     function enableDisableAutoExposureControls(autoExposureSelect){
@@ -1234,7 +1325,8 @@ Item {
         see3camcu30Plus.getOrientation()
         see3camcu30Plus.getFrameRateCtrlValue()
         see3camcu30Plus.getExposureCompensation()
-        see3camcu30Plus.getFaceDetectMode()        
+        see3camcu30Plus.getFaceDetectMode()
+        see3camcu30Plus.getSmileDetectMode()
         see3camcu30Plus.getFlashState()
     }
 
