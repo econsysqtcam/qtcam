@@ -34,6 +34,7 @@ Item {
     property bool cameraSelect : false
     property int stillPropertyY
     property int imageFormatY
+    property bool skipSettingVolume: false
 
     Action {
         id: displayAudioProperties
@@ -159,10 +160,11 @@ Item {
                                   }
 
 
-                                  audioSettings.updateSupportedInfo(audioDevicesList.currentText, false, volume_Slider.value)
+                                  audioSettings.updateSupportedInfo(audioDevicesList.currentIndex)
                                   root.audioDeviceSelected(currentIndex);
                                   root.setSampleRate(sampleFmtList.currentText)
                                   root.setChannelCount(channelCountList.currentText)
+                                  skipSettingVolume = false
 
                               }
                               if(currentIndex == 0){
@@ -298,39 +300,10 @@ Item {
                             }
                         }
                         onClicked: {
-			    volume_value.enabled = false
-                            if(checked){
-                                audioSettings.updateSupportedInfo(audioDevicesList.currentText, true, 0) // 0 - mute
-				volume.opacity = 0.1
-				volume_Slider.enabled = false
-				volume_Slider.opacity = 0.1
-				volume_value.opacity = 0.1								
-                            }else{
-                                audioSettings.updateSupportedInfo(audioDevicesList.currentText, true, volume_Slider.value)
-				volume.opacity = 1
-				volume_Slider.enabled = true
-				volume_Slider.opacity = 1
-				volume_value.opacity = 1			
-                            }
+                            doMuteEnableDisable()
                         }
                         Keys.onReturnPressed: {
-			    volume_value.enabled = false
-
-                            if(checked){
-                                audioSettings.updateSupportedInfo(audioDevicesList.currentText, true, 0) // 0 - mute
-				volume.opacity = 0.1
-				volume_Slider.enabled = false
-				volume_Slider.opacity = 0.1
-				volume_value.opacity = 0.1
-
-                            }else{
-                                audioSettings.updateSupportedInfo(audioDevicesList.currentText, true, volume_Slider.value)
-				volume.opacity = 1
-				volume_Slider.enabled = true
-				volume_Slider.opacity = 1
-				volume_value.opacity = 1
-
-                            }
+                            doMuteEnableDisable()
                         }
                     }
                     Row{
@@ -356,8 +329,11 @@ Item {
                             minimumValue: 1
                             maximumValue: 100
                             onValueChanged: {
-                                if(audioDevicesList.currentText.length != 0){
-                                    audioSettings.updateSupportedInfo(audioDevicesList.currentText, true, volume_Slider.value)
+                                if(audioDevicesList.currentText.length != 0){                                    
+                                    if(!skipSettingVolume){
+                                        audioSettings.setVolume(volume_Slider.value)
+                                        skipSettingVolume = false
+                                    }
                                 }
                             }
                         }
@@ -389,29 +365,53 @@ Item {
         }
     }
 
+    function doMuteEnableDisable()
+    {
+        volume_value.enabled = false
+        if(muteSelection.checked){
+            audioSettings.setVolume(0) // 0 - mute
+            volume.opacity = 0.1
+            volume_Slider.enabled = false
+            volume_Slider.opacity = 0.1
+            volume_value.opacity = 0.1
+        }else{
+            audioSettings.setVolume(volume_Slider.value)
+            volume.opacity = 1
+            volume_Slider.enabled = true
+            volume_Slider.opacity = 1
+            volume_value.opacity = 1
+        }
+    }
     function displayAudioSettings(){
         if(audio_Capture_property_Child.visible){
             audio_Capture_property_Child.visible = false
         }else{
             audio_Capture_property_Child.visible = true
         }
-//        audioSettings.updateSupportedInfo(audioDevicesList.currentText, false, volume_Slider.value)
-//        root.audioDeviceSelected(audioDevicesList.currentIndex);
-//        root.setSampleRate(sampleFmtList.currentText)
-//        root.setChannelCount(channelCountList.currentText)
-//        muteSelection.checked = false
     }
 
     Connections{
         target: root
         onCameraSelected:{
             cameraSelect = true
+        }
 
-//            audioSettings.updateSupportedInfo(audioDevicesList.currentText, false, volume_Slider.value)
-//            root.audioDeviceSelected(audioDevicesList.currentIndex);
-//            root.setSampleRate(sampleFmtList.currentText)
-//            root.setChannelCount(channelCountList.currentText)
-//            muteSelection.checked = false
+	onCameraDeviceUnplugged:
+        {
+            audioDevicesList.currentIndex = 0
+            audio_Capture_property_Child.visible = false
+        }
+
+	// Added by Sankari : Mar 7 - disable audio settings
+        onDisableAudioSettings:{
+            if(disableSettings){
+                audioCaptureProperty.enabled = false
+                audioCaptureProperty.opacity = 0.1
+            }
+            else{
+                audioCaptureProperty.opacity = 1
+                audioCaptureProperty.enabled = true
+            }
         }
 
         onUpdateAudioMenuPosition:
@@ -441,6 +441,7 @@ Item {
     Audioinput{
         id: audioSettings
         onVolumeChanged: {
+            skipSettingVolume = true
             volume_Slider.value = volume
         }
     }

@@ -42,7 +42,7 @@
 #include "see3cam_cu20.h"
 #include "seecam_ar0130.h"
 #include "seecam_cu30.h"
-#include "seecamplus_cu30.h"
+#include "see3cam_cu38.h"
 #include "see3cam_cu55.h"
 // Added by Sankari : 07 Feb 2017
 #include "see3cam_30.h"
@@ -55,6 +55,7 @@
 #include "about.h"
 #include "common.h"
 #include "common_enums.h"
+#include "alsamaster.h"
 
 //*! \mainpage Qtcam - A econ's camera product
 // *
@@ -97,7 +98,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_130>("econ.camera.see3cam130", 1, 0, "See3Cam130");
     qmlRegisterType<See3CAM_130A>("econ.camera.see3cam130A", 1, 0, "See3Cam130A");
     qmlRegisterType<See3CAM_CU30>("econ.camera.see3camcu30", 1, 0, "See3Camcu30");
-    qmlRegisterType<See3CAMPLUS_CU30>("econ.camera.see3campluscu30", 1, 0, "See3CamPluscu30");
+    qmlRegisterType<See3CAM_CU38>("econ.camera.see3camcu38", 1, 0, "See3Camcu38");
     qmlRegisterType<NILECAM30_USB>("econ.camera.nilecam30usb", 1, 0, "NileCam30usb");
     qmlRegisterType<See3CAM_CU55>("econ.camera.see3camcu55", 1, 0, "See3camCu55");
 
@@ -137,6 +138,7 @@ int main(int argc, char *argv[])
     viewer.rootContext()->setContextProperty("camModels", &camProperty.modelCam);
 
     Videostreaming vs;
+    AlsaMaster alsa;
     AudioInput audio;
     viewer.rootContext()->setContextProperty("resolutionModel", &vs.resolution);
     viewer.rootContext()->setContextProperty("stillOutputFormatModel", &vs.stillOutputFormat);

@@ -44,7 +44,8 @@ SOURCES += main.cpp \
     see3cam_cu55.cpp \
     see3cam_130A.cpp \
     audioinput.cpp \
-    seecamplus_cu30.cpp
+    see3cam_cu38.cpp \
+    alsamaster.cpp
 
 # Installation path
 # target.path =
@@ -89,7 +90,8 @@ HEADERS += \
     see3cam_cu55.h \
     see3cam_130A.h \
     audioinput.h \
-    seecamplus_cu30.h
+    see3cam_cu38.h \
+    alsamaster.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
@@ -111,6 +113,7 @@ contains(UNAME_MACHINE_64BIT, amd64):{
         -ludev \
         -lusb-1.0 \
         -lpulse \
+		-lasound\
         -L/usr/lib/ -lturbojpeg \        
         -L/usr/lib/x86_64-linux-gnu/ -levdev
 }
@@ -125,6 +128,7 @@ contains(UNAME_MACHINE_32BIT, i386):{
         -ludev \
         -lusb-1.0 \
         -lpulse \
+        -lasound\
         -L/usr/lib/ -lturbojpeg \
         -L/usr/lib/i386-linux-gnu/ -levdev
 }
@@ -139,6 +143,7 @@ contains(BOARD_ARM64, arm64):{
         -ludev \
         -lusb-1.0 \
         -lpulse \
+        -lasound\
         -L/usr/lib/ -lturbojpeg \
         -L/usr/lib/aarch64-linux-gnu/ -levdev
 }

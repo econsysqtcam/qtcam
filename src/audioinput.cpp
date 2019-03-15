@@ -56,16 +56,22 @@ static int buffer_read_index = 0; /*current read index of buffer list*/
 static int buffer_write_index = 0;/*current write index of buffer list*/
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
+AlsaMaster alsa;
+int card_no;
+int cnt=0;
+int flag=0;
 
 
 QStringListModel AudioInput::audioinputDeviceList;
 QStringListModel AudioInput::audiosupportedFmtListModel;
 QStringListModel AudioInput::audioChannelCountModel;
+QList<int> AudioInput::cardNum;
 QStringList AudioInput::audioDeviceList;
-QMap<QString, QString> AudioInput::audioDeviceMap;
+QMap<int, QString> AudioInput::audioDeviceMap;
 QMap<QString, int> AudioInput::audioDeviceSampleRateMap;
 QMap<QString, int> AudioInput::audioDeviceChannelsMap;
+//int AudioInfo::source_index;
+uint AudioInput::devIndex;
 
 static pthread_t my_read_thread;
 static pa_stream *recordstream = NULL;
@@ -286,7 +292,7 @@ void AudioInput::pa_sourcelist_cb(pa_context *c, const pa_source_info *l, int eo
     double my_latency = 0.0;
 
 
-    /*printf("AUDIO: =======[ Input Device #%d ]=======\n", source_index);
+    printf("AUDIO: =======[ Input Device #%d ]=======\n", source_index);
     printf("       Description: %s\n", l->description);
     printf("       Name: %s\n", l->name);
     printf("       Index: %d\n", l->index);
@@ -296,7 +302,7 @@ void AudioInput::pa_sourcelist_cb(pa_context *c, const pa_source_info *l, int eo
     printf("       Configured Latency: %llu (usec)\n", (long long unsigned) l->configured_latency);
     printf("       Card: %d\n", l->card);
 
-    printf("\n");*/
+    printf("\n");
 
 
 
@@ -313,6 +319,9 @@ void AudioInput::pa_sourcelist_cb(pa_context *c, const pa_source_info *l, int eo
             fprintf(stderr,"AUDIO: FATAL memory allocation failure (pa_sourcelist_cb): %s\n", strerror(errno));
             exit(-1);
         }
+
+        devIndex++;
+
         /*fill device data*/
         audio_ctx->list_devices[audio_ctx->num_input_dev-1].id = l->index; /*saves dev id*/
         strncpy(audio_ctx->list_devices[audio_ctx->num_input_dev-1].name,  l->name, 511);
@@ -322,7 +331,7 @@ void AudioInput::pa_sourcelist_cb(pa_context *c, const pa_source_info *l, int eo
         audio_ctx->list_devices[audio_ctx->num_input_dev-1].low_latency = my_latency; /*in seconds*/
         audio_ctx->list_devices[audio_ctx->num_input_dev-1].high_latency = my_latency; /*in seconds*/
         audioDeviceList.append(audio_ctx->list_devices[audio_ctx->num_input_dev-1].description);
-        audioDeviceMap.insertMulti(audio_ctx->list_devices[audio_ctx->num_input_dev-1].name, audio_ctx->list_devices[audio_ctx->num_input_dev-1].description);
+        audioDeviceMap.insertMulti(devIndex, audio_ctx->list_devices[audio_ctx->num_input_dev-1].name);
         audioDeviceSampleRateMap.insertMulti(audio_ctx->list_devices[audio_ctx->num_input_dev-1].name, audio_ctx->list_devices[audio_ctx->num_input_dev-1].samprate);
         audioDeviceChannelsMap.insertMulti(audio_ctx->list_devices[audio_ctx->num_input_dev-1].name, audio_ctx->list_devices[audio_ctx->num_input_dev-1].channels);
 
@@ -819,6 +828,24 @@ bool AudioInput::audio_init()
     return true;
 }
 
+
+QString AudioInput::checkForUbuntuDistribution(){
+    // read
+    QString fileContent;
+    QFile f("/etc/issue");
+    if (f.open(QFile::ReadOnly)){
+        QTextStream in(&f);
+        fileContent.append(in.readAll());
+        if(-1 != fileContent.indexOf("12.04")){
+                return "precise";
+        }else if(-1 != fileContent.indexOf("14.04")){
+                return "trusty";
+        }else if(-1 != fileContent.indexOf("16.04")){
+            return "xenial";
+        }
+    }
+}
+
 /**
  * @brief AudioInput::getMicVolume - get Mic Volume
  * @param dev - device info list
@@ -853,8 +880,12 @@ void AudioInput::setMicVolume(QList<QAudioDeviceInfo> dev, uint index, uint micV
     AudioInfo *m_audioInfo  = new AudioInfo(m_format, this);
     QAudioInput *inpAudio = new QAudioInput(dev.at(index), m_format);
 
-    // set volume
-    inpAudio->setVolume(qreal(micVolume)/100); // calculation : refer Qt5 examples: audioinput.cpp
+    if(micVolume == 0){
+        inpAudio->setVolume(qreal(0));
+    }else{
+        // set volume
+        inpAudio->setVolume(qreal(micVolume)/100); // calculation : refer Qt5 examples: audioinput.cpp
+    }
 
     inpAudio->start();
     inpAudio->stop();
@@ -864,22 +895,60 @@ void AudioInput::setMicVolume(QList<QAudioDeviceInfo> dev, uint index, uint micV
 }
 
 
-bool AudioInput::updateSupportedInfo(QString deviceDescription, bool setVolume, int micVolume){
-    QString audioDeviceName;
 
-    QMap<QString, QString>::iterator audioDeviceMapIterator;
-    for (audioDeviceMapIterator = audioDeviceMap.begin(); audioDeviceMapIterator != audioDeviceMap.end(); ++audioDeviceMapIterator)
-    {
-        if(audioDeviceMapIterator.value().contains(deviceDescription)){
-            audioDeviceName.append(audioDeviceMapIterator.key());
-            break;
+bool AudioInput::updateSupportedInfo(uint currentIndex)
+{
+    QString ubunutuDistro = checkForUbuntuDistribution();
+    if(ubunutuDistro.contains("precise")){
+        QString audioDeviceName;
+        QMap<int, QString>::iterator audioDeviceNameIterator;
+        for (audioDeviceNameIterator = audioDeviceMap.begin(); audioDeviceNameIterator != audioDeviceMap.end(); ++audioDeviceNameIterator)
+        {
+            if(audioDeviceNameIterator.key() == currentIndex){
+                audioDeviceName = audioDeviceNameIterator.value();
+                break;
+            }
         }
-    }
-    
-    QList<QAudioDeviceInfo> devices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);        
-    for(int i = 0; i < devices.size(); i++){
-        if(devices.at(i).deviceName().contains(audioDeviceName)){
-            if(!setVolume){
+
+        samplerateStringList.clear();
+        channelCountStringList.clear();
+        QMap<QString, int>::iterator audioDeviceSampleRateIterator;
+        for (audioDeviceSampleRateIterator = audioDeviceSampleRateMap.begin(); audioDeviceSampleRateIterator != audioDeviceSampleRateMap.end(); ++audioDeviceSampleRateIterator)
+        {
+            if(audioDeviceSampleRateIterator.key().contains(audioDeviceName)){
+                samplerateStringList.append(QString::number(audioDeviceSampleRateIterator.value()));
+                break;
+            }
+        }
+        QMap<QString, int>::iterator audioDeviceChannelsIterator;
+        for (audioDeviceChannelsIterator = audioDeviceChannelsMap.begin(); audioDeviceChannelsIterator != audioDeviceSampleRateMap.end(); ++audioDeviceChannelsIterator)
+        {
+            if(audioDeviceChannelsIterator.key().contains(audioDeviceName)){
+                channelCountStringList.append(QString::number(audioDeviceChannelsIterator.value()));
+                break;
+            }
+        }
+
+        // Using Alsa
+        qreal volume = alsa.GetAlsaMasterVolume();
+        volume=((volume*100)/65536);
+        emit volumeChanged(volume);
+    }else{
+
+        //Using Qt
+        devices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
+        QString audioDeviceName;
+        QMap<int, QString>::iterator audioDeviceNameIterator;
+        for (audioDeviceNameIterator = audioDeviceMap.begin(); audioDeviceNameIterator != audioDeviceMap.end(); ++audioDeviceNameIterator)
+        {
+            if(audioDeviceNameIterator.key() == currentIndex){
+                audioDeviceName = audioDeviceNameIterator.value();
+                break;
+            }
+        }
+        for(int i = 0; i < devices.size(); i++){
+            if(devices.at(i).deviceName().contains(audioDeviceName)){
+                qtAudioDeviceIndex = i;
                 samplerateStringList.clear();
                 channelCountStringList.clear();
                 QMap<QString, int>::iterator audioDeviceSampleRateIterator;
@@ -900,24 +969,45 @@ bool AudioInput::updateSupportedInfo(QString deviceDescription, bool setVolume, 
                 }
 
                 qreal volume = getMicVolume(devices, i);
-                emit volumeChanged(volume*100);
-            }else{
-                setMicVolume(devices, i, micVolume);
+                //emit volumeChanged(volume*100);
+                emit volumeChanged(volume);
+                break;
             }
-            break;
         }
-    } 
+    }
 
     audiosupportedFmtListModel.setStringList(samplerateStringList);
-    audioChannelCountModel.setStringList(channelCountStringList);    
+    audioChannelCountModel.setStringList(channelCountStringList);
 }
 
+bool AudioInput::setVolume(int micVolume){
+
+    QString ubunutuDistro = checkForUbuntuDistribution();
+    if(ubunutuDistro.contains("precise")){
+        if(micVolume==0)
+        {
+            flag=1;
+            alsa.SetAlsaMasterMute();
+         }
+        else
+        {
+            if(flag==1)
+            {
+                alsa.SetAlsaMasterUnMute();
+                alsa.SetAlsaMasterVolume(micVolume);
+            }
+            else
+                alsa.SetAlsaMasterVolume(micVolume);
+       }
+    }else{
+        setMicVolume(devices, qtAudioDeviceIndex, micVolume);
+    }
+}
 
 void AudioInput::setSampleRate(int sampleRate){
     assert(audio_context != NULL);    
     audio_context->samprate = sampleRate;    
 }
-
 
 void AudioInput::setChannelCount(uint index){
     int channels = 0;   
@@ -948,6 +1038,8 @@ void AudioInput::setChannelCount(uint index){
 audio_context_t* AudioInput::audio_init_pulseaudio()
 {  
     audio_context_t *audio_ctx = (audio_context_t *)calloc(1, sizeof(audio_context_t));
+
+    devIndex = 0;
 
     if(audio_ctx == NULL)
     {

@@ -502,8 +502,12 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
      * Added camera enum comparision
      * Before its like camera name comparision
      */
-    if(selectedDeviceEnum != CommonEnums::SEE3CAM_CU130 && selectedDeviceEnum != CommonEnums::SEE3CAM_CU40)//this condition is put temporary until cu130 and cu40 hardware
-    {                                // does not support sendOSCode implementation
+    //Modified by Sankari - 14th Oct 2018
+    /*
+     * Correcting OS code supported cameras
+     */
+    if(selectedDeviceEnum == CommonEnums::SEE3CAM_11CUG || selectedDeviceEnum == CommonEnums::SEE3CAM_12CUNIR || selectedDeviceEnum == CommonEnums::ECON_1MP_BAYER_RGB  || selectedDeviceEnum == CommonEnums::ECON_1MP_MONOCHROME || selectedDeviceEnum == CommonEnums::SEE3CAM_CU51)
+    {                                
         ret = sendOSCode();
         if (ret == false) {
             emit logHandle(QtCriticalMsg,"OS Identification failed\n");

@@ -691,6 +691,7 @@ void Videostreaming::capFrame()
     v4l2_plane planes[VIDEO_MAX_PLANES];
     v4l2_buffer buf;
     bool again;
+    bool validFrame = false;
 
     memset(planes, 0, sizeof(planes));
     buf.length = VIDEO_MAX_PLANES;
@@ -729,7 +730,26 @@ void Videostreaming::capFrame()
         return;
     }
 
+    switch(m_capSrcFormat.fmt.pix.pixelformat) {
+    case V4L2_PIX_FMT_YUYV:
+    case V4L2_PIX_FMT_UYVY:{
+        if((width*height*2) == buf.bytesused){
+            validFrame = true;
+        }
+    }
+    break;
+    default:
+        validFrame = true;
+        // To do: for other color spaces
+        break;
 
+    }
+
+    if (validFrame != true){
+        qbuf(buf);
+        qDebug()<<"Not a valid frame";
+        return;
+    }
    
     // prepare yuyv/rgba buffer and give to shader.
     if(!prepareBuffer(m_capSrcFormat.fmt.pix.pixelformat, m_buffers[buf.index].start[0], buf.bytesused)){
@@ -965,21 +985,21 @@ int Videostreaming::jpegDecode(Videostreaming *obj, unsigned char **pic, unsigne
             break;
     }
 
-  if(obj->m_VideoRecord){
-       if(obj->videoEncoder!=NULL) {           
-           QMutexLocker lockerRecord(&obj->recordMutex);
-	   if(obj->videoEncoder->ok){
-	   	obj->videoEncoder->encodeImage(*pic, true);
-	   }
-           lockerRecord.unlock();
-       }
-   }
-    if(!obj->m_VideoRecord){ // when stop recording , we need to close the recorded file and do not allow record. So return.
+   if(obj->m_VideoRecord){
+        if(obj->videoEncoder!=NULL) {
             QMutexLocker lockerRecord(&obj->recordMutex);
-	    if(obj->videoEncoder->ok){
-            	obj->videoEncoder->closeFile();
-	    }
+            if(obj->videoEncoder->ok){
+                obj->videoEncoder->encodeImage(*pic, true);
+            }
             lockerRecord.unlock();
+        }
+    }
+    if(!obj->m_VideoRecord){ // when stop recording , we need to close the recorded file and do not allow record. So return.
+        QMutexLocker lockerRecord(&obj->recordMutex);
+        if(obj->videoEncoder->ok){
+            obj->videoEncoder->closeFile();
+        }
+        lockerRecord.unlock();
     }
    
 bailout:
@@ -2255,11 +2275,13 @@ void Videostreaming::displayEncoderList(){
         QTextStream in(&f);
         fileContent.append(in.readAll());
         if((-1 != fileContent.indexOf("12.04")) || (-1 != fileContent.indexOf("14.04"))){
-            encoders<<"YUY"<<"MJPG"<<"H264"<<"VP8";
+            encoders<<"YUY"<<"MJPG"<<"H264";
             ubuntuVersion = "<15"; // version less than 15 [ Here ubuntu 12.04 and ubuntu 14.04 ]
+            emit ubuntuVersionSelectedLessThan16(); // signal to qml that ubuntu version selected is less than 16.04
+
         }else{
-            encoders<<"MJPG"<<"H264"<<"VP8";
-            ubuntuVersion = ">=15"; // version >=  15 [ Here ubuntu 15.10 and ubuntu 16.04 , Linux Mint 18, ubuntu 17.04 ]
+            encoders<<"MJPG"<<"H264";
+            ubuntuVersion = ">=15"; // version >=  15 [ Here ubuntu 15.10 and ubuntu 16.04 , Linux Mint 18, ubuntu 17.04 ]            
         }
         encoderList.setStringList(encoders);
     }
@@ -2587,10 +2609,7 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
             break;
         case 1:
             videoEncoderType = CODEC_ID_H264;
-            break;
-        case 2:
-            videoEncoderType = CODEC_ID_VP8;
-            break;
+            break;        
         }
     } else if(ubuntuVersion == "<15"){
         switch(videoEncoderType) {
@@ -2602,10 +2621,7 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
             break;
         case 2:
             videoEncoderType = CODEC_ID_H264;
-            break;
-        case 3:
-            videoEncoderType = CODEC_ID_VP8;
-            break;
+            break;        
         }
 
     }
@@ -2617,10 +2633,7 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
             break;
         case 1:
             videoEncoderType = AV_CODEC_ID_H264;
-            break;
-        case 2:
-            videoEncoderType = AV_CODEC_ID_VP8;
-            break;
+            break;        
         }
     } else if(ubuntuVersion == "<15"){
         switch(videoEncoderType) {
@@ -2632,10 +2645,7 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
             break;
         case 2:
             videoEncoderType = AV_CODEC_ID_H264;
-            break;
-        case 3:
-            videoEncoderType = AV_CODEC_ID_VP8;
-            break;
+            break;        
         }
 
     }
@@ -2675,7 +2685,8 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
 
 void Videostreaming::recordStop() {    
     emit videoRecord(fileName);
-    m_VideoRecord = false;    
+    m_VideoRecord = false;
+    videoEncoder->m_recStop = true;
 
     if(audiorecordStart){
         if(audioinput.audio_context->stream_flag == AUDIO_STRM_ON)

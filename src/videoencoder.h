@@ -23,6 +23,7 @@
 #include <QIODevice>
 #include <QFile>
 #include <QImage>
+#include <QDateTime>
 
 #include "common.h"
 /* checking version compatibility */
@@ -74,6 +75,17 @@ public:
 
    AVOutputFormat *pOutputFormat;
    bool ok;
+   AVCodecContext *pCodecCtx,*pAudioCodecCtx;
+
+   QTime dateTime1;
+   QTime dateTime2;
+
+   QTime time1;
+   QTime time2;
+
+   bool videoPacketReceived;
+
+   bool m_recStop;
 
  
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
@@ -96,7 +108,8 @@ public:
     int encodeAudio(void *);       
 
    bool closeFile();
-   int encodeImage(uint8_t *buffer, bool rgbaBuffer);
+   int encodeImage(uint8_t *buffer, bool rgbBufferformat);
+   int encodePacket(uint8_t *buffer, bool rgbBufferformat);
    bool isOk();
 
 // Added by Sankari : 8 Oct 2018
@@ -107,21 +120,22 @@ public:
    @param : bytesused - bytes in buffer
 **/
    int writeH264Image(void *buffer, int bytesUsed);
+
+   int encodeH264Packet(void *buffer, int bytesused);
+
 protected:
     unsigned Width,Height;
     unsigned Bitrate;
     unsigned Gop;
     int i, j;
 
-    unsigned int recordStopTimeInMilliSec;
     unsigned int recordStartTimeInMilliSec;
 
     int frameCount;
 
     // FFmpeg stuff
     AVFormatContext *pFormatCtx;
-
-    AVCodecContext *pCodecCtx,*pAudioCodecCtx;
+    
     AVStream *pVideoStream, *pAudioStream;
     AVCodec *pCodec;
 
@@ -150,15 +164,7 @@ protected:
     u_int8_t *audio_outbuf;
 
     AVCodec *paudioCodec;
-    AVFrame *pAudioFrame;
-
-    int index_of_df;
-    int flushed_buffers;
-    int flush_delayed_frames;
-    int flush_done;
-    int delayed_frames;
-    int tempPts;
-    int delayed_pts[MAX_DELAYED_FRAMES];
+    AVFrame *pAudioFrame;   
     
     unsigned getWidth();
     unsigned getHeight();

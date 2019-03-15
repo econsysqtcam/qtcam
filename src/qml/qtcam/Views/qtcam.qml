@@ -42,6 +42,9 @@ Rectangle {
     signal autoFocusSelected(bool autoFocusSelect)
     signal autoExposureSelected(bool autoExposureSelect)
 
+    // Added by Sankari : Mar 7 - disable audio settings
+    signal disableAudioSettings(bool disableSettings)
+
     //Added by Sankari: 07 Mar 2017
     // signal to notify auto white balance selected
     signal autoWhiteBalanceSelected(bool autoWhiteBalanceSelect)
@@ -102,6 +105,8 @@ Rectangle {
     property bool audioCaptureChildVisible: false
     property bool videoSettingsChildVisible: false    
 
+    property bool ubuntuversionLessThan16: false
+    property bool disableAudio: false
 
     //video scrollview visible height
     property int videoPropHeight
@@ -222,7 +227,12 @@ Rectangle {
         id: recordStartDelayTimer // Record after disabling Auto Focus Rectangle or face rect overlay rectangle
         interval: 1000
         onTriggered: {
-            vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, audioDeviceIndex, audioChannel)
+	    if(disableAudio){
+	    	vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, 0, audioChannel)
+	    }
+	    else{
+            	vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, audioDeviceIndex, audioChannel)
+	    }
             stop()
         }
     }
@@ -327,6 +337,13 @@ Rectangle {
             // Added by Sankari:12 Feb 2018 - Get the Pci bus info for selected camera
             onPciDeviceBus:{
                 pciBusCamDetails = businfo
+            }
+
+            onUbuntuVersionSelectedLessThan16:{
+                ubuntuversionLessThan16 = true
+                disableAudioSettings(true) // In ubuntu 12.04 and 14.04 (Video capture settings), video encoder index is 0,(YUY - raw format).
+                                           // so disable audio settings
+				disableAudio = true
             }
 
             onTitleTextChanged:{
@@ -875,6 +892,27 @@ Rectangle {
         vidstreamproperty.updateFrameToSkip(stillSkip)
     }
 
+
+    function videoEncoderSelected(encoderIndex){
+        // Added by Sankari : Mar 7 2019
+        // ubuntu 14.04 and ubuntu 12.04
+            // index 0 - YUY
+            // index 1 - MJPG
+            // index 2 - H264
+
+        // ubuntu 14.04 and ubuntu 12.04
+            // index 0 - MJPG
+            // index 1 - H264
+         if(encoderIndex == 0 && ubuntuversionLessThan16){ // If ubuntu version is less than 16.04(i.e, 12.04 and 14.04),
+                                                           // If index is 0 (YUY), disable audio capture settings
+             disableAudioSettings(true)
+	     disableAudio = true
+         }else{
+             disableAudioSettings(false)
+	     disableAudio = false
+         }
+    }
+
     function mouseClickCapture() {
         m_Snap = false
         captureBtnEnable(false)
@@ -1022,7 +1060,12 @@ Rectangle {
         if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130  || selectedDeviceEnumValue == CommonEnums.SEE3CAM_30){
             recordStartDelayTimer.start() // some delay is required to disable focus rect / face overlay rect. After that delay need to start record.
         }else{
-            vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, audioDeviceIndex, audioChannel)
+	    if(disableAudio){
+	    	vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, 0, audioChannel)
+	    }
+	    else{
+            	vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, audioDeviceIndex, audioChannel)
+	    }
         }
         videoPropertyItemEnable(false)
         stillPropertyItemEnable(false)
@@ -1127,7 +1170,7 @@ Rectangle {
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU30) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu30/uvc_cu30.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAMPLUS_CU30) {
-            see3cam = Qt.createComponent("../UVCSettings/see3campluscu30/uvc_pluscu30.qml").createObject(root)
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu38/uvc_cu38.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU20) { // Added By Sankari : 28 Jul 2017
             see3cam = Qt.createComponent("../UVCSettings/see3camcu20/see3camcu20.qml").createObject(root)
         } else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_30) {
@@ -1229,11 +1272,11 @@ Rectangle {
         {
             videoSettingsRootObject = videoViewComponent.createObject(root,{"imageFormatY" : imageFormatYValue,"stillPropertyY" : stillPropertyYValue});
         }
-        /*var AudioViewComponent = Qt.createComponent("audiocapturesettings.qml")
+        var AudioViewComponent = Qt.createComponent("audiocapturesettings.qml")
         if (AudioViewComponent.status === Component.Ready)
         {
             audioSettingsRootObject = AudioViewComponent.createObject(root,{"imageFormatY" : imageFormatYValue,"stillPropertyY" : stillPropertyYValue});
-        }*/
+        }
         //Capture and Video recording
         var captureVideoRecordComponent = Qt.createComponent("captureandvideorecord.qml")
         if (captureVideoRecordComponent.status === Component.Ready)
@@ -1292,7 +1335,11 @@ Rectangle {
         imageQualitySettingsEnable(true)
         videoPropertyItemEnable(true)
         stillPropertyItemEnable(true)
-        audioPropertyItemEnable(true)
+        if(disableAudio){
+            audioPropertyItemEnable(false)
+        }else{
+            audioPropertyItemEnable(true)
+        }
         uvc_settings.enabled = true
         uvc_settings.opacity = 1
         captureBtnEnable(true)

@@ -1530,7 +1530,6 @@ Item {
 
     function setMasterMode(){
         seecam130.setStreamMode(See3Cam130.STREAM_MASTER)
-        console.log("set master mode")
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
     }

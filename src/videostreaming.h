@@ -504,11 +504,10 @@ public slots:
      * @param videoEncoderType - Encoder types are video codecs, Currently four codecs are used as follows
      * 1. RAW VIDEO
      * 2. MJPEG
-     * 3. H264
-     * 4. VP8
+     * 3. H264     
      * @param videoFormatType - Format type is the container used to record the video.  Currently two containers are used as follows
      * 1. avi
-     * 2. mkv
+     *
      * @param fileLocation - Location where the recorded file is saved
      * @param - audioDeviceIndex  - audio device index
      */
@@ -548,6 +547,10 @@ public slots:
     void doEncodeAudio();
 
 signals:
+
+    // signal to qml that ubuntu version selected is less than 16.04
+    void ubuntuVersionSelectedLessThan16();
+
     // from qml file , rendering animation duration t changed
     void tChanged();
 

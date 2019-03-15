@@ -331,8 +331,7 @@ Item {
                         opacity: 1
                         model: ListModel {
                             id: extensionModel
-                            ListElement { text: "avi"  }
-                            ListElement { text: "mkv"  }
+                            ListElement { text: "avi"  }                           
                         }
 
                         activeFocusOnPress: true
@@ -405,6 +404,7 @@ Item {
                         }
                         onCurrentIndexChanged: {
                             JS.videoEncoder = fileEncoder.currentIndex
+                            root.videoEncoderSelected(currentIndex)                            
                         }
                     }
 

@@ -7,6 +7,7 @@
 #include <QAudioFormat>
 #include <QAudioDeviceInfo>
 #include "videoencoder.h"
+#include "alsamaster.h"
 
 #define pa_memzero(x,l) (memset((x), 0, (l)))
 #define pa_zero(x) (pa_memzero(&(x), sizeof(x)))
@@ -43,7 +44,7 @@ class AudioInfo : public QIODevice
 public:
     AudioInfo(const QAudioFormat &format, QObject *parent);
     ~AudioInfo();
-
+     AlsaMaster alsa;
     void start();
     void stop();
 
@@ -126,9 +127,12 @@ public:
    static QStringListModel audiosupportedFmtListModel;
    static QStringListModel audioChannelCountModel;
    static QStringList audioDeviceList;
-   static QMap<QString, QString> audioDeviceMap;
+   static QList <int>cardNum;
+   static QMap<int, QString> audioDeviceMap;
    static QMap<QString, int> audioDeviceSampleRateMap;
    static QMap<QString, int> audioDeviceChannelsMap;
+
+   static uint devIndex;
 
    audio_context_t *audio_context;
 
@@ -137,6 +141,10 @@ public:
 
    QStringList samplerateStringList;
    QStringList channelCountStringList;
+
+   QList<QAudioDeviceInfo> devices;
+   uint qtAudioDeviceIndex;
+
 
 
 private:
@@ -157,6 +165,8 @@ private:
     audio_context_t* audio_init_pulseaudio();
     void setMicVolume(QList<QAudioDeviceInfo> dev, uint index, uint micVolume);
     qreal getMicVolume(QList<QAudioDeviceInfo> dev, uint index);
+
+    QString checkForUbuntuDistribution();
 
 
 
@@ -181,7 +191,8 @@ public slots:
     void audio_delete_buffer(audio_buff_t *audio_buff);
     void recordAudio();
 
-    bool updateSupportedInfo(QString deviceDescription, bool setVolume, int micVolume);
+    bool updateSupportedInfo(uint currentIndex);
+    bool setVolume(int micVolume);
 
 
 signals:
