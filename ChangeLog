@@ -1,3 +1,7 @@
+Qtcam Application - 21.0.1
+--------------------------
+* Camera name is made correctly when enabling embed data in See3CAM_CU38 camera.
+
 Qtcam Application - 21.0.0
 --------------------------
 * Added audio capture settings to record video with audio using usb audio devices.

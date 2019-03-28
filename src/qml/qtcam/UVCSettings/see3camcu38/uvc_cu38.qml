@@ -1250,7 +1250,7 @@ Item {
         if(see3camcu38.setSmileDetection(true, smileDetectEmbedData.checked)){
             if(smileDetectEmbedData.checked){
                 messageDialog.title = qsTr("Status")
-                messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM+_CU30_Face_and_Smile_Detection for more details")
+                messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_CU38_Conversa_Face_and_Smile_Detection for more details")
                 messageDialog.open()
             }
         }
