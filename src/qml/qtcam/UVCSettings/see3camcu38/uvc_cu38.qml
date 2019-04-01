@@ -1233,7 +1233,7 @@ Item {
     function enableFaceDetectEmbedData(){
         if(see3camcu38.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){
             if(faceDetectEmbedData.checked){
-                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM+_CU30_FaceDetection for more details"))
+                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_CU38_Conversa_FaceDetection for more details"))
             }
         }        
     }
