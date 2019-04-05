@@ -1097,7 +1097,10 @@ Rectangle {
         messageDialog.open()
         videoPropertyItemEnable(true)
         stillPropertyItemEnable(true)
-        audioPropertyItemEnable(true)
+        // Added by Sankari : Apr 5 2018. Once recording is finished, Do not enable audio settings when "YUY" encoder is selected
+        if(!disableAudio){
+            audioPropertyItemEnable(true)
+        }
         device_box.enabled = true
         vidstreamproperty.enabled = true
         device_box.opacity = 1
@@ -1318,6 +1321,10 @@ Rectangle {
         sideBarItems.visible = false
         sidebarVisibleStatus(sideBarItems.visible)
         open_sideBar.visible = true
+
+        // Added by Sankari: 05 Apr 2019
+        // set preview background area. param1:width, param2: height, param3: sidebar visibility true/false
+        vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, false)
     }
 
     Keys.onRightPressed: {
@@ -1329,6 +1336,10 @@ Rectangle {
         sideBarItems.visible = true
         sidebarVisibleStatus(sideBarItems.visible)
         open_sideBar.visible = false
+
+        // Added by Sankari: 05 Apr 2019 - To prevent overlapping preview with side bar.
+        // set preview background area. param1:width, param2: height, param3: sidebar visibility true/false
+        vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, true)
    }
 
     function enableAllSettingsTab(){
