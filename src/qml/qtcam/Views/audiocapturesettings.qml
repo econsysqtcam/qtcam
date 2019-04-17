@@ -35,6 +35,8 @@ Item {
     property int stillPropertyY
     property int imageFormatY
     property bool skipSettingVolume: false
+    property bool skipSettingMuteState: false
+
 
     Action {
         id: displayAudioProperties
@@ -142,7 +144,18 @@ Item {
                                 }
                             }
                         }
-                        onCurrentIndexChanged: {
+                        MouseArea{
+                            anchors.fill: parent
+                            onPressed: {
+                                if(pressed) {
+                                    root.enumerateAudioSettings()
+                                }
+                                mouse.accepted = false
+                            }
+                            onWheel: {
+                            }
+                        }
+                        onCurrentIndexChanged: {                            
                               if(currentIndex != 0){
                                   sampleFmtList.enabled = true
                                   sampleFmtList.opacity = 1
@@ -305,6 +318,9 @@ Item {
                         Keys.onReturnPressed: {
                             doMuteEnableDisable()
                         }
+                        onCheckedChanged: {
+                            doMuteEnableDisable()
+                        }
                     }
                     Row{
                         spacing: 10
@@ -325,12 +341,12 @@ Item {
                             style:econSliderStyle
                             enabled: muteSelection.checked ? 0 : 1
                             opacity: enabled ? 1 : 0.1
-                            stepSize: 1
+                            stepSize: 17
                             minimumValue: 1
                             maximumValue: 100
                             onValueChanged: {
-                                if(audioDevicesList.currentText.length != 0){                                    
-                                    if(!skipSettingVolume){
+                                if(audioDevicesList.currentText.length != 0){                                 
+                                    if(!skipSettingVolume){                                    
                                         audioSettings.setVolume(volume_Slider.value)
                                         skipSettingVolume = false
                                     }
@@ -368,14 +384,16 @@ Item {
     function doMuteEnableDisable()
     {
         volume_value.enabled = false
-        if(muteSelection.checked){
-            audioSettings.setVolume(0) // 0 - mute
+        if(!skipSettingMuteState){ // To skip setting of mute state when getting mute state from camera.
+            audioSettings.setMuteState(muteSelection.checked);
+        }
+        skipSettingMuteState = false;
+        if(muteSelection.checked){           
             volume.opacity = 0.1
             volume_Slider.enabled = false
             volume_Slider.opacity = 0.1
             volume_value.opacity = 0.1
-        }else{
-            audioSettings.setVolume(volume_Slider.value)
+        }else{            
             volume.opacity = 1
             volume_Slider.enabled = true
             volume_Slider.opacity = 1
@@ -443,6 +461,14 @@ Item {
         onVolumeChanged: {
             skipSettingVolume = true
             volume_Slider.value = volume
+        }       
+        onMuteStateChanged:{
+            skipSettingMuteState = true
+            if(muteState == 0){
+                muteSelection.checked = true
+            }else{
+                muteSelection.checked = false
+            }
         }
     }
 

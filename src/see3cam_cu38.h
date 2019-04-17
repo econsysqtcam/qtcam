@@ -234,4 +234,4 @@ public slots:
 
     bool setToDefault();
 };
-#endif // SEECAM+_CU30_H
+#endif // SEE3CAM_CU38_H

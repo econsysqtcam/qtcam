@@ -29,10 +29,12 @@
 #include <QRectF>
 #include <fcntl.h>
 #include <QString>
+#include <QTimer>
 #include <QtQuick/qquickwindow.h>
 #include <QOpenGLShaderProgram>
 #include <QtGui/QOpenGLContext>
 #include <QtConcurrent>
+#include "see3cam_cu1317.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
@@ -65,6 +67,7 @@ QStringListModel Videostreaming::fpsList;
 QStringListModel Videostreaming::encoderList;
 int Videostreaming::deviceNumber;
 QString Videostreaming::camDeviceName;
+bool isStillFrame = false;
 
 typedef void (*ftopict) (int * out, uint8_t *pic, int width) ;
 
@@ -99,11 +102,16 @@ Videostreaming::Videostreaming() : m_t(0)
     m_burstShot = false;
     makeSnapShot = false;
     changeFpsAndShot = false;
+    OnMouseClick=false;
     triggerShot = false;
     m_displayCaptureDialog = false;
+    retrieveframeStoreCam=false;
     m_saveImage = false;
     m_VideoRecord = false;
+    retrieveframeStoreCamInCross = false;
+    SkipIfPreviewFrame=false;
     dotile = 0;
+    retrieveFrame=false;
     // Modified by Sankari : Dec 5 2018, converted TJPF_RGB to TJPF_RGBA and use RGB[RGBA] shader
     pf = TJPF_RGBA;
     warmup = 1;
@@ -116,7 +124,12 @@ Videostreaming::Videostreaming() : m_t(0)
     sf.num = 1;
     flags = TJFLAG_NOREALLOC;
     yuvpad = 1;
-    frameToSkip = 1;
+    frameToSkip = 3;
+    // Added by Sankari: Mar 21, 2019 - To skip preview frames in See3CAM_CU1317
+    previewFrameSkipCount = 1;
+    previewFrameToSkip = 1;
+    skippingPreviewFrame = false;
+
     fpsChangedForStill = false;
     imgSaveSuccessCount = 0;   
     // Initialize all buffers
@@ -135,7 +148,6 @@ Videostreaming::Videostreaming() : m_t(0)
     connect(this, &QQuickItem::windowChanged, this, &Videostreaming::handleWindowChanged);
     connect(&audioinput, SIGNAL(captureAudio()), this, SLOT(doEncodeAudio()));
     connect(this, SIGNAL(captureVideo()), this, SLOT(recordVideo()));
-
     videoEncoder=new VideoEncoder();
 }
 
@@ -617,7 +629,9 @@ double Videostreaming::getTimeInSecs()
 {
     struct timeval tv;
     if(gettimeofday(&tv, NULL)<0) return 0.0;
-    else return (double)tv.tv_sec+((double)tv.tv_usec/1000000.);
+    else
+    {
+        return (double)tv.tv_sec+((double)tv.tv_usec/1000000.);}
 }
 
 /**
@@ -686,23 +700,27 @@ void Videostreaming::setPreviewBgrndArea(int width, int height, bool sidebarAvai
 }
 
 void Videostreaming::capFrame()
-{    
+{
+     unsigned char *temp_Buffer=NULL;
     __u32 buftype = m_buftype;
     v4l2_plane planes[VIDEO_MAX_PLANES];
     v4l2_buffer buf;
     bool again;
     bool validFrame = false;
-
     memset(planes, 0, sizeof(planes));
     buf.length = VIDEO_MAX_PLANES;
     buf.m.planes = planes;
     if (!dqbuf_mmap(buf, buftype, again)) {
+        // stop the timer when device is unplugged
+        if(!retrieveFrame)
+        m_timer.stop();
         closeDevice();
         // Added by Sankari:19 Dec 2017.
         //Bug Fix: 1. Streaming is not available for higher resolution when unplug and plug cu130 camera without closing application
         v4l2_requestbuffers reqbufs;
-        if (m_buffers == NULL)
-            return;
+        if (m_buffers == NULL){
+
+           return;}
 
         for (uint i = 0; i < m_nbuffers; ++i)
             for (unsigned p = 0; p < m_buffers[i].planes; p++)
@@ -718,15 +736,28 @@ void Videostreaming::capFrame()
 
         emit deviceUnplugged("Disconnected","Device Not Found");
         emit logCriticalHandle("Device disconnected");
+
         return;
     }
 
     if (again) {
+
         return;
     }
 
-    if (buf.flags & V4L2_BUF_FLAG_ERROR) {
+    if (buf.flags & V4L2_BUF_FLAG_ERROR) {   
         qbuf(buf);
+        usleep(100000);
+        emit signalTograbPreviewFrame(retrieveframeStoreCamInCross,true);
+        return;
+    }
+
+    previewFrameSkipCount++;
+    if(skippingPreviewFrame && previewFrameSkipCount <= previewFrameToSkip){
+
+        qbuf(buf);
+        retrieveFrame=true;
+        emit signalTograbPreviewFrame(retrieveframeStoreCamInCross,true);
         return;
     }
 
@@ -747,13 +778,15 @@ void Videostreaming::capFrame()
 
     if (validFrame != true){
         qbuf(buf);
-        qDebug()<<"Not a valid frame";
+        emit signalTograbPreviewFrame(retrieveframeStoreCam,true); //Added by Navya ---  Inorder to get the preview
         return;
     }
-   
+
     // prepare yuyv/rgba buffer and give to shader.
     if(!prepareBuffer(m_capSrcFormat.fmt.pix.pixelformat, m_buffers[buf.index].start[0], buf.bytesused)){
         qbuf(buf);
+
+       emit signalTograbPreviewFrame(retrieveframeStoreCam,true);  //Added by Navya  ---Querying the buffer again
         return;
     }
 
@@ -785,17 +818,51 @@ void Videostreaming::capFrame()
             }
             if(err == -1){
                 logCriticalHandle(v4lconvert_get_error_message(m_convertData));
+                if(retrieveframeStoreCam){
+                    for(int i=0; i<m_bufReqCount; i++){
+                        dqbuf_mmap(buf, buftype, again);
+                    }
+                }
+                   qbuf(buf);
+
+                emit signalTograbPreviewFrame(retrieveframeStoreCam,true);
+                return;
+          }
             }
         }
 
-    }
-
     // Taking single shot or burst shot - Skip frames if needed
-    if(((m_frame > frameToSkip) && m_snapShot) || ((m_frame > frameToSkip) && m_burstShot)){
+       if(((m_frame > frameToSkip) && m_snapShot) || ((m_frame > frameToSkip) && m_burstShot)){
          getFileName(getFilePath(),getImageFormatType());
 
-        if(formatType == "raw"){ // save incoming buffer directly
-            if(saveRawFile(m_buffers[buf.index].start[0], buf.bytesused)) {imgSaveSuccessCount++;}
+         /*Added by Navya: 27 Mar 2019
+           Checking whether the frame is still/preview. */
+
+         temp_Buffer = (unsigned char *)malloc(width * height * 2);
+         memcpy(temp_Buffer,(unsigned char *)m_buffers[buf.index].start[0],buf.bytesused);
+
+         if(buf.bytesused>0){
+             if(((uint8_t *)temp_Buffer)[(buf.bytesused)-3] == 0xDC)
+             {
+                 if(retrieveframeStoreCam || retrieveframeStoreCamInCross)
+                 {
+                     SkipIfPreviewFrame=true;
+                 }
+                 else if(!retrieveframeStoreCam)
+                 {
+                     OnMouseClick=true;
+                 }
+             }
+             else if(((uint8_t *)temp_Buffer)[(buf.bytesused)-3] == 0xDD)
+                {
+
+             }
+         }
+            if(formatType == "raw"){// save incoming buffer directly
+            if(saveRawFile(m_buffers[buf.index].start[0], buf.bytesused))
+            {
+                imgSaveSuccessCount++;
+            }
         }else if(formatType == "IR data(8bit BMP)"){ // save IR data
             if(saveIRImage()) {imgSaveSuccessCount++;}
         }
@@ -808,12 +875,16 @@ void Videostreaming::capFrame()
             }
             QImage qImage3(bufferToSave, width, height, QImage::Format_RGB888);
             QImageWriter writer(filename);
-            if(!writer.write(qImage3)) {
-                emit logCriticalHandle("Error while saving an image:"+writer.errorString());                
-            }else{
-                imgSaveSuccessCount++;
+           if((OnMouseClick || !SkipIfPreviewFrame)&& m_saveImage){   //Saving Image after Checking for Preview or Still
+                if(!writer.write(qImage3)) {
+                    emit logCriticalHandle("Error while saving an image:"+writer.errorString());
+                }else{
+                    imgSaveSuccessCount++;
+                }
             }
-        }
+         SkipIfPreviewFrame=false;
+         OnMouseClick=false;
+      }
         if(triggerShot) {
             captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
             makeSnapShot = false;
@@ -836,16 +907,15 @@ void Videostreaming::capFrame()
                         formatSaveSuccess(m_burstShot);
                     }
                     m_burstShot = false;
-
                     // after taking shot(s), restore preview resoln and format.
-                    stopCapture();
-                    vidCapFormatChanged(lastFormat);
-                    setResoultion(lastPreviewSize);
-                    startAgain();
-                    //m_renderer->updateStop = false;
-                    return void();
+                    switchToStillPreviewSettings(false);
+                    retrieveframeStoreCamInCross = false;
+                    retrieveframeStoreCam = false;
+
+                    emit signalTograbPreviewFrame(retrieveframeStoreCam,false);
                 }
                 else{
+                    retrieveframeStoreCam=false;
                     emit logDebugHandle("still and preview resolution and format are same");
                 }
                 if(m_displayCaptureDialog){
@@ -856,7 +926,8 @@ void Videostreaming::capFrame()
             // increasing burst number
             m_burstNumber++;
         }
-    }
+        retrieveframeStoreCam=false;
+   }
     if(y16BayerDestBuffer){
 	free(y16BayerDestBuffer);
 	y16BayerDestBuffer = NULL;
@@ -866,7 +937,25 @@ void Videostreaming::capFrame()
 	free(bayerIRBuffer);
 	bayerIRBuffer = NULL;
     }   
+    if(retrieveframeStoreCam){
+        for(int i=0; i<m_bufReqCount; i++){
+            dqbuf_mmap(buf, buftype, again);
+        }
+    }
     qbuf(buf);
+
+    if(m_frame >frameToSkip)
+    {
+
+        emit signalTograbPreviewFrame(retrieveframeStoreCam,false);
+      retrieveframeStoreCam=false;
+    }
+    else{
+
+    emit signalTograbPreviewFrame(retrieveframeStoreCamInCross,false);
+    }
+    freeBuffer(temp_Buffer);
+
 }
 
 /**
@@ -903,6 +992,7 @@ int Videostreaming::jpegDecode(Videostreaming *obj, unsigned char **pic, unsigne
         obj->logDebugHandle("tjDecompressHeader2()");
 		goto bailout;
     }
+
 
     if(w == 0){ goto bailout;}
     if(h == 0){ goto bailout;} //If tilew or tileh is zero, goto end
@@ -1084,6 +1174,11 @@ int Videostreaming::decomp(Videostreaming *obj,unsigned char **jpegbuf,
             {
                 int width = obj->dotile? min(tilew, w-col*tilew):scaledw;
                 int height = obj->dotile? min(tileh, h-row*tileh):scaledh;
+                // Added by Sankari: To avoid crash when switching resolution.[in storage camera]
+                if(obj->m_capSrcFormat.fmt.pix.width != width && obj->m_capSrcFormat.fmt.pix.height != height){
+                    retval = -1;
+                    goto bailout;
+                }
 
                 if(tjDecompress2(handle, jpegbuf[tile], jpegsize[tile], *pic,
                                     width, pitch, height, obj->pf, obj->flags) == -1){
@@ -1473,12 +1568,13 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG){
             if(bytesUsed <= HEADERFRAME1) {
                 emit logCriticalHandle("Ignoring empty buffer");
+
                 return false;
             }
-            if(((uint8_t *) inputbuffer)[0] == 0xFF && ((uint8_t *) inputbuffer)[1] == 0xD8){               
+            if(((uint8_t *) inputbuffer)[0] == 0xFF && ((uint8_t *) inputbuffer)[1] == 0xD8){
                 if(!frameSkip){       		    
-		    getFrameRates();             
-                    frameSkip = true;
+                     getFrameRates();
+                     frameSkip = true;
                     memcpy(tempSrcBuffer, (unsigned char *)inputbuffer, bytesUsed);
                     QtConcurrent::run(jpegDecode, this, &m_renderer->rgbaDestBuffer, tempSrcBuffer, bytesUsed);
 
@@ -1486,16 +1582,17 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 }
             }
             else{
+
                 return false;
             }
         }
+
         return true;
     }else{
         uint8_t *srcBuffer = NULL;
         uint8_t *destBuffer = NULL;
         getFrameRates();
         m_renderer->renderyuyvMutex.lock();
-
         // cu40 cam - flag
         if(y16BayerFormat){ // y16 - 10bit bayer
 
@@ -1506,6 +1603,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
             bayerIRBuffer = (unsigned short int *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
 
             if(bayerIRBuffer == NULL){
+
                 return false;
             }
             memcpy(bayerIRBuffer, inputbuffer, (width*height*2));
@@ -1693,7 +1791,7 @@ void Videostreaming::getFrameRates() {
         m_lastFrame = m_frame;
         m_tv = tv;
     }
-    ++m_frame;
+    ++m_frame;    
     emit averageFPS(m_fps);
 }
 
@@ -1761,6 +1859,8 @@ bool Videostreaming::startCapture()
         perror("VIDIOC_STREAMON");
         return false;
     }
+
+    previewFrameSkipCount = 1;
     return true;
 }
 
@@ -1794,6 +1894,16 @@ int Videostreaming::findMax(QList<int> *list) {
 void Videostreaming::updateFrameToSkip(uint stillSkip){
     frameToSkip = stillSkip;
 }
+
+/**
+ * @brief Videostreaming::updatePreviewFrameSkip - To skip frame to render preview
+ * @param previewSkip
+ */
+void Videostreaming::updatePreviewFrameSkip(uint previewSkip){
+    skippingPreviewFrame = true;
+    previewFrameToSkip = previewSkip;
+}
+
 
 void Videostreaming::makeShot(QString filePath,QString imgFormatType) {    
     captureTime.start();
@@ -1999,7 +2109,9 @@ void Videostreaming::formatSaveSuccess(bool burstFlag) {
         }
         emit logDebugHandle("Captured image(s) is(are) saved successfully");
         emit titleTextChanged(_title,_text);
-    } else {
+
+    }
+    else {
         _title = "Failure";
         _text = "Image not saved in the selected location";
         emit logCriticalHandle("Still image not saved successfully");
@@ -2019,9 +2131,11 @@ bool Videostreaming::getInterval(struct v4l2_fract &interval)
     return m_has_interval;
 }
 
-void Videostreaming::displayFrame() {    
+void Videostreaming::displayFrame() {
+
     emit logDebugHandle("Start Previewing");
     m_frame = m_lastFrame = m_fps = 0;
+
     emit averageFPS(m_fps);
 
     __u32 buftype = m_buftype;
@@ -2035,11 +2149,9 @@ void Videostreaming::displayFrame() {
             v4lconvert_destroy(m_convertData);
             close();
         }
+
         return void();
     }
-    //} else {
-    //return void();
-    //}
 
     if (getInterval(interval))
         set_interval(buftype, interval);
@@ -2091,7 +2203,7 @@ void Videostreaming::displayFrame() {
     }
 }
 
-void Videostreaming::stopCapture() {    
+void Videostreaming::stopCapture() {
 
     if(h264Decode!=NULL){
         h264Decode->closeFile();
@@ -2123,7 +2235,7 @@ void Videostreaming::stopCapture() {
     y16BayerFormat = false; // BY default this will be false, If cu40 [ y16 bayer format ] is selected ,
     //this will be enabled.
 
-    if (fd() >= 0) {
+    if (fd() >= 0) {  
         emit logDebugHandle("Stop Previewing...");
         v4l2_requestbuffers reqbufs;
         if (m_buffers == NULL)
@@ -2165,7 +2277,8 @@ void Videostreaming::closeDevice() {
     }    
 }
 
-void Videostreaming::startAgain() {    
+void Videostreaming::startAgain() {
+
     m_renderer->videoResolutionwidth = m_width;
     m_renderer->videoResolutionHeight = m_height;
 
@@ -2185,6 +2298,9 @@ void Videostreaming::startAgain() {
     if(openSuccess) {
         displayFrame();
     }
+    if(retrieveFrame)
+    m_timer.start(2000);
+
 }
 
 void Videostreaming::lastPreviewResolution(QString resolution,QString format) {    
@@ -2203,6 +2319,7 @@ void Videostreaming::lastFPS(QString fps) {
 
 void Videostreaming::setResoultion(QString resolution)
 {    
+
     emit logDebugHandle("Resolution set at::"+resolution);
     v4l2_format fmt;
     unsigned int width, height;
@@ -2288,6 +2405,7 @@ void Videostreaming::displayEncoderList(){
 }
 
 void Videostreaming::displayVideoResolution() {
+
     g_fmt_cap(V4L2_BUF_TYPE_VIDEO_CAPTURE, fmt);
 
     QStringList dispVideoRes;
@@ -2596,7 +2714,7 @@ void Videostreaming::recordVideo(){
     videoEncoder->encodeImage(m_renderer->yuvBuffer, false /* other than rgba format means, false */);
 }
 
-void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, QString fileLocation, int audioDeviceIndex, int channels) {
+void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, QString fileLocation, int audioDeviceIndex, unsigned sampleRate, int channels) {
     m_VideoRecord = true;
     if(videoFormatType.isEmpty()) {
         videoFormatType = "avi";        //Application never enters in this condition
@@ -2627,7 +2745,8 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
     }
 #else
     if(ubuntuVersion == ">=15"){
-        switch(videoEncoderType) {       
+        switch(videoEncoderType) {
+
         case 0:
             videoEncoderType = AV_CODEC_ID_MJPEG;
             break;
@@ -2674,9 +2793,9 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
     }
 
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
-    bool tempRet = videoEncoder->createFile(fileName,(AVCodecID)videoEncoderType, m_capDestFormat.fmt.pix.width,m_capDestFormat.fmt.pix.height,temp_interval.denominator,temp_interval.numerator,10000000, audioDeviceIndex, audioinput.audio_context->samprate, audioinput.audio_context->channels);
+    bool tempRet = videoEncoder->createFile(fileName,(AVCodecID)videoEncoderType, m_capDestFormat.fmt.pix.width,m_capDestFormat.fmt.pix.height,temp_interval.denominator,temp_interval.numerator,10000000, audioDeviceIndex, sampleRate, channels);
 #else
-    bool tempRet = videoEncoder->createFile(fileName,(CodecID)videoEncoderType, m_capDestFormat.fmt.pix.width,m_capDestFormat.fmt.pix.height,temp_interval.denominator,temp_interval.numerator,10000000, audioDeviceIndex, audioinput.audio_context->samprate, audioinput.audio_context->channels);
+    bool tempRet = videoEncoder->createFile(fileName,(CodecID)videoEncoderType, m_capDestFormat.fmt.pix.width,m_capDestFormat.fmt.pix.height,temp_interval.denominator,temp_interval.numerator,10000000, audioDeviceIndex, sampleRate, channels);
 #endif
     if(!tempRet){
         emit rcdStop("Unable to record the video");
@@ -2708,7 +2827,6 @@ void Videostreaming::doEncodeAudio(){
         if(audio_buffer_data != NULL){            
             int ret = audioinput.audio_get_next_buffer(audio_buffer_data);
             if(ret > 0){
-                //qDebug()<<"ret > 0"<<ret;
 
             }
             if(ret== 0){                
@@ -2765,4 +2883,97 @@ bool Videostreaming::setUvcExtControlValue(struct uvc_xu_control_query xquery){
         return true;
     }
     return false;
+}
+void Videostreaming::retrieveFrameFromStoreCam() {
+    if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
+    {
+        switchToStillPreviewSettings(true);
+    }
+    retrieveframeStoreCam = true;
+}
+
+/**
+ * @brief Videostreaming::switchToStillPreviewSettings - switch camera to still or preview settings
+ * @param stillSettings - true - switch to still
+ *                        false - switch to preview
+ */
+void Videostreaming::switchToStillPreviewSettings(bool stillSettings){
+
+    if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
+    {
+        stopCapture();
+        if(stillSettings){
+            vidCapFormatChanged(stillOutFormat);
+            setResoultion(stillSize);
+        }
+        else{
+            vidCapFormatChanged(lastFormat);
+            setResoultion(lastPreviewSize);
+        }
+
+        startAgain();
+    }
+}
+
+// To emit a signal that capture frame time out
+void Videostreaming::doCaptureFrameTimeout()
+{
+           emit capFrameTimeout();
+}
+/**
+ * @brief Videostreaming::retrieveShotFromStoreCam - retrieve frame from storage camera
+ * @param filePath - file path - file location to save
+ * @param imgFormatType - image format type like jpg,png,raw,bmp
+ */
+void Videostreaming::retrieveShotFromStoreCam(QString filePath,QString imgFormatType) {
+    m_snapShot = true;
+    m_burstShot = false;
+    m_burstNumber = 1;
+    m_burstLength = 1; // for single shot
+    m_saveImage = true;
+    imgSaveSuccessCount = 0;
+    formatType = imgFormatType;
+
+    getFileName(filePath, imgFormatType);
+
+    triggerShot = false;
+    changeFpsAndShot = false;
+    m_displayCaptureDialog = true;
+
+    if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
+    {
+        retrieveframeStoreCamInCross = true;
+    }
+}
+void Videostreaming::stopFrameTimeoutTimer()
+{
+    m_timer.stop();
+
+}
+void Videostreaming::setSkipPreviewFrame(bool skipFrame){
+    skippingPreviewFrame = skipFrame;
+}
+
+  // Added by Navya--Enabling timer in case of See3Cam_cu1317,inorder to segregate it from other devices.
+
+void Videostreaming::enableTimer(bool timerstatus)
+{
+    retrieveFrame=timerstatus;
+    if(retrieveFrame){
+        connect(&m_timer, SIGNAL(timeout()), this, SLOT(doCaptureFrameTimeout()));
+        //Added by Sankari: Mar 21, 2019 - Made it as single shot - false
+        // To continue running timer, when callback is not happening
+        m_timer.setSingleShot(false);
+    }
+
+}
+
+ //Added by Navya :15 Apr 2019
+ //In order to Stop preview only after frame comes ,when grabPreviewFrame call happens
+
+void Videostreaming::resolnSwitch()
+{
+    usleep(1000000);    //wait until frame comes
+    stopCapture();
+
 }

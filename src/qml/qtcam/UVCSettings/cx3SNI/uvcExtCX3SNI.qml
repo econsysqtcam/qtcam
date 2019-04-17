@@ -86,6 +86,7 @@ Item {
         // Update led brightness in UI for every 2 secs only when extension setting extension tab visible
         onExtensionTabVisible:{
             if(visible){
+
                 geLedStatusTimer.start()
                 getMinMaxStepSizeValues()
                 getValuesFromCamera(UvcExtcamera.UVC_GET_CUR)

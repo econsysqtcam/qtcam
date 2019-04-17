@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 
 using namespace std;
+static int64_t audioPts = 0;
 
 
 /**
@@ -54,8 +55,7 @@ unsigned int VideoEncoder::getTickCount()
     struct timeval tv;
     if(gettimeofday(&tv, NULL) != 0)
         return 0;
-
-    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+      return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 }
 
 VideoEncoder::~VideoEncoder()
@@ -149,8 +149,15 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
             pCodecCtx->pix_fmt =  AV_PIX_FMT_YUV420P;
         }
 #endif
-
-        pCodecCtx->bit_rate =  getWidth() / 3.0f * getHeight() * fpsNumerator / fpsDenominator;
+        // Added by Sankari: Mar 20, 2019
+        // If fps is 120 means, bitrate is very low. So "avcodec_open2" is failed in H264 encoder. So make it as 60.
+        unsigned supportedFpsDen;
+        if(fpsDenominator == 120){
+            supportedFpsDen = 60;
+        }else{
+            supportedFpsDen = fpsDenominator;
+        }
+        pCodecCtx->bit_rate =  getWidth() / 3.0f * getHeight() * fpsNumerator / supportedFpsDen;        
         pCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         pCodecCtx->width = getWidth();
         pCodecCtx->height = getHeight();
@@ -192,7 +199,7 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
         av_dict_set(&opts, "tune", "zerolatency", 0);
         av_dict_set(&opts, "preset","ultrafast",0);
 #if LIBAVCODEC_VER_AT_LEAST(53,6)
-        if (avcodec_open2(pCodecCtx, pCodec, &opts) < 0)
+        if (avcodec_open2(pCodecCtx, pCodec,&opts) < 0)
 #else
         if (avcodec_open(pCodecCtx, pCodec) < 0)
 #endif
@@ -728,7 +735,7 @@ AVStream* VideoEncoder::add_audio_stream(AVFormatContext *oc, CodecID codec_id, 
 
     c->bit_rate = 160000;
     c->sample_rate = sampleRate;
-    c->time_base = (AVRational){1, c->sample_rate};
+    c->time_base =(AVRational){1,c->sample_rate};
     c->channels    = channels;
     if (c->channels < 2)
         c->channel_layout = AV_CH_LAYOUT_MONO;

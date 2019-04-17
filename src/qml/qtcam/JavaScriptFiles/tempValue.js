@@ -13,6 +13,8 @@ var stillCaptureFormat
 var stillCaptureResolution
 var videoCaptureFormat
 var videoCaptureResolution
+var stillCaptureFormatIndex
+var stillCaptureResolutionIndex
 var videocaptureFps
 var videoExtension
 var videoEncoder

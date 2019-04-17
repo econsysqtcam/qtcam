@@ -24,7 +24,7 @@ public:
         SEE3CAM_11CUG,
         SEE3CAM_12CUNIR,
         SEE3CAM_CU30,
-        SEE3CAMPLUS_CU30,
+        SEE3CAM_CU38,
         SEE3CAM_CU40,
         SEE3CAM_CU50,
         SEE3CAM_CU51,
@@ -52,7 +52,8 @@ public:
         NILECAM30_USB,
 	// Added by Sankari - 11 Dec 2018
         ECAM22_USB,
-    SEE3CAM_CU55  // SEE3CAM_AR0521
+    SEE3CAM_CU55,  // SEE3CAM_AR0521
+     SEE3CAM_CU1317 // STORECAM_1335
 
     }ECameraNames;
     //Enum for capture shot type
@@ -61,7 +62,8 @@ public:
         SNAP_SHOT,
         TRIGGER_SHOT,
         BURST_SHOT,
-        CHANGE_FPS_SHOT
+        CHANGE_FPS_SHOT,
+        STORECAM_RETRIEVE_SHOT
     }ECaptureShotType;
 
    // Added by Sankari - 02 Dec 2018 - render shader program usage

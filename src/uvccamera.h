@@ -48,10 +48,17 @@
 #define ENABLETRIGGERMODE	0x51
 #define ENABLE_CROPPED_VGA_MODE	0x52
 #define ENABLE_BINNED_VGA_MODE	0x53
+#define GRAB_PREVIEW_FRAME                        0x1A
+#define CAMERA_CONTROL_See3CAM_CU1317       0x95
+#define QUERY_NEXT_FRAME                          0x01
+
 
 #define OS_CODE			0x70
 #define LINUX_OS		0x01
 #define CAPTURE_COMPLETE	0x71
+#define DESCRIPTOR_SIZE_ENDPOINT		29
+#define DESCRIPTOR_SIZE_IMU_ENDPOINT		23
+
 
 #define CAMERA_CONTROL_80	0x60
 #define CAMERA_CONTROL_50	0x64
@@ -297,6 +304,7 @@ public slots:
      * @param deviceName - Name of the camera device
      */
     void currentlySelectedDevice(QString deviceName);
+
 };
 
 class See3CAM_Control: public uvccamera {
@@ -374,6 +382,7 @@ private:
 signals:
     void gpioLevel(unsigned char level);
     void deviceStatus(QString title, QString message);
+
 public:
 
     /**
@@ -452,5 +461,6 @@ public:
      */
     bool enableTriggerMode();
 };
+
 
 #endif // UVCCAMERA_H

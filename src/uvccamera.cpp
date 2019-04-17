@@ -60,7 +60,7 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c112"),CommonEnums::SEE3CAM_11CUG);
     cameraEnumMap.insert(econVid + (",c113"),CommonEnums::SEE3CAM_12CUNIR);
     cameraEnumMap.insert(econVid + (",c130"),CommonEnums::SEE3CAM_CU30);
-    cameraEnumMap.insert(econVid + (",c133"),CommonEnums::SEE3CAMPLUS_CU30);
+    cameraEnumMap.insert(econVid + (",c133"),CommonEnums::SEE3CAM_CU38);
 
     //Added by Sankari : 28 July 2017
     cameraEnumMap.insert(econVid + (",c120"),CommonEnums::SEE3CAM_CU20);
@@ -87,15 +87,15 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert("04b4,0035",CommonEnums::CX3_SNI_CAM); // Cypress Semiconductor Corp : CX3-SNI front and rear camera
     cameraEnumMap.insert(econVid + (",c132"),CommonEnums::NILECAM30_USB);
     cameraEnumMap.insert(econVid + (",c123"),CommonEnums::ECAM22_USB); // h264 camera
-    cameraEnumMap.insert(econVid + (",c154"),CommonEnums::SEE3CAM_CU55);    
+    cameraEnumMap.insert(econVid + (",c154"),CommonEnums::SEE3CAM_CU55);
+    cameraEnumMap.insert(econVid + (",c1d4"),CommonEnums::SEE3CAM_CU1317);
 }
 
 unsigned int uvccamera::getTickCount()
 {
     struct timeval tv;
     if(gettimeofday(&tv, NULL) != 0)
-        return 0;
-
+        return 0;   
     return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 }
 
@@ -132,7 +132,7 @@ int uvccamera::findEconDevice(QString parameter)
        a loop. The loop will be executed for each member in
        devices, setting dev_list_entry to a list entry
        which contains the device's path in /sys. */
-    udev_list_entry_foreach(dev_list_entry, devices) {
+         udev_list_entry_foreach(dev_list_entry, devices) {
         const char *path;
 
         /* Get the filename of the /sys entry for the device
@@ -417,7 +417,7 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
 
     //Commented by Nithyesh
     //uint i;
-    int ret, desc_size = 0;
+    int ret, desc_size = 0,hid_imu=-1,fd;
     char buf[256];
     struct hidraw_devinfo info;
     struct hidraw_report_descriptor rpt_desc;
@@ -443,15 +443,16 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
         if(tempBuf.contains(hidNode)) {
             openNode = ii.value();
             close(hid_fd);
-            break;
+ //          break;
         }
         close(hid_fd);
         ++ii;
-    }
+ }
+
 
     hid_fd = open(openNode.toLatin1().data(), O_RDWR|O_NONBLOCK);
     //Directly open from map value
-    //hid_fd = open(cameraMap.value(getCameraName()).toLatin1().data(), O_RDWR|O_NONBLOCK);
+    //fd = open(cameraMap.value(getCameraName()).toLatin1().data(), O_RDWR|O_NONBLOCK);
 
     if (hid_fd < 0) {
         perror("Unable to open device");
@@ -461,6 +462,8 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
     memset(&rpt_desc, 0x0, sizeof(rpt_desc));
     memset(&info, 0x0, sizeof(info));
     memset(buf, 0x0, sizeof(buf));
+    /* Get Report Descriptor Size */
+    ret = ioctl(hid_fd, HIDIOCGRDESCSIZE, &desc_size);
 
     /* Get Report Descriptor Size */
     ret = ioctl(hid_fd, HIDIOCGRDESCSIZE, &desc_size);
@@ -472,6 +475,7 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
     /* Get Report Descriptor */
     rpt_desc.size = desc_size;
     ret = ioctl(hid_fd, HIDIOCGRDESC, &rpt_desc);
+
     if (ret < 0) {
         perror("HIDIOCGRDESC");
         return false;
@@ -513,8 +517,16 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
             emit logHandle(QtCriticalMsg,"OS Identification failed\n");
         }
     }    
-    return true;
-}
+    if(desc_size == DESCRIPTOR_SIZE_ENDPOINT)
+        {
+            hid_fd = fd;
+        }
+        else if(desc_size == DESCRIPTOR_SIZE_IMU_ENDPOINT)
+        {
+            hid_imu = fd;
+        }
+      return true;
+    }
 
 void uvccamera::getDeviceNodeName(QString hidDeviceNode) {
     if(hidDeviceNode.isEmpty())
@@ -1089,7 +1101,6 @@ bool uvccamera::sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len)
 {
     // Write data into camera
     int ret = write(hid_fd, outBuf, len);
-
     if (ret < 0) {        
         perror("write");
         return false;
@@ -1105,14 +1116,15 @@ bool uvccamera::sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len)
     tv.tv_usec = 0;
 
     // Monitor read file descriptor for 5 secs
+
     if(0 > select(1, &rfds, NULL, NULL, &tv)){
+
       perror("select");
         return false;
     }
 
     // Read data from camera
     int retval = read(hid_fd, inBuf, len);
-
     if (retval < 0) {
         perror("read");
         return false;

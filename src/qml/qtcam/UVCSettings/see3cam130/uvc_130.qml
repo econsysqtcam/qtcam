@@ -1529,7 +1529,7 @@ Item {
     }
 
     function setMasterMode(){
-        seecam130.setStreamMode(See3Cam130.STREAM_MASTER)
+        seecam130.setStreamMode(See3Cam130.STREAM_MASTER)      
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
     }

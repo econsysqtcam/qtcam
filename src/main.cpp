@@ -55,7 +55,7 @@
 #include "about.h"
 #include "common.h"
 #include "common_enums.h"
-#include "alsamaster.h"
+#include "see3cam_cu1317.h"
 
 //*! \mainpage Qtcam - A econ's camera product
 // *
@@ -79,6 +79,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_10CUG_Bayer>("econ.camera.see3cam10Bayer", 1, 0, "See3Cam10Bayer");
     qmlRegisterType<See3CAM_10CUG_Mono>("econ.camera.see3cam10Mono", 1, 0, "See3Cam10Mono");
     qmlRegisterType<See3CAM_80>("econ.camera.see3cam80", 1, 0, "See3Cam80");
+    qmlRegisterType<See3CAM_CU1317>("econ.camera.see3camcu1317", 1, 0, "See3camcu1317");
 
   // Added by Sankari : 07 Feb 2017
     qmlRegisterType<See3CAM_30>("econ.camera.see3cam30", 1, 0, "See3Cam30");
@@ -137,8 +138,7 @@ int main(int argc, char *argv[])
 
     viewer.rootContext()->setContextProperty("camModels", &camProperty.modelCam);
 
-    Videostreaming vs;
-    AlsaMaster alsa;
+    Videostreaming vs;   
     AudioInput audio;
     viewer.rootContext()->setContextProperty("resolutionModel", &vs.resolution);
     viewer.rootContext()->setContextProperty("stillOutputFormatModel", &vs.stillOutputFormat);

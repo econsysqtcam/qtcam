@@ -37,7 +37,9 @@
 #include "videoencoder.h"
 #include "h264decoder.h"
 #include "audioinput.h"
+#include "uvccamera.h"
 #include "common_enums.h"
+#include"see3cam_cu1317.h"
 #include <linux/uvcvideo.h>
 
 #include <QtQuick/QQuickItem>
@@ -158,6 +160,7 @@ public:
     static QStringListModel videoOutputFormat;
     static QStringListModel fpsList;    
     static QStringListModel encoderList;
+     QTimer m_timer;
 
     void displayFrame();
 
@@ -171,6 +174,7 @@ public:
     bool saveRawFile(void *inputBuffer, int buffersize);    
     bool saveIRImage();
 
+
     static int jpegDecode(Videostreaming *obj, unsigned char **pic, unsigned char *buf, unsigned long bytesUsed);
     static int decomp(Videostreaming *obj, unsigned char **jpegbuf,
                                    unsigned long *jpegsize, unsigned char *dstbuf, int w, int h,
@@ -183,6 +187,7 @@ public:
 
     bool findNativeFormat(__u32 format, QImage::Format &dstFmt);
     bool startCapture();
+    bool retrieveFrame;
 
     // get current resoution set in v4l2
     QString getResoultion();
@@ -195,6 +200,7 @@ public:
     QString _text;
     QString lastPreviewSize;
     QString lastFormat;
+    bool OnMouseClick;
     // Added by Sankari - To maintain last set framerate
     QString lastFPSValue;
 
@@ -204,7 +210,11 @@ public:
     AudioInput audioinput;
     audio_buff_t *audio_buffer_data;
     bool audiorecordStart;
+    bool SkipIfPreviewFrame;
     QMutex recordMutex;
+
+    See3CAM_CU1317 See3camcu1317;
+
 
     /* Jpeg decode */
     int doyuv;
@@ -217,8 +227,13 @@ public:
 
     uint frameToSkip;
 
+    uint previewFrameSkipCount;
+    uint previewFrameToSkip;
+    bool skippingPreviewFrame;
+
 private:
     qreal m_t;
+    __u8 m_bufReqCount;
     FrameRenderer *m_renderer;
 
     uint8_t *yuyvBuffer;
@@ -243,6 +258,7 @@ private:
 
     unsigned m_frame;
     unsigned m_lastFrame;
+
     unsigned m_fps;
     struct timeval m_tv;
 
@@ -333,12 +349,16 @@ private:
     QString getFilePath();
     void setImageFormatType(QString imgFormatType);
     QString getImageFormatType();
+    bool retrieveframeStoreCam;
+    bool retrieveframeStoreCamInCross;
+
 
 private slots:
     void handleWindowChanged(QQuickWindow *win); 
 
 public slots:
-
+     void switchToStillPreviewSettings(bool stillSettings);
+     void retrieveFrameFromStoreCam();
     void sync();
     void cleanup();   
     void setPreviewBgrndArea(int width, int height, bool sidebarAvailable);
@@ -346,6 +366,10 @@ public slots:
     void setChannelCount(uint index);
     void setSampleRate(uint index);
     void stopUpdatePreview();
+    void doCaptureFrameTimeout();
+    void stopFrameTimeoutTimer();
+    void enableTimer(bool timerstatus);
+    void retrieveShotFromStoreCam(QString filePath,QString imgFormatType);
 
 
      // Added by Sankari : 10 Dec 2016
@@ -409,6 +433,7 @@ public slots:
      * @brief To stop the camera preview
      */
     void stopCapture();
+    void resolnSwitch();
 
     /**
      * @brief To start the camera preview
@@ -511,7 +536,7 @@ public slots:
      * @param fileLocation - Location where the recorded file is saved
      * @param - audioDeviceIndex  - audio device index
      */
-    void recordBegin(int videoEncoderType, QString videoFormatType, QString fileLocation, int audioDeviceIndex, int channels);
+    void recordBegin(int videoEncoderType, QString videoFormatType, QString fileLocation, int audioDeviceIndex, unsigned sampleRate, int channels);
 
     /**
      * @brief This function should be called to stop the video recording
@@ -538,6 +563,10 @@ public slots:
     void selectedCameraEnum(CommonEnums::ECameraNames selectedDeviceEnum);
 
     void updateFrameToSkip(uint stillSkip);
+
+    void updatePreviewFrameSkip(uint previewSkip);
+    void setSkipPreviewFrame(bool skipFrame);
+
 
     void enumerateFPSList();
 
@@ -578,6 +607,7 @@ signals:
     void videoRecord(QString fileName);
     void enableRfRectBackInPreview();
     void enableFactRectInPreview();
+    void capFrameTimeout();
 
     // Added by Sankari: 02 Dec 2017
     void stillSkipCount(QString stillResoln, QString videoResoln, QString stillOutFormat);
@@ -588,6 +618,7 @@ signals:
 
     // To get FPS list
     void sendFPSlist(QString fpsList);
+     void signalTograbPreviewFrame(bool retrieveframe,bool InFailureCase);
 };
 
 #endif // VIDEOSTREAMING_H

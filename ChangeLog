@@ -1,3 +1,8 @@
+Qtcam Application - 22.0.0
+--------------------------
+* Added Store and Retrieve ,supporting to store frames in camera.
+* Added support for See3CAM_CU1317 camera.
+
 Qtcam Application - 21.0.1
 --------------------------
 * Camera name is made correctly when enabling embed data in See3CAM_CU38 camera.
