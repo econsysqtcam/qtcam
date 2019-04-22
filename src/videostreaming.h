@@ -268,6 +268,7 @@ private:
     bool openSuccess;
     bool updateOnce;
     bool m_snapShot;
+    bool retrieveShot;
     bool updateStop;
     bool makeSnapShot;
     bool changeFpsAndShot; // To change fps and take shot

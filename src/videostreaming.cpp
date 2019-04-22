@@ -99,6 +99,7 @@ Videostreaming::Videostreaming() : m_t(0)
     openSuccess = false;
     updateOnce = true;
     m_snapShot = false;
+    retrieveShot=false;
     m_burstShot = false;
     makeSnapShot = false;
     changeFpsAndShot = false;
@@ -263,11 +264,11 @@ void Videostreaming::sync()
 FrameRenderer::~FrameRenderer()
 {    
     // Free buffers finally
-    free(yBuffer);
-    free(uBuffer);
-    free(vBuffer);
-    free(yuvBuffer);
-    free(rgbaDestBuffer);    
+    if(yBuffer){ free(yBuffer); yBuffer = NULL;}
+    if(uBuffer){ free(uBuffer); uBuffer = NULL;}
+    if(vBuffer){ free(vBuffer); vBuffer = NULL;}
+    if(yuvBuffer){free(yuvBuffer); yuvBuffer = NULL;}
+    if(rgbaDestBuffer){free(rgbaDestBuffer); rgbaDestBuffer = NULL;}
     delete m_programRGB;
     delete m_programYUYV;
 }
@@ -277,6 +278,7 @@ FrameRenderer::FrameRenderer(): m_t(0), m_programRGB(0),  m_programYUYV(0){
     yBuffer = NULL;
     uBuffer = NULL;
     vBuffer = NULL;
+    yuvBuffer = NULL;
     rgbaDestBuffer = NULL;   
     gotFrame = false;
     updateStop = true;
@@ -403,7 +405,11 @@ void FrameRenderer::drawRGBBUffer(){
     glViewport(sidebarwidth+x+(xMargin/2), y+(m_viewportSize.height()-previewBgrdAreaHeight), destWindowWidth, destWindowHeight);
 
     QMutexLocker locker(&renderMutex);
-    glTexImage2D(GL_TEXTURE_2D, 0,  GL_RGBA, videoResolutionwidth, videoResolutionHeight, 0,GL_RGBA , GL_UNSIGNED_BYTE, rgbaDestBuffer);
+
+    if(rgbaDestBuffer){
+    	glTexImage2D(GL_TEXTURE_2D, 0,  GL_RGBA, videoResolutionwidth, videoResolutionHeight, 0,GL_RGBA , GL_UNSIGNED_BYTE, rgbaDestBuffer);
+    }
+
 
     if(gotFrame && !updateStop){
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
@@ -790,8 +796,10 @@ void Videostreaming::capFrame()
         return;
     }
 
-    if(!m_snapShot){
+    if(!m_snapShot && !retrieveShot){
+
         m_renderer->gotFrame = true;
+        retrieveShot=false;
     }
    
 
@@ -889,6 +897,7 @@ void Videostreaming::capFrame()
             captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
             makeSnapShot = false;
             m_snapShot = false;
+            retrieveShot = false;
             m_burstShot = false;
         } else if(changeFpsAndShot){
             captureSaveTime("Capture time: " +(QString::number((double)captureTime.elapsed()/1000)) + "seconds");
@@ -899,8 +908,8 @@ void Videostreaming::capFrame()
             }
             makeSnapShot = false;
             m_snapShot = false;
+            retrieveShot = false;
             if(m_burstNumber == m_burstLength){
-                m_snapShot = false;
                 if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
                 {
                     if(m_displayCaptureDialog){
@@ -978,8 +987,10 @@ int Videostreaming::jpegDecode(Videostreaming *obj, unsigned char **pic, unsigne
 
     srcSize = bytesUsed;
 
-    if((srcbuf=(unsigned char *)malloc(srcSize))==NULL)
+    if((srcbuf=(unsigned char *)malloc(srcSize))==NULL){
         obj->logDebugHandle("allocating memory");
+	goto bailout;
+    }
 
     memcpy(srcbuf,buf,srcSize);
 
@@ -1086,7 +1097,7 @@ int Videostreaming::jpegDecode(Videostreaming *obj, unsigned char **pic, unsigne
     }
     if(!obj->m_VideoRecord){ // when stop recording , we need to close the recorded file and do not allow record. So return.
         QMutexLocker lockerRecord(&obj->recordMutex);
-        if(obj->videoEncoder->ok){
+        if(obj->videoEncoder && obj->videoEncoder->ok){
             obj->videoEncoder->closeFile();
         }
         lockerRecord.unlock();
@@ -1576,7 +1587,9 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                      getFrameRates();
                      frameSkip = true;
                     memcpy(tempSrcBuffer, (unsigned char *)inputbuffer, bytesUsed);
-                    QtConcurrent::run(jpegDecode, this, &m_renderer->rgbaDestBuffer, tempSrcBuffer, bytesUsed);
+		    if(m_renderer && m_renderer->rgbaDestBuffer){
+                    	QtConcurrent::run(jpegDecode, this, &m_renderer->rgbaDestBuffer, tempSrcBuffer, bytesUsed);
+		    }
 
                 }else{                
                 }
@@ -1593,6 +1606,12 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         uint8_t *destBuffer = NULL;
         getFrameRates();
         m_renderer->renderyuyvMutex.lock();
+
+        if(!m_renderer->yuvBuffer){
+	    m_renderer->renderyuyvMutex.unlock();
+            return false;
+        }
+
         // cu40 cam - flag
         if(y16BayerFormat){ // y16 - 10bit bayer
 
@@ -1618,7 +1637,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 }
             }
             rgb2yuyv(y16BayerDestBuffer, yuyvBuffer, width, height);
-            m_renderer->yuvBuffer = yuyvBuffer;
+            memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
         }else{
             switch(pixformat){
                 case V4L2_PIX_FMT_YUYV:{
@@ -1632,7 +1651,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                     destBuffer = (uint8_t *)malloc(width * height * 3);
                     bayer_to_rgbbgr24((uint8_t *)inputbuffer, destBuffer, width, height, 1, 1);
                     rgb2yuyv(destBuffer, yuyvBuffer, width, height);
-                    m_renderer->yuvBuffer = yuyvBuffer;
+                    memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
                     freeBuffer(destBuffer);
                 }
                 break;
@@ -1649,7 +1668,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                             *pfmb++=0x80;                  //U or V
                         }
                     }
-                    m_renderer->yuvBuffer = yuyvBuffer;
+		    memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);                    
                 }
                 break;
 
@@ -1670,7 +1689,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                             pfmb += 4;
                         }
                     }
-                    m_renderer->yuvBuffer = yuyvBuffer;
+                    memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
                 }
                 break;
                 case V4L2_PIX_FMT_H264:{
@@ -1678,8 +1697,8 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                     // check - decode h264 to yuyv available
 
                     h264Decode->decodeH264(yuv420pdestBuffer, (uint8_t *) inputbuffer, bytesUsed); /* decode h264 to yuv420p */
-                    h264Decode->yu12_to_yuyv(yuyvBuffer, yuv420pdestBuffer, width, height); /*yuv420p to yuyv conversion */
-                    m_renderer->yuvBuffer = yuyvBuffer;
+                    h264Decode->yu12_to_yuyv(yuyvBuffer, yuv420pdestBuffer, width, height); /*yuv420p to yuyv conversion */                    
+                    memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
                 }
                 break;
 
@@ -1694,7 +1713,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                        *pfmb++ = (((srcBuffer[l] & 0xF0) >> 4) | (srcBuffer[l+1] & 0x0F) << 4);
                        *pfmb++ = 0x80;
                     }
-                    m_renderer->yuvBuffer = yuyvBuffer;
+                    memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);                    
                     freeBuffer(srcBuffer);
                 }
                 break;
@@ -1727,6 +1746,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
 void Videostreaming::doAfterChangeFPSAndShot(){
     makeSnapShot = false;
     m_snapShot = false;
+    retrieveShot = false;
     m_burstShot = false;
     // Restore preview color space, resolution, fps.
     if(fpsChangedForStill){
@@ -2071,6 +2091,7 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
     captureTime.start();
     m_burstShot = true;
     m_snapShot = false;
+    retrieveShot = false;
     imgSaveSuccessCount = 0;
 
     // emit signal to set still skip count
@@ -2203,16 +2224,13 @@ void Videostreaming::displayFrame() {
     }
 }
 
-void Videostreaming::stopCapture() {
+void Videostreaming::stopCapture() {    
 
     if(h264Decode!=NULL){
         h264Decode->closeFile();
         delete h264Decode;
         h264Decode=NULL;
-    }
-    yuyvBuffer = NULL;
-    yuv420pdestBuffer = NULL;
-    tempSrcBuffer = NULL;
+    }  
 
     if(yuyvBuffer != NULL ){
         free(yuyvBuffer);
@@ -2235,7 +2253,7 @@ void Videostreaming::stopCapture() {
     y16BayerFormat = false; // BY default this will be false, If cu40 [ y16 bayer format ] is selected ,
     //this will be enabled.
 
-    if (fd() >= 0) {  
+    if (fd() >= 0) {
         emit logDebugHandle("Stop Previewing...");
         v4l2_requestbuffers reqbufs;
         if (m_buffers == NULL)
@@ -2257,10 +2275,40 @@ void Videostreaming::stopCapture() {
             m_capNotifier = NULL;
         }        
         if (m_capImage != NULL) {            
-//          delete m_capImage;
+            delete m_capImage;
             m_capImage = NULL;
         }
-    }    
+    }
+
+  
+    if(m_renderer->yBuffer != NULL){
+        free(m_renderer->yBuffer);
+        m_renderer->yBuffer = NULL;
+    }
+
+
+    if(m_renderer->uBuffer != NULL){
+        free(m_renderer->uBuffer);
+        m_renderer->uBuffer = NULL;
+    }
+
+    if(m_renderer->vBuffer != NULL){
+        free(m_renderer->vBuffer);
+        m_renderer->vBuffer = NULL;
+    }
+
+    m_renderer->renderMutex.lock();
+
+    if(m_renderer->rgbaDestBuffer != NULL){
+	free(m_renderer->rgbaDestBuffer);
+	m_renderer->rgbaDestBuffer = NULL;
+    }
+
+    if(m_renderer->yuvBuffer != NULL){
+    	free(m_renderer->yuvBuffer);
+    	m_renderer->yuvBuffer = NULL;
+    }
+    m_renderer->renderMutex.unlock();
 }
 
 void Videostreaming::closeDevice() {
@@ -2903,8 +2951,9 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings){
     {
         stopCapture();
         if(stillSettings){
-            vidCapFormatChanged(stillOutFormat);
-            setResoultion(stillSize);
+             m_renderer->updateStop = true;
+             vidCapFormatChanged(stillOutFormat);
+             setResoultion(stillSize);
         }
         else{
             vidCapFormatChanged(lastFormat);
@@ -2927,6 +2976,7 @@ void Videostreaming::doCaptureFrameTimeout()
  */
 void Videostreaming::retrieveShotFromStoreCam(QString filePath,QString imgFormatType) {
     m_snapShot = true;
+    retrieveShot=true;
     m_burstShot = false;
     m_burstNumber = 1;
     m_burstLength = 1; // for single shot

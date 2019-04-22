@@ -1206,7 +1206,7 @@ Item {
             if(see3camcu1317.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){
                 if(faceDetectEmbedData.checked){
                     messageDialog.title = qsTr("Status")
-                    messageDialog.text = qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_CU1317_Face_and_Smile_Detection for more details")
+                    messageDialog.text = qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_CU1317_Face_and_Smile_Detection_Application_Note for more details")
                     messageDialog.open()
                 }
             }
@@ -1217,7 +1217,7 @@ Item {
             if(see3camcu1317.setSmileDetection(true, smileDetectEmbedData.checked)){
                 if(smileDetectEmbedData.checked){
                     messageDialog.title = qsTr("Status")
-                    messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_CU1317_Face_and_Smile_Detection for more details")
+                    messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_CU1317_Face_and_Smile_Detection_Application_Note for more details")
                     messageDialog.open()
                 }
             }
