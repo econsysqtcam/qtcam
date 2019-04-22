@@ -2935,6 +2935,7 @@ bool Videostreaming::setUvcExtControlValue(struct uvc_xu_control_query xquery){
 void Videostreaming::retrieveFrameFromStoreCam() {
     if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {
+	retrieveShot = true;
         switchToStillPreviewSettings(true);
     }
     retrieveframeStoreCam = true;
