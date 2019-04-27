@@ -113,13 +113,13 @@ Item {
     {
         target: root
         onTakeScreenShot:
-        {              
+        {
             if(streamSwTrigger.checked || streamHwTrigger.checked){
                 root.disableSaveImage()
                 enableSettings.start()
             }
-            else
-                root.imageCapture(CommonEnums.SNAP_SHOT);
+            else{
+            root.imageCapture(CommonEnums.SNAP_SHOT);}
 
         }
         onGetVideoPinStatus:
@@ -137,7 +137,7 @@ Item {
         }
         onMouseRightClicked:{
             if(autoexpManual.enabled && autoexpManual.checked){
-                see3camcu1317.setROIAutoExposure(see3camcu1317.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
+                see3camcu1317.setROIAutoExposure(See3camcu1317.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
             }
         }
         onAutoExposureSelected:{
@@ -166,8 +166,10 @@ Item {
             if((streamMasterOnDemand.checked || streamHwTrigger.checked)){
                 if(retriveframe){
                     if(!see3camcu1317.grabStillFrame(frameIndexCombo.currentIndex, stillFormatCurrentIndex+1, stillResolutionCurrentIndex+1)){
-                        if(!InFailureCase)
-                        displayMessageBox("Failure", "Image is not available in given index")
+                        if(!InFailureCase){
+                            displayMessageBox("Failure", "Image is not available in given index")
+                            root.switchToCamFrameSettings(false)
+                        }
                     }
                 }else{
 
@@ -1537,8 +1539,9 @@ Item {
                 if(grabStatus){ // If grab still frame command is success, the save the frame in PC
                     root.imageCapture(CommonEnums.STORECAM_RETRIEVE_SHOT)
                 }else{ // If grab still frame command is failure, then ignore
-                    switchToCamFrameSettings(false)
+                    
 
+                    root.switchToCamFrameSettings(false)
                     see3camcu1317.grabPreviewFrame()
                 }
             }

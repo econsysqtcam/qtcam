@@ -424,7 +424,7 @@ Item {
                             afWindowSizeCombo.enabled = true
                       }
                       Keys.onReturnPressed: {
-                            see3cam30.setROIAutoFocusMode(See3Cam30.AFManual, 0, 0, 0, 0, afWindowSizeCombo.currentText);
+                            see3cam30.setROIAutoFoucs(See3Cam30.AFManual, 0, 0, 0, 0, afWindowSizeCombo.currentText);
                             afWindowSizeCombo.enabled = true
                       }
                   }

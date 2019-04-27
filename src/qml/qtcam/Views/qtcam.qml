@@ -304,32 +304,34 @@ Rectangle {
         anchors.leftMargin: sideBarItems.visible ? parent.width*0.15 : 0
         width: sideBarItems.visible ? parent.width * 0.85 : parent.width
         height: layer_0.height
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onReleased:
-            {
-                if (mouse.button == Qt.LeftButton){
-                    if(closeSideBarClicked){
-                        captureRecordWhenSideBarItemsClosed()
-                    }
-                    else{
-                        if(captureVideoRecordRootObject.captureBtnVisible){
-                            mouseClickCapture()
-                        } else if(captureVideoRecordRootObject.recordBtnVisible){
-                            videoRecordBegin()
-                        } else if(captureVideoRecordRootObject.recordStopBtnVisible){
-                            videoSaveVideo()
-                        }
-                    }
-                }else if(mouse.button == Qt.RightButton){
-                    // passing mouse x,y cororinates, preview width and height
-                    mouseRightClicked(mouse.x, mouse.y, vidstreamproperty.width, vidstreamproperty.height)
-                }
-            }
-        }
+//        MouseArea {
+//            anchors.fill: parent
+//            acceptedButtons: Qt.LeftButton | Qt.RightButton
+//            onReleased:
+//            {
 
-   
+//                if (mouse.button == Qt.LeftButton){
+//                    if(closeSideBarClicked){
+//                        captureRecordWhenSideBarItemsClosed()
+//                    }
+//                    else{
+//                        if(captureVideoRecordRootObject.captureBtnVisible){
+//                            mouseClickCapture()
+//                        } else if(captureVideoRecordRootObject.recordBtnVisible){
+//                            videoRecordBegin()
+//                        } else if(captureVideoRecordRootObject.recordStopBtnVisible){
+//                            videoSaveVideo()
+//                        }
+//                    }
+//                }else if(mouse.button == Qt.RightButton){
+//                    // passing mouse x,y cororinates, preview width and height
+//
+//                    mouseRightClicked(mouse.x, mouse.y, previewwindow.width, previewwindow.height)
+//                }
+//            }
+//        }
+
+   }
         Videostreaming {
             id: vidstreamproperty
             focus: true
@@ -510,7 +512,20 @@ Rectangle {
                 captureFrameTimeout();
             }
 
-            MouseArea {
+            //  Added by Navya : 23 Apr 2019
+            //  In order to maintain Mousearea similar to preview window
+            onSignalForPreviewWindow:{
+                     previewwindow.width = resWidth
+                     previewwindow.height = resHeight
+                     previewwindow.x = x;
+                     previewwindow.y = y;
+            }
+            Rectangle
+            {
+                id:previewwindow
+                color : "black"
+
+            MouseArea{
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 onReleased:
@@ -530,13 +545,12 @@ Rectangle {
                         }
                     }else if(mouse.button == Qt.RightButton){
                         // passing mouse x,y cororinates, preview width and height
-                        mouseRightClicked(mouse.x, mouse.y, vidstreamproperty.width, vidstreamproperty.height)
+                        mouseRightClicked(mouse.x, mouse.y, previewwindow.width, previewwindow.height)
                     }
                 }
             }
+          }
         }
-
-    }
 
     Image {
         id: open_sideBar
@@ -857,8 +871,8 @@ Rectangle {
                     sideBarItems.visible = false
                     sidebarVisibleStatus(sideBarItems.visible)
                     open_sideBar.visible = true
-		    // set preview backgrond area. param1:width, param2: height, param3: sidebar visibility true/false
-                    vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, false)                    
+                    // set preview backgrond area. param1:width, param2: height, param3: sidebar visibility true/false
+                    vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, false)
                 }
             }
         }

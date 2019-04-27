@@ -429,7 +429,7 @@ Item {
                             afWindowSizeCombo.enabled = true
                       }
                       Keys.onReturnPressed: {
-                            seecam130A.setROIAutoFocusMode(See3Cam130A.AFManual, 0, 0, 0, 0, afWindowSizeCombo.currentText);
+                            seecam130A.setROIAutoFoucs(See3Cam130A.AFManual, 0, 0, 0, 0, afWindowSizeCombo.currentText);
                             afWindowSizeCombo.enabled = true
                       }
                   }
