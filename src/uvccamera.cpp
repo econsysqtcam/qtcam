@@ -964,7 +964,7 @@ bool See3CAM_GPIOControl::getGpioLevel(camGpioPin gpioPinNumber)
         ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
 
         if (ret < 0) {
-            perror("read");
+         //   perror("read");
         } else {
             if(g_in_packet_buf[0] == GPIO_OPERATION &&
                     g_in_packet_buf[1] == GPIO_GET_LEVEL &&
@@ -1020,7 +1020,7 @@ bool See3CAM_GPIOControl::setGpioLevel(camGpioPin gpioPin,camGpioValue gpioValue
         /* Get a report from the device */
         ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
         if (ret < 0) {
-            perror("read");
+        //    perror("read");
         } else {
             if(g_in_packet_buf[0] == GPIO_OPERATION &&
                     g_in_packet_buf[1] == GPIO_SET_LEVEL &&
@@ -1126,7 +1126,7 @@ bool uvccamera::sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len)
     // Read data from camera
     int retval = read(hid_fd, inBuf, len);
     if (retval < 0) {
-        perror("read");
+    //    perror("read");
         return false;
     }
     else{

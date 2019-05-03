@@ -28,6 +28,7 @@ import econ.camera.property 1.0
 import econ.camera.stream 1.0
 import econ.camera.keyEvent 1.0
 import econ.camera.see3camcu1317 1.0
+import econ.camera.see3cam50 1.0
 import "../JavaScriptFiles/tempValue.js" as JS
 import cameraenum 1.0
 
@@ -36,6 +37,7 @@ Rectangle {
     //Removed unused signals and property  - By Dhurka - 21st Oct 2016
     signal stopCamPreview()
     signal mouseRightClicked(var x, var y, var width, var height)
+    signal mouseRightClickedWithStreamResolution(var x, var y, var previewwindowWidth, var previewwindowHeight, var videoStreamWidth, var videoStreamHeight)
     signal afterBurst()
     signal beforeRecordVideo()
     signal afterRecordVideo()
@@ -57,6 +59,7 @@ Rectangle {
     //To grab preview Frames
     signal queryFrame(bool retriveframe,bool InFailureCase);
 
+    signal usbSpeed(var usbPort);
     property int burstLength;
     property bool vidFormatChanged: false
     property bool keyEventFiltering
@@ -546,6 +549,7 @@ Rectangle {
                     }else if(mouse.button == Qt.RightButton){
                         // passing mouse x,y cororinates, preview width and height
                         mouseRightClicked(mouse.x, mouse.y, previewwindow.width, previewwindow.height)
+                        mouseRightClickedWithStreamResolution(mouse.x, mouse.y, previewwindow.width, previewwindow.height, vidstreamproperty.width, vidstreamproperty.height)
                     }
                 }
             }
@@ -662,6 +666,8 @@ Rectangle {
                         keyEventFiltering = false
                         vidstreamproperty.enabled = true                                                
                         webcamKeyAccept = true
+                        camproperty.getUsbSpeed(pciBusCamDetails)
+
                         vidstreamproperty.stopCapture()
                         vidstreamproperty.closeDevice()
                         selectCameraSettings()
@@ -707,6 +713,10 @@ Rectangle {
 
                         // Initially enable capture image when external keyevent is occured.
                         disableCaptureImage =  false
+
+                        //Added by Navya :30 Apr 2019 -To getusbspeed
+                        camproperty.getPort()
+
                     }
                 }
                 else {
@@ -877,6 +887,10 @@ Rectangle {
             }
         }
     }
+    See3Cam50{
+        id:see3camcu50
+    }
+
     Camproperty {
         id: camproperty
         //Added by Dhurka - 13th Oct 2016
@@ -885,6 +899,11 @@ Rectangle {
         {
             selectedDeviceEnumValue = selectedDevice;
         }
+        onSignalForUsbSpeed:{
+
+           usbSpeed(bcdusb);
+        }
+
         // Added by Sankari: To notify user about warning
         // 07 Dec 2017
         onNotifyUserInfo:{

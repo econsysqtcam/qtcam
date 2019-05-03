@@ -19,6 +19,8 @@
  */
 
 #include "seecam_cu50.h"
+#include "cameraproperty.h"
+Cameraproperty camprop;
 
 void See3CAM_CU50::getFlashLevel() {
     quint8 flash_level = 0;
@@ -32,4 +34,19 @@ void See3CAM_CU50::getTorchLevel() {
     see3cam_ctrl.getTorchState(&torch_level);
     QString tmpStr = QString::number(torch_level);
     emit updateTorchCheckBox(tmpStr);
+}
+
+// Added by Navya :30 Apr 2019
+// To skip Frames as per usbspeed
+void See3CAM_CU50::setStillSkipCount(QString port){
+    uint frameToSkip;
+    int n = port.toInt();   //Converting string to int
+
+    if(n < 300)
+        frameToSkip = 5;
+    else
+        frameToSkip = 8;
+
+    // send frame to skip values to qtcam.qml
+    emit updateFrameToSkipFromCam50(frameToSkip);
 }

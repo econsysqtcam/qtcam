@@ -200,6 +200,37 @@ bool H264Camera::getHDRMode(uint queryType){
         return false;
 }
 
+
+/**
+ * @brief H264Camera::setGainMode - setting gain value
+ * @param qFactorValue - gain mode to set
+ * @return true/false
+ */
+bool H264Camera::setGainMode(QString gainMode){
+
+    __u16 gain;
+    gain = gainMode.toUShort();
+    return setCurrentValueCmd(V4L2_CID_XU_GAINTYPE, gain);
+}
+
+/**
+ * @brief H264Camera::get gain Mode
+ * @param queryType - UVC_GET_CUR / UVC_GET_DEF / UVC_GET_MIN / UVC_GET_MAX/ UVC_GET_RES
+* @return true/false
+ */
+bool H264Camera::getGainMode(uint queryType){
+    __u8 outputGainMode;
+
+    if(getValueCmd(V4L2_CID_XU_GAINTYPE, queryType, outputGainMode)){
+        uint gainValue = outputGainMode;
+
+        emit gainModeReceived(queryType, gainValue);
+        return true;
+    }
+    else
+        return false;
+}
+
 /**
  * @brief H264Camera::setDewarpMode - setting dewarpMode mode value
  * @param dewarpMode - dewarp mode to set
@@ -227,6 +258,96 @@ bool H264Camera::getDewarpMode(uint queryType){
     }
     else
         return false;
+}
+
+/**
+ * @brief H264Camera::setROIAutoExposureMode - Set ROI auto exposure mode to camera
+ * return true - success /false - failure
+ */
+bool H264Camera::setROIAutoExposureMode(QString autoexpROIMode){
+    __u16 expMode;
+
+    expMode = autoexpROIMode.toUShort();
+    return setCurrentValueCmd(V4L2_CID_XU_EXPOSURE_ROI_MODE, expMode);
+}
+
+/**
+ * @brief H264Camera::setROIAutoExposureMode
+ * @param queryType - UVC_GET_CUR / UVC_GET_DEF / UVC_GET_MIN / UVC_GET_MAX/ UVC_GET_RES
+* @return true/false
+ */
+bool H264Camera::getROIAutoExposureMode(uint queryType){
+    __u8 expROIMode;
+
+    if(getValueCmd(V4L2_CID_XU_EXPOSURE_ROI_MODE, queryType, expROIMode)){
+        uint roiMode = expROIMode;
+
+        emit roiModeReceived(queryType, roiMode);
+        return true;
+    }
+    else
+        return false;
+}
+/**
+ * @brief H264Camera::setROIExposureWindowSize - Set ROI auto exposure window size in manual mode to camera
+ * return true - success /false - failure
+ */
+bool H264Camera::setROIExposureWindowSize(QString windowSize){
+    __u16 roiWindowSize;
+
+    roiWindowSize = windowSize.toUShort();
+    return setCurrentValueCmd(V4L2_CID_XU_EXPOSURE_ROI_WINSIZE, roiWindowSize);
+}
+
+/**
+ * @brief H264Camera::getROIExposureWindowSize
+ * @param queryType - UVC_GET_CUR / UVC_GET_DEF / UVC_GET_MIN / UVC_GET_MAX/ UVC_GET_RES
+* @return true/false
+ */
+bool H264Camera::getROIExposureWindowSize(uint queryType){
+    __u8 roiWinSize;
+
+    if(getValueCmd(V4L2_CID_XU_EXPOSURE_ROI_WINSIZE, queryType, roiWinSize)){
+        uint roiWindowSize = roiWinSize;
+
+        emit roiWindowSizeReceived(queryType, roiWindowSize);
+        return true;
+    }
+    else
+        return false;
+}
+
+/**
+ * @brief H264Camera::setROIExposure - Set ROI auto exposure  to camera
+ * @param videoResolutionWidth -  resolution width from camera
+ * @param videoResolutionHeight - resolution height from camera
+ * @param previewRenderWidth -  preview area width
+ * @param previewRenderHeight - preview area  height
+ * @param xCord - mouse xCordinate from preview
+ * @param yCord - mouse yCordinate from preview
+ * @param winSize - ROI window size
+ * return true - success /false - failure
+ */
+bool H264Camera::setROIExposureCoordinates(uint previewRenderWidth, uint previewRenderHeight, uint videoResolutionWidth, uint videoResolutionHeight, uint xCord, uint yCord){
+    __u32 exposureParameters;
+
+    //((Input - InputLow) / (InputHigh - InputLow)) * (OutputHigh - OutputLow) + OutputLow // map preview render area width/height  to  video camera stream resolution width/height
+
+    double outputXLow = 0;
+    double outputXHigh = videoResolutionWidth-1;
+    double outputYLow = 0;
+    double outputYHigh = videoResolutionHeight-1;
+    double inputXLow = 0;
+    double inputXHigh = previewRenderWidth-1;
+    double inputXCord = xCord;
+    int outputXCord = ((inputXCord - inputXLow) / (inputXHigh - inputXLow)) * (outputXHigh - outputXLow) + outputXLow;
+
+    double inputYLow = 0;
+    double inputYHigh = previewRenderHeight-1;
+    double inputYCord = yCord;
+    int outputYCord = ((inputYCord - inputYLow) / (inputYHigh - inputYLow)) * (outputYHigh - outputYLow) + outputYLow;
+    exposureParameters = outputXCord<<16 | outputYCord;
+    return setArrayOfValues(V4L2_CID_XU_EXPOSURE_ROI_COORDINATES, exposureParameters);
 }
 
 
@@ -339,6 +460,51 @@ bool H264Camera::setCurrentValueCmd(__u8 controlId, uint16_t setVal){
 
    return true;
 }
+
+/**
+ * @brief H264Camera::setCurrentValueCmd - set current value from camera
+ * @param controlId - control id
+ * @param setVal- value to set
+ * @return true/false
+ */
+bool H264Camera::setArrayOfValues(__u8 controlId, uint32_t setVal){
+    if(!gvobj){
+        return false;
+    }
+
+    struct uvc_xu_control_query xquery;
+    __u16 size = 0;
+
+    memset(&xquery, 0, sizeof(xquery));
+
+    // To allocate a sufficiently large buffer and set the buffer size to the correct value
+    xquery.query = UVC_GET_LEN;
+    xquery.size = 2; /* size seems to always be 2 for the LEN query, but
+                       doesn't seem to be documented. Use result for size
+                                  in all future queries of the same control number */
+    xquery.selector = controlId;
+    xquery.unit = EXTENSION_UNIT_ID;
+    xquery.data = (__u8 *)&size;
+
+    if(!gvobj->setUvcExtControlValue(xquery)){
+        return false;
+    }
+
+   // To set the current value to the camera
+    xquery.query = UVC_SET_CUR;
+    xquery.size = size;
+    xquery.selector = controlId;
+    xquery.unit = EXTENSION_UNIT_ID;
+    xquery.data = (uint8_t *)&setVal;
+
+    if(!gvobj->setUvcExtControlValue(xquery)){
+        return false;
+    }
+
+
+   return true;
+}
+
 
 
 /**

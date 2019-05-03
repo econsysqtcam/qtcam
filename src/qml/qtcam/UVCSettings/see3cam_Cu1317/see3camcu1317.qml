@@ -168,7 +168,7 @@ Item {
                     if(!see3camcu1317.grabStillFrame(frameIndexCombo.currentIndex, stillFormatCurrentIndex+1, stillResolutionCurrentIndex+1)){
                         if(!InFailureCase){
                             displayMessageBox("Failure", "Image is not available in given index")
-                            root.switchToCamFrameSettings(false)
+                            root.switchToCamFrameSettings(false)   // To get the preview back after failure case
                         }
                     }
                 }else{

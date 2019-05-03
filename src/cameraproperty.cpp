@@ -199,6 +199,71 @@ void Cameraproperty::checkforDevice() {
      */
     uvccam.findEconDevice("hidraw");
 }
+QString  Cameraproperty::getUsbSpeed(QString busInfo){
+
+    int retVal, r;
+    uint16_t usb;
+    libusb_device **list = NULL;
+    libusb_context *context = NULL;
+    libusb_device_handle *h_handle = NULL;
+
+    r = libusb_init(&context);
+    if (r < 0 ) {
+        printf("Error in initializing libusb library...\n");
+        return NULL;
+    }
+
+    size_t count = libusb_get_device_list(context, &list);
+
+    for (size_t idx = 0; idx < count; idx++) {
+        libusb_device *device = list[idx];
+        struct libusb_device_descriptor devDesc = {0};
+
+        retVal = libusb_get_device_descriptor (device, &devDesc);
+
+        if (retVal != LIBUSB_SUCCESS) {
+            printf("libusb_get_device_descriptor return %d\n", retVal);
+            return NULL;
+        }
+
+
+        retVal = libusb_open(device, &h_handle);
+
+        if(retVal < 0) {
+            printf("Problem acquiring device handle in %s \n", __func__);
+            return NULL;
+        }
+
+        if(devDesc.idVendor == 0x2560 ){
+            uint8_t path[8];
+
+            QString busPath;
+
+            int r = libusb_get_port_numbers(device, path, sizeof(path));
+
+            if (r > 0) {
+
+                busPath.append(QString::number(path[0]));
+                for (int j = 1; j < r; j++){
+
+                    busPath.append(".");
+                    busPath.append(QString::number(path[j]));
+                }
+            }
+            usb = devDesc.bcdUSB;
+            usbhex.setNum(usb,16);
+        }
+        if(h_handle) {
+            libusb_close(h_handle);
+            h_handle = NULL;
+        }
+    }
+
+    libusb_free_device_list(list, 1);
+    libusb_exit(context);
+
+}
+
 
 void Cameraproperty::setCurrentDevice(QString deviceIndex,QString deviceName) {
 
@@ -260,4 +325,11 @@ void Cameraproperty::closeLibUsbDeviceAscella(){
 // 07 Dec 2017
 void Cameraproperty::notifyUser(QString title, QString text){
     emit notifyUserInfo(title, text);
+}
+
+// Added by Navya: 30 Apr 2019
+// To emit signal to assign frametoskip for cu50 camera according to the port used
+void Cameraproperty::getPort()
+{
+    emit signalForUsbSpeed(usbhex);
 }

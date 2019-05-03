@@ -29,6 +29,11 @@ Item {
         {
             root.enableVideoPin(true);
         }
+        onMouseRightClickedWithStreamResolution:{
+            if(autoexpManual.enabled && autoexpManual.checked){
+                h264camId.setROIExposureCoordinates(previewwindowWidth, previewwindowHeight, videoStreamWidth, videoStreamHeight, x, y)
+            }
+        }
     }
 
     ScrollView{
@@ -39,7 +44,7 @@ Item {
             height: 450
             style: econscrollViewStyle
             Item{
-                height:650
+                height:850
                 ColumnLayout{
                 x:5
                 y:5
@@ -224,8 +229,7 @@ Item {
                     model: ListModel {
                         ListElement { text: "OFF" }
                         ListElement { text: "HDR 1X" }
-                        ListElement { text: "HDR 2X" }
-			ListElement { text: "Night Mode" }
+                        ListElement { text: "HDR 2X" }                        
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
@@ -261,9 +265,136 @@ Item {
                     style: econComboBoxStyle
                     onCurrentIndexChanged: {
                         if(skipUpdateUIOnDewarp){
-			    h264camId.setDewarpMode(currentIndex)
+                            h264camId.setDewarpMode(currentIndex)
                         }
                         skipUpdateUIOnDewarp = true
+                    }
+                }
+
+                Text {
+                    id: roiAutoExpMode
+                    text: "--- ROI - Auto Exposure ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+
+                Row{
+                    spacing:38
+                    ExclusiveGroup { id: roiExpogroup }
+                    RadioButton {
+                        exclusiveGroup: roiExpogroup
+                        id: autoexpFull
+                        text: "Full"
+                        checked:true
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+
+                        onClicked: {
+                            h264camId.setROIAutoExposureMode(H264camera.ROI_FULL)
+                            autoExpoWinSizeCombo.enabled = false
+                        }
+                        Keys.onReturnPressed: {
+                            h264camId.setROIAutoExposureMode(H264camera.ROI_FULL)
+                            autoExpoWinSizeCombo.enabled = false
+                        }
+                    }
+                    RadioButton {
+                        exclusiveGroup: roiExpogroup
+                        id: autoexpManual
+                        text: "Manual"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        onClicked: {
+                            h264camId.setROIAutoExposureMode(H264camera.ROI_MANUAL)
+                             autoExpoWinSizeCombo.enabled = true
+                        }
+                        Keys.onReturnPressed: {
+                            h264camId.setROIAutoExposureMode(H264camera.ROI_MANUAL)
+                             autoExpoWinSizeCombo.enabled = true
+                        }
+                    }
+                }
+
+                Text {
+                            id: windowsize
+                            text: "--- ROI Window Size ---"
+                            font.pixelSize: 14
+                            font.family: "Ubuntu"
+                            color: "#ffffff"
+                            smooth: true
+                            Layout.alignment: Qt.AlignCenter
+                            opacity: 0.50196078431373
+                        }
+
+                ComboBox
+                {
+                    id: autoExpoWinSizeCombo
+                    enabled: (autoexpManual.enabled && autoexpManual.checked) ? true : false
+                    opacity: (autoexpManual.enabled && autoexpManual.checked) ? 1 : 0.1
+                    model: ListModel{
+                        ListElement {text : "1"}
+                        ListElement {text : "2"}
+                        ListElement {text : "3"}
+                        ListElement {text : "4"}
+                        ListElement {text : "5"}
+                        ListElement {text : "6"}
+                        ListElement {text : "7"}
+                        ListElement {text : "8"}
+                    }
+                    activeFocusOnPress: true
+                    style: econComboBoxStyle
+                    onCurrentIndexChanged: {
+                        h264camId.setROIExposureWindowSize(autoExpoWinSizeCombo.currentText)
+                    }
+                }
+
+                Text {
+                    id: gainCtrl
+                    text: "--- Gain Control ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+
+                ExclusiveGroup { id: gainGrp }
+                Row{
+                    spacing: 35
+                    RadioButton {
+                        exclusiveGroup: gainGrp
+                        checked: false
+                        id: gainLcg
+                        text: "LCG"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        onClicked: {
+                            h264camId.setGainMode(H264camera.GAIN_MIN)
+                        }
+                        Keys.onReturnPressed: {
+                            h264camId.setGainMode(H264camera.GAIN_MIN)
+                        }
+                    }
+                    RadioButton {
+                        exclusiveGroup: gainGrp
+                        checked: false
+                        id: gainHcg
+                        text: "HCG"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        onClicked: {
+                            h264camId.setGainMode(H264camera.GAIN_MAX)
+                        }
+                        Keys.onReturnPressed: {
+                            h264camId.setGainMode(H264camera.GAIN_MAX)
+                        }
                     }
                 }
 
@@ -377,15 +508,27 @@ Item {
             queryForHDRControl(queryType, hdrValue)
         }
 
-	onDewarpModeReceived:{
-	    queryForDewarpControl(queryType, dewarpValue)	
-	}
+        onGainModeReceived:{
+            queryForGainControl(queryType, gainValue)
+        }
+
+        onRoiModeReceived:{
+            queryForRoiMode(queryType, expMode)
+        }
+
+        onRoiWindowSizeReceived:{
+            queryForWindowSize(queryType, windowSize)
+        }
+
+        onDewarpModeReceived:{
+            queryForDewarpControl(queryType, dewarpValue)
+        }
 
         onNoiseReductionValueReceived:{
             queryForNoiseReductionControl(queryType, noiseReductionValue)
         }
 	
-	onTitleTextChanged: {
+        onTitleTextChanged: {
             displayMessageBox(qsTr(_title), qsTr(_text))
         }
     }
@@ -446,7 +589,7 @@ Item {
     }
 
     function setToDefaultValues(){
-	h264camId.setDefault()
+        h264camId.setDefault()
         getValuesFromCamera(H264camera.UVC_GET_CUR)
     }
 
@@ -520,15 +663,48 @@ Item {
             case H264camera.HDR_1X:
                 hdrCombo.currentIndex = 1
                break
-	    case H264camera.HDR_2X:
+            case H264camera.HDR_2X:
                 hdrCombo.currentIndex = 2
-                break
-            case H264camera.HDR_NIGHTMODE:
-                hdrCombo.currentIndex = 3
-               break
+                break            
             }
         }
     }
+
+   function queryForGainControl(queryType, gainVal){
+       if(queryType == H264camera.UVC_GET_CUR){
+           switch(gainVal){
+           case H264camera.GAIN_MIN:
+               gainLcg.checked = true
+               break
+           case H264camera.GAIN_MAX:
+               gainHcg.checked = true
+               break
+           }
+       }
+
+   }
+
+
+   function queryForRoiMode(queryType, expMode){
+       if(queryType == H264camera.UVC_GET_CUR){
+           switch(expMode){
+           case H264camera.ROI_FULL:
+               autoexpFull.checked = true
+               break
+           case H264camera.ROI_MANUAL:
+               autoexpManual.checked = true
+               break
+           }
+       }
+   }
+
+
+   function queryForWindowSize(queryType, windowSize){
+       if(queryType == H264camera.UVC_GET_CUR){
+            autoExpoWinSizeCombo.currentIndex = windowSize-1
+       }
+   }
+
 
     function queryForDewarpControl(queryType, dewarpValue){
 	if(queryType == H264camera.UVC_GET_CUR){
@@ -584,12 +760,16 @@ Item {
 
 
     function getValuesFromCamera(valueToGet){
+
         h264camId.getBitrate(valueToGet)
         h264camId.getQFactor(valueToGet)
-        h264camId.getHDRMode(valueToGet)        
+        h264camId.getHDRMode(valueToGet)
+        h264camId.getGainMode(valueToGet)
         h264camId.getNoiseReductionValue(valueToGet)
         h264camId.getH264Quality(valueToGet)
-	h264camId.getDewarpMode(valueToGet)
+        h264camId.getDewarpMode(valueToGet)
+        h264camId.getROIAutoExposureMode(valueToGet)
+        h264camId.getROIExposureWindowSize(valueToGet)
     }
 
     // get minimum , maximum and step size values for bitrate, qfactor control

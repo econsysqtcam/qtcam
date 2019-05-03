@@ -183,7 +183,8 @@ public:
                                    unsigned long *jpegsize, unsigned char *dstbuf, int w, int h,
                                    int jpegqual, int tilew, int tileh,unsigned char **pic);
 
-  
+    // Added by Sankari: 25 Apr 2019. To avoid preview hang while recording video.
+    static void captureVideoInThread(Videostreaming *obj);
     double getTimeInSecs(void);
     void freeBuffer(unsigned char *ptr);
 

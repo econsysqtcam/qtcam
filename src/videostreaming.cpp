@@ -433,7 +433,8 @@ void FrameRenderer::drawRGBBUffer(){
 /**
  * @brief FrameRenderer::drawYUYVBUffer - Shader for yuyv to RGB conversion and render buffer
  */
-void FrameRenderer::drawYUYVBUffer(){    
+void FrameRenderer::drawYUYVBUffer(){
+
     if (!m_programYUYV) {
             initializeOpenGLFunctions();
             m_programYUYV = new QOpenGLShaderProgram();
@@ -813,6 +814,7 @@ void Videostreaming::capFrame()
         if(!y16BayerFormat){ //  y16 bayer format means these conversions are not needed. Calculations are done in "prepareBuffer" function itself.
             // Ex: cu40 camera
             if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16){ // y16
+                copy = m_capSrcFormat;
                 copy.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
                 err = v4lconvert_convert(m_convertData, &copy, &m_capDestFormat,
                                          (unsigned char *)m_renderer->yuvBuffer, buf.bytesused,
@@ -1663,7 +1665,8 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
             switch(pixformat){
                 case V4L2_PIX_FMT_YUYV:{
                     m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
-                    m_renderer->yuvBuffer = (uint8_t *)inputbuffer; /* directly giving yuyv to render */
+                   // m_renderer->yuvBuffer = (uint8_t *)inputbuffer;
+                      memcpy(m_renderer->yuvBuffer, (uint8_t *)inputbuffer, width*height*2);/* directly giving yuyv to render */
                 }
                 break;
 
@@ -1750,7 +1753,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         #endif
                             videoEncoder->writeH264Image(inputbuffer, bytesUsed);
                         }else{
-                            captureVideo();
+                             QtConcurrent::run(captureVideoInThread, this);
                         }
                 }
             }
@@ -1758,6 +1761,14 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         m_renderer->renderyuyvMutex.unlock();
     }
     return true;
+}
+
+/**
+ * @brief Videostreaming::captureVideoInThread - Record video in separate thread (YUYV buffer)
+ * @param obj - passing Videostreaming class object
+ */
+void Videostreaming::captureVideoInThread(Videostreaming *obj){
+    emit obj->captureVideo();
 }
 
 // Added by Sankari - 04 Jan 2017
@@ -2112,7 +2123,8 @@ QString Videostreaming::getImageFormatType(){
 }
 
 
-void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint burstLength){    
+void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint burstLength){
+
     captureTime.start();
     m_burstShot = true;
     m_snapShot = false;

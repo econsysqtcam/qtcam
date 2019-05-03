@@ -21,7 +21,16 @@
 #define V4L2_CID_XU_NOISE_REDUCION          0x08  //0x0A046DF9
 #define V4L2_CID_XU_DEFAULT                 0x06
 #define V4L2_CID_XU_H264QUALITY             0x09
-#define V4L2_CID_XU_DEWARPING		    0x0A
+#define V4L2_CID_XU_DEWARPING       	    0x0A
+#define V4L2_CID_XU_EXPOSURE_ROI_MODE            0x0C
+#define V4L2_CID_XU_EXPOSURE_ROI_COORDINATES     0x0D
+#define V4L2_CID_XU_EXPOSURE_ROI_WINSIZE         0x0E
+
+#define EXTENSION_UNIT_ID                   3
+#define XU_ROI_EXPOSURE_OFF                 0xC0
+#define XU_ROI_EXPOSURE_ON                  0xD0
+#define XU_ROI_EXPOSURE_WINDOW_SIZE         0xE0
+
 #define EXTENSION_UNIT_ID                   3
 
 class H264Camera: public QObject, public v4l2
@@ -37,6 +46,9 @@ private:
      */
     // set the current value into the camera.
     bool setCurrentValueCmd(__u8 controlId, uint16_t setVal);
+
+
+    bool setArrayOfValues(__u8 controlId, uint32_t setVal);
 
     /**
      * @brief UVCExtCx3SNI::getValueCmd - get Current value command multiple values
@@ -77,8 +89,7 @@ public:
     enum hdrModes{
         HDR_OFF = 0x00,
         HDR_1X = 0x01,
-        HDR_2X = 0x02,
-	HDR_NIGHTMODE = 0x03
+        HDR_2X = 0x02
     };
     Q_ENUMS(hdrModes) 
 
@@ -86,7 +97,19 @@ public:
         DEWARP_OFF = 0x00,
         DEWARP_ON = 0x01,
     };
-    Q_ENUMS(dewarpModes)  
+    Q_ENUMS(dewarpModes)
+
+    enum gainModes{
+        GAIN_MIN = 0x00,
+        GAIN_MAX = 0x01,
+    };
+    Q_ENUMS(gainModes)
+
+    enum camROIAutoExpMode {
+        ROI_FULL = 0x00,
+        ROI_MANUAL = 0x01
+    };
+    Q_ENUMS(camROIAutoExpMode)
 
 
 signals:    
@@ -94,8 +117,11 @@ signals:
     void qFactorReceived(uint queryType, uint qFactorValue);
     void h264QualityReceived(uint queryType, uint qualityValue);
     void hdrModeReceived(uint queryType, uint hdrValue);
+    void gainModeReceived(uint queryType, uint gainValue);
     void noiseReductionValueReceived(uint queryType, uint noiseReductionValue);
     void dewarpModeReceived(uint queryType, uint dewarpValue);
+    void roiModeReceived(uint queryType, uint expMode);
+    void roiWindowSizeReceived(uint queryType, uint windowSize);
     void titleTextChanged(QString _title, QString _text);
 
 public slots:
@@ -112,11 +138,21 @@ public slots:
     bool setHDRMode(QString hdrMode);
     bool getHDRMode(uint queryType);
 
+    bool setGainMode(QString gainMode);
+    bool getGainMode(uint queryType);
+
     bool setNoiseReductionValue(QString noiseReduceValue);
     bool getNoiseReductionValue(uint queryType);
 
     bool getDewarpMode(uint queryType);
     bool setDewarpMode(QString dewarpMode);
+
+    bool setROIAutoExposureMode(QString autoexpROIMode);
+    bool setROIExposureWindowSize(QString windowSize);
+    bool setROIExposureCoordinates(uint previewRenderWidth, uint previewRenderHeight, uint videoResolutionWidth, uint videoResolutionHeight, uint xCord, uint yCord);
+
+    bool getROIAutoExposureMode(uint queryType);
+    bool getROIExposureWindowSize(uint queryType);
 
     bool getFirmwareVersion();
 

@@ -59,15 +59,19 @@ public:
     static QStringListModel modelCam;
     static bool saveLog;
     static int event_fd;
+     QString usbhex;
 
 private:
     QDir qDir;
     struct v4l2_capability m_querycap;
     QMap<int, QString> cameraMap;
     QMap<int, QString> deviceNodeMap;
+    QMap<int, QString> libusbNodeMap;
 
 
 public slots:
+
+    QString  getUsbSpeed(QString busInfo);
     /**
      * @brief Check e-con Cameras
      *  - List all the camera devices detected in the system
@@ -137,12 +141,14 @@ public slots:
 
      // open event node file path  - open device event path file Ex: /dev/input/by-path/pci-0000:00:1a.0-usb-0:1.4:1.0-event
     void openEventNode(QString businfo);
+    void getPort();
 
 signals:
 
     void setFirstCamDevice(int);
     void setCamName(QString);
     void logHandle(QtMsgType,QString);
+    void signalForUsbSpeed(QString bcdusb);
     /**
      * @brief currentlySelectedCameraEnum - This signal is used to emit selected camera enum value to
      * qtcam.qml file

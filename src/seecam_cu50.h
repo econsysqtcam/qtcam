@@ -32,6 +32,7 @@ public:
 signals:
     void updateFlashCheckBox(QVariant flash_Check_state);
     void updateTorchCheckBox(QVariant torch_Check_state);
+    void updateFrameToSkipFromCam50(uint stillSkip);
 
 public slots:
     /**
@@ -45,6 +46,7 @@ public slots:
      *  - Get the flash on/off value from the see3cam_control class
      */
     void getFlashLevel();
+    void setStillSkipCount(QString port);
 };
 
 #endif // SEECAM_CU50_H
