@@ -44,11 +44,6 @@ Item {
         {
             root.enableVideoPin(true);
         }
-        onUsbSpeed:{
-
-              seecam50.setStillSkipCount(usbPort)
-        }
-
         onGetStillImageFormats:
         {
             var stillImageFormat = []
@@ -509,10 +504,7 @@ Item {
                 flash_ctrl.checked =  false;
             }
         }
-        onUpdateFrameToSkipFromCam50:{
-            root.updateFrametoSkip(stillSkip)
-        }
-    }
+     }
 
     See3CamCtrl {
         id: see3camctrl

@@ -2,7 +2,6 @@ Qtcam Application - 22.0.1
 --------------------------
 * Added support for ROI Exposure and Removed Light mode in Hyperyon.
 * Fixed hang issue while capturing in see3camcu51.
-* Added support to get usbspeed and skipframes in see3camcu50 camera.
 
 Qtcam Application - 22.0.0
 --------------------------

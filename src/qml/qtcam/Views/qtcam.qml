@@ -59,7 +59,7 @@ Rectangle {
     //To grab preview Frames
     signal queryFrame(bool retriveframe,bool InFailureCase);
 
-    signal usbSpeed(var usbPort);
+
     property int burstLength;
     property bool vidFormatChanged: false
     property bool keyEventFiltering
@@ -666,7 +666,7 @@ Rectangle {
                         keyEventFiltering = false
                         vidstreamproperty.enabled = true                                                
                         webcamKeyAccept = true
-                        camproperty.getUsbSpeed(pciBusCamDetails)
+
 
                         vidstreamproperty.stopCapture()
                         vidstreamproperty.closeDevice()
@@ -714,8 +714,7 @@ Rectangle {
                         // Initially enable capture image when external keyevent is occured.
                         disableCaptureImage =  false
 
-                        //Added by Navya :30 Apr 2019 -To getusbspeed
-                        camproperty.getPort()
+
 
                     }
                 }
@@ -899,10 +898,7 @@ Rectangle {
         {
             selectedDeviceEnumValue = selectedDevice;
         }
-        onSignalForUsbSpeed:{
 
-           usbSpeed(bcdusb);
-        }
 
         // Added by Sankari: To notify user about warning
         // 07 Dec 2017
