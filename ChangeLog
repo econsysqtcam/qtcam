@@ -1,3 +1,10 @@
+Qtcam Application - 22.0.2
+--------------------------
+* Fixed crash issue while swiching resolutions in Hyperyon.
+* Fixed issue of stride while streaming in MJPG in Hyperyon.
+* Removed "YUY" encoder(raw video).
+* Fixed issues of see3cam cameras.
+
 Qtcam Application - 22.0.1
 --------------------------
 * Added support for ROI Exposure and Removed Light mode in Hyperyon.

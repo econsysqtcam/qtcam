@@ -131,19 +131,13 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
 
         pCodecCtx->codec_id = pOutputFormat->video_codec;
 #if !LIBAVCODEC_VER_AT_LEAST(54, 25)
-        if(encodeType == CODEC_ID_RAWVIDEO){
-            pCodecCtx->pix_fmt =  PIX_FMT_YUYV422;//AV_PIX_FMT_YUV444P;//AV_PIX_FMT_YUV422P;//PIX_FMT_YUYV422;//PIX_FMT_YUV420P;
-        }
-        else if(encodeType == CODEC_ID_MJPEG)
+        if(encodeType == CODEC_ID_MJPEG)
             pCodecCtx->pix_fmt =  PIX_FMT_YUVJ420P;
         else {
             pCodecCtx->pix_fmt =  PIX_FMT_YUV420P;
         }
 #else
-        if(encodeType == AV_CODEC_ID_RAWVIDEO){
-            pCodecCtx->pix_fmt =  AV_PIX_FMT_YUYV422;//AV_PIX_FMT_YUV444P;//AV_PIX_FMT_YUV422P;//PIX_FMT_YUYV422;//PIX_FMT_YUV420P;
-        }
-        else if(encodeType == AV_CODEC_ID_MJPEG)
+        if(encodeType == AV_CODEC_ID_MJPEG)
             pCodecCtx->pix_fmt =  AV_PIX_FMT_YUVJ420P;
         else {
             pCodecCtx->pix_fmt =  AV_PIX_FMT_YUV420P;

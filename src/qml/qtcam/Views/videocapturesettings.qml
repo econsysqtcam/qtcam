@@ -40,6 +40,7 @@ Item {
     property string videoColorComboIndex : color_comp_box_VideoPin.currentIndex.toString()
     property string videoFrameRate : frame_rate_box.currentText.toString()
     property string videoFrameRateIndex : frame_rate_box.currentIndex.toString()
+    property string videoOutputSize : output_size_box_Video.currentText.toString()
 
     Action {
         id: videoCap
@@ -403,8 +404,7 @@ Item {
                             }
                         }
                         onCurrentIndexChanged: {
-                            JS.videoEncoder = fileEncoder.currentIndex
-                            root.videoEncoderSelected(currentIndex)                            
+                            JS.videoEncoder = fileEncoder.currentIndex                                              
                         }
                     }
 

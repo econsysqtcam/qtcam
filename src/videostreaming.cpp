@@ -2468,25 +2468,11 @@ void Videostreaming::displayStillResolution() {
 }
 
 void Videostreaming::displayEncoderList(){
-    QStringList encoders;
-    QString fileContent;
-    encoders.clear();
-    // read
-    QFile f("/etc/issue");
-    if (f.open(QFile::ReadOnly)){
-        QTextStream in(&f);
-        fileContent.append(in.readAll());
-        if((-1 != fileContent.indexOf("12.04")) || (-1 != fileContent.indexOf("14.04"))){
-            encoders<<"YUY"<<"MJPG"<<"H264";
-            ubuntuVersion = "<15"; // version less than 15 [ Here ubuntu 12.04 and ubuntu 14.04 ]
-            emit ubuntuVersionSelectedLessThan16(); // signal to qml that ubuntu version selected is less than 16.04
-
-        }else{
-            encoders<<"MJPG"<<"H264";
-            ubuntuVersion = ">=15"; // version >=  15 [ Here ubuntu 15.10 and ubuntu 16.04 , Linux Mint 18, ubuntu 17.04 ]            
-        }
-        encoderList.setStringList(encoders);
-    }
+    QStringList encoders;    
+    encoders.clear();    
+    encoders<<"MJPG"<<"H264";
+    emit ubuntuVersionSelectedLessThan16(); // signal to qml that ubuntu version selected is less than 16.04
+    encoderList.setStringList(encoders);
 }
 
 void Videostreaming::displayVideoResolution() {
@@ -2804,8 +2790,7 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
     if(videoFormatType.isEmpty()) {
         videoFormatType = "avi";        //Application never enters in this condition
     }
-#if !LIBAVCODEC_VER_AT_LEAST(54, 25)
-    if(ubuntuVersion == ">=15"){
+#if !LIBAVCODEC_VER_AT_LEAST(54, 25)   
         switch(videoEncoderType) {
         case 0:
             videoEncoderType = CODEC_ID_MJPEG;
@@ -2813,48 +2798,17 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
         case 1:
             videoEncoderType = CODEC_ID_H264;
             break;        
-        }
-    } else if(ubuntuVersion == "<15"){
-        switch(videoEncoderType) {
-        case 0:
-            videoEncoderType = CODEC_ID_RAWVIDEO;
-            break;
-        case 1:
-            videoEncoderType = CODEC_ID_MJPEG;
-            break;
-        case 2:
-            videoEncoderType = CODEC_ID_H264;
-            break;        
-        }
-
+        }        
+#else    
+    switch(videoEncoderType) {
+    case 0:
+        videoEncoderType = AV_CODEC_ID_MJPEG;
+        break;
+    case 1:
+        videoEncoderType = AV_CODEC_ID_H264;
+        break;
     }
-#else
-    if(ubuntuVersion == ">=15"){
-        switch(videoEncoderType) {
-
-        case 0:
-            videoEncoderType = AV_CODEC_ID_MJPEG;
-            break;
-        case 1:
-            videoEncoderType = AV_CODEC_ID_H264;
-            break;        
-        }
-    } else if(ubuntuVersion == "<15"){
-        switch(videoEncoderType) {
-        case 0:
-            videoEncoderType = AV_CODEC_ID_RAWVIDEO;
-            break;
-        case 1:
-            videoEncoderType = AV_CODEC_ID_MJPEG;
-            break;
-        case 2:
-            videoEncoderType = AV_CODEC_ID_H264;
-            break;        
-        }
-
-    }
-#endif    
-
+#endif
     fileName = fileLocation +"/Qtcam-" + QDateTime::currentDateTime().toString("yy_MM_dd:hh_mm_ss")+"."+ videoFormatType;
 
     // Fixed issue: Incorrect frame rate for video recording

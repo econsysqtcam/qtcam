@@ -113,7 +113,7 @@ Rectangle {
     property bool audioCaptureChildVisible: false
     property bool videoSettingsChildVisible: false    
 
-    property bool ubuntuversionLessThan16: false
+   
     property bool disableAudio: false
 
     //video scrollview visible height
@@ -307,32 +307,6 @@ Rectangle {
         anchors.leftMargin: sideBarItems.visible ? parent.width*0.15 : 0
         width: sideBarItems.visible ? parent.width * 0.85 : parent.width
         height: layer_0.height
-//        MouseArea {
-//            anchors.fill: parent
-//            acceptedButtons: Qt.LeftButton | Qt.RightButton
-//            onReleased:
-//            {
-
-//                if (mouse.button == Qt.LeftButton){
-//                    if(closeSideBarClicked){
-//                        captureRecordWhenSideBarItemsClosed()
-//                    }
-//                    else{
-//                        if(captureVideoRecordRootObject.captureBtnVisible){
-//                            mouseClickCapture()
-//                        } else if(captureVideoRecordRootObject.recordBtnVisible){
-//                            videoRecordBegin()
-//                        } else if(captureVideoRecordRootObject.recordStopBtnVisible){
-//                            videoSaveVideo()
-//                        }
-//                    }
-//                }else if(mouse.button == Qt.RightButton){
-//                    // passing mouse x,y cororinates, preview width and height
-//
-//                    mouseRightClicked(mouse.x, mouse.y, previewwindow.width, previewwindow.height)
-//                }
-//            }
-//        }
 
    }
         Videostreaming {
@@ -351,12 +325,7 @@ Rectangle {
                 pciBusCamDetails = businfo
             }
 
-            onUbuntuVersionSelectedLessThan16:{
-                ubuntuversionLessThan16 = true
-                disableAudioSettings(true) // In ubuntu 12.04 and 14.04 (Video capture settings), video encoder index is 0,(YUY - raw format).
-                disableAudio = true          // so disable audio settings
-            }
-
+           
             onTitleTextChanged:{
                 vidstreamproperty.enabled = true
                 captureBtnEnable(true)
@@ -945,25 +914,7 @@ Rectangle {
         vidstreamproperty.updatePreviewFrameSkip(previewSkip)
     }
 
-    function videoEncoderSelected(encoderIndex){
-        // Added by Sankari : Mar 7 2019
-        // ubuntu 14.04 and ubuntu 12.04
-            // index 0 - YUY
-            // index 1 - MJPG
-            // index 2 - H264
-
-        // ubuntu 14.04 and ubuntu 12.04
-            // index 0 - MJPG
-            // index 1 - H264
-         if(encoderIndex == 0 && ubuntuversionLessThan16){ // If ubuntu version is less than 16.04(i.e, 12.04 and 14.04),
-                                                           // If index is 0 (YUY), disable audio capture settings
-             disableAudioSettings(true)
-	     disableAudio = true
-         }else{
-             disableAudioSettings(false)
-	     disableAudio = false
-         }
-    }
+   
     function retrieveFrameFromStorageCamera(){
         setStillSettings()
         vidstreamproperty.retrieveFrameFromStoreCam()
@@ -1003,8 +954,8 @@ Rectangle {
             vidstreamproperty.width = str.toString().split("x")[0].toString()
             vidstreamproperty.height = str.toString().split("x")[1].toString()
         }
+        //Added by Navya -To avoid unwanted call for grabPreviewFrame in case of storagecamera by giving delay.
         vidstreamproperty.resolnSwitch()
-    //    vidstreamproperty.stopCapture()
         if(vidFormatChanged){
             vidstreamproperty.lastPreviewResolution(vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString(),format)         
             JS.videoCaptureResolution = vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString()
@@ -1034,6 +985,7 @@ Rectangle {
         if(JS.videoCaptureFormat !== JS.stillCaptureFormat  || JS.stillCaptureResolution !== JS.videoCaptureResolution)
         {
             vidstreamproperty.vidCapFormatChanged(JS.videoCaptureFormat)
+            checkForResoln()
             vidstreamproperty.setResoultion(JS.videoCaptureResolution)
         }
         vidstreamproperty.startAgain()
@@ -1532,6 +1484,7 @@ Rectangle {
    {
        root.updateScenePreview(vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString(),colorComboText,frameRateIndex)
        vidstreamproperty.displayVideoResolution()
+       vidstreamproperty.lastPreviewResolution(vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString(),colorComboText)
    }
    function imageSettingVisibleChanged()
    {
@@ -1554,5 +1507,9 @@ Rectangle {
    function enableTimerforGrabPreviewFrame(timerstatus)
    {
        vidstreamproperty.enableTimer(timerstatus);
+   }
+   function checkForResoln()
+   {
+          JS.videoCaptureResolution = videoSettingsRootObject.videoOutputSize
    }
 }
