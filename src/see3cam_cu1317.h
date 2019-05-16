@@ -284,8 +284,8 @@ public slots:
 
 
     bool setToDefault();
-    bool initStoreCAM1335(char *hidDeviceName);
-    void deinitStoreCAM1335();
+    bool initSee3CAM_CU1317(char *hidDeviceName);
+    void deinitSee3CAM_CU1317();
     bool readFirmwareVersion(uint *pMajorVersion, uint *pMinorVersion1, uint *sdkVersion, uint *svnVersion);
     bool resetTimeStamp();
 

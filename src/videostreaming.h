@@ -46,6 +46,7 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QMutex>
+#include <unistd.h>
 
 class FrameRenderer : public QObject, protected QOpenGLFunctions
 {

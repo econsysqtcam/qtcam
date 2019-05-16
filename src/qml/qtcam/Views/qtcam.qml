@@ -31,6 +31,7 @@ import econ.camera.see3camcu1317 1.0
 import econ.camera.see3cam50 1.0
 import "../JavaScriptFiles/tempValue.js" as JS
 import cameraenum 1.0
+import econ.camera.uvcsettings 1.0
 
 Rectangle {
     id: root
@@ -59,7 +60,7 @@ Rectangle {
     //To grab preview Frames
     signal queryFrame(bool retriveframe,bool InFailureCase);
 
-
+    signal usbSpeed(var usbPort);
     property int burstLength;
     property bool vidFormatChanged: false
     property bool keyEventFiltering
@@ -93,7 +94,7 @@ Rectangle {
     property variant videoSettingsRootObject
     property variant audioSettingsRootObject
     property variant captureVideoRecordRootObject
-
+    property variant uniqueSerialNumber
     property variant pciBusCamDetails
 
     //Disabling side bar controls - Added below by Dhurka
@@ -858,6 +859,13 @@ Rectangle {
     See3Cam50{
         id:see3camcu50
     }
+    See3camcu1317{
+        id:see3camcu1317
+    }
+    Uvccamera{
+        id: uvccam
+
+    }
 
     Camproperty {
         id: camproperty
@@ -1508,6 +1516,8 @@ Rectangle {
    {
        vidstreamproperty.enableTimer(timerstatus);
    }
+
+   // Added by Navya -To avoid crash in case of Hyperyon by setting correct resoln
    function checkForResoln()
    {
           JS.videoCaptureResolution = videoSettingsRootObject.videoOutputSize

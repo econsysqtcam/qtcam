@@ -46,6 +46,11 @@ class Cameraproperty : public QObject, public v4l2
 {
     Q_OBJECT
 public:
+    enum usbPort{
+        USB2_0 = 1,
+        USB3_0 = 2
+    };
+
     Cameraproperty();
     Cameraproperty(bool enableLog);
     ~Cameraproperty();
@@ -70,6 +75,7 @@ private:
 
 public slots:
 
+    int  getUsbSpeed(QString serialNumber);
     /**
      * @brief Check e-con Cameras
      *  - List all the camera devices detected in the system
@@ -162,6 +168,7 @@ signals:
     // Added by Sankari: To notify user about warning[Ex: hid access from uvccamera.cpp]
     // 07 Dec 2017
     void notifyUserInfo(QString title, QString text);
+    void usbSpeed(QString usbPort);
 };
 
 

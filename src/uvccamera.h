@@ -247,6 +247,8 @@ signals:
      * @brief currentlySelectedCameraEnum - This signal is used to emit selected camera enum value to camera property.cpp
      */
     void currentlySelectedCameraEnum(CommonEnums::ECameraNames);
+    void serialNumberToCheckUsbSpeed(QString serialnumber);
+
 
 public slots:
 
@@ -285,6 +287,7 @@ public slots:
      * @
      */
     void exitExtensionUnit();
+    QString retrieveSerialNumber();
 
     /**
      * @brief initExtensionUnitAscella

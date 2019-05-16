@@ -1077,7 +1077,7 @@ void See3CAM_CU1317::initializeBuffers(){
     memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
     memset(g_in_packet_buf, 0x00, sizeof(g_in_packet_buf));
 }
-bool See3CAM_CU1317::initStoreCAM1335(char *hidDeviceName)
+bool See3CAM_CU1317::initSee3CAM_CU1317(char *hidDeviceName)
 {
     initializeBuffers();
     if(hidDeviceName == NULL)
@@ -1132,7 +1132,7 @@ bool See3CAM_CU1317::initStoreCAM1335(char *hidDeviceName)
 //    }
     return true;
 }
-void See3CAM_CU1317::deinitStoreCAM1335()
+void See3CAM_CU1317::deinitSee3CAM_CU1317()
 {
     close(uvccamera::hid_fd);
 }

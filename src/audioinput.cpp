@@ -68,6 +68,7 @@ static int buffer_write_index = 0;/*current write index of buffer list*/
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
+
 QStringListModel AudioInput::audioinputDeviceList;
 QStringListModel AudioInput::audiosupportedFmtListModel;
 QStringListModel AudioInput::audioChannelCountModel;

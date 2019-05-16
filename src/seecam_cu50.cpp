@@ -36,17 +36,3 @@ void See3CAM_CU50::getTorchLevel() {
     emit updateTorchCheckBox(tmpStr);
 }
 
-// Added by Navya :30 Apr 2019
-// To skip Frames as per usbspeed
-void See3CAM_CU50::setStillSkipCount(QString port){
-    uint frameToSkip;
-    int n = port.toInt();   //Converting string to int
-
-    if(n < 300)
-        frameToSkip = 5;
-    else
-        frameToSkip = 8;
-
-    // send frame to skip values to qtcam.qml
-    emit updateFrameToSkipFromCam50(frameToSkip);
-}

@@ -35,6 +35,7 @@
 #include <QtGui/QOpenGLContext>
 #include <QtConcurrent>
 #include "see3cam_cu1317.h"
+#include "uvccamera.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
@@ -928,6 +929,7 @@ void Videostreaming::capFrame()
                         formatSaveSuccess(m_burstShot);
                     }
                     m_burstShot = false;
+                    m_snapShot = false;
                     // after taking shot(s), restore preview resoln and format.
                     switchToStillPreviewSettings(false);
                     retrieveframeStoreCamInCross = false;

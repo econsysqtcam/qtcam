@@ -954,6 +954,20 @@ Item {
         }
     }
 
+    Component {
+        id: econTextFieldStyle
+        TextFieldStyle {
+            textColor: "black"
+            background: Rectangle {
+                radius: 2
+                implicitWidth: 50
+                implicitHeight: 20
+                border.color: "#333"
+                border.width: 2
+                y: 1
+            }
+        }
+    }
     function displayMessageBox(title, text){
         messageDialog.title = qsTr(title)
         messageDialog.text = qsTr(text)

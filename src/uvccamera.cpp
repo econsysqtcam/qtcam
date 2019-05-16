@@ -619,7 +619,12 @@ void uvccamera::getFirmWareVersion() {
 }
 
 void uvccamera::getSerialNumber(){
-    emit serialNumber("Serial Number: "+serialNumberMap.value(openNode));
+     emit serialNumber("Serial Number: "+serialNumberMap.value(openNode));
+}
+
+QString uvccamera::retrieveSerialNumber()
+{
+    return serialNumberMap.value(openNode);
 }
 
 bool See3CAM_Control::getFlashState(quint8 *flashState) {
