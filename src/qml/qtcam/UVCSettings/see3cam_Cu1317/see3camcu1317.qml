@@ -702,20 +702,14 @@ Item {
                         text: "Store"
                         style: econButtonStyle
                         enabled: streamMasterOnDemand.checked ? true : false
-
                         opacity: enabled ? 1 : 0.1
-                        //                    enabled: true
-                        //                    opacity: 1
-
                         implicitHeight: 30
                         implicitWidth: 100
-                        onClicked: {
-                            storeFrame.enabled = true
+                        onClicked: {                          
                             storeImageInCamera()
                         }
                         Keys.onReturnPressed: {
-                            storeFrame.enabled = true
-                            storeImageInCamera()
+                           storeImageInCamera()
                         }
                     }
                     Text {
@@ -1210,7 +1204,7 @@ Item {
             see3camcu1317.setToDefault()
            //Added by Navya:28-Feb-2019 -To get a popup window
             messageDialog.title=qsTr("Restore Default")
-            messageDialog.text=qsTr("When we click extension unit restore default option, all the controls will be updated to their default values except stream mode. The stream mode control can be changed manually")
+            messageDialog.text=qsTr("When we click Extension Settings default option, all the controls will be updated to their default values except stream mode. The stream mode control can be changed manually")
              messageDialog.open()
             getValuesFromCamera()
             // Added by Sankari: 24 Apr 2017. To get preview in master mode
@@ -1561,8 +1555,6 @@ Item {
             }
 
             onStoreStillFrameSucceess:{
-                storeFrame.enabled = true
-
                 see3camcu1317.grabPreviewFrame()
             }
 

@@ -60,7 +60,7 @@ Rectangle {
     //To grab preview Frames
     signal queryFrame(bool retriveframe,bool InFailureCase);
 
-    signal usbSpeed(var usbPort);
+
     property int burstLength;
     property bool vidFormatChanged: false
     property bool keyEventFiltering
@@ -94,7 +94,6 @@ Rectangle {
     property variant videoSettingsRootObject
     property variant audioSettingsRootObject
     property variant captureVideoRecordRootObject
-    property variant uniqueSerialNumber
     property variant pciBusCamDetails
 
     //Disabling side bar controls - Added below by Dhurka
@@ -637,7 +636,6 @@ Rectangle {
                         vidstreamproperty.enabled = true                                                
                         webcamKeyAccept = true
 
-
                         vidstreamproperty.stopCapture()
                         vidstreamproperty.closeDevice()
                         selectCameraSettings()
@@ -659,14 +657,14 @@ Rectangle {
                         // Added by Sankari: 12 Feb 2018 - open camera key event file node using pci bus info.
                         camproperty.openEventNode(pciBusCamDetails)
                         updateFPS(stillSettingsRootObject.stillClorComboValue, stillSettingsRootObject.stillOutputTextValue)
-//                        vidstreamproperty.startAgain()
+
                         vidstreamproperty.width = stillSettingsRootObject.stillOutputTextValue.split("x")[0].toString()
                         vidstreamproperty.height = stillSettingsRootObject.stillOutputTextValue.split("x")[1].toString()
                         vidstreamproperty.lastPreviewResolution(stillSettingsRootObject.stillOutputTextValue,stillSettingsRootObject.stillColorComboIndexValue)
                         JS.stillCaptureFormat = stillSettingsRootObject.stillColorComboIndexValue
                         JS.stillCaptureFormatIndex = stillSettingsRootObject.stillColorComboIndexValue*1
                         JS.stillCaptureResolution = stillSettingsRootObject.stillOutputTextValue.toString()
-                          JS.stillCaptureResolutionIndex = stillSettingsRootObject.stillResolutionIndex
+                        JS.stillCaptureResolutionIndex = stillSettingsRootObject.stillResolutionIndex
                         JS.videoCaptureFormat = JS.stillCaptureFormat
                         JS.videoCaptureResolution = JS.stillCaptureResolution
                         JS.videocaptureFps = videoSettingsRootObject.videoFrameRate
@@ -683,8 +681,6 @@ Rectangle {
 
                         // Initially enable capture image when external keyevent is occured.
                         disableCaptureImage =  false
-
-
 
                     }
                 }

@@ -168,7 +168,7 @@ signals:
     // Added by Sankari: To notify user about warning[Ex: hid access from uvccamera.cpp]
     // 07 Dec 2017
     void notifyUserInfo(QString title, QString text);
-    void usbSpeed(QString usbPort);
+
 };
 
 

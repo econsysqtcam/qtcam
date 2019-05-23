@@ -1,6 +1,8 @@
 Qtcam Application - 22.0.3
 --------------------------
-* Added Skipframes in See3CAM_CU50 camera based on usbSpeed.
+* Fixed issue for store button enabled in case of trigger modes for See3CAM_CU1317 camera.
+* Made necessary changes in document for See3CAM_CU1317 camera.
+* Added SkipFrames based on UsbSpeed for See3CAM_CU50 camera. 
  
 Qtcam Application - 22.0.2
 --------------------------
