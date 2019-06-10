@@ -1,3 +1,10 @@
+Qtcam Application - 22.0.4
+--------------------------
+* Implemented LED Control and Flicker Detection Control for See3CAM_CU1317 camera.
+* Implemented Flicker Detection Control for See3CAM_CU135,See3CAM_CU55,See3CAM_CU30,See3CAM_130 cameras and disabled powerline Frequency in UVC Settings.
+* Implemented ROI Exposure only when HDR is OFF and getting RoiWindow Size from camera dynamically for Hyperyon.
+* Fixed issue of getting Dewarp State as ON on clicking default in Hyperyon.
+
 Qtcam Application - 22.0.3
 --------------------------
 * Fixed issue for store button enabled in case of trigger modes for See3CAM_CU1317 camera.
