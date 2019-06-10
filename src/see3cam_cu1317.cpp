@@ -1178,7 +1178,7 @@ bool See3CAM_CU1317::readFirmwareVersion(uint *pMajorVersion, uint *pMinorVersio
 
 bool See3CAM_CU1317::getLedControl()
 {
-   bool ledstatus,blueledstatus,greenledstatus,redledstatus;
+   bool ledstatus,powerctl,stream,trigger;
 
    // hid validation
    if(uvccamera::hid_fd < 0)
@@ -1201,12 +1201,10 @@ bool See3CAM_CU1317::getLedControl()
            g_in_packet_buf[1]==GET_LED_CONTROL_See3CAM_CU1317 &&
            g_in_packet_buf[6]==GET_SUCCESS) {
            ledstatus = g_in_packet_buf[3];
-           blueledstatus=g_in_packet_buf[4];
-           greenledstatus=g_in_packet_buf[5];
-           redledstatus=g_in_packet_buf[6];
-
-           emit ledControlStatus(ledstatus,blueledstatus,greenledstatus,redledstatus);
-
+           powerctl=g_in_packet_buf[4];
+           stream=g_in_packet_buf[6];
+           trigger=g_in_packet_buf[5];
+           emit ledControlStatus(ledstatus,powerctl,stream,trigger);
            return true;
        }
    }
@@ -1214,13 +1212,17 @@ bool See3CAM_CU1317::getLedControl()
 
 }
 
-/** breif description for setLedControl
- * ledstatus     -  whether ON/OFF
- * blueledstatus -  status of blue led
- * greenledstatus-  status of green led
- * redledstatus  -  status of red led     **/
+//Modified by Navya - 5th June 2019
 
-bool See3CAM_CU1317::setLedControl(bool ledstatus,bool blueledstatus,bool greenledstatus,bool redledstatus)
+/** breif description for setLedControl
+ * ledstatus       -  whether ON/OFF
+ * powerctl(red)   -  status of Power ON/OFF
+ * stream (blue)   -  status of Streaming
+ * trigger (green) -  status of Trigger Acknowledgement
+ * @return true/false
+ **/
+
+bool See3CAM_CU1317::setLedControl(bool ledstatus,bool powerctl,bool stream,bool trigger)
 {
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -1234,10 +1236,25 @@ bool See3CAM_CU1317::setLedControl(bool ledstatus,bool blueledstatus,bool greenl
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_See3CAM_CU1317; /* set camera control code */
     g_out_packet_buf[2] = SET_LED_CONTROL_See3CAM_CU1317; /* set led control code */
-    g_out_packet_buf[3] = ledstatus; /* actual led status */
-    g_out_packet_buf[4] = blueledstatus;
-    g_out_packet_buf[5] = greenledstatus;
-    g_out_packet_buf[6] = redledstatus;
+    if(ledstatus)
+        g_out_packet_buf[3] = ENABLE_LED_CONTROL_See3CAM_CU1317;
+    else
+        g_out_packet_buf[3] = DISABLE_LED_CONTROL_See3CAM_CU1317;
+
+    if(powerctl)
+        g_out_packet_buf[4] = ENABLE_POWERON_CONTROL_See3CAM_CU1317;
+    else
+        g_out_packet_buf[4] = DISABLE_POWERON_CONTROL_See3CAM_CU1317;
+
+    if(stream)
+        g_out_packet_buf[6] = ENABLE_STREAMING_CONTROL_See3CAM_CU1317;
+    else
+        g_out_packet_buf[6] = DISABLE_STREAMING_CONTROL_See3CAM_CU1317;
+
+    if(trigger)
+        g_out_packet_buf[5] = ENABLE_TRIGGERACK_CONTROL_See3CAM_CU1317;
+    else
+        g_out_packet_buf[5] = DISABLE_TRIGGERACK_CONTROL_See3CAM_CU1317;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -1245,7 +1262,42 @@ bool See3CAM_CU1317::setLedControl(bool ledstatus,bool blueledstatus,bool greenl
 
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_See3CAM_CU1317 &&
-            g_in_packet_buf[1]==SET_LED_CONTROL_See3CAM_CU1317 &&
+                  g_in_packet_buf[1]==SET_LED_CONTROL_See3CAM_CU1317 &&
+                  g_in_packet_buf[6]==SET_SUCCESS) {
+
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_130::setFlickerDetection - setting the flicker control.
+ * @param flickerMode - mode we set for camera
+ * @return true/false
+ */
+
+bool See3CAM_CU1317::setFlickerDetection(camFlickerMode flickerMode){
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_See3CAM_CU1317; /* camera id */
+    g_out_packet_buf[2] = SET_FLICKER_DETECTION; /* set flicker detection command */
+    g_out_packet_buf[3] = flickerMode; /* flicker detection mode to set */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_See3CAM_CU1317 &&
+            g_in_packet_buf[1]==SET_FLICKER_DETECTION &&
             g_in_packet_buf[6]==SET_SUCCESS) {
 
             return true;
@@ -1253,6 +1305,41 @@ bool See3CAM_CU1317::setLedControl(bool ledstatus,bool blueledstatus,bool greenl
     }
     return false;
 }
+
+/**
+ * @brief See3CAM_CU1317::getFlickerDetection - getting the flicker control we set,from the camera.
+ * @return true/false
+ */
+
+bool See3CAM_CU1317::getFlickerDetection()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_See3CAM_CU1317; /* camera id */
+    g_out_packet_buf[2] = GET_FLICKER_DETECTION; /* get flicker detection command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_See3CAM_CU1317 &&
+            g_in_packet_buf[1]==GET_FLICKER_DETECTION &&
+            g_in_packet_buf[6]==GET_SUCCESS) {
+            emit flickerDetectionMode(g_in_packet_buf[2]);
+            return true;
+        }
+    }
+    return false;
+}
+
 bool See3CAM_CU1317::resetTimeStamp()
 {
 

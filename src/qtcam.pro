@@ -32,8 +32,8 @@ SOURCES += main.cpp \
     ascella.cpp \
     seecam_cu30.cpp \
     see3cam_130.cpp \
-	see3cam_30.cpp \
-	seecam_81.cpp \
+    see3cam_30.cpp \
+    seecam_81.cpp \
     see3cam_cu135.cpp \
     see3cam_cu40.cpp\
     see3cam_cu20.cpp\
@@ -75,10 +75,10 @@ HEADERS += \
     see3cam_cu130.h \
     h264decoder.h \
     ascella.h \
-	seecam_cu30.h \
-	common.h \
+    seecam_cu30.h \
+    common.h \
     see3cam_130.h \
-	common_enums.h \
+    common_enums.h \
     see3cam_30.h \
     seecam_81.h \
     see3cam_cu135.h \
@@ -104,6 +104,11 @@ UNAME_MACHINE_32BIT = $$system(dpkg --print-architecture | grep -o "i386")
 UNAME_MACHINE_64BIT = $$system(dpkg --print-architecture | grep -o "amd64")
 BOARD_ARM64 = $$system(dpkg --print-architecture | grep -o "arm64")
 
+DISTRIBUTION_NAME = $$system(lsb_release -a | grep -o "bionic")
+contains(DISTRIBUTION_NAME,bionic):{
+QMAKE_CXX = "g++-5"
+QMAKE_CXXFLAGS += -std=c++11
+}
 
 contains(UNAME_MACHINE_64BIT, amd64):{
     message("x86_64 bit libs")

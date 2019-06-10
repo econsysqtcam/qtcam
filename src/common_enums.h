@@ -52,8 +52,8 @@ public:
         NILECAM30_USB,
 	// Added by Sankari - 11 Dec 2018
         ECAM22_USB,
-    SEE3CAM_CU55,  // SEE3CAM_AR0521
-     SEE3CAM_CU1317 // STORECAM_1335
+        SEE3CAM_CU55,  // SEE3CAM_AR0521
+        SEE3CAM_CU1317 // STORECAM_1335
 
     }ECameraNames;
     //Enum for capture shot type
@@ -69,7 +69,8 @@ public:
    // Added by Sankari - 02 Dec 2018 - render shader program usage
     typedef enum
     {
-        RGB_BUFFER_RENDER = 1, // rgba
+        NO_RENDER = 0,      // stop render for skipframes
+        RGB_BUFFER_RENDER , // rgba
         YUYV_BUFFER_RENDER
     }ERenderBuffer;
 	

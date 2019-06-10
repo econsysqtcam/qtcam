@@ -34,6 +34,9 @@ Item {
     property bool skipUpdateUIiHDR: false
     property bool skipUpdateUIOnExpWindowSize: false
     property bool setButtonClicked: false
+    property bool skipUpdateUIFlickerCtrl:false
+    property int  flickerCtrl
+
 
     // Used when selecting auto exposure in image Quality settings menu
 
@@ -566,6 +569,7 @@ Item {
                             activeFocusOnPress: true          // grabPreviewFrame
                             style: econRadioButtonStyle
                             onClicked:{
+                               root.checkForTriggerMode(false)
                                root.skipFrameInPreview(true)
                                setMasterOnDemandMode()
                                see3camcu1317.grabPreviewFrame()
@@ -586,6 +590,8 @@ Item {
                                 activeFocusOnPress: true
                                 style: econRadioButtonStyle
                                 onClicked: {
+                                 
+                                    root.checkForTriggerMode(true)
                                     root.captureBtnEnable(false)
                                     root.videoRecordBtnEnable(false)
                                     see3camcu1317.setStreamMode(See3camcu1317.STREAM_SOFTWARE_TRIGGER)
@@ -626,6 +632,8 @@ Item {
                                 activeFocusOnPress: true
                                 style: econRadioButtonStyle
                                 onClicked: {
+                                 
+                                    root.checkForTriggerMode(true)
                                     root.captureBtnEnable(false)
                                     root.videoRecordBtnEnable(false)
                                     see3camcu1317.setStreamMode(See3camcu1317.STREAM_HARDWARE_TRIGGER)
@@ -1104,6 +1112,132 @@ Item {
                         }
                     }
 
+                    Text {
+                        id: flickerctrlField
+                        text: "-- Flicker Detection Control --"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        Layout.alignment: Qt.AlignCenter
+                        opacity: 0.50196078431373
+                    }
+
+                    ComboBox
+                    {
+                        id: flickercombo
+                        opacity: 1
+                        enabled: true
+                        model: ListModel {
+                            ListElement { text: "AUTO" }
+                            ListElement { text: "50Hz" }
+                            ListElement { text: "60Hz" }
+                            ListElement { text: "DISABLE" }
+                        }
+                        activeFocusOnPress: true
+                        style: econComboBoxStyle
+                        onCurrentIndexChanged: {
+                            if(skipUpdateUIFlickerCtrl){
+                               setFlickerDetectionFn();
+                            }
+                        }
+                    }
+
+                    Text {
+                        id: ledCtrl
+                        text: "--- LED Control ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        Layout.alignment: Qt.AlignCenter
+                        opacity: 0.50196078431373
+                    }
+
+                    Row{
+                        spacing: 62
+                        ExclusiveGroup { id:ledControlGroup  }
+                        RadioButton {
+                            exclusiveGroup: ledControlGroup
+                            id: ledctrlenable
+                            text: "Enable"
+                            activeFocusOnPress: true
+                            style: econRadioButtonStyle
+                            onClicked:{
+                                see3camcu1317.setLedControl(true,powerOn.checked,streaming.checked,trigger.checked)
+                            }
+                            Keys.onReturnPressed: {
+                                 see3camcu1317.setLedControl(true,powerOn.checked,streaming.checked,trigger.checked)
+                            }
+                        }
+                        RadioButton {
+                            exclusiveGroup: ledControlGroup
+                            id: ledctrldisable
+                            text: "Disable"
+                            activeFocusOnPress: true
+                            style: econRadioButtonStyle
+                            onClicked: {
+                                    see3camcu1317.setLedControl(false,powerOn.checked,streaming.checked,trigger.checked)
+                            }
+                            Keys.onReturnPressed: {
+                                     see3camcu1317.setLedControl(false,powerOn.checked,streaming.checked,trigger.checked)
+                            }
+                        }
+                    }
+
+                    Grid{
+                        columns :2
+                        spacing: 10
+                        ExclusiveGroup { id: enableledGrp }
+                        CheckBox {
+                            id: powerOn
+                            activeFocusOnPress : true
+                            text: "PowerON"
+                            style: econCheckBoxStyle
+                            enabled: ledctrlenable.checked ? true : false
+                            opacity: enabled ? 1 : 0.1
+                            onClicked:{
+                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,trigger.checked)
+                            }
+                            Keys.onReturnPressed: {
+                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,trigger.checked)
+
+                            }
+                        }
+                        CheckBox {
+                            id: streaming
+                            activeFocusOnPress : true
+                            text: "Streaming"
+                            style: econCheckBoxStyle
+                            enabled: ledctrlenable.checked ? true : false
+                            opacity: enabled ? 1 : 0.1
+                            onClicked:{
+                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,trigger.checked)
+
+                            }
+                            Keys.onReturnPressed: {
+                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,trigger.checked)
+
+                            }
+                        }
+                        CheckBox {
+                            id: trigger
+                            activeFocusOnPress : true
+                            text: "Trigger ACK"
+                            style: econCheckBoxStyle
+                            enabled: ledctrlenable.checked ? true : false
+                            opacity: enabled ? 1 : 0.1
+                            onClicked:{
+                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,trigger.checked)
+
+                            }
+                            Keys.onReturnPressed: {
+                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,trigger.checked)
+
+                            }
+                        }
+                    }
+
                     Row{
                         Layout.alignment: Qt.AlignCenter
                         Button {
@@ -1341,6 +1475,8 @@ Item {
             see3camcu1317.getFaceDetectMode()
             see3camcu1317.getSmileDetectMode()
             see3camcu1317.getOrientation()
+            see3camcu1317.getLedControl()
+            see3camcu1317.getFlickerDetection()
             getexposureCompFrameRateCtrlTimer.start()
 
         }
@@ -1367,6 +1503,25 @@ Item {
                 flipCtrlHorizotal.checked = false
                 break;
             }
+        }
+
+        function setFlickerDetectionFn()
+        {
+            switch(flickercombo.currentIndex){
+            case 0:
+                flickerCtrl= See3camcu1317.MODE_AUTO
+                break
+            case 1:
+                flickerCtrl = See3camcu1317.MODE_50Hz
+                break
+            case 2:
+                flickerCtrl = See3camcu1317.MODE_60Hz
+                break
+            case 3:
+                flickerCtrl = See3camcu1317.MODE_DISABLE
+                break
+            }
+            see3camcu1317.setFlickerDetection(flickerCtrl)
         }
 
         // Added by Sankari: Added message box to intimate user about success/failure while storing image in the camera
@@ -1463,7 +1618,7 @@ Item {
             }
             onStreamModeValue:{
                 if(streamMode == See3camcu1317.STREAM_MASTER_ONDEMAND){
-                    streamMasterOnDemand.checked = true                  
+                    streamMasterOnDemand.checked = true
                  //   root.enableTimerforGrabPreviewFrame(true)
                 }else if(streamMode == See3camcu1317.STREAM_SOFTWARE_TRIGGER){
                     streamSwTrigger.checked = true
@@ -1471,6 +1626,20 @@ Item {
                     streamHwTrigger.checked = true
                 }
             }
+            onFlickerDetectionMode:{
+                skipUpdateUIFlickerCtrl = false
+                if(flickerMode == See3camcu1317.MODE_AUTO){
+                    flickercombo.currentIndex = 0
+                }else if(flickerMode == See3camcu1317.MODE_50Hz){
+                    flickercombo.currentIndex  = 1
+                }else if(flickerMode == See3camcu1317.MODE_60Hz){
+                    flickercombo.currentIndex  = 2
+                }else if(flickerMode == See3camcu1317.MODE_DISABLE){
+                    flickercombo.currentIndex  = 3
+                }else{ }
+                skipUpdateUIFlickerCtrl = true;
+            }
+
             onFlipMirrorModeChanged:{
                 currentFlipMirrorMode(flipMirrorMode)
             }
@@ -1508,6 +1677,32 @@ Item {
                     }
                 }
             }
+            onLedControlStatus: {
+                if(ledstatus == See3camcu1317.LedControlEnable){
+                    ledctrlenable.checked = true
+                    if(powerctl == See3camcu1317.PowerOnControlEnable){
+                        powerOn.checked = true
+                    }else{
+                        powerOn.checked = false
+                    }
+                    if(stream == See3camcu1317.StreamingControlEnable){
+                        streaming.checked = true
+                    }else{
+                        streaming.checked = false
+                    }
+                    if(trigger == See3camcu1317.TriggerACKControlEnable){
+                        trigger.checked = true
+                    }else{
+                        trigger.checked = false
+                    }
+                }else if(ledstatus == See3camcu1317.LedControlDisable){
+                    ledctrldisable.checked = true
+                    powerOn.checked = false
+                    streaming.checked = false
+                    trigger.checked = false
+                }
+            }
+
             onSmileDetectModeValue:{
                 if(smileDetectMode == See3camcu1317.SmileDetectEnable){
                     smileDetectEnable.checked = true
@@ -1703,6 +1898,7 @@ Item {
             getValuesFromCamera()
             see3camcu1317.getStillResolution()
             root.enableTimerforGrabPreviewFrame(true)
+            root.disablePowerLineFreq()
 
         }
         Component.onDestruction:{

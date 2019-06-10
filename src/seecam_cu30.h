@@ -91,8 +91,11 @@
 #define ENABLE_FACE_RECTANGLE_CU30              0x01
 #define DISABLE_FACE_RECTANGLE_CU30             0x00
 
-#define SETFLASH_STATUS_CU30 0x19
-#define GETFLASH_STATUS_CU30 0x18
+#define SETFLASH_STATUS_CU30                 0x19
+#define GETFLASH_STATUS_CU30                 0x18
+
+#define SET_FLICKER_DETECTION                0x1B
+#define GET_FLICKER_DETECTION                0x1A
 
 
 class See3CAM_CU30 : public QObject
@@ -178,6 +181,14 @@ public:
     };
     Q_ENUMS(flashStateValues)
 
+   enum camFlickerMode {
+        MODE_DISABLE = 0x00,
+        MODE_50Hz =0x01,
+        MODE_60Hz =0x02,
+        MODE_AUTO =0x03
+      };
+      Q_ENUMS(camFlickerMode)
+
 signals:
     void sendEffectMode(uint effectMode);
     void sendDenoiseValue(uint denoiseValue);
@@ -193,6 +204,7 @@ signals:
     void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
     void smileDetectModeValue(uint smileDetectMode, uint smileDetectEmbedDataValue);
     void flashModeValue(uint flashMode);
+    void flickerDetectionMode(uint flickerMode);
 
 public slots:
     bool setEffectMode(const specialEffects &specialEffect);
@@ -227,6 +239,9 @@ public slots:
 
     bool setSmileDetection(bool enableSmileDetect, bool embedData);
     bool getSmileDetectMode();
+
+    bool setFlickerDetection(camFlickerMode flickerMode);
+    bool getFlickerDetection();
 
     bool enableDisableFaceRectangle(bool enableFaceRect);
 

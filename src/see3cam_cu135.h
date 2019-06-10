@@ -90,6 +90,10 @@
 
 #define SET_TO_DEFAULT_CU135                       0x12
 
+#define SET_FLICKER_DETECTION                      0x1E
+#define GET_FLICKER_DETECTION                      0x1D
+
+
 
 class See3CAM_CU135 : public QObject
 {
@@ -180,6 +184,14 @@ public:
     };
     Q_ENUMS(flipMirrorControls)
 
+    enum camFlickerMode {
+         MODE_AUTO = 0x00,
+         MODE_50Hz =0x01,
+         MODE_60Hz =0x02,
+         MODE_DISABLE =0x03
+       };
+       Q_ENUMS(camFlickerMode)
+
 
 
     // To run function in background
@@ -201,6 +213,8 @@ signals:
      void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
      void smileDetectModeValue(uint smileDetectMode, uint smileDetectEmbedDataValue);
      void indicateExposureValueRangeFailure(QString title, QString text);
+     void flickerDetectionMode(uint flickerMode);
+
 
 public slots:
     bool setSceneMode(const sceneModes& sceneMode);
@@ -220,6 +234,9 @@ public slots:
 
     bool setStreamMode(camStreamMode streamMode);
     bool getStreamMode();
+
+    bool setFlickerDetection(camFlickerMode flickerMode);
+    bool getFlickerDetection();
 
     bool setOrientation(bool horzModeSel, bool vertiModeSel);
     bool getOrientation();

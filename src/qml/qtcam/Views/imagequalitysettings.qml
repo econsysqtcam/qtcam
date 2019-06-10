@@ -77,6 +77,7 @@ Item {
     property bool focusValueChangeProperty
     property bool focusAutoChangeProperty
     property bool usb3speed: false
+    property bool enablePowerLineFreq : true
 
     property bool powerLineComboEnable
     // Skip doing things when exposure combo index changed calls when no selection of any camera
@@ -1688,15 +1689,23 @@ Item {
         menuitems.push(controlName)
         if(controlName === "Power Line Frequency")
         {
-            menuitems.pop() //Control Name should be removed
-            powerLine.opacity = 1
-            powerLineCombo.opacity = 1
-            powerLineComboEnable =  false	    // To avoid setting power line freq when get the control values
-            powerLineCombo.model = menuitems
-            powerLineCombo.currentIndex = controlDefaultValue
-            while(menuitems.pop()){}
-            powerLineComboControlId = controlID
-            powerLineComboEnable =  true
+            if(enablePowerLineFreq){
+                menuitems.pop() //Control Name should be removed
+                powerLine.opacity = 1
+                powerLineCombo.opacity = 1
+                powerLineComboEnable =  false	    // To avoid setting power line freq when get the control values
+                powerLineCombo.model = menuitems
+                powerLineCombo.currentIndex = controlDefaultValue;
+                while(menuitems.pop()){}
+                powerLineComboControlId = controlID
+                powerLineComboEnable =  true
+            }
+            else
+            {
+                menuitems.pop()
+                powerLineCombo.model = menuitems
+                powerLineCombo.enabled = false
+            }
 
         }
         else if(controlName === "Exposure, Auto")
@@ -1724,6 +1733,11 @@ Item {
                 exposure_value.opacity = 0                
             }
         }
+    }
+
+    function controlPowerLineFreq()
+    {
+        enablePowerLineFreq = false
     }
 
     function setOpacityFalse(){
@@ -1875,7 +1889,7 @@ Item {
             ledFreqValueChangeProperty = true
             focusLogitechValueChangeProperty = true
             focusValueChangeProperty = true
-	    focusAutoChangeProperty = true
+            focusAutoChangeProperty = true
             video_capture_filter_Child.visible = true
 	    // To avoid setting exposure when get the control values 
 	    exposureComboEnable = false

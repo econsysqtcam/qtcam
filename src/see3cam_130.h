@@ -11,7 +11,7 @@
 #define GET_DENOISE_CONTROL  0x05
 
 /* SEE3CAM_130 */
-#define CAMERA_CONTROL_130               0x7B
+#define CAMERA_CONTROL_130              0x7B
 #define GET_SCENEMODE_130				0x01
 #define SET_SCENEMODE_130				0x02
 #define GET_SPECIALEFFECT_130			0x03
@@ -75,6 +75,9 @@
 
 #define SET_FRAME_RATE_130              0x25
 #define GET_FRAME_RATE_130              0x24
+
+#define SET_FLICKER_DETECTION           0x28
+#define GET_FLICKER_DETECTION           0x27
 
 
 class See3CAM_130 : public QObject
@@ -190,6 +193,15 @@ public:
         SmileDetectEmbedDataDisable = 0x00
     };
     Q_ENUMS(camSmileDetectEmbedDataMode)
+
+    enum camFlickerMode {
+         MODE_AUTO = 0x00,
+         MODE_50Hz =0x01,
+         MODE_60Hz =0x02,
+         MODE_DISABLE =0x03
+       };
+       Q_ENUMS(camFlickerMode)
+
    
 signals:
      void sceneModeValue(uint sceneMode);
@@ -210,6 +222,7 @@ signals:
      void frameRateCtrlValueReceived(uint frameRateCtrlValue);
      void indicateCommandStatus(QString title, QString text);
      void indicateExposureValueRangeFailure(QString title, QString text);
+     void flickerDetectionMode(uint flickerMode);
 
 public slots:
     bool getSceneMode();
@@ -250,6 +263,9 @@ public slots:
 
     bool setStreamMode(camStreamMode streamMode);
     bool getStreamMode();
+
+    bool setFlickerDetection(camFlickerMode flickerMode);
+    bool getFlickerDetection();
 
     bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
     bool getFaceDetectMode();

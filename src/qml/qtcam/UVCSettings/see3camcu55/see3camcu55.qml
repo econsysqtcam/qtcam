@@ -43,6 +43,8 @@ Item {
     property bool skipUpdateUIQFactor : false
     property bool skipUpdateUIFrameRate: false
     property bool setButtonClicked: false
+    property bool skipUpdateUIFlickerCtrl:false
+    property int  flickerCtrl
 
     Connections
     {
@@ -765,6 +767,38 @@ Item {
                     }
                 }
             }
+
+            Text {
+                id: flickerctrlField
+                text: "-- Flicker Detection Control --"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+
+            ComboBox
+            {
+                id: flickercombo
+                opacity: 1
+                enabled: true
+                model: ListModel {
+                    ListElement { text: "AUTO" }
+                    ListElement { text: "50Hz" }
+                    ListElement { text: "60Hz" }
+                    ListElement { text: "DISABLE" }
+                }
+                activeFocusOnPress: true
+                style: econComboBoxStyle
+                onCurrentIndexChanged: {
+                    if(skipUpdateUIFlickerCtrl){
+                       setFlickerDetectionFn();
+                    }
+                }
+            }
+
             Row{
                 Layout.alignment: Qt.AlignCenter
                 Button {
@@ -1040,6 +1074,20 @@ Item {
         onSmileDetectModeValue:{            
             updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue)
         }
+        onFlickerDetectionMode:{
+
+            skipUpdateUIFlickerCtrl = false
+            if(flickerMode == See3camCu55.MODE_AUTO){
+                flickercombo.currentIndex = 0
+            }else if(flickerMode == See3camCu55.MODE_50Hz){
+                flickercombo.currentIndex  = 1
+            }else if(flickerMode == See3camCu55.MODE_60Hz){
+                flickercombo.currentIndex  = 2
+            }else if(flickerMode == See3camCu55.MODE_DISABLE){
+                flickercombo.currentIndex  = 3
+            }else{ }
+            skipUpdateUIFlickerCtrl = true;
+        }
 
         onFlipMirrorModeChanged:{
             currentFlipMirrorMode(flipMirrorMode)
@@ -1071,6 +1119,7 @@ Item {
 
     Component.onCompleted:{        
         getCameraValues()
+        root.disablePowerLineFreq()
     }
 
     function displayMessageBox(title, text){
@@ -1158,6 +1207,25 @@ Item {
         }
 
     }
+
+      function setFlickerDetectionFn()
+      {
+          switch(flickercombo.currentIndex){
+          case 0:
+              flickerCtrl = See3camCu55.MODE_AUTO
+              break
+          case 1:
+              flickerCtrl = See3camCu55.MODE_50Hz
+              break
+          case 2:
+              flickerCtrl = See3camCu55.MODE_60Hz
+              break
+          case 3:
+              flickerCtrl = See3camCu55.MODE_DISABLE
+              break
+          }
+          see3camcu55.setFlickerDetection(flickerCtrl)
+      }
 
     function updateFaceDetectModeUI(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect){        
         if(faceDetectMode == See3camCu55.FaceRectEnable){
@@ -1266,6 +1334,7 @@ Item {
         see3camcu55.getFrameRateCtrlValue()
         see3camcu55.getExposureCompensation()
         see3camcu55.getFaceDetectMode()
+        see3camcu55.getFlickerDetection()
         see3camcu55.getSmileDetectMode()
         see3camcu55.getFlashState()
     }

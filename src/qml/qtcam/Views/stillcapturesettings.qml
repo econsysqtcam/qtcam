@@ -202,8 +202,7 @@ Item {
                       JS.stillCaptureResolutionIndex = output_value.currentIndex
                     if(JS.triggerMode_11cug === 1 || JS.triggerMode_B === 1 || JS.triggerMode_M === 1 || JS.triggerMode_cu51 === 1 || JS.triggerMode_12cuinr == 1)
                         root.triggerModeCapture()
-
-                     root.informStillResolutionIndexChanged(output_value.currentText.toString(),output_value.currentIndex, color_comp_box.currentIndex.toString(),color_comp_box.currentIndex)
+                        root.informStillResolutionIndexChanged(output_value.currentText.toString(),output_value.currentIndex, color_comp_box.currentIndex.toString(),color_comp_box.currentIndex)
 
                 }
             }

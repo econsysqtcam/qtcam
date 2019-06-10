@@ -103,7 +103,20 @@
 #define GET_FAIL		0x00
 #define GET_SUCCESS		0x01
 
+#define SET_FLICKER_DETECTION           0x29
+#define GET_FLICKER_DETECTION           0x28
 
+#define ENABLE_LED_CONTROL_See3CAM_CU1317        0x01
+#define DISABLE_LED_CONTROL_See3CAM_CU1317       0x00
+
+#define ENABLE_POWERON_CONTROL_See3CAM_CU1317        0x01
+#define DISABLE_POWERON_CONTROL_See3CAM_CU1317       0x00
+
+#define ENABLE_STREAMING_CONTROL_See3CAM_CU1317        0x01
+#define DISABLE_STREAMING_CONTROL_See3CAM_CU1317       0x00
+
+#define ENABLE_TRIGGERACK_CONTROL_See3CAM_CU1317        0x01
+#define DISABLE_TRIGGERACK_CONTROL_See3CAM_CU1317       0x00
 
 class See3CAM_CU1317 : public QObject
 {
@@ -199,6 +212,37 @@ public:
     };
     Q_ENUMS(flipMirrorControls)
 
+    enum camFlickerMode {
+         MODE_AUTO = 0x00,
+         MODE_50Hz =0x01,
+         MODE_60Hz =0x02,
+         MODE_DISABLE =0x03
+       };
+       Q_ENUMS(camFlickerMode)
+
+    enum camLedControl {
+      LedControlEnable = 0x01,
+      LedControlDisable = 0x00
+    };
+    Q_ENUMS(camLedControl)
+
+    enum camLedPowerControl {
+      PowerOnControlEnable = 0x01,
+      PowerOnControlDisable = 0x00
+    };
+    Q_ENUMS(camLedPowerControl)
+
+    enum camLedStreamControl {
+      StreamingControlEnable = 0x01,
+      StreamingControlDisable = 0x00
+    };
+    Q_ENUMS(camLedStreamControl)
+
+    enum camLedTriggerControl {
+      TriggerACKControlEnable = 0x01,
+      TriggerACKControlDisable = 0x00
+    };
+    Q_ENUMS(camLedPowerControl)
 
 signals:
      void sceneModeValue(uint sceneMode);
@@ -225,7 +269,9 @@ signals:
      // Added by Sankari: Mar 21, 2019
      //To set number of frames to skip in preview - signal to qml
      void updatePreviewFrameToSkip(uint previewSkip);
-     void ledControlStatus(bool ledstatus,bool blueledstatus,bool greenledstatus,bool redledstatus);
+     void ledControlStatus(bool ledstatus,bool powerctl,bool stream,bool trigger);
+     void flickerDetectionMode(uint flickerMode);
+
 
 
 public slots:
@@ -260,7 +306,7 @@ public slots:
     bool setExposureCompensation(unsigned int exposureCompValue);
     bool getExposureCompensation();
 
-    bool setLedControl(bool ledstatus,bool blueledstatus,bool greenledstatus,bool redledstatus);
+    bool setLedControl(bool ledstatus,bool powerctl,bool stream,bool trigger);
     bool getLedControl();
 
     bool setFrameRateCtrlValue(uint frameRate);
@@ -271,6 +317,9 @@ public slots:
 
     bool setSmileDetection(bool enableSmileDetect, bool embedData);
     bool getSmileDetectMode();   
+
+    bool setFlickerDetection(camFlickerMode flickerMode);
+    bool getFlickerDetection();
 
     bool grabPreviewFrame();
     bool storePreviewFrame();

@@ -29,6 +29,8 @@ Item {
     property bool skipUpdateUIOnBurstLength: false
     property bool skipUpdateUIOnExpWindowSize: false
     property bool setButtonClicked: false
+    property bool skipUpdateUIFlickerCtrl:false
+    property int  flickerCtrl
 
     // Used when selecting auto exposure in image Quality settings menu
     Timer {
@@ -890,6 +892,37 @@ Item {
                         }
                     }
                 }
+
+                Text {
+                    id: flickerctrlField
+                    text: "-- Flicker Detection Control --"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+
+                ComboBox
+                {
+                    id: flickercombo
+                    opacity: 1
+                    enabled: true
+                    model: ListModel {
+                        ListElement { text: "AUTO" }
+                        ListElement { text: "50Hz" }
+                        ListElement { text: "60Hz" }
+                        ListElement { text: "DISABLE" }
+                    }
+                    activeFocusOnPress: true
+                    style: econComboBoxStyle
+                    onCurrentIndexChanged: {
+                        if(skipUpdateUIFlickerCtrl){
+                           setFlickerDetectionFn();
+                        }
+                    }
+                }
                
                 Row{
                     Layout.alignment: Qt.AlignCenter
@@ -1111,6 +1144,7 @@ Item {
         seecamcu135.getiHDRMode()
         seecamcu135.getStreamMode()
         seecamcu135.getBurstLength()
+        seecamcu135.getFlickerDetection();
         seecamcu135.getAutoExpROIModeAndWindowSize()        
         seecamcu135.getFaceDetectMode()
         seecamcu135.getSmileDetectMode()
@@ -1164,6 +1198,25 @@ Item {
             autoExpoWinSizeCombo.enabled = false
             break
         }
+    }
+
+    function setFlickerDetectionFn()
+    {
+        switch(flickercombo.currentIndex){
+        case 0:
+            flickerCtrl = See3CamCu135.MODE_AUTO
+            break
+        case 1:
+            flickerCtrl = See3CamCu135.MODE_50Hz
+            break
+        case 2:
+            flickerCtrl = See3CamCu135.MODE_60Hz
+            break
+        case 3:
+            flickerCtrl = See3CamCu135.MODE_DISABLE
+            break
+        }
+        seecamcu135.setFlickerDetection(flickerCtrl)
     }
 
     Uvccamera {
@@ -1223,6 +1276,21 @@ Item {
             }
 
         }
+        onFlickerDetectionMode:{
+
+            skipUpdateUIFlickerCtrl = false
+            if(flickerMode == See3CamCu135.MODE_AUTO){
+                flickercombo.currentIndex = 0
+            }else if(flickerMode == See3CamCu135.MODE_50Hz){
+                flickercombo.currentIndex  = 1
+            }else if(flickerMode == See3CamCu135.MODE_60Hz){
+                flickercombo.currentIndex  = 2
+            }else if(flickerMode == See3CamCu135.MODE_DISABLE){
+                flickercombo.currentIndex  = 3
+            }else{ }
+            skipUpdateUIFlickerCtrl = true;
+        }
+
         onFlipMirrorModeChanged:{
             currentFlipMirrorMode(flipMirrorMode)
         }
@@ -1426,5 +1494,6 @@ Item {
 
     Component.onCompleted: {
         getValuesFromCamera()
+        root.disablePowerLineFreq()
     }
 }

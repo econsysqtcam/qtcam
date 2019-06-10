@@ -246,12 +246,11 @@ bool H264Camera::setDewarpMode(QString dewarpMode){
 /**
  * @brief H264Camera::getDewarpMode
  * @param queryType - UVC_GET_CUR / UVC_GET_DEF / UVC_GET_MIN / UVC_GET_MAX/ UVC_GET_RES
-* @return true/false
+ * @return true/false
  */
 bool H264Camera::getDewarpMode(uint queryType){
     __u8 outputDewarpMode;
-
-    if(getValueCmd(V4L2_CID_XU_HDR, queryType, outputDewarpMode)){
+    if(getValueCmd(V4L2_CID_XU_DEWARPING, queryType, outputDewarpMode)){
 	uint dewarpValue = outputDewarpMode;	
         emit dewarpModeReceived(queryType, dewarpValue);
         return true;
