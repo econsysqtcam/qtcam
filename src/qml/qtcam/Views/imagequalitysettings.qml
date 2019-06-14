@@ -482,10 +482,10 @@ Item {
                         smooth: true
                         horizontalAlignment: TextInput.AlignHCenter
                         validator: IntValidator {bottom: white_balance_Slider.minimumValue; top: white_balance_Slider.maximumValue;}
-                        opacity: autoSelect_wb.checked ? 0: 1
-                        enabled: false
+                        opacity:  white_balance_Slider.enabled ? 1: 0
+                        enabled:   white_balance_Slider.enabled ? 1: 0
                         style: econTextFieldStyle
-                        maximumLength: (white_balance_Slider.maximumValue.toString().length > white_balance_Slider.minimumValue.toString().length) ? white_balance_Slider.maximumValue.toString().length : white_balance_Slider.minimumValue.toString().length                        
+                        maximumLength: (white_balance_Slider.maximumValue.toString().length > white_balance_Slider.minimumValue.toString().length) ? white_balance_Slider.maximumValue.toString().length : white_balance_Slider.minimumValue.toString().length
                     }
                     Text {
                         id: gamma

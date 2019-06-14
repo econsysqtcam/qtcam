@@ -196,6 +196,7 @@ Rectangle {
     signal getStillImageFormats();
     signal cameraDeviceUnplugged();
     signal setMasterMode();
+    signal getExposure();
 
     // Added by Sankari: 16 Dec 2016 - To init trigger shot for 12CUNIR camera
     signal initTriggershot();    
@@ -229,8 +230,8 @@ Rectangle {
 
     Action {
         id: cameratab
-        onTriggered: {
-            selectCameraSettings()
+        onTriggered: {      // Removed selectCameraSettings API inorder to avoid getting camera settngs on pressing space key.
+
         }
     }
 	Timer {
@@ -1530,5 +1531,13 @@ Rectangle {
    function disablePowerLineFreq()
    {
        imageSettingsRootObject.controlPowerLineFreq()
+   }
+
+   //Added by Navya -12 June 2019 -- Getting exposure compensation only after setting resolution for See3CAM_CU55 camera.
+   function getExposureOnResolnCheck()
+   {
+       checkForResoln()
+       vidstreamproperty.setResoultion(JS.videoCaptureResolution)
+       getExposure()
    }
 }

@@ -92,6 +92,7 @@
 
 #define ENABLE_FACE_RECTANGLE_See3CAM_CU1317        0x01
 #define DISABLE_FACE_RECTANGLE_See3CAM_CU1317       0x00
+
 #define SET_FACE_RECT_STATE                        0x20
 #define RESET_TIME_STAMP                            0x21
 

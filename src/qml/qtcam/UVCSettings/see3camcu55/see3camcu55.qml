@@ -1119,7 +1119,8 @@ Item {
 
     Component.onCompleted:{        
         getCameraValues()
-        root.disablePowerLineFreq()
+        root.getExposureOnResolnCheck()  // getting exposure compensation value only after checking for  setresolution.
+        root.disablePowerLineFreq()     //disable powerline Frequency in UVC settings due to mismatch in HID and v4l2 cofigurations.
     }
 
     function displayMessageBox(title, text){
@@ -1321,6 +1322,7 @@ Item {
         defaultValue.enabled = false //To avoid multiple clicks over Default button
         see3camcu55.setToDefault()
         getCameraValues()
+        see3camcu55.getExposureCompensation()
         defaultValue.enabled = true
     }
 
@@ -1332,7 +1334,7 @@ Item {
         see3camcu55.getQFactor()
         see3camcu55.getOrientation()
         see3camcu55.getFrameRateCtrlValue()
-        see3camcu55.getExposureCompensation()
+       
         see3camcu55.getFaceDetectMode()
         see3camcu55.getFlickerDetection()
         see3camcu55.getSmileDetectMode()
@@ -1365,6 +1367,9 @@ Item {
              getexposureCompFrameRateCtrlTimer.start()
          }
          onVideoColorSpaceChanged:{
+             getexposureCompFrameRateCtrlTimer.start()
+         }
+         onGetExposure:{        //get exposure when resolution is set.
              getexposureCompFrameRateCtrlTimer.start()
          }
     }

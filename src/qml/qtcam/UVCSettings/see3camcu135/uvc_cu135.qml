@@ -43,6 +43,15 @@ Item {
     }
 
     Timer {
+        id:scenemodeTimer
+        interval:1000
+        repeat:false
+        onTriggered:{
+            seecamcu135.getSceneMode()
+        }
+    }
+
+    Timer {
         id: getexposureCompFrameRateCtrlTimer
         interval: 500
         onTriggered: {
@@ -1137,6 +1146,7 @@ Item {
 
     // Get the control values in extension settings
     function getValuesFromCamera(){
+        scenemodeTimer.start()       // To call getSceneMode API after some delay
         seecamcu135.getEffectMode()
         seecamcu135.getSceneMode()
         seecamcu135.getDenoiseValue()

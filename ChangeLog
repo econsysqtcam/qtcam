@@ -1,3 +1,8 @@
+Qtcam Applicaion - 22.0.5
+---------------------------
+* Fixed issue of updating Exposure Compensation wrongly on unplugging and plugging device in See3CAM_CU50 camera.
+* Fixed issue of enabling camera Settings on pressing spacebar for all See3CAM cameras.
+* Fixed issue of enabling whitebalance textbox even whitebalance is disbled for all See3CAM cameras.
 Qtcam Application - 22.0.4
 --------------------------
 * Implemented LED Control and Flicker Detection Control for See3CAM_CU1317 camera.

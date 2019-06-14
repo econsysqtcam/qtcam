@@ -1316,8 +1316,7 @@ Item {
         }
     }
 
-
-        function setMasterOnDemandMode(){
+      function setMasterOnDemandMode(){
             root.captureBtnEnable(true)
             root.videoRecordBtnEnable(true)
             see3camcu1317.setStreamMode(See3camcu1317.STREAM_MASTER_ONDEMAND)
@@ -1339,8 +1338,9 @@ Item {
            //Added by Navya:28-Feb-2019 -To get a popup window
             messageDialog.title=qsTr("Restore Default")
             messageDialog.text=qsTr("When we click Extension Settings default option, all the controls will be updated to their default values except stream mode. The stream mode control can be changed manually")
-             messageDialog.open()
+            messageDialog.open()
             getValuesFromCamera()
+
             // Added by Sankari: 24 Apr 2017. To get preview in master mode
             root.startUpdatePreviewInMasterMode()
         }
