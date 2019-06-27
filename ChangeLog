@@ -1,4 +1,9 @@
-Qtcam Applicaion - 22.0.5
+Qtcam Application - 22.0.6
+---------------------------
+* Fixed issue of getting Greencolour image on capturing still in h264 in Hyperyon.
+* Fixed issue of exposure UI in UVC Settings updated wrongly in See3CAM cameras.
+ 
+Qtcam Application - 22.0.5
 ---------------------------
 * Fixed issue of updating Exposure Compensation wrongly on unplugging and plugging device in See3CAM_CU50 camera.
 * Fixed issue of enabling camera Settings on pressing spacebar for all See3CAM cameras.
