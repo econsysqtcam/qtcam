@@ -1704,6 +1704,7 @@ Item {
             {
                 menuitems.pop()
                 powerLineCombo.model = menuitems
+                  while(menuitems.pop()){}
                 powerLineCombo.enabled = false
             }
 

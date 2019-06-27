@@ -108,7 +108,7 @@ Videostreaming::Videostreaming() : m_t(0)
     triggerShot = false;
     m_displayCaptureDialog = false;
     retrieveframeStoreCam=false;
-    stopRenderOnMakeShot = false;
+
     m_saveImage = false;
     m_VideoRecord = false;
     retrieveframeStoreCamInCross = false;
@@ -798,21 +798,13 @@ void Videostreaming::capFrame()
         return;
     }
 
-    //Added by Navya - 29 May 2019 --In order to stop rendering the skipframes on capturing image
-    if(m_frame <=3 ){
-        getFrameRates();
-    }
-    else
-         stopRenderOnMakeShot = false;
 
-    // prepare yuyv/rgba buffer and give to shader.
-    if(!stopRenderOnMakeShot){  //Allow render only after checking for Makeshot.
         if(!prepareBuffer(m_capSrcFormat.fmt.pix.pixelformat, m_buffers[buf.index].start[0], buf.bytesused)){
             qbuf(buf);
             emit signalTograbPreviewFrame(retrieveframeStoreCam,true);  //Added by Navya  ---Querying the buffer again
             return;
         }
-    }
+
 
     if(!m_snapShot && !retrieveShot){  // Checking for retrieveshot flag inorder to avoid, updating still frame to UI
         m_renderer->gotFrame = true;
@@ -2001,7 +1993,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
         stopCapture();
         vidCapFormatChanged(stillOutFormat);
         setResoultion(stillSize);
-        stopRenderOnMakeShot = true;
+
         startAgain();
     }
 }

@@ -364,7 +364,6 @@ private:
     bool retrieveframeStoreCam;
     bool retrieveframeStoreCamInCross;
     bool retrieveShot;
-    bool stopRenderOnMakeShot;
 
 
 private slots:
