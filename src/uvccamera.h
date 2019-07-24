@@ -383,7 +383,7 @@ private:
     uvccamera uvc;
 
 signals:
-    void gpioLevel(unsigned char level);
+    void gpioLevel(unsigned int level);
     void deviceStatus(QString title, QString message);
 
 public:

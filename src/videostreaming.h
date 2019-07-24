@@ -86,6 +86,7 @@ public:
     uint8_t *vBuffer;
     uint8_t *yuvBuffer;
       __u32 xcord;
+    unsigned frame;
 
     // rgba buffer
     unsigned char *rgbaDestBuffer;
@@ -99,6 +100,16 @@ public:
 
     QMutex renderMutex; // mutex to use in rendering - rgba
     QMutex renderyuyvMutex; // mutex to use in rendering yuyv   
+
+    bool  m_formatChange;
+    bool  m_videoResolnChange;
+    bool sidebarStateChanged;
+    int glViewPortX;
+    int glViewPortY;
+    int glViewPortWidth;
+    int glViewPortHeight;
+    __u32 m_pixelformat;
+    bool y16BayerFormat;
 
 signals:
      void ybufferchanged(uint8_t);
@@ -246,7 +257,7 @@ private:
     __u8 m_bufReqCount;
     FrameRenderer *m_renderer;
 
-    uint8_t *yuyvBuffer;
+    uint8_t *yuyvBuffer ,*yuyvBuffer_Y12;
     uint8_t *yuv420pdestBuffer;
     unsigned short int *bayerIRBuffer;
 
@@ -328,7 +339,8 @@ private:
     static QString camDeviceName;
 
     unsigned char  *y16BayerDestBuffer;
-    bool y16BayerFormat;
+	bool y16BayerFormat;
+    unsigned char* rgb_image;
  /**
      * @brief currentlySelectedCameraEnum - This contains currently selected camera enum value
      */
@@ -342,6 +354,7 @@ private:
 
     // Added by Sankari  - 10 Nov 2016 - To decide whether to save image or not
     bool m_saveImage;
+    bool saveIfY12jpg;
 
     unsigned int imgSaveSuccessCount;
 
@@ -364,6 +377,8 @@ private:
     bool retrieveframeStoreCam;
     bool retrieveframeStoreCamInCross;
     bool retrieveShot;
+    bool stopRenderOnMakeShot;
+    bool onY12Format;
 
 
 private slots:
@@ -535,6 +550,7 @@ public slots:
      * @param idx
      */
     void frameIntervalChanged(int idx);
+    void convertYUVtoRGB(unsigned char* buffer);
 
     void recordVideo();
       /**

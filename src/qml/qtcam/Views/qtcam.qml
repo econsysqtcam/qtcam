@@ -29,6 +29,7 @@ import econ.camera.stream 1.0
 import econ.camera.keyEvent 1.0
 import econ.camera.see3camcu1317 1.0
 import econ.camera.see3cam50 1.0
+import econ.camera.see3camcu55mh 1.0
 import "../JavaScriptFiles/tempValue.js" as JS
 import cameraenum 1.0
 import econ.camera.uvcsettings 1.0
@@ -63,11 +64,12 @@ Rectangle {
 
     property int burstLength;
     property bool vidFormatChanged: false
-    property bool keyEventFiltering
+    property bool keyEventFiltering :true
 
     property bool m_Snap : true
     property bool stillPreview : false
     property bool webcamKeyAccept: true
+    property bool enableUVCSettings :true
 
     // Added by Sankari : 25 May 2017, the flag to indicate side bar items are opened/closed
     property bool closeSideBarClicked: false
@@ -309,8 +311,7 @@ Rectangle {
         anchors.leftMargin: sideBarItems.visible ? parent.width*0.15 : 0
         width: sideBarItems.visible ? parent.width * 0.85 : parent.width
         height: layer_0.height
-
-   }
+     }
         Videostreaming {
             id: vidstreamproperty
             focus: true
@@ -375,6 +376,7 @@ Rectangle {
                 cameraDeviceUnplugged();
                 device_box.oldIndex = 0
                 device_box.currentIndex = 0
+                enableUVCSettings = false;
                 disableImageSettings();
                 // Added by Sankari: 25 May 2017. When device is unplugged, make preview area disabled
                 vidstreamproperty.enabled = false
@@ -614,7 +616,9 @@ Rectangle {
             onCurrentIndexChanged: {
                 if(currentIndex.toString() != "-1" && currentIndex.toString() != "0") {                    
                     if(oldIndex!=currentIndex) {
-			seqAni.running = true
+                        // when switching camera make "exposureAutoAvailable" as false
+                        imageSettingsRootObject.exposureAutoAvailable = false
+                        seqAni.running = true
                         seqAni.start()
                         vidstreamproperty.stopFrameTimeoutTimer()
                         vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, true)
@@ -1212,6 +1216,8 @@ Rectangle {
         }
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU1317) { // Added By Sankari
                     see3cam = Qt.createComponent("../UVCSettings/see3cam_Cu1317/see3camcu1317.qml").createObject(root)
+        }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU55_MH) { // Added By Navya
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu55_MH/see3camcu55_mh.qml").createObject(root)
         }else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
@@ -1255,6 +1261,7 @@ Rectangle {
             case CommonEnums.SEE3CAM_CU55:
             case CommonEnums.SEE3CAM_CU1317:
             case CommonEnums.SEE3CAM_CU38:
+            case CommonEnums.SEE3CAM_CU55_MH:
 
                 camproperty.openHIDDevice(device_box.currentText);
             break;
@@ -1455,7 +1462,6 @@ Rectangle {
    {
        stillChildVisibleState(false)
        videoChildMenuVisible(false)
-       vidstreamproperty.cameraFilterControls()
    }
    //get still settings from camera[used in storagecam] and Update in UI
    function changeStillSettings(stillFormat, stillResolution){ // still capture settings in UI
@@ -1480,7 +1486,10 @@ Rectangle {
    }
    function selectMenuIndex(controlId,index)
    {
-       vidstreamproperty.selectMenuIndex(controlId,index)
+       if(enableUVCSettings)
+           vidstreamproperty.selectMenuIndex(controlId,index)
+       else
+           enableUVCSettings = true;
    }
    function cameraFilterControls(value)
    {
@@ -1521,7 +1530,7 @@ Rectangle {
           JS.videoCaptureResolution = videoSettingsRootObject.videoOutputSize
    }
 
-   //Added by Navya - 29 May 2019 -- Inorder to stop VideoRecord and Image Capture in case of Software and Hardware Trigger Modes for See3CAM_CU1317 camera.
+   //Added by Navya - 29 May 2019 -- Inorder to stop VideoRecord and Image Capture in case of Software and Hardware Trigger Modes for See3camcu1317 camera.
    function checkForTriggerMode(mode)
    {
        getTriggerMode = mode;

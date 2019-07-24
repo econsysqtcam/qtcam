@@ -56,6 +56,7 @@
 #include "common.h"
 #include "common_enums.h"
 #include "see3cam_cu1317.h"
+#include "see3camcu55_mh.h"
 
 //*! \mainpage Qtcam - A econ's camera product
 // *
@@ -102,6 +103,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_CU38>("econ.camera.see3camcu38", 1, 0, "See3Camcu38");
     qmlRegisterType<NILECAM30_USB>("econ.camera.nilecam30usb", 1, 0, "NileCam30usb");
     qmlRegisterType<See3CAM_CU55>("econ.camera.see3camcu55", 1, 0, "See3camCu55");
+    // Added by Navya :08 July 2019
+    qmlRegisterType<See3CAM_CU55_MH>("econ.camera.see3camcu55mh",1,0,"See3camcu55MH");
 
     // Added by Sankari: 27 July 2017
     qmlRegisterType<See3CAM_CU20>("econ.camera.see3camcu20", 1, 0, "See3Camcu20");

@@ -53,8 +53,8 @@ public:
 	// Added by Sankari - 11 Dec 2018
         ECAM22_USB,
         SEE3CAM_CU55,  // SEE3CAM_AR0521
-        SEE3CAM_CU1317 // STORECAM_1335
-
+        SEE3CAM_CU1317, // STORECAM_1335
+        SEE3CAM_CU55_MH // cu55 monochrome
     }ECameraNames;
     //Enum for capture shot type
     typedef enum
@@ -70,8 +70,9 @@ public:
     typedef enum
     {
         NO_RENDER = 0,      // stop render for skipframes
-        RGB_BUFFER_RENDER , // rgba
-        YUYV_BUFFER_RENDER
+        RGB_BUFFER_RENDER = 1, // rgba
+        YUYV_BUFFER_RENDER,
+	UYVY_BUFFER_RENDER
     }ERenderBuffer;
 	
     Q_ENUMS(ERenderBuffer)

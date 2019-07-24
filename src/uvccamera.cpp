@@ -88,7 +88,8 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c132"),CommonEnums::NILECAM30_USB);
     cameraEnumMap.insert(econVid + (",c123"),CommonEnums::ECAM22_USB); // h264 camera
     cameraEnumMap.insert(econVid + (",c154"),CommonEnums::SEE3CAM_CU55);
-    cameraEnumMap.insert(econVid + (",c1d4"),CommonEnums::SEE3CAM_CU1317);
+    cameraEnumMap.insert(econVid + (",c155"),CommonEnums::SEE3CAM_CU55_MH); // cu55 monochrome
+    cameraEnumMap.insert(econVid + (",c1d4"),CommonEnums::SEE3CAM_CU1317);    
 }
 
 unsigned int uvccamera::getTickCount()

@@ -219,7 +219,7 @@ Item {
         height: 500
         style: econscrollViewStyle
         Item{
-            height:1800
+            height:1900
             ColumnLayout{
                 x:2
                 y:5
@@ -1164,10 +1164,11 @@ Item {
                             activeFocusOnPress: true
                             style: econRadioButtonStyle
                             onClicked:{
-                                see3camcu1317.setLedControl(true,powerOn.checked,streaming.checked,trigger.checked)
+                                console.log("enable")
+                                see3camcu1317.setLedControl(true,powerOn.checked,streaming.checked,triggerCtrl.checked)
                             }
                             Keys.onReturnPressed: {
-                                 see3camcu1317.setLedControl(true,powerOn.checked,streaming.checked,trigger.checked)
+                                 see3camcu1317.setLedControl(true,powerOn.checked,streaming.checked,triggerCtrl.checked)
                             }
                         }
                         RadioButton {
@@ -1177,10 +1178,11 @@ Item {
                             activeFocusOnPress: true
                             style: econRadioButtonStyle
                             onClicked: {
-                                    see3camcu1317.setLedControl(false,powerOn.checked,streaming.checked,trigger.checked)
+                                console.log("disable")
+                                    see3camcu1317.setLedControl(false,powerOn.checked,streaming.checked,triggerCtrl.checked)
                             }
                             Keys.onReturnPressed: {
-                                     see3camcu1317.setLedControl(false,powerOn.checked,streaming.checked,trigger.checked)
+                                     see3camcu1317.setLedControl(false,powerOn.checked,streaming.checked,triggerCtrl.checked)
                             }
                         }
                     }
@@ -1197,10 +1199,10 @@ Item {
                             enabled: ledctrlenable.checked ? true : false
                             opacity: enabled ? 1 : 0.1
                             onClicked:{
-                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,trigger.checked)
+                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,triggerCtrl.checked)
                             }
                             Keys.onReturnPressed: {
-                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,trigger.checked)
+                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,triggerCtrl.checked)
 
                             }
                         }
@@ -1212,27 +1214,27 @@ Item {
                             enabled: ledctrlenable.checked ? true : false
                             opacity: enabled ? 1 : 0.1
                             onClicked:{
-                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,trigger.checked)
+                                  see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,triggerCtrl.checked)
 
                             }
                             Keys.onReturnPressed: {
-                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,trigger.checked)
+                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,triggerCtrl.checked)
 
                             }
                         }
                         CheckBox {
-                            id: trigger
+                            id: triggerCtrl
                             activeFocusOnPress : true
                             text: "Trigger ACK"
                             style: econCheckBoxStyle
                             enabled: ledctrlenable.checked ? true : false
                             opacity: enabled ? 1 : 0.1
                             onClicked:{
-                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,trigger.checked)
+                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,triggerCtrl.checked)
 
                             }
                             Keys.onReturnPressed: {
-                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,trigger.checked)
+                                see3camcu1317.setLedControl(ledctrlenable.checked,powerOn.checked,streaming.checked,triggerCtrl.checked)
 
                             }
                         }
@@ -1681,25 +1683,21 @@ Item {
                 if(ledstatus == See3camcu1317.LedControlEnable){
                     ledctrlenable.checked = true
                     if(powerctl == See3camcu1317.PowerOnControlEnable){
-                        powerOn.checked = true
-                    }else{
-                        powerOn.checked = false
+                        powerOn.checked = true 
                     }
                     if(stream == See3camcu1317.StreamingControlEnable){
                         streaming.checked = true
-                    }else{
-                        streaming.checked = false
                     }
                     if(trigger == See3camcu1317.TriggerACKControlEnable){
-                        trigger.checked = true
-                    }else{
-                        trigger.checked = false
+                        console.log("trigger checked")
+                        triggerCtrl.checked = true
                     }
                 }else if(ledstatus == See3camcu1317.LedControlDisable){
+                    console.log("led disable")
                     ledctrldisable.checked = true
                     powerOn.checked = false
                     streaming.checked = false
-                    trigger.checked = false
+                    triggerCtrl.checked = false
                 }
             }
 

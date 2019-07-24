@@ -243,7 +243,7 @@ public:
       TriggerACKControlEnable = 0x01,
       TriggerACKControlDisable = 0x00
     };
-    Q_ENUMS(camLedPowerControl)
+    Q_ENUMS(camLedTriggerControl)
 
 signals:
      void sceneModeValue(uint sceneMode);
@@ -270,7 +270,7 @@ signals:
      // Added by Sankari: Mar 21, 2019
      //To set number of frames to skip in preview - signal to qml
      void updatePreviewFrameToSkip(uint previewSkip);
-     void ledControlStatus(bool ledstatus,bool powerctl,bool stream,bool trigger);
+     void ledControlStatus(uint ledstatus,uint powerctl,uint stream,uint trigger);
      void flickerDetectionMode(uint flickerMode);
 
 

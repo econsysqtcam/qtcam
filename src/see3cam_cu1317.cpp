@@ -1190,8 +1190,8 @@ bool See3CAM_CU1317::getLedControl()
    initializeBuffers();
 
    // fill buffer values
-   g_out_packet_buf[1] = CAMERA_CONTROL_See3CAM_CU1317;  /* set camera control code */
-   g_out_packet_buf[2] = GET_LED_CONTROL_See3CAM_CU1317; /* get LED control code */
+   g_out_packet_buf[0] = CAMERA_CONTROL_See3CAM_CU1317;  /* set camera control code */
+   g_out_packet_buf[1] = GET_LED_CONTROL_See3CAM_CU1317; /* get LED control code */
 
    // send request and get reply from camera
    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -1200,9 +1200,9 @@ bool See3CAM_CU1317::getLedControl()
        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_See3CAM_CU1317 &&
            g_in_packet_buf[1]==GET_LED_CONTROL_See3CAM_CU1317 &&
            g_in_packet_buf[6]==GET_SUCCESS) {
-           ledstatus = g_in_packet_buf[3];
-           powerctl=g_in_packet_buf[4];
-           stream=g_in_packet_buf[6];
+           ledstatus = g_in_packet_buf[2];
+           powerctl=g_in_packet_buf[3];
+           stream=g_in_packet_buf[4];
            trigger=g_in_packet_buf[5];
            emit ledControlStatus(ledstatus,powerctl,stream,trigger);
            return true;
@@ -1234,22 +1234,22 @@ bool See3CAM_CU1317::setLedControl(bool ledstatus,bool powerctl,bool stream,bool
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_See3CAM_CU1317; /* set camera control code */
-    g_out_packet_buf[2] = SET_LED_CONTROL_See3CAM_CU1317; /* set led control code */
+    g_out_packet_buf[0] = CAMERA_CONTROL_See3CAM_CU1317; /* set camera control code */
+    g_out_packet_buf[1] = SET_LED_CONTROL_See3CAM_CU1317; /* set led control code */
     if(ledstatus)
-        g_out_packet_buf[3] = ENABLE_LED_CONTROL_See3CAM_CU1317;
+        g_out_packet_buf[2] = ENABLE_LED_CONTROL_See3CAM_CU1317;
     else
-        g_out_packet_buf[3] = DISABLE_LED_CONTROL_See3CAM_CU1317;
+        g_out_packet_buf[2] = DISABLE_LED_CONTROL_See3CAM_CU1317;
 
     if(powerctl)
-        g_out_packet_buf[4] = ENABLE_POWERON_CONTROL_See3CAM_CU1317;
+        g_out_packet_buf[3] = ENABLE_POWERON_CONTROL_See3CAM_CU1317;
     else
-        g_out_packet_buf[4] = DISABLE_POWERON_CONTROL_See3CAM_CU1317;
+        g_out_packet_buf[3] = DISABLE_POWERON_CONTROL_See3CAM_CU1317;
 
     if(stream)
-        g_out_packet_buf[6] = ENABLE_STREAMING_CONTROL_See3CAM_CU1317;
+        g_out_packet_buf[4] = ENABLE_STREAMING_CONTROL_See3CAM_CU1317;
     else
-        g_out_packet_buf[6] = DISABLE_STREAMING_CONTROL_See3CAM_CU1317;
+        g_out_packet_buf[4] = DISABLE_STREAMING_CONTROL_See3CAM_CU1317;
 
     if(trigger)
         g_out_packet_buf[5] = ENABLE_TRIGGERACK_CONTROL_See3CAM_CU1317;
