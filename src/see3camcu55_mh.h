@@ -57,10 +57,10 @@ public :
     Q_ENUMS(flashModes)
 
     enum rollControl {
-       FLIP_NORMAL =0x01,
-       FLIP_HORIZONTAL =0x02,
-       FLIP_VERTICAL =0x03,
-       FLIP_BOTH =0x04
+       FLIP_NORMAL =0x00,
+       FLIP_HORIZONTAL =0x01,
+       FLIP_VERTICAL =0x02,
+       FLIP_BOTH =0x03
     };
     Q_ENUMS(rollControl)
 
