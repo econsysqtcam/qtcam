@@ -34,7 +34,7 @@
 #include <QOpenGLShaderProgram>
 #include <QtGui/QOpenGLContext>
 #include <QtConcurrent>
-#include "see3cam_cu1317.h"
+#include "fscam_cu135.h"
 #include "uvccamera.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
@@ -130,7 +130,7 @@ Videostreaming::Videostreaming() : m_t(0)
     flags = TJFLAG_NOREALLOC;
     yuvpad = 1;
     frameToSkip = 3;
-    // Added by Sankari: Mar 21, 2019 - To skip preview frames in See3CAM_CU1317
+    // Added by Sankari: Mar 21, 2019 - To skip preview frames in FSCAM_CU135
     previewFrameSkipCount = 1;
     previewFrameToSkip = 1;
     skippingPreviewFrame = false;
@@ -3131,7 +3131,7 @@ void Videostreaming::setSkipPreviewFrame(bool skipFrame){
     skippingPreviewFrame = skipFrame;
 }
 
-  // Added by Navya--Enabling timer in case of See3Cam_cu1317,inorder to segregate it from other devices.
+  // Added by Navya--Enabling timer in case of Fscam_cu135,inorder to segregate it from other devices.
 
 void Videostreaming::enableTimer(bool timerstatus)
 {

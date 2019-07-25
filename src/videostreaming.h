@@ -39,7 +39,7 @@
 #include "audioinput.h"
 #include "uvccamera.h"
 #include "common_enums.h"
-#include"see3cam_cu1317.h"
+#include"fscam_cu135.h"
 #include <linux/uvcvideo.h>
 
 #include <QtQuick/QQuickItem>
@@ -234,7 +234,7 @@ public:
     bool SkipIfPreviewFrame;
     QMutex recordMutex;
 
-    See3CAM_CU1317 See3camcu1317;
+   FSCAM_CU135 Fscamcu135;
 
 
     /* Jpeg decode */

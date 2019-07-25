@@ -27,7 +27,7 @@ import QtQuick.Dialogs 1.1
 import econ.camera.property 1.0
 import econ.camera.stream 1.0
 import econ.camera.keyEvent 1.0
-import econ.camera.see3camcu1317 1.0
+import econ.camera.fscamcu135 1.0
 import econ.camera.see3cam50 1.0
 import econ.camera.see3camcu55mh 1.0
 import "../JavaScriptFiles/tempValue.js" as JS
@@ -511,7 +511,7 @@ Rectangle {
                             captureRecordWhenSideBarItemsClosed()
                         }
                         else{
-                            if(captureVideoRecordRootObject.captureBtnVisible && !getTriggerMode ){//Restricts in case of Trigger Modes for See3CAM_CU1317 camera.
+                            if(captureVideoRecordRootObject.captureBtnVisible && !getTriggerMode ){//Restricts in case of Trigger Modes for FSCAM_CU135 camera.
                                 mouseClickCapture()
                             } else if(captureVideoRecordRootObject.recordBtnVisible && !getTriggerMode ){
                                 videoRecordBegin()
@@ -678,7 +678,7 @@ Rectangle {
                         vidstreamproperty.lastFPS(videoSettingsRootObject.videoFrameRateIndex)
                         vidstreamproperty.masterModeEnabled()
                         // Moved by Sankari: Mar 20, 2019. For storage camera, before start preview, we need to set ondemand mode.
-                        createExtensionUnitQml(selectedDeviceEnumValue) //setting ondemand mode in see3camcu1317 qml oncompleted.
+                        createExtensionUnitQml(selectedDeviceEnumValue) //setting ondemand mode in fscamcu135 qml oncompleted.
                         vidstreamproperty.startAgain() // Then start preview
                         getStillImageFormats();
 
@@ -861,8 +861,8 @@ Rectangle {
     See3Cam50{
         id:see3camcu50
     }
-    See3camcu1317{
-        id:see3camcu1317
+    Fscamcu135{
+        id:fscamcu135
     }
     Uvccamera{
         id: uvccam
@@ -919,7 +919,7 @@ Rectangle {
         vidstreamproperty.updateFrameToSkip(stillSkip)
     }
 
-    // Added by Sankari: Mar 21, 2019. To set number of frames to skip in preview[ex: in see3cam_cu1317]
+    // Added by Sankari: Mar 21, 2019. To set number of frames to skip in preview[ex: in fscam_cu135]
     function updatePreviewFrameskip(previewSkip){        
         vidstreamproperty.updatePreviewFrameSkip(previewSkip)
     }
@@ -1214,8 +1214,8 @@ Rectangle {
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU55) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu55/see3camcu55.qml").createObject(root)
         }
-        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU1317) { // Added By Sankari
-                    see3cam = Qt.createComponent("../UVCSettings/see3cam_Cu1317/see3camcu1317.qml").createObject(root)
+        else if(selectedDeviceEnumValue == CommonEnums.FSCAM_CU135){ // Added By Sankari
+                    see3cam = Qt.createComponent("../UVCSettings/fscamcu135/fscamcu135.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU55_MH) { // Added By Navya
             see3cam = Qt.createComponent("../UVCSettings/see3camcu55_MH/see3camcu55_mh.qml").createObject(root)
         }else {
@@ -1259,7 +1259,7 @@ Rectangle {
             case CommonEnums.SEE3CAM_CU135:
             case CommonEnums.NILECAM30_USB:
             case CommonEnums.SEE3CAM_CU55:
-            case CommonEnums.SEE3CAM_CU1317:
+            case CommonEnums.FSCAM_CU135:
             case CommonEnums.SEE3CAM_CU38:
             case CommonEnums.SEE3CAM_CU55_MH:
 
@@ -1530,7 +1530,7 @@ Rectangle {
           JS.videoCaptureResolution = videoSettingsRootObject.videoOutputSize
    }
 
-   //Added by Navya - 29 May 2019 -- Inorder to stop VideoRecord and Image Capture in case of Software and Hardware Trigger Modes for See3camcu1317 camera.
+   //Added by Navya - 29 May 2019 -- Inorder to stop VideoRecord and Image Capture in case of Software and Hardware Trigger Modes for FSCAM_CU135 camera.
    function checkForTriggerMode(mode)
    {
        getTriggerMode = mode;

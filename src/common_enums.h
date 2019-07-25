@@ -53,7 +53,7 @@ public:
 	// Added by Sankari - 11 Dec 2018
         ECAM22_USB,
         SEE3CAM_CU55,  // SEE3CAM_AR0521
-        SEE3CAM_CU1317, // STORECAM_1335
+        FSCAM_CU135, // STORECAM_1335
         SEE3CAM_CU55_MH // cu55 monochrome
     }ECameraNames;
     //Enum for capture shot type

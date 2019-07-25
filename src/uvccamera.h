@@ -49,7 +49,7 @@
 #define ENABLE_CROPPED_VGA_MODE	0x52
 #define ENABLE_BINNED_VGA_MODE	0x53
 #define GRAB_PREVIEW_FRAME                        0x1A
-#define CAMERA_CONTROL_See3CAM_CU1317       0x95
+#define CAMERA_CONTROL_FSCAM_CU135      0x95
 #define QUERY_NEXT_FRAME                          0x01
 
 
