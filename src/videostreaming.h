@@ -119,6 +119,7 @@ public slots:
 
     // spilit yuyv buffer to y,u,v buffer
     void fillBuffer();
+    void selectedCameraEnum(CommonEnums::ECameraNames selectedDeviceEnum);
 
 public:
     QSize m_viewportSize;
@@ -149,6 +150,8 @@ private:
     GLint samplerLocV;
 
     GLint samplerLocRGB;
+
+     static CommonEnums::ECameraNames currentlySelectedEnumValue;
 };
 
 class Videostreaming :  public QQuickItem, public v4l2

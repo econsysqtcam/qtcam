@@ -77,6 +77,7 @@ typedef void (*ftopict) (int * out, uint8_t *pic, int width) ;
  * @brief Videostreaming::currentlySelectedCameraEnum - This contains currenly selected camera enum value
  */
 CommonEnums::ECameraNames Videostreaming::currentlySelectedCameraEnum;
+CommonEnums::ECameraNames FrameRenderer::currentlySelectedEnumValue;
 
 static GLfloat mVerticesDataPosition[] = {
     -1.f, 1.f, 0.0f, // Position 0
@@ -434,6 +435,10 @@ void FrameRenderer::drawRGBBUffer(){
     // mixing with raw OpenGL.
     m_window->resetOpenGLState();
 }
+void FrameRenderer::selectedCameraEnum(CommonEnums::ECameraNames selectedDeviceEnum)
+{
+    currentlySelectedEnumValue = selectedDeviceEnum;
+}
 
 /**
  * @brief FrameRenderer::drawYUYVBUffer - Shader for yuyv to RGB conversion and render buffer
@@ -535,6 +540,7 @@ void FrameRenderer::drawYUYVBUffer(){
 
     int xMargin = 250; // [left margin + right margin ]
     int sidebarwidth;
+    int skipFrames = 4;
 
     QRect rec = QApplication::desktop()->screenGeometry();
     if(sidebarAvailable){
@@ -557,7 +563,12 @@ void FrameRenderer::drawYUYVBUffer(){
     xcord =sidebarwidth+x+(xMargin/2);
 
     if (yBuffer != NULL && uBuffer != NULL && vBuffer != NULL){
-            if(gotFrame && !updateStop && frame>3){
+          if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB){
+               skipFrames = frame;
+           }else{
+              skipFrames = 4;
+          }
+            if(gotFrame && !updateStop && skipFrames >3){
 	     // set active texture and give input y buffer
             glActiveTexture(GL_TEXTURE1);
             glUniform1i(samplerLocY, 1);

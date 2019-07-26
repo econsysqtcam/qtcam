@@ -41,6 +41,7 @@ Cameraproperty::Cameraproperty()
     connect(this,SIGNAL(setCamName(QString)),&uvccam,SLOT(currentlySelectedDevice(QString)));
     connect(this,SIGNAL(logHandle(QtMsgType,QString)),this,SLOT(logWriter(QtMsgType,QString)));
     connect(&uvccam,SIGNAL(logHandle(QtMsgType,QString)),this,SLOT(logWriter(QtMsgType,QString)));
+     connect(&uvccam,SIGNAL(currentlySelectedCameraEnum(CommonEnums::ECameraNames)),&frmrend,SLOT(selectedCameraEnum(CommonEnums::ECameraNames)));
     //Added by Dhurka - 13th Oct 2016
     /**
      * @brief connect - This signal is used to send the currently selected camera enum to videostreaming.cpp

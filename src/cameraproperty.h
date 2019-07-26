@@ -58,6 +58,7 @@ public:
 
     uvccamera uvccam;
     Videostreaming vidStr;
+    FrameRenderer frmrend;
     logger log;
     void checkforEconDevice(QStringList*);
 
