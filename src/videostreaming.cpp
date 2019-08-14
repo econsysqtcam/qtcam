@@ -117,7 +117,7 @@ Videostreaming::Videostreaming() : m_t(0)
     SkipIfPreviewFrame=false;
     dotile = 0;
     retrieveFrame=false;
-    saveIfY12jpg =false;
+
     // Modified by Sankari : Dec 5 2018, converted TJPF_RGB to TJPF_RGBA and use RGB[RGBA] shader
     pf = TJPF_RGBA;
     warmup = 1;
@@ -729,54 +729,7 @@ void Videostreaming::setPreviewBgrndArea(int width, int height, bool sidebarAvai
     }    
 }
 
-void Videostreaming::convertYUVtoRGB(unsigned char * buffer)
-{
-    rgb_image = new unsigned char[width * height * 3]; //width and height of the image to be converted
-    int y ,cr,cb;
-    double r,g,b;
-    for (int i = 0, j = 0; i < width * height * 3; i+=6,j+=4) {
-        //first pixel
-        y = buffer[j];
-        cb = buffer[j+1];
-        cr = buffer[j+3];
 
-        r = y + (1.4065 * (cr - 128));
-        g = y - (0.3455 * (cb - 128)) - (0.7169 * (cr - 128));
-        b = y + (1.7790 * (cb - 128));
-
-        //This prevents colour distortions in  rgb image
-        if (r < 0) r = 0;
-        else if (r > 255) r = 255;
-        if (g < 0) g = 0;
-        else if (g > 255) g = 255;
-        if (b < 0) b = 0;
-        else if (b > 255) b = 255;
-
-        rgb_image[i] = (unsigned char)r;
-        rgb_image[i+1] = (unsigned char)g;
-        rgb_image[i+2] = (unsigned char)b;
-
-        //second pixel
-        y = buffer[j+2];
-        cb = buffer[j+1];
-        cr = buffer[j+3];
-
-        r = y + (1.4065 * (cr - 128));
-        g = y - (0.3455 * (cb - 128)) - (0.7169 * (cr - 128));
-        b = y + (1.7790 * (cb - 128));
-
-        if (r < 0) r = 0;
-        else if (r > 255) r = 255;
-        if (g < 0) g = 0;
-        else if (g > 255) g = 255;
-        if (b < 0) b = 0;
-        else if (b > 255) b = 255;
-
-        rgb_image[i+3] = (unsigned char)r;
-        rgb_image[i+4] = (unsigned char)g;
-        rgb_image[i+5] = (unsigned char)b;
-    }
-}
 
 void Videostreaming::capFrame()
 {
@@ -884,8 +837,7 @@ void Videostreaming::capFrame()
 
 
     if(!m_snapShot && !retrieveShot){  // Checking for retrieveshot flag inorder to avoid, updating still frame to UI
-        m_renderer->gotFrame = true;
-       
+        m_renderer->gotFrame = true;    
     }
    
 
@@ -918,8 +870,16 @@ void Videostreaming::capFrame()
                 }
                 else{   // still capture for jpg/bmp/png files
                     onY12Format = false;
-                    saveIfY12jpg = true;
-                    convertYUVtoRGB((unsigned char *)m_renderer->yuvBuffer);  //removed v4l2_convert for yuyv to rgb conversion
+
+                    // Added by Navya: 12 Aug 2019 -- Fixed sizeimage and bytesperline values for incoming Src Buffer as they are updated with improper values.
+                    m_capSrcFormat.fmt.pix.sizeimage = width*height*2; // Initially it was width*height*1.5
+                    m_capSrcFormat.fmt.pix.bytesperline = width *2;  // Initially it was width *1.5
+                    copy = m_capSrcFormat;
+                    copy.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
+
+                    err = v4lconvert_convert(m_convertData, &copy, &m_capDestFormat,
+                                             (unsigned char *)m_renderer->yuvBuffer, width*height*2,
+                                             m_capImage->bits(), m_capDestFormat.fmt.pix.sizeimage); // yuyv to rgb conversion
                 }
             }
             else if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264 && !m_VideoRecord){ // capture and save image in h264 format[not for video recording]
@@ -995,9 +955,6 @@ void Videostreaming::capFrame()
             unsigned char *bufferToSave = NULL;
             if(y16BayerFormat){ // y16 format - ex: cu40 camera
                 bufferToSave = y16BayerDestBuffer;
-            }else if(saveIfY12jpg){        // saving Y12 as jpg for See3CAM_CU55_MH camera.
-                bufferToSave = rgb_image;
-                saveIfY12jpg = false;
             }else{
                 bufferToSave = m_capImage->bits(); // image data converted using v4l2convert
             }
@@ -3081,7 +3038,7 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings){
 
     if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {
-        stopCapture();
+        resolnSwitch();   //Replaced stopCapture() with resolnSwitch() inorder to get preview in higher resolns while using Retrieve button.
         if(stillSettings){
             makeSnapShot = true;
             retrieveShot =true;
@@ -3161,7 +3118,7 @@ void Videostreaming::enableTimer(bool timerstatus)
 
 void Videostreaming::resolnSwitch()
 {
-    usleep(1000000);    //wait until frame comes
+    usleep(1000000);    // inorder to avoid ioctl call block,while switching to higher resolutions
     stopCapture();
 }
 

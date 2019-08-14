@@ -94,9 +94,11 @@ Item {
                     activeFocusOnPress: true
                     onClicked: {
                         see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_MASTER)
+                        root.masterEnableForMonochrome()
                     }
                     Keys.onReturnPressed:  {
                         see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_MASTER)
+                        root.masterEnableForMonochrome()
                     }
                 }
                 RadioButton {
@@ -106,10 +108,12 @@ Item {
                     exclusiveGroup: streamModeGroup
                     activeFocusOnPress: true
                     onClicked: {
-                        see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_TRIGGER)
+                        root.checkForTriggerMode(true)
+                        setTriggerMode()
                     }
                     Keys.onReturnPressed: {
-                        see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_TRIGGER)
+                        root.checkForTriggerMode(true)
+                        setTriggerMode()
                     }
                 }
 
@@ -144,7 +148,7 @@ Item {
                         see3camcu55_mh.setFlashMode(See3camcu55MH.MODE_OFF)
                     }
                     Keys.onReturnPressed:  {
-                        see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_OFF)
+                        see3camcu55_mh.setFlashMode(See3camcu55MH.MODE_OFF)
                     }
                 }
                 RadioButton {
@@ -449,7 +453,18 @@ Item {
         see3camcu55_mh.setToDefault()
         getValuesFromCamera()
     }
+    function setTriggerMode(){
+        root.checkForTriggerMode(true)
+        root.captureBtnEnable(false)
+        root.videoRecordBtnEnable(false)
+        see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_TRIGGER)
+    }
+
     Component.onCompleted: {
         getValuesFromCamera();
+    }
+    Component.onDestruction:{
+         // While quitting the camera, set it to continuous mode
+         see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_MASTER)
     }
 }

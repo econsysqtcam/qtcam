@@ -1072,7 +1072,15 @@ Rectangle {
             vidstreamproperty.vidCapFormatChanged(JS.videoCaptureFormat)
             vidstreamproperty.setResoultion(JS.videoCaptureResolution);
             vidstreamproperty.startAgain();            
-        }
+       }
+    }
+
+    // Added by Navya :13 Aug 2019 --Implemented streamon after switching to master from Trigger mode in case of See3CAM_CU55_MH camera.
+    function masterEnableForMonochrome(){
+        vidstreamproperty.stopCapture()
+        vidstreamproperty.vidCapFormatChanged(JS.videoCaptureFormat)
+        vidstreamproperty.setResoultion(JS.videoCaptureResolution);
+        vidstreamproperty.startAgain();
     }
 
     function videoRecordBegin() {

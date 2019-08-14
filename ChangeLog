@@ -1,3 +1,10 @@
+Qtcam Application - 22.0.9
+---------------------------
+* Fixed issue of Preview hang in Stream Mode when unplug and plug the device for See3CAM_CU55_MH camera.
+* Fixed issue of "Unable to record Video" display message while recording video in h264 encoder format for See3CAM_CU55_MH camera.
+* Fixed issue of preview hang while capturing multiple images(more than 50) in 1080p resolution in Y12 (.jpg)format for See3CAM_CU55_MH camera.
+* Fixed issue of no preview while using Retrieve in higher resolutions for FSCAM_CU135 camera. 
+
 Qtcam Application - 22.0.8
 ---------------------------
 * Changed product from See3CAM_CU1317 to FSCAM_CU135 for storage camera.

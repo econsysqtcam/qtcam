@@ -357,8 +357,6 @@ private:
 
     // Added by Sankari  - 10 Nov 2016 - To decide whether to save image or not
     bool m_saveImage;
-    bool saveIfY12jpg;
-
     unsigned int imgSaveSuccessCount;
 
     bool frameSkip;
@@ -553,7 +551,6 @@ public slots:
      * @param idx
      */
     void frameIntervalChanged(int idx);
-    void convertYUVtoRGB(unsigned char* buffer);
 
     void recordVideo();
       /**
