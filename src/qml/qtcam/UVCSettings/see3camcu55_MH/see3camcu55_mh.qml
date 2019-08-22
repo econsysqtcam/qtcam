@@ -93,6 +93,7 @@ Item {
                     exclusiveGroup: streamModeGroup
                     activeFocusOnPress: true
                     onClicked: {
+                        root.checkForTriggerMode(false)
                         root.captureBtnEnable(true)
                         root.videoRecordBtnEnable(true)
                         root.masterEnableForMonochrome()
@@ -100,6 +101,7 @@ Item {
 
                     }
                     Keys.onReturnPressed:  {
+                        root.checkForTriggerMode(false)
                         root.captureBtnEnable(true)
                         root.videoRecordBtnEnable(true)
                         root.masterEnableForMonochrome()
@@ -455,11 +457,13 @@ Item {
         see3camcu55_mh.getRollCtrlValue()
     }
     function setToDefaultValues(){
+        root.checkForTriggerMode(false)
+        root.captureBtnEnable(true)
+        root.videoRecordBtnEnable(true)
         see3camcu55_mh.setToDefault()
         getValuesFromCamera()
     }
-    function setTriggerMode(){
-        root.checkForTriggerMode(true)
+    function setTriggerMode(){  
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
         see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_TRIGGER)
