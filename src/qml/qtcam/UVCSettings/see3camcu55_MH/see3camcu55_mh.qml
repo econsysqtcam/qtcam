@@ -93,12 +93,17 @@ Item {
                     exclusiveGroup: streamModeGroup
                     activeFocusOnPress: true
                     onClicked: {
-                        see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_MASTER)
+                        root.captureBtnEnable(true)
+                        root.videoRecordBtnEnable(true)
                         root.masterEnableForMonochrome()
+                        see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_MASTER)
+
                     }
                     Keys.onReturnPressed:  {
-                        see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_MASTER)
+                        root.captureBtnEnable(true)
+                        root.videoRecordBtnEnable(true)
                         root.masterEnableForMonochrome()
+                        see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_MASTER)
                     }
                 }
                 RadioButton {

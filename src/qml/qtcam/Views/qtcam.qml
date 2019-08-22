@@ -361,6 +361,14 @@ Rectangle {
                 setControlValues(ctrlName.toString(),ctrlType,ctrlMinValue,ctrlMaxValue, ctrlStepSize, ctrlDefaultValue,ctrlID);
             }
 
+            // Added by Navya :31 July 2019
+            // To update the preview window width n height only when Application window is resized.
+            onSetWindowSize:{
+                previewBgrndArea.width = win_width * 0.85
+                previewBgrndArea.height = win_height - statusBarRootObject.statusBarHeight+5
+                setpreviewWindowSize();
+            }
+
             onDeviceUnplugged: {
                 // Added by Sankari:12 Feb 2018 - Get the Pci bus info for selected camera
                 keyEvent.stopGetKeyFromCamera()
@@ -1077,7 +1085,7 @@ Rectangle {
 
     // Added by Navya :13 Aug 2019 --Implemented streamon after switching to master from Trigger mode in case of See3CAM_CU55_MH camera.
     function masterEnableForMonochrome(){
-        vidstreamproperty.stopCapture()
+        vidstreamproperty.resolnSwitch();
         vidstreamproperty.vidCapFormatChanged(JS.videoCaptureFormat)
         vidstreamproperty.setResoultion(JS.videoCaptureResolution);
         vidstreamproperty.startAgain();
@@ -1556,5 +1564,14 @@ Rectangle {
        checkForResoln()
        vidstreamproperty.setResoultion(JS.videoCaptureResolution)
        getExposure()
+   }
+   // Added by Navya -31 July 2019 --Updating Preview display area when Application window is resized.
+   function setpreviewWindowSize(){
+       if(closeSideBarClicked){
+           vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, false)
+       }
+       else{
+           vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, true)
+       }
    }
 }

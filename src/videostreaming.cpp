@@ -117,6 +117,7 @@ Videostreaming::Videostreaming() : m_t(0)
     SkipIfPreviewFrame=false;
     dotile = 0;
     retrieveFrame=false;
+    windowResized = false;
 
     // Modified by Sankari : Dec 5 2018, converted TJPF_RGB to TJPF_RGBA and use RGB[RGBA] shader
     pf = TJPF_RGBA;
@@ -231,10 +232,15 @@ void Videostreaming::handleWindowChanged(QQuickWindow *win)
     if (win) {
         connect(win, &QQuickWindow::beforeSynchronizing, this, &Videostreaming::sync, Qt::DirectConnection);
         connect(win, &QQuickWindow::sceneGraphInvalidated, this, &Videostreaming::cleanup, Qt::DirectConnection);
-//! [1]
-        // If we allow QML to do the clearing, they would clear what we paint
-        // and nothing would show.
-//! [3]
+
+        // Event call to acknowledge when Application window state changes.
+        connect(win, &QQuickWindow::widthChanged,this,&Videostreaming::widthChangedEvent,Qt::DirectConnection);
+        connect(win, &QQuickWindow::heightChanged,this,&Videostreaming::heightChangedEvent,Qt::DirectConnection);
+
+        //! [1]
+                // If we allow QML to do the clearing, they would clear what we paint
+                // and nothing would show.
+        //! [3]
         win->setClearBeforeRendering(false);
     }
 }
@@ -400,9 +406,8 @@ void FrameRenderer::drawRGBBUffer(){
     int xMargin = 250; // [left margin + right margin ]
     int sidebarwidth;
 
-    QRect rec = QApplication::desktop()->screenGeometry();
-    if(sidebarAvailable){
-        sidebarwidth = rec.width() - previewBgrdAreaWidth;
+    if(sidebarAvailable){  //Fixed sidebarwidth,to avoid getting large values,which leads to change the preview position
+        sidebarwidth = 222;
     }else{
         sidebarwidth = 0;
     }
@@ -413,7 +418,7 @@ void FrameRenderer::drawRGBBUffer(){
     }else{
 		calculateViewport(videoResolutionwidth, videoResolutionHeight, previewBgrdAreaWidth-xMargin, previewBgrdAreaHeight, &x, &y, &destWindowWidth, &destWindowHeight);
     }
-    glViewport(sidebarwidth+x+(xMargin/2), y+(m_viewportSize.height()-previewBgrdAreaHeight), destWindowWidth, destWindowHeight);
+    glViewport(sidebarwidth+x+(xMargin/2),  y+(viewportHeight-previewBgrdAreaHeight), destWindowWidth, destWindowHeight);
       xcord =sidebarwidth+x+(xMargin/2);
     QMutexLocker locker(&renderMutex);
 
@@ -542,9 +547,8 @@ void FrameRenderer::drawYUYVBUffer(){
     int sidebarwidth;
     int skipFrames = 4;
 
-    QRect rec = QApplication::desktop()->screenGeometry();
-    if(sidebarAvailable){
-        sidebarwidth = rec.width() - previewBgrdAreaWidth;
+    if(sidebarAvailable){  //Fixed sidebarwidth,to avoid getting large values,which leads to change the preview position
+        sidebarwidth = 222;
     }else{
         sidebarwidth = 0;
     }
@@ -558,7 +562,7 @@ void FrameRenderer::drawYUYVBUffer(){
 	}
 
         // set view port
-	glViewport(sidebarwidth+x+(xMargin/2), y+(m_viewportSize.height()-previewBgrdAreaHeight), destWindowWidth, destWindowHeight);
+    glViewport(sidebarwidth+x+(xMargin/2), y+(viewportHeight-previewBgrdAreaHeight), destWindowWidth, destWindowHeight);
 
     xcord =sidebarwidth+x+(xMargin/2);
 
@@ -723,6 +727,11 @@ bool Videostreaming::saveIRImage(){
 
 void Videostreaming::setPreviewBgrndArea(int width, int height, bool sidebarAvailable){    
     if(m_renderer){
+        if(windowResized){  //Update Application width and height only when window is resized.
+            m_renderer->windowStatusChanged = true;
+            m_renderer->viewportHeight = resizedHeight;
+            windowResized = false;
+        }
         m_renderer->previewBgrdAreaHeight = height;
         m_renderer->previewBgrdAreaWidth = width;
         m_renderer->sidebarAvailable = sidebarAvailable;
@@ -773,15 +782,14 @@ void Videostreaming::capFrame()
     }
 
     if (again) {
-
-        return;
+      return;
     }
 
     if (buf.flags & V4L2_BUF_FLAG_ERROR) {   
         qbuf(buf);
         usleep(100000);
         emit signalTograbPreviewFrame(retrieveframeStoreCamInCross,true);
-        return;
+       return;
     }
 
     previewFrameSkipCount++;
@@ -1054,6 +1062,10 @@ void Videostreaming::capFrame()
      if(getPreviewWindow){
          previewWindow();
          m_renderer->getPreviewFrameWindow =false;
+     }
+     // signal to update preview width and height in qml
+     if(windowResized){
+          emit setWindowSize(resizedWidth,resizedHeight);
      }
      m_timer.start(2000);
 
@@ -2475,9 +2487,7 @@ void Videostreaming::startAgain() {
    
     yuyvBuffer = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
     yuyvBuffer_Y12 = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
-    
-    
-    
+      
     if(openSuccess) {
         displayFrame();
     }
@@ -3118,7 +3128,7 @@ void Videostreaming::enableTimer(bool timerstatus)
 
 void Videostreaming::resolnSwitch()
 {
-    usleep(1000000);    // inorder to avoid ioctl call block,while switching to higher resolutions
+    usleep(1000000);    // inorder to avoid ioctl block,while switching to higher resolutions
     stopCapture();
 }
 
@@ -3132,4 +3142,20 @@ void Videostreaming :: previewWindow()
     y= m_renderer->y1;
      emit signalForPreviewWindow(resWidth,resHeight,x,y);
 
+}
+/** Added by Navya :31 July 2019
+  * Event to know the change in ApplicationWindow width
+  * @param - width- resized window width
+  **/
+void Videostreaming::widthChangedEvent(int width){
+    windowResized =true;
+    resizedWidth = width;
+}
+
+/** Event to know the change in ApplicationWindow height
+  * @param height- resized window height
+  * */
+void Videostreaming::heightChangedEvent(int height){
+     windowResized =true;
+     resizedHeight = height;
 }

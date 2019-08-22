@@ -130,6 +130,7 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
             pCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
         pCodecCtx->codec_id = pOutputFormat->video_codec;
+
 #if !LIBAVCODEC_VER_AT_LEAST(54, 25)
         if(encodeType == CODEC_ID_MJPEG)
             pCodecCtx->pix_fmt =  PIX_FMT_YUVJ420P;
@@ -316,6 +317,7 @@ int VideoEncoder::encodeImage(uint8_t *buffer, bool rgbBufferformat)
      *                 - false if other than rgbabuffer passes 
  * @return 0 if success/ -ve if failure
  */
+
 int VideoEncoder::encodePacket(uint8_t *buffer, bool rgbBufferformat){
 
     double fps, recordTimeDurationInSec, millisecondsDiff;
@@ -330,13 +332,13 @@ int VideoEncoder::encodePacket(uint8_t *buffer, bool rgbBufferformat){
         recordTimeDurationInSec = millisecondsDiff/1000; // convert millisec to sec
 
         fps = (frameCount)/ recordTimeDurationInSec; // calculate fps
+
     }
 
     if(!isOk())
         return -1;    
 
     convertImage_sws(buffer, rgbBufferformat);
-
 
     int got_packet = 0;
     int out_size = 0;     
@@ -377,17 +379,16 @@ int VideoEncoder::encodePacket(uint8_t *buffer, bool rgbBufferformat){
             //pkt->duration = frameDuration;
 
         // The above calculation can be shortly gives as below
-       pkt.pts  = (frameCount*(pCodecCtx->time_base.den/fps)) / pCodecCtx->time_base.num;
-
+          pkt.pts  = (frameCount*(pCodecCtx->time_base.den/fps)) / pCodecCtx->time_base.num;
         if(pCodecCtx->coded_frame->key_frame)
             pkt.flags |= AV_PKT_FLAG_KEY;
 
         /* Write the compressed frame to the media file. */
         out_size = av_write_frame(pFormatCtx, &pkt);
-        if(out_size == 0){            
+        if(out_size == 0){
             videoPacketReceived = true;
             m_recStop = false;
-        }        
+        }
     }
 
     return out_size;
@@ -663,10 +664,11 @@ int VideoEncoder::encodeH264Packet(void *buffer, int bytesused){
         pkt.flags |= AV_PKT_FLAG_KEY;
 
     /* Write the compressed frame to the media file. */
+
     out_size = av_write_frame(pFormatCtx, &pkt);
     if(out_size == 0){
          frameCount++;
-	 videoPacketReceived = true;
+         videoPacketReceived = true;
     }
 
      if(pkt.data != NULL && pkt.size != 0){
