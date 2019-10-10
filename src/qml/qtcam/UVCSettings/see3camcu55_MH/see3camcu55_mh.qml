@@ -208,8 +208,8 @@ Item {
                     minimumValue: 0
                     maximumValue: 3
                     onValueChanged:  {
-                        rollTextField.text = rollSlider.value                  
-                            see3camcu55_mh.setRollCtrlValue(rollSlider.value)
+                        rollTextField.text = rollSlider.value
+                        see3camcu55_mh.setRollCtrlValue(rollSlider.value)
                     }
                 }
                 TextField {
@@ -471,9 +471,5 @@ Item {
 
     Component.onCompleted: {
         getValuesFromCamera();
-    }
-    Component.onDestruction:{
-         // While quitting the camera, set it to continuous mode
-         see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_MASTER)
     }
 }

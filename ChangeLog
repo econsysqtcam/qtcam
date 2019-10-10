@@ -1,3 +1,8 @@
+Qtcam Application - 22.0.11
+---------------------------
+* Fixed issue of no preview while switching between cameras for See3CAM_CU55M camera.
+* Added fix to avoid glitches in a recorded video in h264 encoder type.
+
 Qtcam Application - 22.0.10
 ---------------------------
 * Fixed issue of Video Record and Image Capture Button disabling while switching from Trigger to Master Mode in See3CAM_CU55_MH camera.

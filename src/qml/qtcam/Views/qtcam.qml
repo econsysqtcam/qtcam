@@ -1229,9 +1229,8 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/h264cam/h264camExt.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU55) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu55/see3camcu55.qml").createObject(root)
-        }
-        else if(selectedDeviceEnumValue == CommonEnums.FSCAM_CU135){ // Added By Sankari
-                    see3cam = Qt.createComponent("../UVCSettings/fscamcu135/fscamcu135.qml").createObject(root)
+        }else if(selectedDeviceEnumValue == CommonEnums.FSCAM_CU135){ // Added By Sankari
+            see3cam = Qt.createComponent("../UVCSettings/fscamcu135/fscamcu135.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU55_MH) { // Added By Navya
             see3cam = Qt.createComponent("../UVCSettings/see3camcu55_MH/see3camcu55_mh.qml").createObject(root)
         }else {
@@ -1550,6 +1549,10 @@ Rectangle {
    function checkForTriggerMode(mode)
    {
        getTriggerMode = mode;
+       if(mode)
+           keyEventFiltering = true;
+        else
+           keyEventFiltering = false;
    }
 
    //Added by Navya - 3rd June 2019 -- Disabling powerLine Frequency due to mismatch in set and get controls from HID and v4l2.
