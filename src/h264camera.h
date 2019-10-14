@@ -25,6 +25,10 @@
 #define V4L2_CID_XU_EXPOSURE_ROI_MODE            0x0C
 #define V4L2_CID_XU_EXPOSURE_ROI_COORDINATES     0x0D
 #define V4L2_CID_XU_EXPOSURE_ROI_WINSIZE         0x0E
+#define V4L2_CID_XU_HFLIP                   0xF
+#define V4L2_CID_XU_VFLIP                   0x10
+#define V4L2_CID_XU_MIN                     0x00
+#define V4L2_CID_XU_MAX                     0x01
 
 #define EXTENSION_UNIT_ID                   3
 #define XU_ROI_EXPOSURE_OFF                 0xC0
@@ -105,6 +109,18 @@ public:
     };
     Q_ENUMS(gainModes)
 
+    enum flipHorizontal{
+        HFLIP_MIN =0x00,
+        HFLIP_MAX = 0x01,
+    };
+    Q_ENUMS(flipHorizontal)
+
+    enum flipVertical{
+        VFLIP_MIN =0x00,
+        VFLIP_MAX = 0x01,
+    };
+    Q_ENUMS(flipVertical)
+
     enum camROIAutoExpMode {
         ROI_FULL = 0x00,
         ROI_MANUAL = 0x01
@@ -123,6 +139,10 @@ signals:
     void roiModeReceived(uint queryType, uint expMode);
     void roiWindowSizeReceived(uint queryType, uint windowSize);
     void titleTextChanged(QString _title, QString _text);
+    void flipHorizontalValue(uint queryType ,uint flipValue);
+    void flipVerticalValue(uint queryType ,uint flipValue);
+    void disableVFlipControl();
+    void disableHFlipControl();
 
 public slots:
 
@@ -153,6 +173,12 @@ public slots:
 
     bool getROIAutoExposureMode(uint queryType);
     bool getROIExposureWindowSize(uint queryType);
+
+    bool setHorizontalFlip(bool hFlipCheck);
+    bool getHorizontalFlip(uint queryType);
+
+    bool setVerticalFlip(bool vFlipCheck);
+    bool getVerticalFlip(uint queryType);
 
     bool getFirmwareVersion();
 

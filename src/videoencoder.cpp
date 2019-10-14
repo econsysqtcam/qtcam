@@ -321,7 +321,6 @@ int VideoEncoder::encodeImage(uint8_t *buffer, bool rgbBufferformat)
 int VideoEncoder::encodePacket(uint8_t *buffer, bool rgbBufferformat){
 
     double fps, recordTimeDurationInSec, millisecondsDiff;
-    static int64_t pts_prev;
     if(frameCount == 0){
         time1  = QTime::currentTime();
         fps = pCodecCtx->time_base.den;
@@ -386,7 +385,6 @@ int VideoEncoder::encodePacket(uint8_t *buffer, bool rgbBufferformat){
 
         // Added by Navya -- 18 Sep 2019
         // Adjusted timestamps inorder to avoid glitches in recorded video for h264 encoder.
-
         if(pts_prev == pkt.pts | pkt.pts < pts_prev){
             pkt.pts = pts_prev+1;  // Incremented the timestamp value,as pkt.pts is maintaining the same value,leading to av_write_interleaved_frame failure.
             pkt.dts = pkt.pts;
@@ -394,15 +392,13 @@ int VideoEncoder::encodePacket(uint8_t *buffer, bool rgbBufferformat){
         pts_prev = pkt.pts;
         if(pCodecCtx->coded_frame->key_frame)
             pkt.flags |= AV_PKT_FLAG_KEY;
-
         /* Write the compressed frame to the media file. */
-        out_size = av_write_frame(pFormatCtx, &pkt);
+        out_size = av_interleaved_write_frame(pFormatCtx, &pkt);
         if(out_size == 0){
             videoPacketReceived = true;
             m_recStop = false;
         }
     }
-
     return out_size;
 }
 #else

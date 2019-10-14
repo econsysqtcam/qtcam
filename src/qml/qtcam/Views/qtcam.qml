@@ -1131,7 +1131,6 @@ Rectangle {
 
         // enable capture image when smile trigger key or external camera key once recording video is finished
         disableCaptureImage = false
-
         captureVideoRecordRootObject.videoTimerUpdate(false)
         messageDialog.title = qsTr("Saved")
         messageDialog.text = qsTr("Video saved in the location:"+videofileName)

@@ -19,6 +19,8 @@ Item {
     property bool skipUpdateUIOnDewarp: false
     property int minWindowValue
     property int maxWindowValue
+    property bool hFlipClick :true
+    property bool vFlipClick :true
 
     Connections
     {
@@ -39,15 +41,15 @@ Item {
     }
 
     ScrollView{
-            id: scrollview
-            x: 10
-            y: 189.5
-            width: 257
-            height: 450
-            style: econscrollViewStyle
-            Item{
-                height:850
-                ColumnLayout{
+        id: scrollview
+        x: 10
+        y: 189.5
+        width: 257
+        height: 450
+        style: econscrollViewStyle
+        Item{
+            height:1000
+            ColumnLayout{
                 x:5
                 y:5
                 spacing:20
@@ -72,7 +74,7 @@ Item {
                         width: 150
                         stepSize: 1
                         style:econSliderStyle
-                        onValueChanged:{                            
+                        onValueChanged:{
                             if(skipUpdateInCamOnQFactor){
                                 h264camId.setQFactor(qFactorSlider.value)
                             }
@@ -231,7 +233,7 @@ Item {
                     model: ListModel {
                         ListElement { text: "OFF" }
                         ListElement { text: "HDR 1X" }
-                        ListElement { text: "HDR 2X" }                        
+                        ListElement { text: "HDR 2X" }
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
@@ -243,7 +245,7 @@ Item {
                     }
                 }
 
-		Text {
+                Text {
                     id: dewarpMode
                     text: "--- Dewarp Mode ---"
                     font.pixelSize: 14
@@ -269,7 +271,7 @@ Item {
                         if(skipUpdateUIOnDewarp){
                             h264camId.setDewarpMode(currentIndex)
                         }
-                      
+
                     }
                 }
 
@@ -303,7 +305,7 @@ Item {
                         }
                         Keys.onReturnPressed: {
                             h264camId.setROIAutoExposureMode(H264camera.ROI_FULL)
-                          
+
                         }
                     }
                     RadioButton {
@@ -326,16 +328,16 @@ Item {
                 }
 
                 Text {
-                            id: windowsize
-                            text: "--- ROI Window Size ---"
-                            font.pixelSize: 14
-                            enabled:hdrCombo.currentIndex == 0 ?1 :0
-                            font.family: "Ubuntu"
-                            color: "#ffffff"
-                            smooth: true
-                            Layout.alignment: Qt.AlignCenter
-                            opacity: 0.50196078431373
-                        }
+                    id: windowsize
+                    text: "--- ROI Window Size ---"
+                    font.pixelSize: 14
+                    enabled:hdrCombo.currentIndex == 0 ?1 :0
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
 
                 ComboBox
                 {
@@ -343,7 +345,7 @@ Item {
                     enabled: (autoexpManual.enabled && autoexpManual.checked && hdrCombo.currentIndex == 0) ? true : false
                     opacity: (autoexpManual.enabled && autoexpManual.checked && hdrCombo.currentIndex == 0) ? 1 : 0.1
                     model: ListModel{
-                       id:roiwinsize
+                        id:roiwinsize
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
@@ -396,7 +398,46 @@ Item {
                     }
                 }
 
+                Text {
+                    id: flipText
+                    text: "--- Flip Control ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
 
+                Row{
+                    spacing: 55
+                    CheckBox {
+                        id: flipCtrlHorizotal
+                        activeFocusOnPress : true
+                        text: "Horizontal"
+                        style: econCheckBoxStyle
+                        opacity: enabled ? 1 :0.1
+                        onClicked:{
+                            h264camId.setHorizontalFlip(flipCtrlHorizotal.checked)
+                        }
+                        Keys.onReturnPressed: {
+                            h264camId.setHorizontalFlip(flipCtrlHorizotal.checked)
+                        }
+                    }
+                    CheckBox {
+                        id: flipCtrlVertical
+                        activeFocusOnPress : true
+                        text: "Vertical"
+                        style: econCheckBoxStyle
+                        opacity: enabled ? 1 :0.1
+                        onClicked:{
+                              h264camId.setVerticalFlip(flipCtrlVertical.checked)
+                        }
+                        Keys.onReturnPressed: {
+                             h264camId.setVerticalFlip(flipCtrlVertical.checked)
+                        }
+                    }
+                }
                 Row{
                     Layout.alignment: Qt.AlignCenter
                     Button {
@@ -416,11 +457,11 @@ Item {
                     }
                 }
 
-              
-		 Row{
+
+                Row{
                     Layout.alignment: Qt.AlignCenter
 
-		 Button {
+                    Button {
                         id: f_wversion_selected
                         opacity: 1
                         activeFocusOnPress : true
@@ -436,15 +477,15 @@ Item {
                                 source: "images/f_wversion_selected.png"
                             }
                         }
-			onClicked: {
+                        onClicked: {
                             getFirmwareVer()
                         }
 
                         Keys.onReturnPressed: {
                             getFirmwareVer()
                         }
-		    }
-                 }
+                    }
+                }
             }
         }
     }
@@ -467,6 +508,23 @@ Item {
                 font.family: "Ubuntu"
                 font.pointSize: 10
                 text: control.text
+            }
+        }
+    }
+    Component {
+        id: econCheckBoxStyle
+        CheckBoxStyle {
+            label: Text {
+                text: control.text
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                opacity: 1
+            }
+            background: Rectangle {
+                color: "#222021"
+                border.color: control.activeFocus ? "#ffffff" : "#222021"
             }
         }
     }
@@ -505,7 +563,19 @@ Item {
         onHdrModeReceived:{
             queryForHDRControl(queryType, hdrValue)
         }
+        onFlipHorizontalValue:{
+            queryForHFlipControl(queryType, flipValue)
+        }
 
+        onFlipVerticalValue:{
+            queryForVFlipControl(queryType, flipValue)
+        }
+        onDisableHFlipControl:{
+            flipCtrlHorizotal.enabled = false;
+        }
+        onDisableVFlipControl:{
+            flipCtrlVertical.enabled = false;
+        }
         onGainModeReceived:{
             queryForGainControl(queryType, gainValue)
         }
@@ -525,7 +595,7 @@ Item {
         onNoiseReductionValueReceived:{
             queryForNoiseReductionControl(queryType, noiseReductionValue)
         }
-	
+
         onTitleTextChanged: {
             displayMessageBox(qsTr(_title), qsTr(_text))
         }
@@ -607,27 +677,27 @@ Item {
     }
 
     function displayMessageBox(title, text){
-        messageDialog.title = qsTr(title)        
+        messageDialog.title = qsTr(title)
         messageDialog.text = qsTr(text)
         messageDialog.open()
     }
 
     // Query for jpeg Q control - min, max, current values
-    function queryForQFactorControl(queryType, jpegQVal){        
+    function queryForQFactorControl(queryType, jpegQVal){
         skipUpdateInCamOnQFactor = false
         switch(queryType){
-            case H264camera.UVC_GET_CUR:
-                qFactorSlider.value = jpegQVal                
-                break;
-            case H264camera.UVC_GET_MIN:
-                qFactorSlider.minimumValue = jpegQVal
-                break;
-            case H264camera.UVC_GET_MAX:
-                qFactorSlider.maximumValue = jpegQVal
-                break;
-            case H264camera.UVC_GET_RES:
-                qFactorSlider.stepSize = jpegQVal
-                break;
+        case H264camera.UVC_GET_CUR:
+            qFactorSlider.value = jpegQVal
+            break;
+        case H264camera.UVC_GET_MIN:
+            qFactorSlider.minimumValue = jpegQVal
+            break;
+        case H264camera.UVC_GET_MAX:
+            qFactorSlider.maximumValue = jpegQVal
+            break;
+        case H264camera.UVC_GET_RES:
+            qFactorSlider.stepSize = jpegQVal
+            break;
         }
         skipUpdateInCamOnQFactor = true
 
@@ -636,23 +706,23 @@ Item {
     function queryForH264QualityControl(queryType, h264Quality){
         skipUpdateInCamOnh264Quality = false
         switch(queryType){
-            case H264camera.UVC_GET_CUR:
-                h264QualitySlider.value = h264Quality
-                break;
-            case H264camera.UVC_GET_MIN:
-                h264QualitySlider.minimumValue = h264Quality
-                break;
-            case H264camera.UVC_GET_MAX:
-                h264QualitySlider.maximumValue = h264Quality
-                break;
-            case H264camera.UVC_GET_RES:
-                h264QualitySlider.stepSize = h264Quality
-                break;
+        case H264camera.UVC_GET_CUR:
+            h264QualitySlider.value = h264Quality
+            break;
+        case H264camera.UVC_GET_MIN:
+            h264QualitySlider.minimumValue = h264Quality
+            break;
+        case H264camera.UVC_GET_MAX:
+            h264QualitySlider.maximumValue = h264Quality
+            break;
+        case H264camera.UVC_GET_RES:
+            h264QualitySlider.stepSize = h264Quality
+            break;
         }
         skipUpdateInCamOnh264Quality = true
     }
 
-   function queryForHDRControl(queryType, hdrVal){
+    function queryForHDRControl(queryType, hdrVal){
         if(queryType == H264camera.UVC_GET_CUR){
             switch(hdrVal){
             case H264camera.HDR_OFF:
@@ -660,75 +730,101 @@ Item {
                 break
             case H264camera.HDR_1X:
                 hdrCombo.currentIndex = 1
-               break
+                break
             case H264camera.HDR_2X:
                 hdrCombo.currentIndex = 2
-                break            
+                break
             }
         }
     }
 
-   function queryForGainControl(queryType, gainVal){
-       if(queryType == H264camera.UVC_GET_CUR){
-           switch(gainVal){
-           case H264camera.GAIN_MIN:
-               gainLcg.checked = true
-               break
-           case H264camera.GAIN_MAX:
-               gainHcg.checked = true
-               break
-           }
-       }
+    function queryForHFlipControl(queryType, HFlipVal){
+        if(queryType == H264camera.UVC_GET_CUR){
+            switch(HFlipVal){
+            case H264camera.HFLIP_MAX:
+                flipCtrlHorizotal.checked = true;
+                break
+            case H264camera.HFLIP_MIN:
+                flipCtrlHorizotal.checked = false;
+                break
+            }
+        }
+    }
 
-   }
+    function queryForVFlipControl(queryType, VFlipVal){
+        if(queryType == H264camera.UVC_GET_CUR){
+            switch(VFlipVal){
+            case H264camera.VFLIP_MAX:
+                flipCtrlVertical.checked = true;
+                break
+            case H264camera.VFLIP_MIN:
+                flipCtrlVertical.checked = false;
+                break
+            }
+        }
+    }
+
+    function queryForGainControl(queryType, gainVal){
+        if(queryType == H264camera.UVC_GET_CUR){
+            switch(gainVal){
+            case H264camera.GAIN_MIN:
+                gainLcg.checked = true
+                break
+            case H264camera.GAIN_MAX:
+                gainHcg.checked = true
+                break
+            }
+        }
+
+    }
 
 
-   function queryForRoiMode(queryType, expMode){
-       if(queryType == H264camera.UVC_GET_CUR){
-           switch(expMode){
-           case H264camera.ROI_FULL:
-               autoexpFull.checked = true
-               break
-           case H264camera.ROI_MANUAL:
-               autoexpManual.checked = true
-               break
-           }
-       }
-   }
+    function queryForRoiMode(queryType, expMode){
+        if(queryType == H264camera.UVC_GET_CUR){
+            switch(expMode){
+            case H264camera.ROI_FULL:
+                autoexpFull.checked = true
+                break
+            case H264camera.ROI_MANUAL:
+                autoexpManual.checked = true
+                break
+            }
+        }
+    }
 
 
-   function queryForWindowSize(queryType, windowSize){
-           switch(queryType){
-               case H264camera.UVC_GET_CUR:
-                   autoExpoWinSizeCombo.currentIndex = windowSize -1
-                   break;
-               case H264camera.UVC_GET_MIN:
-                   minWindowValue = windowSize
-                   break;
-               case H264camera.UVC_GET_MAX:
-                   maxWindowValue = windowSize
-                   break;
-               case H264camera.UVC_GET_RES:
-                   autoExpoWinSizeCombo.currentIndex = windowSize -1
-                   break;
-           }
+    function queryForWindowSize(queryType, windowSize){
+        switch(queryType){
+        case H264camera.UVC_GET_CUR:
+            autoExpoWinSizeCombo.currentIndex = windowSize -1
+            break;
+        case H264camera.UVC_GET_MIN:
+            minWindowValue = windowSize
+            break;
+        case H264camera.UVC_GET_MAX:
+            maxWindowValue = windowSize
+            break;
+        case H264camera.UVC_GET_RES:
+            autoExpoWinSizeCombo.currentIndex = windowSize -1
+            break;
+        }
 
-            fillROIWindowSizeCombo(minWindowValue,maxWindowValue)
-   }
+        fillROIWindowSizeCombo(minWindowValue,maxWindowValue)
+    }
 
 
     function queryForDewarpControl(queryType, dewarpValue){
-	if(queryType == H264camera.UVC_GET_CUR){
+        if(queryType == H264camera.UVC_GET_CUR){
             switch(dewarpValue){
             case H264camera.DEWARP_OFF:
-               dewarpCombo.currentIndex = 0
-               break
+                dewarpCombo.currentIndex = 0
+                break
             case H264camera.DEWARP_ON:
-               dewarpCombo.currentIndex = 1
-               break
+                dewarpCombo.currentIndex = 1
+                break
             }
         }
-          skipUpdateUIOnDewarp = true
+        skipUpdateUIOnDewarp = true
     }
 
 
@@ -742,19 +838,19 @@ Item {
 
     function queryForNoiseReductionControl(queryType, noiseReductionVal){
         skipUpdateInCamOnNoiseReduceChange = false
-        switch(queryType){            
-            case H264camera.UVC_GET_CUR:
-                noiseReduceSlider.value = noiseReductionVal                
-                break;
-            case H264camera.UVC_GET_MIN:
-                noiseReduceSlider.minimumValue = noiseReductionVal
-                break;
-            case H264camera.UVC_GET_MAX:
-                noiseReduceSlider.maximumValue = noiseReductionVal
-                break;
-            case H264camera.UVC_GET_RES:
-                noiseReduceSlider.stepSize = noiseReductionVal
-                break;
+        switch(queryType){
+        case H264camera.UVC_GET_CUR:
+            noiseReduceSlider.value = noiseReductionVal
+            break;
+        case H264camera.UVC_GET_MIN:
+            noiseReduceSlider.minimumValue = noiseReductionVal
+            break;
+        case H264camera.UVC_GET_MAX:
+            noiseReduceSlider.maximumValue = noiseReductionVal
+            break;
+        case H264camera.UVC_GET_RES:
+            noiseReduceSlider.stepSize = noiseReductionVal
+            break;
         }
 
     }
@@ -762,18 +858,18 @@ Item {
     function queryForBitrateControl(queryType, bitrateVal){
         skipUpdateInCamOnBitrateChange = false
         switch(queryType){
-            case H264camera.UVC_GET_CUR:
-                bitrateSlider.value = bitrateVal
-                break;
-            case H264camera.UVC_GET_MIN:
-                bitrateSlider.minimumValue = bitrateVal
-                break;
-            case H264camera.UVC_GET_MAX:
-                bitrateSlider.maximumValue = bitrateVal
-                break;
-            case H264camera.UVC_GET_RES:
-                bitrateSlider.stepSize = bitrateVal
-                break;
+        case H264camera.UVC_GET_CUR:
+            bitrateSlider.value = bitrateVal
+            break;
+        case H264camera.UVC_GET_MIN:
+            bitrateSlider.minimumValue = bitrateVal
+            break;
+        case H264camera.UVC_GET_MAX:
+            bitrateSlider.maximumValue = bitrateVal
+            break;
+        case H264camera.UVC_GET_RES:
+            bitrateSlider.stepSize = bitrateVal
+            break;
         }
 
     }
@@ -785,6 +881,8 @@ Item {
         h264camId.getQFactor(valueToGet)
         h264camId.getHDRMode(valueToGet)
         h264camId.getGainMode(valueToGet)
+        h264camId.getHorizontalFlip(valueToGet)
+        h264camId.getVerticalFlip(valueToGet)
         h264camId.getNoiseReductionValue(valueToGet)
         h264camId.getH264Quality(valueToGet)
         h264camId.getDewarpMode(valueToGet)

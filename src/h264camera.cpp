@@ -139,6 +139,51 @@ bool H264Camera::getH264Quality(uint queryType){
         return false;
 }
 
+bool H264Camera::setHorizontalFlip(bool hFlipCheck){
+    __u16 h264flip;
+    if(hFlipCheck){
+        h264flip = V4L2_CID_XU_MAX;
+    }else{
+        h264flip = V4L2_CID_XU_MIN;
+    }
+    return setCurrentValueCmd(V4L2_CID_XU_HFLIP, h264flip);
+}
+
+bool H264Camera::getHorizontalFlip(uint queryType){
+    __u8 flipVal;
+    int ret = getValueCmd(V4L2_CID_XU_HFLIP, queryType, flipVal);
+    if(ret){
+        uint flipValue = flipVal;
+        emit flipHorizontalValue(queryType, flipValue);
+        return true;
+    }else{
+        emit disableHFlipControl();
+        return false;
+    }
+}
+
+bool H264Camera::setVerticalFlip(bool vFlipCheck){
+    __u16 h264flip;  
+    if(vFlipCheck){
+        h264flip = V4L2_CID_XU_MAX;
+    }else{
+        h264flip = V4L2_CID_XU_MIN;
+    }
+    return setCurrentValueCmd(V4L2_CID_XU_VFLIP, h264flip);
+}
+
+bool H264Camera::getVerticalFlip(uint queryType){
+    __u8 flipVal;
+    int ret =getValueCmd(V4L2_CID_XU_VFLIP, queryType, flipVal);
+    if(ret){
+        uint flipValue = flipVal;
+        emit flipVerticalValue(queryType, flipValue);
+        return true;
+    }else{
+        emit disableVFlipControl();
+        return false;
+    }
+}
 
 /**
  * @brief H264Camera::setQFactor - setting QFactor value

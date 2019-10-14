@@ -2895,6 +2895,7 @@ void Videostreaming::recordVideo(){
 
 void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, QString fileLocation, int audioDeviceIndex, unsigned sampleRate, int channels) {
     m_VideoRecord = true;
+    videoEncoder->pts_prev = 0;     // To clear the previously stored pts value before recording video,so that video lag can be avoided in h264 encoder type.
     if(videoFormatType.isEmpty()) {
         videoFormatType = "avi";        //Application never enters in this condition
     }
