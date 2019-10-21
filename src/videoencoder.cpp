@@ -152,7 +152,7 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
         }else{
             supportedFpsDen = fpsDenominator;
         }
-        pCodecCtx->bit_rate =  getWidth() / 3.0f * getHeight() * fpsNumerator / supportedFpsDen;        
+        pCodecCtx->bit_rate =  getWidth() / 3.0f * getHeight() * fpsNumerator / supportedFpsDen;
         pCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         pCodecCtx->width = getWidth();
         pCodecCtx->height = getHeight();
@@ -319,7 +319,6 @@ int VideoEncoder::encodeImage(uint8_t *buffer, bool rgbBufferformat)
  */
 
 int VideoEncoder::encodePacket(uint8_t *buffer, bool rgbBufferformat){
-
     double fps, recordTimeDurationInSec, millisecondsDiff;
     if(frameCount == 0){
         time1  = QTime::currentTime();
@@ -385,6 +384,7 @@ int VideoEncoder::encodePacket(uint8_t *buffer, bool rgbBufferformat){
 
         // Added by Navya -- 18 Sep 2019
         // Adjusted timestamps inorder to avoid glitches in recorded video for h264 encoder.
+
         if(pts_prev == pkt.pts | pkt.pts < pts_prev){
             pkt.pts = pts_prev+1;  // Incremented the timestamp value,as pkt.pts is maintaining the same value,leading to av_write_interleaved_frame failure.
             pkt.dts = pkt.pts;
@@ -661,16 +661,22 @@ int VideoEncoder::encodeH264Packet(void *buffer, int bytesused){
 
     av_init_packet(&pkt);
 
-    pkt.pts  = (frameCount*(pCodecCtx->time_base.den/fps)) / pCodecCtx->time_base.num;
-
- /*   if (pCodecCtx->coded_frame->pts != AV_NOPTS_VALUE){
-        pkt.pts = av_rescale_q(pCodecCtx->coded_frame->pts, pCodecCtx->time_base, pVideoStream->time_base);
-    }*/
     pkt.stream_index = pVideoStream->index;
 
     if(pCodecCtx->coded_frame->key_frame)
         pkt.flags |= AV_PKT_FLAG_KEY;
 
+    pkt.pts  = (frameCount*(pCodecCtx->time_base.den/fps)) / pCodecCtx->time_base.num;
+    pkt.dts = pkt.pts;
+
+    // Added by Navya -- 18 Oct 2019
+    // Adjusted timestamps inorder to avoid glitches in recorded video for h264 encoder.
+
+    if(pts_prev == pkt.pts | pkt.pts < pts_prev){
+        pkt.pts = pts_prev+1;  // Incremented the timestamp value,as pkt.pts is maintaining the same value,leading to av_write_interleaved_frame failure.
+        pkt.dts = pkt.pts;
+    }
+    pts_prev = pkt.pts;
     /* Write the compressed frame to the media file. */
 
     out_size = av_write_frame(pFormatCtx, &pkt);

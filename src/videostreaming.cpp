@@ -1684,7 +1684,6 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG){
             if(bytesUsed <= HEADERFRAME1) {
                 emit logCriticalHandle("Ignoring empty buffer");
-
                 return false;
             }
             if(((uint8_t *) inputbuffer)[0] == 0xFF && ((uint8_t *) inputbuffer)[1] == 0xD8){
@@ -1695,12 +1694,10 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
 		    if(m_renderer && m_renderer->rgbaDestBuffer){
                     	QtConcurrent::run(jpegDecode, this, &m_renderer->rgbaDestBuffer, tempSrcBuffer, bytesUsed);
 		    }
-
                 }else{                
                 }
             }
             else{
-
                 return false;
             }
         }
@@ -1711,7 +1708,6 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         uint8_t *destBuffer = NULL;
         getFrameRates();
         m_renderer->renderyuyvMutex.lock();
-
         if(!m_renderer->yuvBuffer){
 	    m_renderer->renderyuyvMutex.unlock();
             return false;
@@ -1830,7 +1826,6 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 memcpy(srcBuffer, inputbuffer, ((width * height *3)/2));
                 for( __u32 l=0; l<(width* height * 3)/2; l=l+3) /* Y12 to YUYV conversion */
                 {
-
                     *pfmb++ = (((uint8_t *)srcBuffer)[l]);
                     *pfmb++ = 0x80;
                     *pfmb++ = (((uint8_t *)srcBuffer)[l+1]);
@@ -2893,7 +2888,7 @@ void Videostreaming::recordVideo(){
     videoEncoder->encodeImage(m_renderer->yuvBuffer, false /* other than rgba format means, false */);
 }
 
-void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, QString fileLocation, int audioDeviceIndex, unsigned sampleRate, int channels) {
+void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, QString fileLocation, int audioDeviceIndex, unsigned sampleRate, int channels) { 
     m_VideoRecord = true;
     videoEncoder->pts_prev = 0;     // To clear the previously stored pts value before recording video,so that video lag can be avoided in h264 encoder type.
     if(videoFormatType.isEmpty()) {
