@@ -47,6 +47,7 @@
 #include <QOpenGLShaderProgram>
 #include <QMutex>
 #include <unistd.h>
+#include <sys/ioctl.h>
 
 class FrameRenderer : public QObject, protected QOpenGLFunctions
 {
@@ -85,7 +86,7 @@ public:
     uint8_t *uBuffer;
     uint8_t *vBuffer;
     uint8_t *yuvBuffer;
-      __u32 xcord;
+      __u32 xcord,ycord;
     unsigned frame;
 
     // rgba buffer
@@ -99,6 +100,7 @@ public:
      __u32 x1,y1;
     bool gotFrame;
     bool copied;
+    unsigned fps;
 
     QMutex renderMutex; // mutex to use in rendering - rgba
     QMutex renderyuyvMutex; // mutex to use in rendering yuyv   
@@ -345,7 +347,7 @@ private:
     static QString camDeviceName;
 
     unsigned char  *y16BayerDestBuffer;
-	bool y16BayerFormat;
+    bool y16BayerFormat,y16FormatFor20CUG;
     unsigned char* rgb_image;
  /**
      * @brief currentlySelectedCameraEnum - This contains currently selected camera enum value

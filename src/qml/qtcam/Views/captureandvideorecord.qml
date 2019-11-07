@@ -82,6 +82,7 @@ Item {
 
     Action {
         id: saveVideo
+        enabled: record_stop.visible ? true : false
         onTriggered: {
             root.videoSaveVideo()
         }

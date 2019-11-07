@@ -232,7 +232,7 @@ Rectangle {
 
     Action {
         id: cameratab
-        onTriggered: {      // Removed selectCameraSettings API inorder to avoid getting camera settngs on pressing space key.
+        onTriggered: {      // Removed selectCameraSettings API inorder to avoid getting camera settings on pressing space key.
 
         }
     }
@@ -524,6 +524,7 @@ Rectangle {
                             } else if(captureVideoRecordRootObject.recordBtnVisible && !getTriggerMode ){
                                 videoRecordBegin()
                             } else if(captureVideoRecordRootObject.recordStopBtnVisible){
+                                console.log("video save video cal in Mouse area")
                                 videoSaveVideo()
                             }
                         }
@@ -1128,7 +1129,6 @@ Rectangle {
     function videoSaveVideo() {
         statusText = "Saving..."
         vidstreamproperty.recordStop()
-
         // enable capture image when smile trigger key or external camera key once recording video is finished
         disableCaptureImage = false
         captureVideoRecordRootObject.videoTimerUpdate(false)
@@ -1232,6 +1232,8 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/fscamcu135/fscamcu135.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU55_MH) { // Added By Navya
             see3cam = Qt.createComponent("../UVCSettings/see3camcu55_MH/see3camcu55_mh.qml").createObject(root)
+        }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_20CUG) { // Added By Navya
+            see3cam = Qt.createComponent("../UVCSettings/see3cam20cug/see3cam_20cug.qml").createObject(root)
         }else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
@@ -1252,30 +1254,31 @@ Rectangle {
     {
         switch(selectedEnum)
         {
-            case CommonEnums.ECON_1MP_BAYER_RGB:
-            case CommonEnums.ECON_1MP_MONOCHROME:
-            case CommonEnums.SEE3CAM_11CUG:
-            case CommonEnums.SEE3CAM_CU30:
-            case CommonEnums.SEE3CAMPLUS_CU30:
-		// Added by Sankari : 01 Aug 2017
-            case CommonEnums.SEE3CAM_CU20:
-            case CommonEnums.SEE3CAM_CU40:
-            case CommonEnums.SEE3CAM_CU50:
-            case CommonEnums.SEE3CAM_CU51:
-            case CommonEnums.SEE3CAM_CU130:
-            case CommonEnums.SEE3CAM_12CUNIR:
-            case CommonEnums.ECON_8MP_CAMERA:
-            case CommonEnums.SEE3CAM_130:
-            case CommonEnums.SEE3CAM_130A:
-            case CommonEnums.SEE3CAM_30:
-			case CommonEnums.SEE3CAM_81:
- 			// Added by Sankari : 22 Feb 2017
-            case CommonEnums.SEE3CAM_CU135:
-            case CommonEnums.NILECAM30_USB:
-            case CommonEnums.SEE3CAM_CU55:
-            case CommonEnums.FSCAM_CU135:
-            case CommonEnums.SEE3CAM_CU38:
-            case CommonEnums.SEE3CAM_CU55_MH:
+        case CommonEnums.ECON_1MP_BAYER_RGB:
+        case CommonEnums.ECON_1MP_MONOCHROME:
+        case CommonEnums.SEE3CAM_11CUG:
+        case CommonEnums.SEE3CAM_CU30:
+        case CommonEnums.SEE3CAMPLUS_CU30:
+            // Added by Sankari : 01 Aug 2017
+        case CommonEnums.SEE3CAM_CU20:
+        case CommonEnums.SEE3CAM_CU40:
+        case CommonEnums.SEE3CAM_CU50:
+        case CommonEnums.SEE3CAM_CU51:
+        case CommonEnums.SEE3CAM_CU130:
+        case CommonEnums.SEE3CAM_12CUNIR:
+        case CommonEnums.ECON_8MP_CAMERA:
+        case CommonEnums.SEE3CAM_130:
+        case CommonEnums.SEE3CAM_130A:
+        case CommonEnums.SEE3CAM_30:
+        case CommonEnums.SEE3CAM_81:
+            // Added by Sankari : 22 Feb 2017
+        case CommonEnums.SEE3CAM_CU135:
+        case CommonEnums.NILECAM30_USB:
+        case CommonEnums.SEE3CAM_CU55:
+        case CommonEnums.FSCAM_CU135:
+        case CommonEnums.SEE3CAM_CU38:
+        case CommonEnums.SEE3CAM_CU55_MH:
+        case CommonEnums.SEE3CAM_20CUG:
 
                 camproperty.openHIDDevice(device_box.currentText);
             break;

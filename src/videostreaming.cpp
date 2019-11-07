@@ -147,6 +147,7 @@ Videostreaming::Videostreaming() : m_t(0)
     bayerIRBuffer = NULL;
     yuv420pdestBuffer = NULL;
     y16BayerFormat = false;
+    y16FormatFor20CUG = false;
     audio_buffer_data = NULL;
     m_capNotifier = NULL;
     m_capImage = NULL;
@@ -565,15 +566,17 @@ void FrameRenderer::drawYUYVBUffer(){
     glViewport(sidebarwidth+x+(xMargin/2), y+(viewportHeight-previewBgrdAreaHeight), destWindowWidth, destWindowHeight);
 
     xcord =sidebarwidth+x+(xMargin/2);
-
     if (yBuffer != NULL && uBuffer != NULL && vBuffer != NULL){
-          if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB){
-               skipFrames = frame;
-           }else{
-              skipFrames = 4;
-          }
-            if(gotFrame && !updateStop && skipFrames >3){
-	     // set active texture and give input y buffer
+
+        // Added by Navya -- 18 Sep 2019
+        // Skipped frames inorder to avoid grren strips in streaming while switching resolution or capturing images continuosly.
+        if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB | currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG){
+            skipFrames = frame;
+        }else{
+            skipFrames = 4;
+        }
+        if(gotFrame && !updateStop && skipFrames >3){
+            // set active texture and give input y buffer
             glActiveTexture(GL_TEXTURE1);
             glUniform1i(samplerLocY, 1);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth, videoResolutionHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, yBuffer);
@@ -818,6 +821,12 @@ void Videostreaming::capFrame()
         break;
     case V4L2_PIX_FMT_GREY:{
         if((width*height*1) == buf.bytesused){
+            validFrame =true;
+        }
+    }
+        break;
+    case V4L2_PIX_FMT_Y16:{
+        if((width*height*2) == buf.bytesused){
             validFrame =true;
         }
     }
@@ -1705,6 +1714,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         return true;
     }else{
         uint8_t *srcBuffer = NULL;
+        uint16_t *sourceBuf20CUG =NULL;
         uint8_t *destBuffer = NULL;
         getFrameRates();
         m_renderer->renderyuyvMutex.lock();
@@ -1739,6 +1749,19 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
             }
             rgb2yuyv(y16BayerDestBuffer, yuyvBuffer, width, height);
             memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+
+        }else if(y16FormatFor20CUG){
+            m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
+            sourceBuf20CUG = (uint16_t *)malloc(width * height * 2);
+            uint8_t *pfmb = yuyvBuffer;
+            memcpy(sourceBuf20CUG, inputbuffer, (width * height * 2));
+            for(__u32 l=0; l<(width * height); l++) /* Y16 to YUYV conversion */
+            {
+                *pfmb++ =uint8_t(sourceBuf20CUG[l] * 0.2490234375);
+                *pfmb++ = 0x80;
+            }
+            memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+            freeBuffer((uint8_t *)sourceBuf20CUG);
         }else{
             switch(pixformat){
                 case V4L2_PIX_FMT_YUYV:{
@@ -1940,6 +1963,7 @@ void Videostreaming::getFrameRates() {
     
     ++m_frame;
     ++m_renderer->frame;
+    m_renderer->fps = m_fps;
     emit averageFPS(m_fps);
 }
 
@@ -2345,6 +2369,9 @@ void Videostreaming::displayFrame() {
         y16BayerFormat = true;
     }
 
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG && m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16) {
+        y16FormatFor20CUG = true;
+    }
     if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264){
         h264Decode = new H264Decoder();
         h264Decode->initH264Decoder(width, height);
@@ -2391,7 +2418,7 @@ void Videostreaming::stopCapture() {
 
     y16BayerFormat = false; // BY default this will be false, If cu40 [ y16 bayer format ] is selected ,
     //this will be enabled.
-
+    y16FormatFor20CUG = false;
     if (fd() >= 0) {
         emit logDebugHandle("Stop Previewing...");
         v4l2_requestbuffers reqbufs;

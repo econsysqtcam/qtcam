@@ -99,7 +99,6 @@ Item {
             exposureSliderSetEnable = false
             exposureComboEnable = false
             root.cameraFilterControls(true)
-
             exposureComboEnable = true
             exposureSliderSetEnable = true
             stop()

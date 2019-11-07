@@ -147,7 +147,7 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
         // Added by Sankari: Mar 20, 2019
         // If fps is 120 means, bitrate is very low. So "avcodec_open2" is failed in H264 encoder. So make it as 60.
         unsigned supportedFpsDen;
-        if(fpsDenominator == 120 | fpsDenominator == 112 || fpsDenominator == 180){   // Making fps as 60 for See3CAM_CU55_MH when fps is 112
+        if(fpsDenominator == 120 || fpsDenominator == 112 || fpsDenominator == 180 || fpsDenominator == 280){   // Making fps as 60 for See3CAM_CU55_MH when fps is 112
             supportedFpsDen = 60;
         }else{
             supportedFpsDen = fpsDenominator;

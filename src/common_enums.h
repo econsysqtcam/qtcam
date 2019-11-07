@@ -53,8 +53,10 @@ public:
 	// Added by Sankari - 11 Dec 2018
         ECAM22_USB,
         SEE3CAM_CU55,  // SEE3CAM_AR0521
+        // Added by Navya
         FSCAM_CU135, // STORECAM_1335
-        SEE3CAM_CU55_MH // cu55 monochrome
+        SEE3CAM_CU55_MH, // cu55 monochrome
+        SEE3CAM_20CUG
     }ECameraNames;
     //Enum for capture shot type
     typedef enum

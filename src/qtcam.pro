@@ -47,7 +47,8 @@ SOURCES += main.cpp \
     see3cam_cu38.cpp \
     alsa.cpp\
     fscam_cu135.cpp \
-    see3camcu55_mh.cpp
+    see3camcu55_mh.cpp \
+    see3cam_20cug.cpp
 
 # Installation path
 # target.path =
@@ -95,7 +96,8 @@ HEADERS += \
     see3cam_cu38.h \
     alsa.h\
     fscam_cu135.h\
-    see3camcu55_mh.h
+    see3camcu55_mh.h \
+    see3cam_20cug.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
