@@ -74,7 +74,7 @@ public:
         NO_RENDER = 0,      // stop render for skipframes
         RGB_BUFFER_RENDER = 1, // rgba
         YUYV_BUFFER_RENDER,
-	UYVY_BUFFER_RENDER
+        UYVY_BUFFER_RENDER
     }ERenderBuffer;
 	
     Q_ENUMS(ERenderBuffer)

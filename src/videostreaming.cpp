@@ -569,7 +569,7 @@ void FrameRenderer::drawYUYVBUffer(){
     if (yBuffer != NULL && uBuffer != NULL && vBuffer != NULL){
 
         // Added by Navya -- 18 Sep 2019
-        // Skipped frames inorder to avoid grren strips in streaming while switching resolution or capturing images continuosly.
+        // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
         if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB | currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG){
             skipFrames = frame;
         }else{
@@ -783,7 +783,6 @@ void Videostreaming::capFrame()
 
         return;
     }
-
     if (again) {
       return;
     }
@@ -1696,7 +1695,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 return false;
             }
             if(((uint8_t *) inputbuffer)[0] == 0xFF && ((uint8_t *) inputbuffer)[1] == 0xD8){
-                if(!frameSkip){       		    
+                if(!frameSkip){
                      getFrameRates();
                      frameSkip = true;
                     memcpy(tempSrcBuffer, (unsigned char *)inputbuffer, bytesUsed);
@@ -1793,7 +1792,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                             *pfmb++=0x80;                  //U or V
                         }
                     }
-		    memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);                    
+                    memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
                 }
                 break;
 

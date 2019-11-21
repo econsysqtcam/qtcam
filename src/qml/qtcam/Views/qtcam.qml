@@ -524,7 +524,6 @@ Rectangle {
                             } else if(captureVideoRecordRootObject.recordBtnVisible && !getTriggerMode ){
                                 videoRecordBegin()
                             } else if(captureVideoRecordRootObject.recordStopBtnVisible){
-                                console.log("video save video cal in Mouse area")
                                 videoSaveVideo()
                             }
                         }
