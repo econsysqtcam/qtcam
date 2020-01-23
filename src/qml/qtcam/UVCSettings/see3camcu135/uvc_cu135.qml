@@ -145,16 +145,15 @@ Item {
     }
 
     ScrollView{
-            id: scrollview
-            x: 10
-            y: 189.5
-            width: 257
-            height: 500
-            style: econscrollViewStyle
-            Item{
-                height:1500
-
-                ColumnLayout{
+        id: scrollview
+        x: 10
+        y: 189.5
+        width: 257
+        height: 500
+        style: econscrollViewStyle
+        Item{
+            height:1600
+            ColumnLayout{
                 x:2
                 y:5
                 spacing:20
@@ -1017,6 +1016,7 @@ Item {
     }
 
     function setMasterMode(){
+        root.checkForTriggerMode(false)
         seecamcu135.setStreamMode(See3CamCu135.STREAM_MASTER)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
@@ -1024,6 +1024,7 @@ Item {
 
     // set to default values
     function setToDefaultValues(){
+        root.checkForTriggerMode(false)
         seecamcu135.setToDefault()
         getValuesFromCamera()        
     }
@@ -1138,9 +1139,10 @@ Item {
 
     // set trigger stream mode
     function setTriggerMode(){
+        root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
-        seecamcu135.setStreamMode(See3CamCu135.STREAM_TRIGGER)        
+        seecamcu135.setStreamMode(See3CamCu135.STREAM_TRIGGER)
         displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document See3CAM_CU135_Trigger_Mode"))
     }
 

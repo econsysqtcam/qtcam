@@ -1,3 +1,10 @@
+Qtcam Application - 22.0.13
+---------------------------
+* Fixed issue of getting Streaming in Trigger Mode for See3CAM_CU20 camera.
+* Not allowing White Balance Text box to be modified by user.
+* Added fix for the issue of enumerating Device name twice in case of higher Kernal Version's.
+* Fixed issue of disabling camera Settings option on switching Trigger mode to Master Mode in See3CAM_CU135 camera. 
+
 Qtcam Application - 22.0.12
 ---------------------------
 * Added support to See3CAM_20CUG camera.

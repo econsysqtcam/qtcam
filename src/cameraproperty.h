@@ -42,6 +42,8 @@
 #include "videostreaming.h"
 #include "logger.h"
 #include "libudev.h"
+#define V4L2_CAP_META_CAPTURE     0x00800000
+
 class Cameraproperty : public QObject, public v4l2
 {
     Q_OBJECT

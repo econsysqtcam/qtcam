@@ -483,7 +483,7 @@ Item {
                         horizontalAlignment: TextInput.AlignHCenter
                         validator: IntValidator {bottom: white_balance_Slider.minimumValue; top: white_balance_Slider.maximumValue;}
                         opacity:  white_balance_Slider.enabled ? 1: 0
-                        enabled:   white_balance_Slider.enabled ? 1: 0
+                        enabled: false
                         style: econTextFieldStyle
                         maximumLength: (white_balance_Slider.maximumValue.toString().length > white_balance_Slider.minimumValue.toString().length) ? white_balance_Slider.maximumValue.toString().length : white_balance_Slider.minimumValue.toString().length
                     }

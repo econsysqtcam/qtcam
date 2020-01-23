@@ -1546,7 +1546,7 @@ Rectangle {
           JS.videoCaptureResolution = videoSettingsRootObject.videoOutputSize
    }
 
-   //Added by Navya - 29 May 2019 -- Inorder to stop VideoRecord and Image Capture in case of Software and Hardware Trigger Modes for FSCAM_CU135 camera.
+   //Added by Navya - 29 May 2019 -- Inorder to stop VideoRecord and Image Capture in case of Trigger Mode.
    function checkForTriggerMode(mode)
    {
        getTriggerMode = mode;

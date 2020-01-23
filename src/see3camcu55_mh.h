@@ -7,23 +7,23 @@
 #define SET_SUCCESS                     0x01
 #define SET_FAILURE                     0x00
 
-#define SET_STREAM_MODE                 0x02
-#define GET_STREAM_MODE                 0x01
+#define SET_STREAM_MODE_CU55_MH                 0x02
+#define GET_STREAM_MODE_CU55_MH                 0x01
 
 #define GET_SUCCESS                     0x01
 #define GET_FAILURE                     0x00
 
-#define SET_FLASH_MODE                 0x04
-#define GET_FLASH_MODE                 0x03
+#define SET_FLASH_MODE_CU55_MH                 0x04
+#define GET_FLASH_MODE_CU55_MH                 0x03
 
-#define SET_ROLL_CONTROL                0x07
-#define GET_ROLL_CONTROL                0x06
+#define SET_ROLL_CONTROL_CU55_MH                0x07
+#define GET_ROLL_CONTROL_CU55_MH                0x06
 
-#define SET_DEFAULT                     0x05
+#define SET_DEFAULT_CU55_MH                     0x05
 
-#define READ_FIRMWARE_VERSION           0x40
+#define READ_FIRMWARE_VERSION_CU55_MH           0x40
 
-#define READ_UNIQUE_ID                  0x41
+#define READ_UNIQUE_ID_CU55_MH                  0x41
 
 class See3CAM_CU55_MH : public QObject
 {

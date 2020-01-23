@@ -25,7 +25,7 @@ bool See3CAM_CU55_MH ::setStreamMode(streamModes streamMode)
 
     // fill buffer values
     g_out_packet_buf[1] =CAMERA_CONTROL_SEE3CAM_CU55_MH; /* set camera control code */
-    g_out_packet_buf[2] = SET_STREAM_MODE; /* set stream mode code */
+    g_out_packet_buf[2] = SET_STREAM_MODE_CU55_MH; /* set stream mode code */
     g_out_packet_buf[3] = streamMode; /* actual stream mode */
 
     // send request and get reply from camera
@@ -34,7 +34,7 @@ bool See3CAM_CU55_MH ::setStreamMode(streamModes streamMode)
         if (g_in_packet_buf[6]==SET_FAILURE) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU55_MH &&
-            g_in_packet_buf[1]==SET_STREAM_MODE &&
+            g_in_packet_buf[1]==SET_STREAM_MODE_CU55_MH &&
             g_in_packet_buf[6]==SET_SUCCESS) {
 
             return true;
@@ -59,14 +59,14 @@ bool See3CAM_CU55_MH::getStreamMode()
 
    // fill buffer values
    g_out_packet_buf[1] = CAMERA_CONTROL_SEE3CAM_CU55_MH;  /* set camera control code */
-   g_out_packet_buf[2] = GET_STREAM_MODE; /* get stream mode code */
+   g_out_packet_buf[2] = GET_STREAM_MODE_CU55_MH; /* get stream mode code */
 
    // send request and get reply from camera
    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
        if (g_in_packet_buf[6]==GET_FAILURE) {
            return false;
        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU55_MH &&
-           g_in_packet_buf[1]==GET_STREAM_MODE &&
+           g_in_packet_buf[1]==GET_STREAM_MODE_CU55_MH &&
            g_in_packet_buf[6]==GET_SUCCESS) {
            streamMode = g_in_packet_buf[2];
 
@@ -89,7 +89,7 @@ bool See3CAM_CU55_MH ::setFlashMode(flashModes flashMode)
 
     // fill buffer values
     g_out_packet_buf[1] =CAMERA_CONTROL_SEE3CAM_CU55_MH; /* set camera control code */
-    g_out_packet_buf[2] = SET_FLASH_MODE; /* set flash mode code */
+    g_out_packet_buf[2] = SET_FLASH_MODE_CU55_MH; /* set flash mode code */
     g_out_packet_buf[3] = flashMode; /* actual flash mode */
 
     // send request and get reply from camera
@@ -97,7 +97,7 @@ bool See3CAM_CU55_MH ::setFlashMode(flashModes flashMode)
         if (g_in_packet_buf[6]==SET_FAILURE) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU55_MH &&
-            g_in_packet_buf[1]==SET_FLASH_MODE &&
+            g_in_packet_buf[1]==SET_FLASH_MODE_CU55_MH &&
             g_in_packet_buf[6]==SET_SUCCESS) {
 
             return true;
@@ -121,14 +121,14 @@ bool See3CAM_CU55_MH::getFlashMode()
 
    // fill buffer values
    g_out_packet_buf[1] = CAMERA_CONTROL_SEE3CAM_CU55_MH;  /* set camera control code */
-   g_out_packet_buf[2] = GET_FLASH_MODE; /* get flash mode code */
+   g_out_packet_buf[2] = GET_FLASH_MODE_CU55_MH; /* get flash mode code */
 
    // send request and get reply from camera
    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
        if (g_in_packet_buf[6]==GET_FAILURE) {
            return false;
        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU55_MH &&
-           g_in_packet_buf[1]==GET_FLASH_MODE &&
+           g_in_packet_buf[1]==GET_FLASH_MODE_CU55_MH &&
            g_in_packet_buf[6]==GET_SUCCESS) {
            flashMode = g_in_packet_buf[2];
            emit flashModeValue(flashMode);
@@ -151,7 +151,7 @@ bool See3CAM_CU55_MH::setRollCtrlValue(uint rollValue)
 
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_SEE3CAM_CU55_MH; /* set camera control code */
-    g_out_packet_buf[2] = SET_ROLL_CONTROL; /* set roll control code */
+    g_out_packet_buf[2] = SET_ROLL_CONTROL_CU55_MH; /* set roll control code */
     g_out_packet_buf[3] = rollValue; /* set rollControl value */
 
     // send request and get reply from camera
@@ -159,7 +159,7 @@ bool See3CAM_CU55_MH::setRollCtrlValue(uint rollValue)
         if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU55_MH &&
-            g_in_packet_buf[1]==SET_ROLL_CONTROL &&
+            g_in_packet_buf[1]==SET_ROLL_CONTROL_CU55_MH &&
             g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
         }
@@ -185,14 +185,14 @@ bool See3CAM_CU55_MH::getRollCtrlValue()
 
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_SEE3CAM_CU55_MH; /* set camera control code */
-    g_out_packet_buf[2] = GET_ROLL_CONTROL; /* get roll control code */
+    g_out_packet_buf[2] = GET_ROLL_CONTROL_CU55_MH; /* get roll control code */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU55_MH &&
-            g_in_packet_buf[1]==GET_ROLL_CONTROL &&
+            g_in_packet_buf[1]==GET_ROLL_CONTROL_CU55_MH &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             emit rollCtrlValue(g_in_packet_buf[2]);
             return true;
@@ -214,14 +214,14 @@ bool See3CAM_CU55_MH::setToDefault()
 
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_SEE3CAM_CU55_MH; /* camera id */
-    g_out_packet_buf[2] = SET_DEFAULT; /* set to default command */
+    g_out_packet_buf[2] = SET_DEFAULT_CU55_MH; /* set to default command */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==SET_FAILURE) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU55_MH &&
-            g_in_packet_buf[1]==SET_DEFAULT &&
+            g_in_packet_buf[1]==SET_DEFAULT_CU55_MH &&
             g_in_packet_buf[6]==SET_SUCCESS) {\
             emit titleTextChanged(_title,_text);
             return true;

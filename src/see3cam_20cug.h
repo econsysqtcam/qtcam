@@ -8,23 +8,23 @@
 #define SET_SUCCESS                     0x01
 #define SET_FAILURE                     0x00
 
-#define SET_STREAM_MODE                 0x02
-#define GET_STREAM_MODE                 0x01
+#define SET_STREAM_MODE_20CUG                 0x02
+#define GET_STREAM_MODE_20CUG                 0x01
 
 #define GET_SUCCESS                     0x01
 #define GET_FAILURE                     0x00
 
-#define SET_FLASH_MODE                  0x04
-#define GET_FLASH_MODE                  0x03
+#define SET_FLASH_MODE_20CUG                   0x04
+#define GET_FLASH_MODE_20CUG                   0x03
 
-#define SET_FLIP_CONTROLS               0x06
-#define GET_FLIP_CONTROLS               0x05
+#define SET_FLIP_CONTROLS_20CUG                0x06
+#define GET_FLIP_CONTROLS_20CUG                0x05
 
-#define SET_DEFAULT                     0xFF
+#define SET_DEFAULT_20CUG                      0xFF
 
-#define READ_FIRMWARE_VERSION           0x40
+#define READ_FIRMWARE_VERSION_20CUG            0x40
 
-#define READ_UNIQUE_ID                  0x41
+#define READ_UNIQUE_ID_20CUG                   0x41
 
 class See3CAM_20CUG : public QObject
 {

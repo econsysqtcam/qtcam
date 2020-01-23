@@ -168,7 +168,12 @@ void Cameraproperty::checkforDevice() {
                     //Removed the commented code by Dhurka - 13th Oct 2016
                     cameraMap.insert(qDevCount,QString::number(deviceIndex,10));
                     deviceNodeMap.insert(deviceIndex,(char*)m_querycap.bus_info);
-                    availableCam.append(cameraName);
+
+                    // Added by Navya: 12-Dec-2019
+                    // For Kernal Version >= 4.15 ,single device is detecting as two Nodes ,one as VideoCapture and other as MetaData Capture.Enumerating the Node which is VideoCapture.
+                    if(!(m_querycap.device_caps & V4L2_CAP_META_CAPTURE)){
+                        availableCam.append(cameraName);
+                    }
                     deviceIndex++;
                     close();
                 } else {
@@ -226,7 +231,7 @@ int Cameraproperty::getUsbSpeed(QString serialNumber){
 
     for (size_t idx = 0; idx < count; idx++) {
         libusb_device *device = list[idx];
-        struct libusb_device_descriptor devDesc = {0};
+        struct libusb_device_descriptor devDesc = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
         retVal = libusb_get_device_descriptor (device, &devDesc);
 

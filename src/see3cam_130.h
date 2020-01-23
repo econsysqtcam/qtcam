@@ -76,8 +76,8 @@
 #define SET_FRAME_RATE_130              0x25
 #define GET_FRAME_RATE_130              0x24
 
-#define SET_FLICKER_DETECTION           0x28
-#define GET_FLICKER_DETECTION           0x27
+#define SET_FLICKER_DETECTION_130           0x28
+#define GET_FLICKER_DETECTION_130           0x27
 
 
 class See3CAM_130 : public QObject

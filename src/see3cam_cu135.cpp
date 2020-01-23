@@ -998,7 +998,7 @@ bool See3CAM_CU135::setFlickerDetection(camFlickerMode flickerMode){
 
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU135; /* camera id */
-    g_out_packet_buf[2] = SET_FLICKER_DETECTION; /* set flicker detection command */
+    g_out_packet_buf[2] = SET_FLICKER_DETECTION_CU135; /* set flicker detection command */
     g_out_packet_buf[3] = flickerMode; /* flicker detection mode to set */
 
     // send request and get reply from camera
@@ -1006,7 +1006,7 @@ bool See3CAM_CU135::setFlickerDetection(camFlickerMode flickerMode){
         if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU135 &&
-            g_in_packet_buf[1]==SET_FLICKER_DETECTION &&
+            g_in_packet_buf[1]==SET_FLICKER_DETECTION_CU135 &&
             g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
         }
@@ -1032,14 +1032,14 @@ bool See3CAM_CU135::getFlickerDetection()
 
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU135; /* camera id */
-    g_out_packet_buf[2] = GET_FLICKER_DETECTION; /* get flicker detection command */
+    g_out_packet_buf[2] = GET_FLICKER_DETECTION_CU135; /* get flicker detection command */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU135 &&
-            g_in_packet_buf[1]==GET_FLICKER_DETECTION &&
+            g_in_packet_buf[1]==GET_FLICKER_DETECTION_CU135 &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             emit flickerDetectionMode(g_in_packet_buf[2]);
             return true;

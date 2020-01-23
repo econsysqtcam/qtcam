@@ -94,8 +94,8 @@
 #define SETFLASH_STATUS_CU30                 0x19
 #define GETFLASH_STATUS_CU30                 0x18
 
-#define SET_FLICKER_DETECTION                0x1B
-#define GET_FLICKER_DETECTION                0x1A
+#define SET_FLICKER_DETECTION_CU30               0x1B
+#define GET_FLICKER_DETECTION_CU30                0x1A
 
 
 class See3CAM_CU30 : public QObject

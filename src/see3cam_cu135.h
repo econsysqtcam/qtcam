@@ -90,8 +90,8 @@
 
 #define SET_TO_DEFAULT_CU135                       0x12
 
-#define SET_FLICKER_DETECTION                      0x1E
-#define GET_FLICKER_DETECTION                      0x1D
+#define SET_FLICKER_DETECTION_CU135                      0x1E
+#define GET_FLICKER_DETECTION_CU135                      0x1D
 
 
 
