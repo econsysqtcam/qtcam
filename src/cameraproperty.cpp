@@ -148,6 +148,7 @@ void Cameraproperty::checkforDevice() {
     cameraMap.clear();
     deviceNodeMap.clear();
     int deviceIndex = 1;
+    bool metaCapture = false;
     availableCam.clear();
     if(qDir.cd("/sys/class/video4linux/")) {
         QStringList filters,list;
@@ -165,12 +166,24 @@ void Cameraproperty::checkforDevice() {
                     if(cameraName.length()>22){
                         cameraName.insert(22,"\n");
                     }
-                    //Removed the commented code by Dhurka - 13th Oct 2016
-                    cameraMap.insert(qDevCount,QString::number(deviceIndex,10));
-                    deviceNodeMap.insert(deviceIndex,(char*)m_querycap.bus_info);
-                    availableCam.append(cameraName);
-                    deviceIndex++;
+                    // Added by Navya: 12-Dec-2019
+                    // For Kernal Version >= 4.15 ,single device is detecting as two Nodes ,one as VideoCapture and other as MetaData Capture.Enumerating the Node which is VideoCapture.
+                    if(!(m_querycap.device_caps & V4L2_CAP_META_CAPTURE)){
+                        cameraMap.insert(qDevCount,QString::number(deviceIndex,10));
+                        deviceNodeMap.insert(deviceIndex,(char*)m_querycap.bus_info);
+                        availableCam.append(cameraName);
+                        metaCapture = true;
+                    }
+
+                    // Added by Navya : 24th Jan 2020
+                    // Increasing the deviceIndex only if the /dev/video node is VideoCapture Node.
+
+                    if(!metaCapture){
+                        deviceIndex++;
+                    }
+                    metaCapture = false;
                     close();
+
                 } else {
                     emit logWriter(QtCriticalMsg, "Cannot open device: /dev/video"+qDevCount);
                     return void();
