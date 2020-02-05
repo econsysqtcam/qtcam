@@ -641,6 +641,7 @@ signals:
     void refreshDevice();
     void addControls();
     void rcdStop(QString recordFail);
+    void videoRecordInvalid(QString noVideo);
     void videoRecord(QString fileName);
     void enableRfRectBackInPreview();
     void enableFactRectInPreview();

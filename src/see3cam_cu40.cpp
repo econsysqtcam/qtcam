@@ -49,7 +49,7 @@ bool See3CAM_CU40::setFlashState(const flashStateValues &flashMode)
     ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
 
     if (ret < 0) {
-        perror("write");
+        //perror("write");
         return false;
     }
 
@@ -110,7 +110,7 @@ bool See3CAM_CU40::getFlashState()
     ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
 
     if (ret < 0) {
-        perror("write");
+        //perror("write");
         return false;
     }
 

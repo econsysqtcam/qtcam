@@ -85,7 +85,7 @@ bool See3CAM_11CUG::enableCroppedVGAMode(u_int8_t *VGAStatus)
 
     ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
     if (ret < 0) {
-        perror("write");
+        //perror("write");
         return false;
     }
     start = uvc.getTickCount();
@@ -132,7 +132,7 @@ bool See3CAM_11CUG::enableBinnedVGAMode(u_int8_t *VGAStatus)
 
     ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
     if (ret < 0) {
-        perror("write");
+        //perror("write");
         return false;
     }
     start = uvc.getTickCount();
@@ -223,7 +223,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
 
             ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
             if (ret < 0) {
-                perror("write");
+                //perror("write");
                 return false;
             }
             start = uvc.getTickCount();
@@ -289,7 +289,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
 
             ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
             if (ret < 0) {
-                perror("write");
+                //perror("write");
                 emit deviceStatus("Failure",tr("Unable to get whitebalance values"));
             }
             start = uvc.getTickCount();
@@ -347,7 +347,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
 
         ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
         if (ret < 0) {
-            perror("write");
+            //perror("write");
             return false;
         }
         start = uvc.getTickCount();
@@ -405,7 +405,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
 
         ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
         if (ret < 0) {
-            perror("write");
+            //perror("write");
             return false;
         }
         start = uvc.getTickCount();
@@ -461,7 +461,7 @@ bool See3CAM_11CUG::setWbValues(camRGBcolor rgbColor, uint rgbValue)
 
         ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
         if (ret < 0) {
-            perror("write");
+            //perror("write");
             return false;
         }
         start = uvc.getTickCount();

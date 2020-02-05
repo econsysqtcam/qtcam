@@ -292,6 +292,26 @@ Rectangle {
             close()
         }
     }
+        MessageDialog {
+            id: recordDisable
+            icon: StandardIcon.Critical
+            onAccepted: {
+                videoPropertyItemEnable(true)
+                stillPropertyItemEnable(true)
+                audioPropertyItemEnable(true)
+                device_box.enabled = true
+                vidstreamproperty.enabled = true
+                device_box.opacity = 1
+                videoRecordBtnVisible(true)
+                uvc_settings.enabled = true
+                uvc_settings.opacity = 1
+                close()
+            }
+            Component.onCompleted:{
+                close()
+            }
+        }
+
 
     Image {
         id: layer_0
@@ -427,7 +447,9 @@ Rectangle {
             onAverageFPS: {
                 if(device_box.opacity === 0.5)
                 {
-                    statusText = "Recording..." + " " + "Current FPS: " + fps + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
+                    if(!(vidstreamproperty.width == 320 && vidstreamproperty.height ==240)){ // Added by Navya : 05-02-2020 -- Avoid showing the fps on status bar while trying to record video for 320x240.
+                        statusText = "Recording..." + " " + "Current FPS: " + fps + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
+                    }
                 }
                 else
                 {
@@ -467,6 +489,14 @@ Rectangle {
                 vidstreamproperty.recordStop()
                 captureVideoRecordRootObject.videoTimerUpdate(false)
             }
+            onVideoRecordInvalid :{
+                recordDisable.title = "Disable"
+                recordDisable.text = noVideo
+                recordDisable.open()
+                vidstreamproperty.recordStop()
+                captureVideoRecordRootObject.videoTimerUpdate(false)
+            }
+
             onCaptureSaveTime: {
                 stillSettingsRootObject.startCaptureTimer(saveTime);
             }
@@ -1097,7 +1127,9 @@ Rectangle {
         // disable capture image when smile trigger key or external camera key when recording video
         disableCaptureImage = true
 
-        captureVideoRecordRootObject.videoTimerUpdate(true)
+        if(!(vidstreamproperty.width == 320 && vidstreamproperty.height ==240)){  // Added by Navya : Stop updating the timer for 320x240
+            captureVideoRecordRootObject.videoTimerUpdate(true)
+        }
         if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130  || selectedDeviceEnumValue == CommonEnums.SEE3CAM_30){
             recordStartDelayTimer.start() // some delay is required to disable focus rect / face overlay rect. After that delay need to start record.
         }else{
@@ -1126,6 +1158,7 @@ Rectangle {
     }
 
     function videoSaveVideo() {
+        if(!(vidstreamproperty.width == 320 && vidstreamproperty.height ==240)){  // Added by Navya : Save the video only if it is not 320x240.
         statusText = "Saving..."
         vidstreamproperty.recordStop()
         // enable capture image when smile trigger key or external camera key once recording video is finished
@@ -1136,6 +1169,7 @@ Rectangle {
         messageDialog.open()
         videoPropertyItemEnable(true)
         stillPropertyItemEnable(true)
+        }
         // Added by Sankari : Apr 5 2018. Once recording is finished, Do not enable audio settings when "YUY" encoder is selected
         if(!disableAudio){
             audioPropertyItemEnable(true)
