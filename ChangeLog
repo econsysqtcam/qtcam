@@ -1,3 +1,7 @@
+Qtcam Application - 22.0.14
+---------------------------
+* Disabled video record option for 320x240 resolution in See3CAM_20CUG camera.
+
 Qtcam Application - 22.0.13
 ---------------------------
 * Fixed issue of getting Streaming in Trigger Mode for See3CAM_CU20 camera.
