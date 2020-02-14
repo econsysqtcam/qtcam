@@ -58,6 +58,7 @@
 #include "fscam_cu135.h"
 #include "see3camcu55_mh.h"
 #include "see3cam_20cug.h"
+#include "see3cam_cu22.h"
 
 //*! \mainpage Qtcam - A econ's camera product
 // *
@@ -112,7 +113,8 @@ int main(int argc, char *argv[])
 
     // Added by Sankari: 27 July 2017
     qmlRegisterType<See3CAM_CU20>("econ.camera.see3camcu20", 1, 0, "See3Camcu20");
-    qmlRegisterType<See3CAM_CU51>("econ.camera.see3cam51", 1, 0, "See3Cam51");    
+    qmlRegisterType<See3CAM_CU22>("econ.camera.see3camcu22", 1, 0, "See3Camcu22");
+    qmlRegisterType<See3CAM_CU51>("econ.camera.see3cam51", 1, 0, "See3Cam51");
     // Added by Sankari - 5 Oct 2018
     qmlRegisterType<H264Camera>("econ.camera.h264cam", 1, 0, "H264camera"); //ecam22_usb 
     qmlRegisterType<ASCELLA>("econ.camera.ascella", 1, 0, "Ascella");

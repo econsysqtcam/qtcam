@@ -90,8 +90,8 @@ Rectangle {
     property int selectedDeviceEnumValue;
     //Added by Dhurka - 19th Oct 2016
     //create object for statusbar qml - Added by Dhurka - 18th Oct 2016
-	property variant statusBarRootObject
-	property variant aboutViewRootObject
+    property variant statusBarRootObject
+    property variant aboutViewRootObject
     property variant imageSettingsRootObject
     property variant stillSettingsRootObject
     property variant videoSettingsRootObject
@@ -100,7 +100,7 @@ Rectangle {
     property variant pciBusCamDetails
 
     //Disabling side bar controls - Added below by Dhurka
-	signal sidebarVisibleStatus(variant status);
+    signal sidebarVisibleStatus(variant status);
     signal cameraSettingsTabEnable(variant status);
     //Send control values to imagequalitysettings
     signal setControlValues(string controlName,int controlType,int controlMinValue,int controlMaxValue,int controlStepSize, int controlDefaultValue,int controlID);
@@ -114,9 +114,9 @@ Rectangle {
     property bool videoCaptureChildVisible : false;
     property bool stillCaptureChildVisible: false
     property bool audioCaptureChildVisible: false
-    property bool videoSettingsChildVisible: false    
+    property bool videoSettingsChildVisible: false
 
-   
+
     property bool disableAudio: false
 
     //video scrollview visible height
@@ -135,7 +135,7 @@ Rectangle {
     //Enable or disable audio property item
     signal audioPropertyItemEnable(bool enableStatus)
     //Insert Still image formats
-    signal insertStillImageFormat(var stillFormat);    
+    signal insertStillImageFormat(var stillFormat);
     signal insertChannelFormats(var channels);
     //Set index of color combox in still property
     signal setColorComboOutputIndex(bool isColorCombo,int indexValue)
@@ -201,7 +201,7 @@ Rectangle {
     signal getExposure();
 
     // Added by Sankari: 16 Dec 2016 - To init trigger shot for 12CUNIR camera
-    signal initTriggershot();    
+    signal initTriggershot();
 
     //Added by Sankari: 23 Dec 2016
     signal videoResolutionChanged();
@@ -236,16 +236,16 @@ Rectangle {
 
         }
     }
-	Timer {
+    Timer {
         id: recordStartDelayTimer // Record after disabling Auto Focus Rectangle or face rect overlay rectangle
         interval: 1000
         onTriggered: {
-	    if(disableAudio){
-            vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, 0, audioSampleRate, audioChannel)
-	    }
-	    else{
+            if(disableAudio){
+                vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, 0, audioSampleRate, audioChannel)
+            }
+            else{
                 vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, audioDeviceIndex, audioSampleRate, audioChannel)
-	    }
+            }
             stop()
         }
     }
@@ -292,25 +292,25 @@ Rectangle {
             close()
         }
     }
-        MessageDialog {
-            id: recordDisable
-            icon: StandardIcon.Critical
-            onAccepted: {
-                videoPropertyItemEnable(true)
-                stillPropertyItemEnable(true)
-                audioPropertyItemEnable(true)
-                device_box.enabled = true
-                vidstreamproperty.enabled = true
-                device_box.opacity = 1
-                videoRecordBtnVisible(true)
-                uvc_settings.enabled = true
-                uvc_settings.opacity = 1
-                close()
-            }
-            Component.onCompleted:{
-                close()
-            }
+    MessageDialog {
+        id: recordDisable
+        icon: StandardIcon.Critical
+        onAccepted: {
+            videoPropertyItemEnable(true)
+            stillPropertyItemEnable(true)
+            audioPropertyItemEnable(true)
+            device_box.enabled = true
+            vidstreamproperty.enabled = true
+            device_box.opacity = 1
+            videoRecordBtnVisible(true)
+            uvc_settings.enabled = true
+            uvc_settings.opacity = 1
+            close()
         }
+        Component.onCompleted:{
+            close()
+        }
+    }
 
 
     Image {
@@ -323,7 +323,7 @@ Rectangle {
         height: parent.height - statusBarRootObject.statusBarHeight+5
     }
 
-     Rectangle{
+    Rectangle{
         id: previewBgrndArea
         color: "#000000"
         x: layer_0.x
@@ -331,213 +331,227 @@ Rectangle {
         anchors.leftMargin: sideBarItems.visible ? parent.width*0.15 : 0
         width: sideBarItems.visible ? parent.width * 0.85 : parent.width
         height: layer_0.height
-     }
-        Videostreaming {
-            id: vidstreamproperty
-            focus: true
+    }
+    Videostreaming {
+        id: vidstreamproperty
+        focus: true
 
-	    SequentialAnimation on t {
-                    id:seqAni
-                    NumberAnimation { to: 1; duration: 16; easing.type: Easing.InQuad }
-                    NumberAnimation { to: 0; duration: 16; easing.type: Easing.OutQuad }
-                    loops: Animation.Infinite
-                    running: false
+        SequentialAnimation on t {
+            id:seqAni
+            NumberAnimation { to: 1; duration: 16; easing.type: Easing.InQuad }
+            NumberAnimation { to: 0; duration: 16; easing.type: Easing.OutQuad }
+            loops: Animation.Infinite
+            running: false
+        }
+        // Added by Sankari:12 Feb 2018 - Get the Pci bus info for selected camera
+        onPciDeviceBus:{
+            pciBusCamDetails = businfo
+        }
+
+
+        onTitleTextChanged:{
+            vidstreamproperty.enabled = true
+            captureBtnEnable(true)
+            videoRecordBtnEnable(true)
+            webcamKeyAccept = true
+            keyEventFiltering = false
+            messageDialog.title = _title.toString()
+            messageDialog.text = _text.toString()
+            messageDialog.visible = true
+            if(mouseClickCap){
+                //Added by Sankari : 08 Mar 2017
+                //Enable camera settings/extension settings tab after capturing image
+                enableAllSettingsTab()
+                mouseClickCap = false
             }
+            seqAni.start()
+            vidstreamproperty.stopUpdatePreview()
+
+        }
+        onEnableRfRectBackInPreview:{
+            afterBurst() // signal to do anything need to do after capture continuous[burst] shots.
+        }
+
+        // Enable Face detection rect in preview
+        onEnableFactRectInPreview:{
+            enableFaceRectafterBurst()
+        }
+
+        onNewControlAdded: {
+            setControlValues(ctrlName.toString(),ctrlType,ctrlMinValue,ctrlMaxValue, ctrlStepSize, ctrlDefaultValue,ctrlID);
+        }
+
+        // Added by Navya :31 July 2019
+        // To update the preview window width n height only when Application window is resized.
+        onSetWindowSize:{
+            previewBgrndArea.width = win_width * 0.85
+            previewBgrndArea.height = win_height - statusBarRootObject.statusBarHeight+5
+            setpreviewWindowSize();
+        }
+
+        onDeviceUnplugged: {
             // Added by Sankari:12 Feb 2018 - Get the Pci bus info for selected camera
-            onPciDeviceBus:{
-                pciBusCamDetails = businfo
-            }
+            keyEvent.stopGetKeyFromCamera()
+            seqAni.stop()
+            captureBtnEnable(false)
+            videoRecordBtnEnable(false)
+            keyEventFiltering = true
+            statusText = ""
+            messageDialog.visible = false
+            messageDialog.title = _title.toString()
+            messageDialog.text = _text.toString()
+            messageDialog.open()
+            cameraDeviceUnplugged();
+            device_box.oldIndex = 0
+            device_box.currentIndex = 0
+            enableUVCSettings = false;
+            disableImageSettings();
+            // Added by Sankari: 25 May 2017. When device is unplugged, make preview area disabled
+            vidstreamproperty.enabled = false
 
-           
-            onTitleTextChanged:{
-                vidstreamproperty.enabled = true
-                captureBtnEnable(true)
-                videoRecordBtnEnable(true)
-                webcamKeyAccept = true
-                keyEventFiltering = false
-                messageDialog.title = _title.toString()
-                messageDialog.text = _text.toString()
-                messageDialog.visible = true
-                if(mouseClickCap){
-                    //Added by Sankari : 08 Mar 2017
-                    //Enable camera settings/extension settings tab after capturing image
-                    enableAllSettingsTab()
-                    mouseClickCap = false
-                }                
-                seqAni.start()
-                vidstreamproperty.stopUpdatePreview()
-
-            }
-            onEnableRfRectBackInPreview:{
-                afterBurst() // signal to do anything need to do after capture continuous[burst] shots.
-            }
-
-            // Enable Face detection rect in preview
-            onEnableFactRectInPreview:{
-                enableFaceRectafterBurst()
-            }
-
-            onNewControlAdded: {
-                setControlValues(ctrlName.toString(),ctrlType,ctrlMinValue,ctrlMaxValue, ctrlStepSize, ctrlDefaultValue,ctrlID);
-            }
-
-            // Added by Navya :31 July 2019
-            // To update the preview window width n height only when Application window is resized.
-            onSetWindowSize:{
-                previewBgrndArea.width = win_width * 0.85
-                previewBgrndArea.height = win_height - statusBarRootObject.statusBarHeight+5
-                setpreviewWindowSize();
-            }
-
-            onDeviceUnplugged: {
-                // Added by Sankari:12 Feb 2018 - Get the Pci bus info for selected camera
-                keyEvent.stopGetKeyFromCamera()
-                seqAni.stop()
-                captureBtnEnable(false)
-                videoRecordBtnEnable(false)
-                keyEventFiltering = true
-                statusText = ""
-                messageDialog.visible = false
-                messageDialog.title = _title.toString()
-                messageDialog.text = _text.toString()
+            if(captureVideoRecordRootObject.recordStopBtnVisible) {
+                statusText = "Saving..."
+                vidstreamproperty.recordStop()
+                captureVideoRecordRootObject.videoTimerUpdate(false)
+                messageDialog.title = qsTr("Saved")
+                messageDialog.text = qsTr("Video saved in the location:"+videofileName)
                 messageDialog.open()
-                cameraDeviceUnplugged();
-                device_box.oldIndex = 0
-                device_box.currentIndex = 0
-                enableUVCSettings = false;
-                disableImageSettings();
-                // Added by Sankari: 25 May 2017. When device is unplugged, make preview area disabled
-                vidstreamproperty.enabled = false
-
-                if(captureVideoRecordRootObject.recordStopBtnVisible) {
-                    statusText = "Saving..."
-                    vidstreamproperty.recordStop()
-                    captureVideoRecordRootObject.videoTimerUpdate(false)
-                    messageDialog.title = qsTr("Saved")
-                    messageDialog.text = qsTr("Video saved in the location:"+videofileName)
-                    messageDialog.open()
-                    videoPropertyItemEnable(true)
-                    stillPropertyItemEnable(true)
-                    audioPropertyItemEnable(true)
-                    device_box.enabled = true
-                    device_box.opacity = 1
-                    videoRecordBtnVisible(true)
-                    uvc_settings.enabled = true
-                    uvc_settings.opacity = 1
-                }
-                if(sideBarItems.visible){ // only when side bar items visible
-                    //When device is unplugged,need to destroy the active camera qml and create default qml file
-                    if(see3cam){
-                        see3cam.destroy()
-                        see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
-                        see3cam.visible = !cameraColumnLayout.visible
-                        extensionTabVisible(see3cam.visible)
-                    }
+                videoPropertyItemEnable(true)
+                stillPropertyItemEnable(true)
+                audioPropertyItemEnable(true)
+                device_box.enabled = true
+                device_box.opacity = 1
+                videoRecordBtnVisible(true)
+                uvc_settings.enabled = true
+                uvc_settings.opacity = 1
+            }
+            if(sideBarItems.visible){ // only when side bar items visible
+                //When device is unplugged,need to destroy the active camera qml and create default qml file
+                if(see3cam){
+                    see3cam.destroy()
+                    see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
+                    see3cam.visible = !cameraColumnLayout.visible
+                    extensionTabVisible(see3cam.visible)
                 }
             }
+        }
 
-            onLogDebugHandle: {
-                camproperty.logDebugWriter(_text.toString())
-            }
+        onLogDebugHandle: {
+            camproperty.logDebugWriter(_text.toString())
+        }
 
-            onLogCriticalHandle: {
-                camproperty.logCriticalWriter(_text.toString())
-            }
+        onLogCriticalHandle: {
+            camproperty.logCriticalWriter(_text.toString())
+        }
 
-            onAverageFPS: {
-                if(device_box.opacity === 0.5)
-                {
-                    if(!(vidstreamproperty.width == 320 && vidstreamproperty.height ==240)){ // Added by Navya : 05-02-2020 -- Avoid showing the fps on status bar while trying to record video for 320x240.
-                        statusText = "Recording..." + " " + "Current FPS: " + fps + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
-                    }
-                }
-                else
-                {
-                    statusText = "Current FPS: " + fps + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
+        onAverageFPS: {
+            if(device_box.opacity === 0.5)
+            {
+                if(!(vidstreamproperty.width == 320 && vidstreamproperty.height ==240)){
+                    statusText = "Recording..." + " " + "Current FPS: " + fps + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
                 }
             }
-
-            onDefaultFrameSize: {                
-                if(m_Snap) {
-                    setColorComboOutputIndex(false,outputIndexValue)
-                }
-                setVideoColorComboOutputIndex(false,outputIndexValue)
-                vidstreamproperty.width = defaultWidth
-                vidstreamproperty.height = defaultHeight
+            else
+            {
+                statusText = "Current FPS: " + fps + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
             }
+        }
 
-            onDefaultStillFrameSize: {
+        onDefaultFrameSize: {
+            if(m_Snap) {
                 setColorComboOutputIndex(false,outputIndexValue)
             }
+            setVideoColorComboOutputIndex(false,outputIndexValue)
+            vidstreamproperty.width = defaultWidth
+            vidstreamproperty.height = defaultHeight
+        }
 
-            onDefaultOutputFormat: {
-                if(m_Snap){
-                    setColorComboOutputIndex(true,formatIndexValue)
-                }
-                if(!stillPreview){
-                    setVideoColorComboOutputIndex(true,formatIndexValue)
-                }
-            }
+        onDefaultStillFrameSize: {
+            setColorComboOutputIndex(false,outputIndexValue)
+        }
 
-            onDefaultFrameInterval:{                
-                videoFrameInterval(frameInterval)
+        onDefaultOutputFormat: {
+            if(m_Snap){
+                setColorComboOutputIndex(true,formatIndexValue)
             }
-            onRcdStop: {
-                recordFailedDialog.title = "Failed"
-                recordFailedDialog.text = recordFail
-                recordFailedDialog.open()
-                vidstreamproperty.recordStop()
-                captureVideoRecordRootObject.videoTimerUpdate(false)
+            if(!stillPreview){
+                setVideoColorComboOutputIndex(true,formatIndexValue)
             }
-            onVideoRecordInvalid :{
-                recordDisable.title = "Disable"
-                recordDisable.text = noVideo
-                recordDisable.open()
-                vidstreamproperty.recordStop()
-                captureVideoRecordRootObject.videoTimerUpdate(false)
-            }
+        }
 
-            onCaptureSaveTime: {
-                stillSettingsRootObject.startCaptureTimer(saveTime);
-            }
+        onDefaultFrameInterval:{
+            videoFrameInterval(frameInterval)
+        }
+        onRcdStop: {
+            recordFailedDialog.title = "Failed"
+            recordFailedDialog.text = recordFail
+            recordFailedDialog.open()
+            vidstreamproperty.recordStop()
+            captureVideoRecordRootObject.videoTimerUpdate(false)
+        }
+        onVideoRecordInvalid :{
+            recordDisable.title = "Disable"
+            recordDisable.text = noVideo
+            recordDisable.open()
+            vidstreamproperty.recordStop()
+            captureVideoRecordRootObject.videoTimerUpdate(false)
+        }
 
-            onVideoRecord: {
-                videofileName = fileName
-            }
+        onCaptureSaveTime: {
+            stillSettingsRootObject.startCaptureTimer(saveTime);
+        }
 
-            onStillSkipCount:{                
-                frameSkipCount(stillResoln, videoResoln, stillOutFormat);
-            }
+        onVideoRecord: {
+            videofileName = fileName
+        }
 
-            onStillSkipCountWhenFPSChange:{
-                frameSkipCountWhenFPSChange(fpsChange)
-            }
+        onStillSkipCount:{
+            frameSkipCount(stillResoln, videoResoln, stillOutFormat);
+        }
 
-            // Added by Sankari - get FPS list
-            onSendFPSlist:{
-                availableFpslist = fpsList;
-            }
+        onStillSkipCountWhenFPSChange:{
+            frameSkipCountWhenFPSChange(fpsChange)
+        }
 
-          onSignalTograbPreviewFrame:{
-                queryFrame(retrieveframe,InFailureCase);
-             }
+        // Added by Sankari - get FPS list
+        onSendFPSlist:{
+            availableFpslist = fpsList;
+        }
 
-            onCapFrameTimeout:{
-                captureFrameTimeout();
-            }
+        onSignalTograbPreviewFrame:{
+            queryFrame(retrieveframe,InFailureCase);
+        }
 
-            //  Added by Navya : 23 Apr 2019
-            //  In order to maintain Mousearea similar to preview window
-            onSignalForPreviewWindow:{
-                     previewwindow.width = resWidth
-                     previewwindow.height = resHeight
-                     previewwindow.x = x;
-                     previewwindow.y = y;
+        onCapFrameTimeout:{
+            captureFrameTimeout();
+        }
+
+        //  Added by Navya : 23 Apr 2019
+        //  In order to maintain Mousearea similar to preview window
+        onSignalForPreviewWindow:{
+            previewwindow.width = resWidth
+            previewwindow.height = resHeight
+            previewwindow.x = x;
+            previewwindow.y = y;
+        }
+
+        // Added by Navya : 11 Feb 2020
+        // Disabling capturing images while switching Resolutions (false - disable ,true -enable )
+        onSignalToSwitchResoln:{
+            if(switchResoln){
+                keyEventFiltering = false
+                captureBtnEnable(true)
             }
-            Rectangle
-            {
-                id:previewwindow
-                color : "black"
+            else {
+                keyEventFiltering = true
+                captureBtnEnable(false)
+            }
+        }
+
+        Rectangle
+        {
+            id:previewwindow
+            color : "black"
 
             MouseArea{
                 anchors.fill: parent
@@ -564,8 +578,8 @@ Rectangle {
                     }
                 }
             }
-          }
         }
+    }
 
     Image {
         id: open_sideBar
@@ -590,8 +604,9 @@ Rectangle {
                 sideBarItems.visible = true
                 sidebarVisibleStatus(sideBarItems.visible)
                 open_sideBar.visible = false
-		// set preview background area. param1:width, param2: height, param3: sidebar visibility true/false
+                // set preview background area. param1:width, param2: height, param3: sidebar visibility true/false
                 vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, true)
+                vidstreamproperty.sidebarStateChanged()
             }
         }
     }
@@ -652,7 +667,7 @@ Rectangle {
                 }
             }
             onCurrentIndexChanged: {
-                if(currentIndex.toString() != "-1" && currentIndex.toString() != "0") {                    
+                if(currentIndex.toString() != "-1" && currentIndex.toString() != "0") {
                     if(oldIndex!=currentIndex) {
                         // when switching camera make "exposureAutoAvailable" as false
                         imageSettingsRootObject.exposureAutoAvailable = false
@@ -677,7 +692,7 @@ Rectangle {
                         captureBtnEnable(true)
                         videoRecordBtnEnable(true)
                         keyEventFiltering = false
-                        vidstreamproperty.enabled = true                                                
+                        vidstreamproperty.enabled = true
                         webcamKeyAccept = true
 
                         vidstreamproperty.stopCapture()
@@ -690,7 +705,7 @@ Rectangle {
                         vidstreamproperty.displayVideoResolution()
                         vidstreamproperty.displayEncoderList()
                         //Added by Dhurka - 24th Oct 2016 - Push Auto mode item in image quality settings for ascella camera
-                        addAutoModeMenuItem();                        
+                        addAutoModeMenuItem();
                         //Added by Sankari - 06th Mar 2016
                         queryUvcControls();
                         //Added by Dhurka - 20th Oct 2016
@@ -712,7 +727,7 @@ Rectangle {
                         JS.videoCaptureFormat = JS.stillCaptureFormat
                         JS.videoCaptureResolution = JS.stillCaptureResolution
                         JS.videocaptureFps = videoSettingsRootObject.videoFrameRate
-						// retain lastly set fps index
+                        // retain lastly set fps index
                         vidstreamproperty.lastFPS(videoSettingsRootObject.videoFrameRateIndex)
                         vidstreamproperty.masterModeEnabled()
                         // Moved by Sankari: Mar 20, 2019. For storage camera, before start preview, we need to set ondemand mode.
@@ -892,6 +907,7 @@ Rectangle {
                     open_sideBar.visible = true
                     // set preview backgrond area. param1:width, param2: height, param3: sidebar visibility true/false
                     vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, false)
+                    vidstreamproperty.sidebarStateChanged()
                 }
             }
         }
@@ -909,13 +925,13 @@ Rectangle {
 
     Camproperty {
         id: camproperty
+
         //Added by Dhurka - 13th Oct 2016
         //This signal is caught from cameraproperty.cpp to get the selected camera enum value
         onCurrentlySelectedCameraEnum:
         {
             selectedDeviceEnumValue = selectedDevice;
         }
-
 
         // Added by Sankari: To notify user about warning
         // 07 Dec 2017
@@ -934,9 +950,8 @@ Rectangle {
             if(!disableCaptureImage){ // disable capture by smile trigger key or external key is pressed when recording video
                 takeScreenShot(true)
             }
-        }        
+        }
     }
-
 
     function enumerateAudioSettings(){
         vidstreamproperty.enumerateAudioProperties()
@@ -951,18 +966,18 @@ Rectangle {
         audioChannel = channel
         vidstreamproperty.setChannelCount(channel)
     }
-	
-    // Added by Sankari : Update frame to skip 
+
+    // Added by Sankari : Update frame to skip
     function updateFrametoSkip(stillSkip){
         vidstreamproperty.updateFrameToSkip(stillSkip)
     }
 
     // Added by Sankari: Mar 21, 2019. To set number of frames to skip in preview[ex: in fscam_cu135]
-    function updatePreviewFrameskip(previewSkip){        
+    function updatePreviewFrameskip(previewSkip){
         vidstreamproperty.updatePreviewFrameSkip(previewSkip)
     }
 
-   
+
     function retrieveFrameFromStorageCamera(){
         setStillSettings()
         vidstreamproperty.retrieveFrameFromStoreCam()
@@ -997,18 +1012,18 @@ Rectangle {
     }
 
     function updateScenePreview(str, format, fps) {
-        m_Snap = false        
-        if (!vidFormatChanged){            
+        m_Snap = false
+        if (!vidFormatChanged){
             vidstreamproperty.width = str.toString().split("x")[0].toString()
             vidstreamproperty.height = str.toString().split("x")[1].toString()
         }
         //Added by Navya -To avoid unwanted call for grabPreviewFrame in case of storagecamera by giving delay.
         vidstreamproperty.resolnSwitch()
         if(vidFormatChanged){
-            vidstreamproperty.lastPreviewResolution(vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString(),format)         
+            vidstreamproperty.lastPreviewResolution(vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString(),format)
             JS.videoCaptureResolution = vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString()
         }else{
-            vidstreamproperty.lastPreviewResolution(str,format)                       
+            vidstreamproperty.lastPreviewResolution(str,format)
         }
 
         // Added by Sankari: 04 Jan 2017 -  store last fps index
@@ -1022,7 +1037,7 @@ Rectangle {
     }
 
     function updateStillPreview(str, format) {
-		m_Snap = false
+        m_Snap = false
         stillPreview = true
         vidstreamproperty.stopCapture()
         vidstreamproperty.vidCapFormatChanged(format)
@@ -1056,7 +1071,7 @@ Rectangle {
         vidstreamproperty.startAgain()
     }
 
-    function updateFPS(pix, size) {        
+    function updateFPS(pix, size) {
         vidstreamproperty.updateFrameInterval(pix, size)
         vidstreamproperty.enumerateFPSList()
     }
@@ -1109,8 +1124,8 @@ Rectangle {
             vidstreamproperty.stopCapture()
             vidstreamproperty.vidCapFormatChanged(JS.videoCaptureFormat)
             vidstreamproperty.setResoultion(JS.videoCaptureResolution);
-            vidstreamproperty.startAgain();            
-       }
+            vidstreamproperty.startAgain();
+        }
     }
 
     // Added by Navya :13 Aug 2019 --Implemented streamon after switching to master from Trigger mode in case of See3CAM_CU55_MH camera.
@@ -1122,53 +1137,54 @@ Rectangle {
     }
 
     function videoRecordBegin() {
-        beforeRecordVideo() // signal to do before starting record video
 
-        // disable capture image when smile trigger key or external camera key when recording video
-        disableCaptureImage = true
-
-        if(!(vidstreamproperty.width == 320 && vidstreamproperty.height ==240)){  // Added by Navya : Stop updating the timer for 320x240
-            captureVideoRecordRootObject.videoTimerUpdate(true)
-        }
         if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130  || selectedDeviceEnumValue == CommonEnums.SEE3CAM_30){
             recordStartDelayTimer.start() // some delay is required to disable focus rect / face overlay rect. After that delay need to start record.
         }else{
-	    if(disableAudio){
-            vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, 0, audioSampleRate, audioChannel)
-	    }
-	    else{
+            if(disableAudio){
+                vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, 0, audioSampleRate, audioChannel)
+            }
+            else{
                 vidstreamproperty.recordBegin(JS.videoEncoder,JS.videoExtension, videoSettingsRootObject.videoStoragePath, audioDeviceIndex, audioSampleRate, audioChannel)
             }
         }
-        videoPropertyItemEnable(false)
-        stillPropertyItemEnable(false)
-        audioPropertyItemEnable(false)
-        device_box.enabled = false
-        device_box.opacity = 0.5
-        videoRecordBtnVisible(false)
-        keyEventFiltering = true
-        uvc_settings.enabled = false
-        uvc_settings.opacity = 0.5
-        if(!videoRecButtonVisibleStatus)
-            selectCameraSettings()
+
+        // Added by Navya - 10 Feb 2020 : Disabling the video record for 320x240 resolution in See3CAM_20CUG camera.
+        if(!(vidstreamproperty.width == 320 && vidstreamproperty.height ==240)){
+            beforeRecordVideo() // signal to do before starting record video
+            // disable capture image when smile trigger key or external camera key when recording video
+            disableCaptureImage = true
+            keyEventFiltering = true
+            captureVideoRecordRootObject.videoTimerUpdate(true)
+            videoPropertyItemEnable(false)
+            stillPropertyItemEnable(false)
+            audioPropertyItemEnable(false)
+            device_box.enabled = false
+            device_box.opacity = 0.5
+            videoRecordBtnVisible(false)
+            uvc_settings.enabled = false
+            uvc_settings.opacity = 0.5
+            if(!videoRecButtonVisibleStatus)
+                selectCameraSettings()
+        }
     }
 
-    function audioDeviceSelected(currentIndex){        
+    function audioDeviceSelected(currentIndex){
         audioDeviceIndex = currentIndex;
     }
 
     function videoSaveVideo() {
-        if(!(vidstreamproperty.width == 320 && vidstreamproperty.height ==240)){  // Added by Navya : Save the video only if it is not 320x240.
-        statusText = "Saving..."
-        vidstreamproperty.recordStop()
-        // enable capture image when smile trigger key or external camera key once recording video is finished
-        disableCaptureImage = false
-        captureVideoRecordRootObject.videoTimerUpdate(false)
-        messageDialog.title = qsTr("Saved")
-        messageDialog.text = qsTr("Video saved in the location:"+videofileName)
-        messageDialog.open()
-        videoPropertyItemEnable(true)
-        stillPropertyItemEnable(true)
+        if(!(vidstreamproperty.width == 320 && vidstreamproperty.height ==240)){
+            statusText = "Saving..."
+            vidstreamproperty.recordStop()
+            // enable capture image when smile trigger key or external camera key once recording video is finished
+            disableCaptureImage = false
+            captureVideoRecordRootObject.videoTimerUpdate(false)
+            messageDialog.title = qsTr("Saved")
+            messageDialog.text = qsTr("Video saved in the location:"+videofileName)
+            messageDialog.open()
+            videoPropertyItemEnable(true)
+            stillPropertyItemEnable(true)
         }
         // Added by Sankari : Apr 5 2018. Once recording is finished, Do not enable audio settings when "YUY" encoder is selected
         if(!disableAudio){
@@ -1187,7 +1203,7 @@ Rectangle {
     function extensionTab() {
         if(cameraColumnLayout.visible) {
             cameraSettingsTabEnable(false)
-            cameraColumnLayout.visible = false            
+            cameraColumnLayout.visible = false
             see3cam.visible = true
             extensionTabVisible(true)
         }
@@ -1267,6 +1283,8 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu55_MH/see3camcu55_mh.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_20CUG) { // Added By Navya
             see3cam = Qt.createComponent("../UVCSettings/see3cam20cug/see3cam_20cug.qml").createObject(root)
+        }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU22) { // Added By Navya : 11 Dec 2019
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu22/see3camcu22.qml").createObject(root)
         }else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
@@ -1310,13 +1328,16 @@ Rectangle {
         case CommonEnums.SEE3CAM_CU55:
         case CommonEnums.FSCAM_CU135:
         case CommonEnums.SEE3CAM_CU38:
+
+            // Added by Navya
         case CommonEnums.SEE3CAM_CU55_MH:
         case CommonEnums.SEE3CAM_20CUG:
+        case CommonEnums.SEE3CAM_CU22:
 
-                camproperty.openHIDDevice(device_box.currentText);
+            camproperty.openHIDDevice(device_box.currentText);
             break;
         }
-    }    
+    }
 
     Component.onCompleted: {
         camproperty.createLogger()
@@ -1383,7 +1404,7 @@ Rectangle {
         setMasterMode();
         // Added by Sankari: 12 Feb 2018 - stop Getting key from camera.
         keyEvent.stopGetKeyFromCamera()
-    }    
+    }
 
     Keys.onReleased: {
         if(event.key === Qt.Key_I) {
@@ -1412,6 +1433,7 @@ Rectangle {
         // Added by Sankari: 05 Apr 2019
         // set preview background area. param1:width, param2: height, param3: sidebar visibility true/false
         vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, false)
+        vidstreamproperty.sidebarStateChanged()
     }
 
     Keys.onRightPressed: {
@@ -1427,6 +1449,7 @@ Rectangle {
         // Added by Sankari: 05 Apr 2019 - To prevent overlapping preview with side bar.
         // set preview background area. param1:width, param2: height, param3: sidebar visibility true/false
         vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, true)
+        vidstreamproperty.sidebarStateChanged()
    }
 
     function enableAllSettingsTab(){
@@ -1464,8 +1487,8 @@ Rectangle {
     }
 
     function informStillResolutionIndexChanged(resoln, resolutionIndex,format,stillFormatIndex){
-         stillResolutionChanged(resoln, resolutionIndex, format, stillFormatIndex)
-       }
+        stillResolutionChanged(resoln, resolutionIndex, format, stillFormatIndex)
+    }
 
     // Added by Sankari - 9 Dec 2016
     function takeTriggershot(){
@@ -1479,137 +1502,137 @@ Rectangle {
         webcamKeyTriggerShot = true
     }
 
-   //Added below by Dhurka - 24th Oct 2016
+    //Added below by Dhurka - 24th Oct 2016
     function stillBurstLength(burstLen)
     {
         burstLength = burstLen
     }
-   //for taking snap shot
-   function imageCapture(shotType)
-   {
-       seqAni.stop()       
-       vidstreamproperty.setStillVideoSize(stillSettingsRootObject.stillOutputTextValue, stillSettingsRootObject.stillColorComboIndexValue)
-       switch(shotType)
-       {
-       case CommonEnums.SNAP_SHOT:
-           vidstreamproperty.makeShot(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText)
-           break;
-       case CommonEnums.STORECAM_RETRIEVE_SHOT:            
-           vidstreamproperty.retrieveShotFromStoreCam(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText)
-           break;
-       case CommonEnums.TRIGGER_SHOT:            
-           vidstreamproperty.triggerModeShot(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText)
-           break;
-       case CommonEnums.BURST_SHOT:          
-           vidstreamproperty.makeBurstShot(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText, burstLength)
-           break;
-       case CommonEnums.CHANGE_FPS_SHOT:
-           vidstreamproperty.changeFPSandTakeShot(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText, fpsIndexToChange)
-           break;
-       }
-   }
-   function enableCameraControls()
-   {
-       stillChildVisibleState(false)
-       videoChildMenuVisible(false)
-   }
-   //get still settings from camera[used in storagecam] and Update in UI
-   function changeStillSettings(stillFormat, stillResolution){ // still capture settings in UI
-       setColorComboOutputIndex(true, stillFormat-1) // setting still format in UI
-       setColorComboOutputIndex(false, stillResolution-1) // setting still resolution in UI
-       JS.stillCaptureFormat = stillSettingsRootObject.stillColorComboIndexValue
-       JS.stillCaptureFormatIndex = stillSettingsRootObject.stillColorComboIndexValue*1
-       JS.stillCaptureResolution = stillSettingsRootObject.stillOutputTextValue.toString()
-       JS.stillCaptureResolutionIndex = stillSettingsRootObject.stillResolutionIndex
-   }
-   function setStillSettings()
-   {
-       vidstreamproperty.setStillVideoSize(stillSettingsRootObject.stillOutputTextValue, stillSettingsRootObject.stillColorComboIndexValue)
-   }
-   function logInfo(log)
-   {
-       camproperty.logDebugWriter(log)
-   }
-   function changeCameraSettings(controlId,value)
-   {
-       vidstreamproperty.changeSettings(controlId,value.toString())
-   }
-   function selectMenuIndex(controlId,index)
-   {
-       if(enableUVCSettings)
-           vidstreamproperty.selectMenuIndex(controlId,index)
-       else
-           enableUVCSettings = true;
-   }
-   function cameraFilterControls(value)
-   {
-       vidstreamproperty.cameraFilterControls(value)
-   }
-   function updateVideoResolution(colorComboText,frameRateIndex)
-   {
-       root.updateScenePreview(vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString(),colorComboText,frameRateIndex)
-       vidstreamproperty.displayVideoResolution()
-       vidstreamproperty.lastPreviewResolution(vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString(),colorComboText)
-   }
-   function imageSettingVisibleChanged()
-   {
-       if(videoCaptureChildVisible)
-       {
-           getStillPropertyPositionValues();
-       }
-       else
-       {
-           imageFormatYValue = defaultImageFormatYValue
-           stillPropertyYValue = defaultStillPropertyYValue
-       }
-       updateVideoMenuPosition();
-       updateAudioMenuPosition();
-   }
-   function enableVideoPin(videoPinEnable)
-   {
-       videoSettingsRootObject.enableVideoPin(videoPinEnable)
-   }
-   function enableTimerforGrabPreviewFrame(timerstatus)
-   {
-       vidstreamproperty.enableTimer(timerstatus);
-   }
-
-   // Added by Navya -To avoid crash in case of Hyperyon by setting correct resoln
-   function checkForResoln()
-   {
-          JS.videoCaptureResolution = videoSettingsRootObject.videoOutputSize
-   }
-
-   //Added by Navya - 29 May 2019 -- Inorder to stop VideoRecord and Image Capture in case of Trigger Mode.
-   function checkForTriggerMode(mode)
-   {
-       getTriggerMode = mode;
-       if(mode)
-           keyEventFiltering = true;
+    //for taking snap shot
+    function imageCapture(shotType)
+    {
+        seqAni.stop()
+        vidstreamproperty.setStillVideoSize(stillSettingsRootObject.stillOutputTextValue, stillSettingsRootObject.stillColorComboIndexValue)
+        switch(shotType)
+        {
+        case CommonEnums.SNAP_SHOT:
+            vidstreamproperty.makeShot(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText)
+            break;
+        case CommonEnums.STORECAM_RETRIEVE_SHOT:
+            vidstreamproperty.retrieveShotFromStoreCam(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText)
+            break;
+        case CommonEnums.TRIGGER_SHOT:
+            vidstreamproperty.triggerModeShot(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText)
+            break;
+        case CommonEnums.BURST_SHOT:
+            vidstreamproperty.makeBurstShot(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText, burstLength)
+            break;
+        case CommonEnums.CHANGE_FPS_SHOT:
+            vidstreamproperty.changeFPSandTakeShot(stillSettingsRootObject.stillStoragePath,stillSettingsRootObject.stillImageFormatComboText, fpsIndexToChange)
+            break;
+        }
+    }
+    function enableCameraControls()
+    {
+        stillChildVisibleState(false)
+        videoChildMenuVisible(false)
+    }
+    //get still settings from camera[used in storagecam] and Update in UI
+    function changeStillSettings(stillFormat, stillResolution){ // still capture settings in UI
+        setColorComboOutputIndex(true, stillFormat-1) // setting still format in UI
+        setColorComboOutputIndex(false, stillResolution-1) // setting still resolution in UI
+        JS.stillCaptureFormat = stillSettingsRootObject.stillColorComboIndexValue
+        JS.stillCaptureFormatIndex = stillSettingsRootObject.stillColorComboIndexValue*1
+        JS.stillCaptureResolution = stillSettingsRootObject.stillOutputTextValue.toString()
+        JS.stillCaptureResolutionIndex = stillSettingsRootObject.stillResolutionIndex
+    }
+    function setStillSettings()
+    {
+        vidstreamproperty.setStillVideoSize(stillSettingsRootObject.stillOutputTextValue, stillSettingsRootObject.stillColorComboIndexValue)
+    }
+    function logInfo(log)
+    {
+        camproperty.logDebugWriter(log)
+    }
+    function changeCameraSettings(controlId,value)
+    {
+        vidstreamproperty.changeSettings(controlId,value.toString())
+    }
+    function selectMenuIndex(controlId,index)
+    {
+        if(enableUVCSettings)
+            vidstreamproperty.selectMenuIndex(controlId,index)
         else
-           keyEventFiltering = false;
-   }
+            enableUVCSettings = true;
+    }
+    function cameraFilterControls(value)
+    {
+        vidstreamproperty.cameraFilterControls(value)
+    }
+    function updateVideoResolution(colorComboText,frameRateIndex)
+    {
+        root.updateScenePreview(vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString(),colorComboText,frameRateIndex)
+        vidstreamproperty.displayVideoResolution()
+        vidstreamproperty.lastPreviewResolution(vidstreamproperty.width.toString() +"x"+vidstreamproperty.height.toString(),colorComboText)
+    }
+    function imageSettingVisibleChanged()
+    {
+        if(videoCaptureChildVisible)
+        {
+            getStillPropertyPositionValues();
+        }
+        else
+        {
+            imageFormatYValue = defaultImageFormatYValue
+            stillPropertyYValue = defaultStillPropertyYValue
+        }
+        updateVideoMenuPosition();
+        updateAudioMenuPosition();
+    }
+    function enableVideoPin(videoPinEnable)
+    {
+        videoSettingsRootObject.enableVideoPin(videoPinEnable)
+    }
+    function enableTimerforGrabPreviewFrame(timerstatus)
+    {
+        vidstreamproperty.enableTimer(timerstatus);
+    }
 
-   //Added by Navya - 3rd June 2019 -- Disabling powerLine Frequency due to mismatch in set and get controls from HID and v4l2.
-   function disablePowerLineFreq()
-   {
-       imageSettingsRootObject.controlPowerLineFreq()
-   }
+    // Added by Navya -To avoid crash in case of Hyperyon by setting correct resoln
+    function checkForResoln()
+    {
+        JS.videoCaptureResolution = videoSettingsRootObject.videoOutputSize
+    }
 
-   //Added by Navya -12 June 2019 -- Getting exposure compensation only after setting resolution for See3CAM_CU55 camera.
-   function getExposureOnResolnCheck()
-   {
-       checkForResoln()
-       vidstreamproperty.setResoultion(JS.videoCaptureResolution)
-       getExposure()
-   }
-   // Added by Navya -31 July 2019 --Updating Preview display area when Application window is resized.
-   function setpreviewWindowSize(){
-       if(closeSideBarClicked){
-           vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, false)
-       }
-       else{
-           vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, true)
-       }
-   }
+    //Added by Navya - 29 May 2019 -- Inorder to stop VideoRecord and Image Capture in case of Trigger Mode.
+    function checkForTriggerMode(mode)
+    {
+        getTriggerMode = mode;
+        if(mode)
+            keyEventFiltering = true;
+        else
+            keyEventFiltering = false;
+    }
+
+    //Added by Navya - 3rd June 2019 -- Disabling powerLine Frequency due to mismatch in set and get controls from HID and v4l2.
+    function disablePowerLineFreq()
+    {
+        imageSettingsRootObject.controlPowerLineFreq()
+    }
+
+    //Added by Navya -12 June 2019 -- Getting exposure compensation only after setting resolution for See3CAM_CU55 camera.
+    function getExposureOnResolnCheck()
+    {
+        checkForResoln()
+        vidstreamproperty.setResoultion(JS.videoCaptureResolution)
+        getExposure()
+    }
+    // Added by Navya -31 July 2019 --Updating Preview display area when Application window is resized.
+    function setpreviewWindowSize(){
+        if(closeSideBarClicked){
+            vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, false)
+        }
+        else{
+            vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, true)
+        }
+    }
 }

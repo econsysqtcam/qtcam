@@ -89,6 +89,18 @@ public:
 
    bool m_recStop;
 
+
+   // Added by Navya - 25 Nov 2019 -- To configure source formats in "convertImage_sws" API according to the format Selected"
+   typedef enum
+   {
+       RGB_BUFFER = 0,
+       YUYV_BUFFER = 1,
+       UYVY_BUFFER,
+       Y8_BUFFER,
+       Y16_BUFFER
+   }bufferType;
+
+   Q_ENUMS(bufferType)
  
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
    bool createFile(QString filename, AVCodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitRate,  int audioDeviceIndex, int sampleRate, int channels);
@@ -110,8 +122,8 @@ public:
     int encodeAudio(void *);       
 
    bool closeFile();
-   int encodeImage(uint8_t *buffer, bool rgbBufferformat);
-   int encodePacket(uint8_t *buffer, bool rgbBufferformat);
+   int encodeImage(uint8_t *buffer, uint8_t bufferType);
+   int encodePacket(uint8_t *buffer, uint8_t bufferType);
    bool isOk();
 
 // Added by Sankari : 8 Oct 2018
@@ -186,7 +198,7 @@ protected:
 
       // Frame conversion
       bool convertImage(const QImage &img);
-      bool convertImage_sws(uint8_t *buffer, bool rgbBufferformat);
+      bool convertImage_sws(uint8_t *buffer, uint8_t bufferType);
 };
 #endif // VideoEncoder_H
 

@@ -300,26 +300,27 @@ bool VideoEncoder::closeFile()
 /**
    \brief Encode one frame
     /* buffer - input buffer to encode
-     * rgbBufferFormat - true if rgbabuffer passes
-     *                 - false if other than rgbabuffer passes
+     * bufferType - 0 if rgbabuffer passes
+     *              - 1 if yuyv  or other buffer passes
+     *              - 2 if uyvy buffer passes
 **/
 #if LIBAVCODEC_VER_AT_LEAST(54,01)
-int VideoEncoder::encodeImage(uint8_t *buffer, bool rgbBufferformat)
+int VideoEncoder::encodeImage(uint8_t *buffer,uint8_t bufferType)
 {
     int ret = -1;
-    ret = encodePacket(buffer, rgbBufferformat);
+    ret = encodePacket(buffer, bufferType);
     return ret;
 }
 
 /**
  * @brief VideoEncoder::encodePacket
  * @param buffer - input buffer to encode
-     * rgbBufferFormat - true if rgbabuffer passes
-     *                 - false if other than rgbabuffer passes 
+     * bufferType - 0 if rgbabuffer passes
+     *              - 1 if yuyv  or other buffer passes
+     *              - 2 if uyvy buffer passes
  * @return 0 if success/ -ve if failure
  */
-
-int VideoEncoder::encodePacket(uint8_t *buffer, bool rgbBufferformat){
+int VideoEncoder::encodePacket(uint8_t *buffer, uint8_t bufferType){
     double fps, recordTimeDurationInSec, millisecondsDiff;
     if(frameCount == 0){
         time1  = QTime::currentTime();
@@ -338,7 +339,7 @@ int VideoEncoder::encodePacket(uint8_t *buffer, bool rgbBufferformat){
     if(!isOk())
         return -1;    
 
-    convertImage_sws(buffer, rgbBufferformat);
+    convertImage_sws(buffer,bufferType);
 
     int got_packet = 0;
     int out_size = 0;     
@@ -403,7 +404,7 @@ int VideoEncoder::encodePacket(uint8_t *buffer, bool rgbBufferformat){
     return out_size;
 }
 #else
-int VideoEncoder::encodeImage(uint8_t *buffer, bool rgbBufferformat)
+int VideoEncoder::encodeImage(uint8_t *buffer,uint8_t bufferType)
 {
     int out_size, ret;
 
@@ -424,8 +425,8 @@ int VideoEncoder::encodeImage(uint8_t *buffer, bool rgbBufferformat)
     if(!isOk())
         return -1;
 
-    convertImage_sws(buffer, rgbBufferformat);     /* rgba format means, true */
-                                                    /* other than rgba format means, false */
+    convertImage_sws(buffer, bufferType);
+
     /* encode the image */
     out_size = avcodec_encode_video(pCodecCtx, outbuf, outbuf_size, ppicture);
 
@@ -584,19 +585,36 @@ void VideoEncoder::freeFrame()
     }
 }
 
-bool VideoEncoder::convertImage_sws(uint8_t *buffer, bool rgbBufferformat)
+bool VideoEncoder::convertImage_sws(uint8_t *buffer,uint8_t bufferType)
 {
-    if(rgbBufferformat){
+    if(bufferType == RGB_BUFFER){
 #if !LIBAVCODEC_VER_AT_LEAST(54, 25)
         img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(), PIX_FMT_RGBA,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
 #else
         img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),AV_PIX_FMT_RGBA,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
 #endif
-    }else{
+    }else if(bufferType == YUYV_BUFFER){
 #if !LIBAVCODEC_VER_AT_LEAST(54, 25)
         img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(), PIX_FMT_YUYV422,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
 #else
         img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),AV_PIX_FMT_YUYV422,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
+#endif
+    }
+    /** Added by Navya:29 Nov 2019
+      * Previously UYVY/Y8 data are converted to YUVY and given for recording and hence the source format is configured to YUYV422.
+      * Now these data are directly given for recording,hence configuring source Format to the corresponding formatTypes.
+     **/
+    else if(bufferType == UYVY_BUFFER){
+#if !LIBAVCODEC_VER_AT_LEAST(54, 25)
+        img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(), PIX_FMT_UYVY422,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
+#else
+        img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),AV_PIX_FMT_UYVY422,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
+#endif
+    } else if(bufferType == Y8_BUFFER){
+#if !LIBAVCODEC_VER_AT_LEAST(54, 25)
+        img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(), PIX_FMT_GRAY8,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
+#else
+        img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),AV_PIX_FMT_GRAY8,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
 #endif
     }
 
@@ -611,8 +629,15 @@ bool VideoEncoder::convertImage_sws(uint8_t *buffer, bool rgbBufferformat)
     srcplanes[2]=0;
 
     int srcstride[3];
-    if(rgbBufferformat){
+    if(bufferType == RGB_BUFFER){
         srcstride[0]=getWidth()*4; // RGBA  - 32 bit.  so  4 is used
+    }
+    /** Added by Navya -29 Nov 2019
+        * Giving 8 bit data directly for Video Record,hence making the srcStride as "getwidth()*1"
+        * previously we are giving 16 bit data for recording,hence it was "getwidth()*2".
+        * */
+    else if(bufferType == Y8_BUFFER){
+        srcstride[0]=getWidth(); // Y8  - 8 bit.  so  1 is used
     }else{
         srcstride[0]=getWidth()*2; // YUYV  - 16 bit.  so  2 is used
     }

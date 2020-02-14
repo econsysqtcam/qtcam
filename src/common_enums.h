@@ -56,6 +56,7 @@ public:
         // Added by Navya
         FSCAM_CU135, // STORECAM_1335
         SEE3CAM_CU55_MH, // cu55 monochrome
+        SEE3CAM_CU22,
         SEE3CAM_20CUG
     }ECameraNames;
     //Enum for capture shot type
@@ -74,7 +75,8 @@ public:
         NO_RENDER = 0,      // stop render for skipframes
         RGB_BUFFER_RENDER = 1, // rgba
         YUYV_BUFFER_RENDER,
-        UYVY_BUFFER_RENDER
+        UYVY_BUFFER_RENDER,
+        GREY_BUFFER_RENDER
     }ERenderBuffer;
 	
     Q_ENUMS(ERenderBuffer)

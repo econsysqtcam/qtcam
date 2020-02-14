@@ -521,6 +521,7 @@ Item {
         CheckBox {
             id: flash_ctrl
             text: "Flash"
+            tooltip: " When Flash mode is set to ON state, the flash LED blinks when external trigger is pressed and image is saved in the selected path."
             activeFocusOnPress : true
             style: econCheckBoxStyle
             onClicked:
@@ -539,6 +540,7 @@ Item {
             id: torch_ctrl
             activeFocusOnPress : true
             text: "Torch"
+            tooltip:"When you select the Torch mode, the LED is switched ON until the control is disabled"
             style: econCheckBoxStyle
             onClicked:
             {

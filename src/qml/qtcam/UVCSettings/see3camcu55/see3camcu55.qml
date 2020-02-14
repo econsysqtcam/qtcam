@@ -150,6 +150,7 @@ Item {
                     id: rdoEffectNormal
                     style:  econRadioButtonStyle
                     text:   qsTr("Normal")
+                    tooltip: "In this mode, the normal unprocessed UYVY or MJPEG image stream from the camera"
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
                     onClicked: {
@@ -163,6 +164,8 @@ Item {
                     id: rdoEffectBW
                     style:  econRadioButtonStyle
                     text: qsTr("Black and White")
+                    tooltip: "In this mode, thresholding is applied to the normal preview
+and the image stream is composed of black and white pixels"
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
                     onClicked: {                        
@@ -176,6 +179,8 @@ Item {
                     id: rdoEffectGreyScale
                     style:  econRadioButtonStyle
                     text: qsTr("GreyScale")
+                    tooltip: "In this mode, the normal preview is desaturated, and the image
+stream is composed of gray shades"
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
                     onClicked: {                        
@@ -189,6 +194,8 @@ Item {
                     id: rdoEffectSketch
                     style:  econRadioButtonStyle
                     text: qsTr("Sketch")
+                    tooltip: "In this mode, an effect of edge dominant image stream useful for edge-
+detection is produced"
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
                     onClicked: {                        
@@ -202,6 +209,7 @@ Item {
                     id: rdoEffectNegative
                     style:  econRadioButtonStyle
                     text: qsTr("Negative")
+                    tooltip: "In this mode, the normal preview is color inversed"
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
                     onClicked: {                        
@@ -234,6 +242,8 @@ Item {
                       exclusiveGroup: roiExpogroup
                       id: autoexpFull
                       text: "Full"
+		     tooltip: "In this mode, the full region-based exposure value will be applied to the
+frame."
                       activeFocusOnPress: true
                       style: econRadioButtonStyle
                       opacity: enabled ? 1 : 0.1
@@ -253,6 +263,8 @@ Item {
                       exclusiveGroup: roiExpogroup
                       id: autoexpManual
                       text: "Manual"
+		      tooltip: "In this mode, you can select the ROI and at that region the exposure
+value will be applied to the entire frame"
                       activeFocusOnPress: true
                       style: econRadioButtonStyle
                       opacity: enabled ? 1 : 0.1
@@ -331,6 +343,8 @@ Item {
                         id: exposureCompSet
                         activeFocusOnPress : true
                         text: "Set"
+			 tooltip: "You can set the required exposure compensation value by changing the
+value in the text box and click the Set button"
                         style: econButtonStyle
                         enabled: true
                         opacity: 1
@@ -549,6 +563,7 @@ Item {
                     id: flipCtrlHorizotal
                     activeFocusOnPress : true
                     text: "Horizontal"
+                    tooltip: "This control flips the preview left or right."
                     style: econCheckBoxStyle
                     onClicked:{
                         see3camcu55.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
@@ -561,6 +576,7 @@ Item {
                     id: flipCtrlVertical
                     activeFocusOnPress : true
                     text: "Vertical"
+                    tooltip: "This control flips the preview up or down."
                     style: econCheckBoxStyle
                     onClicked:{
                         see3camcu55.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
@@ -588,6 +604,7 @@ Item {
                     exclusiveGroup: faceRectGroup
                     id: faceRectEnable
                     text: "Enable"
+                    tooltip: "Will enable the overlay rectangle around faces"
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
@@ -601,6 +618,7 @@ Item {
                     exclusiveGroup: faceRectGroup
                     id:faceRectDisable
                     text: "Disable"
+                    tooltip: "Will disable the overlay rectangle"
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
@@ -617,6 +635,8 @@ Item {
                     id: faceDetectEmbedData
                     activeFocusOnPress : true
                     text: "Embed Data"
+                    tooltip: "When embed data option is selected, the last section of the frame will be replaced
+with face details"
                     style: econCheckBoxTextWrapModeStyle
                     enabled: faceRectEnable.checked ? true : false
                     opacity: enabled ? 1 : 0.1
@@ -659,6 +679,7 @@ Item {
                     exclusiveGroup: smileDetectGroup
                     id: smileDetectEnable
                     text: "Enable"
+                    tooltip: "Will enable smile detection"
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
@@ -672,6 +693,7 @@ Item {
                     exclusiveGroup: smileDetectGroup
                     id:smileDetectDisable
                     text: "Disable"
+                    tooltip: "Will disable smile detection"
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
@@ -689,6 +711,8 @@ Item {
                     id: smileDetectEmbedData
                     activeFocusOnPress : true
                     text: "Embed Data"
+                    tooltip: "When embed data option is selected, the last section of the frame will be replaced
+with smile details"
                     style: econCheckBoxStyle
                     enabled: smileDetectEnable.checked ? true : false
                     opacity: enabled ? 1 : 0.1
@@ -724,6 +748,7 @@ Item {
                         checked: false
                         id: flashModeStrobe
                         text: "Strobe"
+                        tooltip: "When you select the Strobe mode, the LED is switched ON for each frame exposure time while video streaming"
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {
@@ -740,6 +765,7 @@ Item {
                         checked: false
                         id: flashModeTorch
                         text: "Torch"
+                        tooltip: "When you select the Torch mode, the LED is switched ON until the control is disabled"
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {
@@ -756,6 +782,7 @@ Item {
                         checked: false
                         id: flashModeOff
                         text: "OFF"
+                        tooltip: "Disables both flash controls."
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {

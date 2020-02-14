@@ -51,9 +51,9 @@ Item {
         target: root
         onTakeScreenShot:
         {
-             if(see3camcu30.enableDisableFaceRectangle(false)) {
-		root.imageCapture(CommonEnums.BURST_SHOT);
-	     }
+            if(see3camcu30.enableDisableFaceRectangle(false)) {
+                root.imageCapture(CommonEnums.BURST_SHOT);
+            }
         }
         onGetVideoPinStatus:
         {
@@ -71,13 +71,13 @@ Item {
     }
 
     Timer {
-         id: burstShotTimer
-         interval: 1000
-         onTriggered: {
-             root.imageCapture(CommonEnums.BURST_SHOT);
-             stop()
-         }
-     }
+        id: burstShotTimer
+        interval: 1000
+        onTriggered: {
+            root.imageCapture(CommonEnums.BURST_SHOT);
+            stop()
+        }
+    }
 
     // Used when selecting auto exposure in image Quality settings menu
     Timer {
@@ -100,8 +100,8 @@ Item {
     }
 
     Action {
-    id: firmwareVersion
-    onTriggered:
+        id: firmwareVersion
+        onTriggered:
         {
             getFirmwareVersion()
         }
@@ -127,14 +127,14 @@ Item {
             spacing:20
 
             Text {
-            id: scene_mode
-            text: "--- Scene Mode ---"
-            font.pixelSize: 14
-            font.family: "Ubuntu"
-            color: "#ffffff"
-            smooth: true
-            Layout.alignment: Qt.AlignCenter
-            opacity: 0.50196078431373
+                id: scene_mode
+                text: "--- Scene Mode ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
             }
 
 
@@ -147,6 +147,8 @@ Item {
                     id: sceneNormal
                     style:  econRadioButtonStyle
                     text:   qsTr("Normal")
+                    tooltip: "In this mode, the normal unprocessed UYVY or MJPEG image stream
+from the camera"
                     exclusiveGroup: sceneInputGroup
                     activeFocusOnPress: true
                     onClicked: {
@@ -160,12 +162,14 @@ Item {
                     id: sceneDoc
                     style:  econRadioButtonStyle
                     text: qsTr("Document")
+                    tooltip: "In this mode, the contrast between letters and background is
+increased to make it easier to read black writings on white paper."
                     exclusiveGroup: sceneInputGroup
                     activeFocusOnPress: true
-                    onClicked: {                        
+                    onClicked: {
                         see3camcu30.setSceneMode(See3Camcu30.SCENE_DOCUMENT)
                     }
-                    Keys.onReturnPressed: {                        
+                    Keys.onReturnPressed: {
                         see3camcu30.setSceneMode(See3Camcu30.SCENE_DOCUMENT)
                     }
 
@@ -175,14 +179,14 @@ Item {
             Row{
                 Layout.alignment: Qt.AlignCenter
                 Text {
-                   id: special_effects
-                   text: "--- Special Effects ---"
-                   font.pixelSize: 14
-                   font.family: "Ubuntu"
-                   color: "#ffffff"
-                   smooth: true
-                   opacity: 0.50196078431373
-               }
+                    id: special_effects
+                    text: "--- Special Effects ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    opacity: 0.50196078431373
+                }
             }
             Grid {
                 x: 23
@@ -196,6 +200,7 @@ Item {
                     id: rdoEffectNormal
                     style:  econRadioButtonStyle
                     text:   qsTr("Normal")
+                    tooltip: "In this mode, the normal unprocessed UYVY or MJPEG image stream from the camera"
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
                     onClicked: {
@@ -209,12 +214,14 @@ Item {
                     id: rdoEffectBW
                     style:  econRadioButtonStyle
                     text: qsTr("Black and White")
+                    tooltip: "In this mode, thresholding is applied to the normal preview
+and the image stream is composed of black and white pixels"
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
-                    onClicked: {                        
+                    onClicked: {
                         see3camcu30.setEffectMode(See3Camcu30.EFFECT_BLACK_WHITE)
                     }
-                    Keys.onReturnPressed: {                        
+                    Keys.onReturnPressed: {
                         see3camcu30.setEffectMode(See3Camcu30.EFFECT_BLACK_WHITE)
                     }
                 }
@@ -222,12 +229,14 @@ Item {
                     id: rdoEffectGreyScale
                     style:  econRadioButtonStyle
                     text: qsTr("GreyScale")
+                    tooltip: "In this mode, the normal preview is desaturated, and the image
+stream is composed of gray shades"
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
-                    onClicked: {                        
+                    onClicked: {
                         see3camcu30.setEffectMode(See3Camcu30.EFFECT_GREYSCALE)
                     }
-                    Keys.onReturnPressed: {                        
+                    Keys.onReturnPressed: {
                         see3camcu30.setEffectMode(See3Camcu30.EFFECT_GREYSCALE)
                     }
                 }
@@ -235,12 +244,14 @@ Item {
                     id: rdoEffectSketch
                     style:  econRadioButtonStyle
                     text: qsTr("Sketch")
+                    tooltip: "In this mode, an effect of edge dominant image stream useful for edge-
+detection is produced"
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
-                    onClicked: {                        
+                    onClicked: {
                         see3camcu30.setEffectMode(See3Camcu30.EFFECT_SKETCH)
                     }
-                    Keys.onReturnPressed: {                        
+                    Keys.onReturnPressed: {
                         see3camcu30.setEffectMode(See3Camcu30.EFFECT_SKETCH)
                     }
                 }
@@ -248,12 +259,13 @@ Item {
                     id: rdoEffectNegative
                     style:  econRadioButtonStyle
                     text: qsTr("Negative")
+                    tooltip: "In this mode, the normal preview is color inversed"
                     exclusiveGroup: effectInputGroup
                     activeFocusOnPress: true
-                    onClicked: {                        
+                    onClicked: {
                         see3camcu30.setEffectMode(See3Camcu30.EFFECT_NEGATIVE)
                     }
-                    Keys.onReturnPressed: {                        
+                    Keys.onReturnPressed: {
                         see3camcu30.setEffectMode(See3Camcu30.EFFECT_NEGATIVE)
                     }
                 }
@@ -276,41 +288,45 @@ Item {
                 spacing:38
                 ExclusiveGroup { id: roiExpogroup }
 
-                 RadioButton {
-                      exclusiveGroup: roiExpogroup
-                      id: autoexpFull
-                      text: "Full"
-                      activeFocusOnPress: true
-                      style: econRadioButtonStyle
-                      opacity: enabled ? 1 : 0.1
-                      // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
-                      // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
-                      // winSize is required only for manual mode
-                      onClicked: {
-                          see3camcu30.setROIAutoExposure(See3Camcu30.AutoExpFull, 0, 0, 0, 0, 0);
-                          autoExpoWinSizeCombo.enabled = false
-                      }
-                      Keys.onReturnPressed: {
-                          see3camcu30.setROIAutoExposure(See3Camcu30.AutoExpFull, 0, 0, 0, 0, 0);
-                          autoExpoWinSizeCombo.enabled = false
-                      }
-                  }
-                  RadioButton {
-                      exclusiveGroup: roiExpogroup
-                      id: autoexpManual
-                      text: "Manual"
-                      activeFocusOnPress: true
-                      style: econRadioButtonStyle
-                      opacity: enabled ? 1 : 0.1
-                      onClicked: {                          
-                          see3camcu30.setROIAutoExposure(See3Camcu30.AutoExpManual, 0, 0, 0, 0, 0);
-                          autoExpoWinSizeCombo.enabled = true
-                      }
-                      Keys.onReturnPressed: {                          
-                          see3camcu30.setROIAutoExposure(See3Camcu30.AutoExpManual, 0, 0, 0, 0, 0);
-                          autoExpoWinSizeCombo.enabled = true
-                      }
-                  }
+                RadioButton {
+                    exclusiveGroup: roiExpogroup
+                    id: autoexpFull
+                    text: "Full"
+                    tooltip: "In this mode, the full region-based exposure value will be applied to the
+frame."
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    opacity: enabled ? 1 : 0.1
+                    // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
+                    // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
+                    // winSize is required only for manual mode
+                    onClicked: {
+                        see3camcu30.setROIAutoExposure(See3Camcu30.AutoExpFull, 0, 0, 0, 0, 0);
+                        autoExpoWinSizeCombo.enabled = false
+                    }
+                    Keys.onReturnPressed: {
+                        see3camcu30.setROIAutoExposure(See3Camcu30.AutoExpFull, 0, 0, 0, 0, 0);
+                        autoExpoWinSizeCombo.enabled = false
+                    }
+                }
+                RadioButton {
+                    exclusiveGroup: roiExpogroup
+                    id: autoexpManual
+                    text: "Manual"
+                    tooltip: "In this mode, you can select the ROI and at that region the exposure
+value will be applied to the entire frame"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    opacity: enabled ? 1 : 0.1
+                    onClicked: {
+                        see3camcu30.setROIAutoExposure(See3Camcu30.AutoExpManual, 0, 0, 0, 0, 0);
+                        autoExpoWinSizeCombo.enabled = true
+                    }
+                    Keys.onReturnPressed: {
+                        see3camcu30.setROIAutoExposure(See3Camcu30.AutoExpManual, 0, 0, 0, 0, 0);
+                        autoExpoWinSizeCombo.enabled = true
+                    }
+                }
             }
 
             ComboBox
@@ -330,65 +346,67 @@ Item {
                 }
                 activeFocusOnPress: true
                 style: econComboBoxStyle
-                onCurrentIndexChanged: {                    
+                onCurrentIndexChanged: {
                     if(skipUpdateUIOnExpWindowSize){
                         see3camcu30.setROIAutoExposure(See3Camcu30.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
                     }
                     skipUpdateUIOnExpWindowSize = true
                 }
-            }            
+            }
 
             Text {
-                    id: exposureCompTextTitle
-                    text: "--- Exposure Compensation ---"
+                id: exposureCompTextTitle
+                text: "--- Exposure Compensation ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                spacing: 9
+                Text {
+                    id: exposureCompText
+                    text: "value(µs)[8000 - 1000000]"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
                     smooth: true
-                    Layout.alignment: Qt.AlignCenter
-                    opacity: 0.50196078431373
+                    width: 80
+                    wrapMode: Text.WordWrap
+                    opacity: 1
                 }
-            Row{
-                    spacing: 9
-                    Text {
-                        id: exposureCompText
-                        text: "value(µs)[8000 - 1000000]"
-                        font.pixelSize: 14
-                        font.family: "Ubuntu"
-                        color: "#ffffff"
-                        smooth: true
-                        width: 80
-                        wrapMode: Text.WordWrap
-                        opacity: 1
+                TextField {
+                    id: exposureCompValue
+                    font.pixelSize: 10
+                    font.family: "Ubuntu"
+                    smooth: true
+                    horizontalAlignment: TextInput.AlignHCenter
+                    opacity: 1
+                    style: econTextFieldStyle
+                    implicitHeight: 25
+                    implicitWidth: 80
+                    validator: IntValidator {bottom: expoCompMin; top: expoCompMax}
+                }
+                Button {
+                    id: exposureCompSet
+                    activeFocusOnPress : true
+                    text: "Set"
+                    tooltip: "You can set the required exposure compensation value by changing the
+value in the text box and click the Set button"
+                    style: econButtonStyle
+                    enabled: true
+                    opacity: 1
+                    implicitHeight: 25
+                    implicitWidth: 60
+                    onClicked: {
+                        exposureCompSetButtonClicked()
                     }
-                    TextField {
-                        id: exposureCompValue
-                        font.pixelSize: 10
-                        font.family: "Ubuntu"
-                        smooth: true
-                        horizontalAlignment: TextInput.AlignHCenter
-                        opacity: 1
-                        style: econTextFieldStyle
-                        implicitHeight: 25
-                        implicitWidth: 80
-                        validator: IntValidator {bottom: expoCompMin; top: expoCompMax}
+                    Keys.onReturnPressed: {
+                        exposureCompSetButtonClicked()
                     }
-                    Button {
-                        id: exposureCompSet
-                        activeFocusOnPress : true
-                        text: "Set"
-                        style: econButtonStyle
-                        enabled: true
-                        opacity: 1
-                        implicitHeight: 25
-                        implicitWidth: 60
-                        onClicked: {
-                            exposureCompSetButtonClicked()
-                        }
-                        Keys.onReturnPressed: {
-                            exposureCompSetButtonClicked()
-                        }
-                    }
+                }
             }
             Row{
                 Layout.alignment: Qt.AlignCenter
@@ -416,7 +434,7 @@ Item {
                     maximumValue: denoiseMax
                     onValueChanged:  {
                         deNoiseTextField.text = deNoiseSlider.value
-                        see3camcu30.setDenoiseValue(deNoiseSlider.value)                        
+                        see3camcu30.setDenoiseValue(deNoiseSlider.value)
                     }
                 }
                 TextField {
@@ -430,7 +448,7 @@ Item {
                     validator: IntValidator {bottom: deNoiseSlider.minimumValue; top: deNoiseSlider.maximumValue}
                     onTextChanged: {
                         if(text.length > 0){
-                            deNoiseSlider.value = deNoiseTextField.text                            
+                            deNoiseSlider.value = deNoiseTextField.text
                         }
                     }
                 }
@@ -476,7 +494,7 @@ Item {
                     if(skipUpdateUIOnBurstLength){
                         see3camcu30.setBurstLength(burstLengthCombo.currentText)
                     }
-                    skipUpdateUIOnBurstLength = true                    
+                    skipUpdateUIOnBurstLength = true
                 }
             }
             Row{
@@ -505,7 +523,7 @@ Item {
                     minimumValue: qFactorMin
                     maximumValue: qFactorMax
                     onValueChanged:  {
-                        qFactorTextField.text = qFactorSlider.value                        
+                        qFactorTextField.text = qFactorSlider.value
                         if(skipUpdateUIQFactor){
                             see3camcu30.setQFactor(qFactorSlider.value)
                         }
@@ -523,7 +541,7 @@ Item {
                     validator: IntValidator {bottom: qFactorSlider.minimumValue; top: qFactorSlider.maximumValue}
                     onTextChanged: {
                         if(text.length > 0){
-                            qFactorSlider.value = qFactorTextField.text                            
+                            qFactorSlider.value = qFactorTextField.text
                         }
                     }
                 }
@@ -557,7 +575,7 @@ Item {
                         if(skipUpdateUIFrameRate){
                             see3camcu30.setFrameRateCtrlValue(frameRateSlider.value)
                         }
-                        skipUpdateUIFrameRate = true                        
+                        skipUpdateUIFrameRate = true
                     }
                 }
                 TextField {
@@ -571,7 +589,7 @@ Item {
                     validator: IntValidator {bottom: frameRateSlider.minimumValue; top: frameRateSlider.maximumValue}
                     onTextChanged: {
                         if(text.length > 0){
-                            frameRateSlider.value = frameRateTextField.text                            
+                            frameRateSlider.value = frameRateTextField.text
                         }
                     }
                 }
@@ -595,24 +613,26 @@ Item {
                     id: flipCtrlHorizotal
                     activeFocusOnPress : true
                     text: "Horizontal"
+                    tooltip: "This control flips the preview left or right."
                     style: econCheckBoxStyle
                     onClicked:{
-                        see3camcu30.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)                        
+                        see3camcu30.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                     }
                     Keys.onReturnPressed: {
-                        see3camcu30.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)                        
+                        see3camcu30.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                     }
                 }
                 CheckBox {
                     id: flipCtrlVertical
                     activeFocusOnPress : true
                     text: "Vertical"
+                    tooltip: "This control flips the preview up or down."
                     style: econCheckBoxStyle
                     onClicked:{
                         see3camcu30.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                     }
                     Keys.onReturnPressed: {
-                        see3camcu30.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)                        
+                        see3camcu30.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                     }
                 }
             }
@@ -634,26 +654,28 @@ Item {
                     exclusiveGroup: faceRectGroup
                     id: faceRectEnable
                     text: "Enable"
+                    tooltip: "Will enable the overlay rectangle around faces"
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
-                        see3camcu30.setFaceDetectionRect(true, faceDetectEmbedData.checked, overlayRect.checked)                        
+                        see3camcu30.setFaceDetectionRect(true, faceDetectEmbedData.checked, overlayRect.checked)
                     }
                     Keys.onReturnPressed: {
-                        see3camcu30.setFaceDetectionRect(true, faceDetectEmbedData.checked, overlayRect.checked)                        
+                        see3camcu30.setFaceDetectionRect(true, faceDetectEmbedData.checked, overlayRect.checked)
                     }
                 }
                 RadioButton {
                     exclusiveGroup: faceRectGroup
                     id:faceRectDisable
                     text: "Disable"
+                    tooltip: "Will disable the overlay rectangle"
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
-                        see3camcu30.setFaceDetectionRect(false, faceDetectEmbedData.checked, overlayRect.checked)                        
+                        see3camcu30.setFaceDetectionRect(false, faceDetectEmbedData.checked, overlayRect.checked)
                     }
                     Keys.onReturnPressed: {
-                        see3camcu30.setFaceDetectionRect(false, faceDetectEmbedData.checked, overlayRect.checked)                        
+                        see3camcu30.setFaceDetectionRect(false, faceDetectEmbedData.checked, overlayRect.checked)
                     }
                 }
             }
@@ -663,6 +685,8 @@ Item {
                     id: faceDetectEmbedData
                     activeFocusOnPress : true
                     text: "Embed Data"
+                    tooltip: "When embed data option is selected, the last section of the frame will be replaced
+with face details"
                     style: econCheckBoxTextWrapModeStyle
                     enabled: faceRectEnable.checked ? true : false
                     opacity: enabled ? 1 : 0.1
@@ -670,7 +694,7 @@ Item {
                         enableFaceDetectEmbedData()
                     }
                     Keys.onReturnPressed: {
-                        enableFaceDetectEmbedData()                        
+                        enableFaceDetectEmbedData()
                     }
                 }
                 CheckBox {
@@ -681,10 +705,10 @@ Item {
                     enabled: faceRectEnable.checked ? true : false
                     opacity: enabled ? 1 : 0.1
                     onClicked:{
-                        see3camcu30.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, checked)                        
+                        see3camcu30.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, checked)
                     }
                     Keys.onReturnPressed: {
-                        see3camcu30.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, checked)                        
+                        see3camcu30.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, checked)
                     }
                 }
             }
@@ -705,6 +729,7 @@ Item {
                     exclusiveGroup: smileDetectGroup
                     id: smileDetectEnable
                     text: "Enable"
+                    tooltip: "Will enable smile detection"
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked:{
@@ -718,6 +743,7 @@ Item {
                     exclusiveGroup: smileDetectGroup
                     id:smileDetectDisable
                     text: "Disable"
+                    tooltip: "Will disable smile detection"
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
@@ -734,14 +760,16 @@ Item {
                     id: smileDetectEmbedData
                     activeFocusOnPress : true
                     text: "Embed Data"
+                    tooltip: "When embed data option is selected, the last section of the frame will be replaced
+with smile details"
                     style: econCheckBoxStyle
                     enabled: smileDetectEnable.checked ? true : false
                     opacity: enabled ? 1 : 0.1
                     onClicked:{
-                        enableSmileDetectEmbedData()                        
+                        enableSmileDetectEmbedData()
                     }
                     Keys.onReturnPressed: {
-                        enableSmileDetectEmbedData()                        
+                        enableSmileDetectEmbedData()
                     }
                 }
             }
@@ -769,6 +797,7 @@ Item {
                         checked: false
                         id: flashModeStrobe
                         text: "Strobe"
+                        tooltip: "When you select the Strobe mode, the LED is switched ON for each frame exposure time while video streaming"
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {
@@ -785,6 +814,7 @@ Item {
                         checked: false
                         id: flashModeTorch
                         text: "Torch"
+                        tooltip: "When you select the Torch mode, the LED is switched ON until the control is disabled"
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {
@@ -801,6 +831,7 @@ Item {
                         checked: false
                         id: flashModeOff
                         text: "OFF"
+                        tooltip: "Disables both flash controls."
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {
@@ -839,7 +870,7 @@ Item {
                 style: econComboBoxStyle
                 onCurrentIndexChanged: {
                     if(skipUpdateUIFlickerCtrl){
-                       setFlickerDetectionFn();
+                        setFlickerDetectionFn();
                     }
                 }
             }
@@ -870,17 +901,17 @@ Item {
                     tooltip: "Click to view the firmware version of the camera"
                     style: ButtonStyle {
                         background: Rectangle {
-                        border.width: control.activeFocus ? 3 :0
-                        color: "#222021"
-                        border.color: control.activeFocus ? "#ffffff" : "#222021"
-                        radius: 5
+                            border.width: control.activeFocus ? 3 :0
+                            color: "#222021"
+                            border.color: control.activeFocus ? "#ffffff" : "#222021"
+                            radius: 5
                         }
                         label: Image {
-                        source: "images/f_wversion_selected.png"
+                            source: "images/f_wversion_selected.png"
                         }
                     }
                     Keys.onReturnPressed: {
-                    getFirmwareVersion()
+                        getFirmwareVersion()
                     }
                 }
                 Button {
@@ -891,26 +922,26 @@ Item {
                     tooltip: "Click to view the Serial Number"
                     style: ButtonStyle {
                         background: Rectangle {
-                        border.width: control.activeFocus ? 3 :0
-                        color: "#222021"
-                        border.color: control.activeFocus ? "#ffffff" : "#222021"
-                        radius: 5
+                            border.width: control.activeFocus ? 3 :0
+                            color: "#222021"
+                            border.color: control.activeFocus ? "#ffffff" : "#222021"
+                            radius: 5
                         }
                         label: Image {
-                        source: "images/serial_no_selected.png"
+                            source: "images/serial_no_selected.png"
                         }
                     }
                     Keys.onReturnPressed: {
-                    getSerialNumber()
+                        getSerialNumber()
                     }
                 }
             }
-	    Row{
+            Row{
                 Layout.alignment: Qt.AlignCenter
                 Button {
                     id: dummybutton
                     opacity: 0
-		    enabled: false
+                    enabled: false
                 }
             }
         }
@@ -1009,26 +1040,26 @@ Item {
     }
 
     Component {
-    id: econscrollViewStyle
-    ScrollViewStyle {
-    scrollToClickedPosition: true
-    handle: Image {
-        id: scrollhandle
-        source: "images/scroller.png"
-    }
-    scrollBarBackground: Image {
-        id: scrollStyle
-        source: "images/Scroller_bg.png"
-    }
-    incrementControl: Image {
-        id: increment
-        source: "images/down_arrow.png"
-    }
-    decrementControl: Image {
-        id: decrement
-        source: "images/up_arrow.png"
-    }
-    }}
+        id: econscrollViewStyle
+        ScrollViewStyle {
+            scrollToClickedPosition: true
+            handle: Image {
+                id: scrollhandle
+                source: "images/scroller.png"
+            }
+            scrollBarBackground: Image {
+                id: scrollStyle
+                source: "images/Scroller_bg.png"
+            }
+            incrementControl: Image {
+                id: increment
+                source: "images/down_arrow.png"
+            }
+            decrementControl: Image {
+                id: decrement
+                source: "images/up_arrow.png"
+            }
+        }}
 
     Component {
         id: econButtonStyle
@@ -1108,9 +1139,9 @@ Item {
             currentSceneMode(sceneMode)
         }
         onQFactorValue:{
-          skipUpdateUIQFactor = false
-          qFactorSlider.value = qFactor
-          skipUpdateUIQFactor = true
+            skipUpdateUIQFactor = false
+            qFactorSlider.value = qFactor
+            skipUpdateUIQFactor = true
         }
         onRoiAutoExpModeValue:{
             currentROIAutoExposureMode(roiMode, winSize)
@@ -1119,7 +1150,7 @@ Item {
         onFaceDetectModeValue:{
             updateFaceDetectModeUI(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect)
         }
-        onSmileDetectModeValue:{            
+        onSmileDetectModeValue:{
             updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue)
         }
 
@@ -1165,7 +1196,7 @@ Item {
     }
 
 
-    Component.onCompleted:{        
+    Component.onCompleted:{
         getCameraValues()
         root.disablePowerLineFreq()
     }
@@ -1176,26 +1207,26 @@ Item {
         messageDialog.open()
     }
     // current ROI auto exposure mode
-    function currentROIAutoExposureMode(roiMode, winSize){       
+    function currentROIAutoExposureMode(roiMode, winSize){
         switch(roiMode){
-            case See3Camcu30.AutoExpFull:
-                autoexpFull.checked = true
-                autoExpoWinSizeCombo.enabled = false
-                break
-            case See3Camcu30.AutoExpManual:
-                skipUpdateUIOnExpWindowSize = false
-                autoexpManual.checked = true
-                // If window size is got from camera is 0 then set window size to 1 in UI
-                if(winSize == 0){
-                    autoExpoWinSizeCombo.currentIndex = 0
-                }else
-                    autoExpoWinSizeCombo.currentIndex = winSize-1
-                break
-            case See3Camcu30.AutoExpDisabled:
-                autoexpFull.enabled = false
-                autoexpManual.enabled = false
-                autoExpoWinSizeCombo.enabled = false
-                break
+        case See3Camcu30.AutoExpFull:
+            autoexpFull.checked = true
+            autoExpoWinSizeCombo.enabled = false
+            break
+        case See3Camcu30.AutoExpManual:
+            skipUpdateUIOnExpWindowSize = false
+            autoexpManual.checked = true
+            // If window size is got from camera is 0 then set window size to 1 in UI
+            if(winSize == 0){
+                autoExpoWinSizeCombo.currentIndex = 0
+            }else
+                autoExpoWinSizeCombo.currentIndex = winSize-1
+            break
+        case See3Camcu30.AutoExpDisabled:
+            autoexpFull.enabled = false
+            autoexpManual.enabled = false
+            autoExpoWinSizeCombo.enabled = false
+            break
         }
     }
 
@@ -1217,33 +1248,33 @@ Item {
     {
         switch(mode)
         {
-            case See3Camcu30.FLIP_ON_MIRROR_ON:
-                 flipCtrlVertical.checked = true
-                 flipCtrlHorizotal.checked = true
-                break;
-            case See3Camcu30.FLIP_OFF_MIRROR_ON:
-                flipCtrlVertical.checked = true
-                flipCtrlHorizotal.checked = false
-                break;
-            case See3Camcu30.FLIP_ON_MIRROR_OFF:
-                 flipCtrlVertical.checked = false
-                 flipCtrlHorizotal.checked = true
-                break;
-            case See3Camcu30.FLIP_OFF_MIRROR_OFF:
-                flipCtrlVertical.checked = false
-                flipCtrlHorizotal.checked = false
-                break;
+        case See3Camcu30.FLIP_ON_MIRROR_ON:
+            flipCtrlVertical.checked = true
+            flipCtrlHorizotal.checked = true
+            break;
+        case See3Camcu30.FLIP_OFF_MIRROR_ON:
+            flipCtrlVertical.checked = true
+            flipCtrlHorizotal.checked = false
+            break;
+        case See3Camcu30.FLIP_ON_MIRROR_OFF:
+            flipCtrlVertical.checked = false
+            flipCtrlHorizotal.checked = true
+            break;
+        case See3Camcu30.FLIP_OFF_MIRROR_OFF:
+            flipCtrlVertical.checked = false
+            flipCtrlHorizotal.checked = false
+            break;
         }
     }
 
-      function updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue){
+    function updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue){
         if(smileDetectMode == See3Camcu30.SmileDetectEnable){
             smileDetectEnable.checked = true
             if(smileDetectEmbedDataValue == See3Camcu30.SmileDetectEmbedDataEnable){
                 smileDetectEmbedData.checked = true
             }else{
-		 smileDetectEmbedData.checked = false
-	    }	    
+                smileDetectEmbedData.checked = false
+            }
         }else if(smileDetectMode == See3Camcu30.SmileDetectDisable){
             smileDetectDisable.checked = true
             if(smileDetectEmbedDataValue == See3Camcu30.SmileDetectEmbedDataEnable){
@@ -1251,12 +1282,12 @@ Item {
             }else{
                 smileDetectEmbedData.checked = false
             }
-    
-	}
+
+        }
 
     }
 
-    function updateFaceDetectModeUI(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect){        
+    function updateFaceDetectModeUI(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect){
         if(faceDetectMode == See3Camcu30.FaceRectEnable){
             faceRectEnable.checked = true
             if(faceDetectEmbedDataValue == See3Camcu30.FaceDetectEmbedDataEnable){
@@ -1285,17 +1316,17 @@ Item {
             if(faceDetectEmbedData.checked){
                 displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_CU30_Face_and_Smile_Detection for more details"))
             }
-        }        
+        }
     }
 
     function exposureCompSetButtonClicked(){
         exposureCompSet.enabled = false
         setButtonClicked = true
         see3camcu30.setExposureCompensation(exposureCompValue.text)
-        exposureCompSet.enabled = true        
+        exposureCompSet.enabled = true
     }
 
-  
+
     function enableSmileDetectEmbedData(){
         setButtonClicked = false
         if(see3camcu30.setSmileDetection(true, smileDetectEmbedData.checked)){
@@ -1304,7 +1335,7 @@ Item {
                 messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_CU30_Face_and_Smile_Detection for more details")
                 messageDialog.open()
             }
-        }        
+        }
     }
 
     function enableDisableAutoExposureControls(autoExposureSelect){
@@ -1341,12 +1372,12 @@ Item {
     {
         switch(mode)
         {
-            case See3Camcu30.SCENE_NORMAL:
-                sceneNormal.checked = true
-                break;
-            case See3Camcu30.SCENE_DOCUMENT:
-                sceneDoc.checked = true
-                break;
+        case See3Camcu30.SCENE_NORMAL:
+            sceneNormal.checked = true
+            break;
+        case See3Camcu30.SCENE_DOCUMENT:
+            sceneDoc.checked = true
+            break;
         }
     }
 
@@ -1380,7 +1411,7 @@ Item {
 
     function setDefaultValues(){
         defaultValue.enabled = false //To avoid multiple clicks over Default button
-        see3camcu30.setToDefault()        
+        see3camcu30.setToDefault()
         getCameraValues()
         defaultValue.enabled = true
     }
@@ -1398,37 +1429,37 @@ Item {
         see3camcu30.getExposureCompensation()
         see3camcu30.getFaceDetectMode()
         see3camcu30.getSmileDetectMode()
-	see3camcu30.getFlashState()
+        see3camcu30.getFlashState()
     }
 
     Connections{
-         target: root
-         onMouseRightClicked:{
-             if(autoexpManual.enabled && autoexpManual.checked){
+        target: root
+        onMouseRightClicked:{
+            if(autoexpManual.enabled && autoexpManual.checked){
                 see3camcu30.setROIAutoExposure(See3Camcu30.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
-             }
-         }
-         onAutoExposureSelected:{
-             enableDisableAutoExposureControls(autoExposureSelect)
-         }
-         onEnableFaceRectafterBurst:{
-           see3camcu30.enableDisableFaceRectangle(true)
-         }
-         onBeforeRecordVideo:{
-            see3camcu30.enableDisableFaceRectangle(false)
-         }
-         onAfterRecordVideo:{
+            }
+        }
+        onAutoExposureSelected:{
+            enableDisableAutoExposureControls(autoExposureSelect)
+        }
+        onEnableFaceRectafterBurst:{
             see3camcu30.enableDisableFaceRectangle(true)
-         }
-         onVideoResolutionChanged:{
-             getexposureCompFrameRateCtrlTimer.start()
-         }
-         onPreviewFPSChanged:{
-             getexposureCompFrameRateCtrlTimer.start()
-         }
-         onVideoColorSpaceChanged:{
-             getexposureCompFrameRateCtrlTimer.start()
-         }
+        }
+        onBeforeRecordVideo:{
+            see3camcu30.enableDisableFaceRectangle(false)
+        }
+        onAfterRecordVideo:{
+            see3camcu30.enableDisableFaceRectangle(true)
+        }
+        onVideoResolutionChanged:{
+            getexposureCompFrameRateCtrlTimer.start()
+        }
+        onPreviewFPSChanged:{
+            getexposureCompFrameRateCtrlTimer.start()
+        }
+        onVideoColorSpaceChanged:{
+            getexposureCompFrameRateCtrlTimer.start()
+        }
     }
 }
 

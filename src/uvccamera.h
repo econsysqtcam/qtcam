@@ -143,6 +143,7 @@
 
 #define GET_FAIL		0x00
 #define GET_SUCCESS		0x01
+#define GET_INVALID     0x02
 
 /* Ascella camera */
 #define ASCELLA_VID 0x04b4

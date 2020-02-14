@@ -1,5 +1,5 @@
 /*
- * uvc_cu30.qml -- extension settings for other cameras
+ * see3camcu22.qml -- extension settings for other cameras
  * Copyright © 2015  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
@@ -22,7 +22,7 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.0
 import QtQuick.Dialogs 1.1
 import econ.camera.uvcsettings 1.0
-import econ.camera.see3camcu20 1.0
+import econ.camera.see3camcu22 1.0
 import QtQuick.Layouts 1.1
 import cameraenum 1.0
 
@@ -32,7 +32,6 @@ Item {
     property bool skipUpdateUIOnColorKillVal: false
     property bool skipUpdateUIOnBurstLength: false
     property bool skipUpdateUIOnAntiFlickerMode:false
-    property bool skipUpdateUIOnLSCMode: false
     property bool skipUpdateUIOnExpComp: false
     property bool setButtonClicked: false
     property int expCompMinValue : 1
@@ -49,18 +48,10 @@ Item {
         id:autoExpROITimer
         interval: 2000
         onTriggered: {
-            see3camcu20.getAutoExpROIModeAndWindowSize()
+            see3camcu22.getAutoExpROIModeAndWindowSize()
         }
     }
 
-    Timer{
-        id:exposureCompensationTimer
-        interval: 500
-        repeat: false
-        onTriggered: {
-            see3camcu20.getExposureCompensation()
-        }
-    }
     Connections
     {
         target: root
@@ -83,18 +74,10 @@ Item {
         }
         onMouseRightClicked:{
             if(autoexpManual.enabled && autoexpManual.checked){
-               see3camcu20.setROIAutoExposure(See3Camcu20.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
+                see3camcu22.setROIAutoExposure(See3Camcu22.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
             }
         }
-        onVideoResolutionChanged:{
-            exposureCompensationTimer.start()
-        }
-        onPreviewFPSChanged:{
-            exposureCompensationTimer.start()
-        }
-        onVideoColorSpaceChanged:{
-            see3camcu20.getExposureCompensation()
-        }
+
         onAutoExposureSelected:{
             autoExposureMode = autoExposureSelect
             if(autoExposureSelect){
@@ -106,26 +89,18 @@ Item {
                     autoExpoWinSizeCombo.enabled = false
                 autoexpManual.opacity = 1
                 autoexpCentered.opacity = 1
-                if(sensorStandard.checked){
-                    exposureCompSlider.enabled = true
-                    exposureCompSlider.opacity  = 1
-                    exposureCompTextValue.opacity = 1
-                }else if(sensorHdrDlo.checked){
-                    exposureCompSlider.enabled = false
-                    exposureCompSlider.opacity  = 0.1
-                    exposureCompTextValue.opacity = 0.1
-                }
             }else{
                 autoexpManual.enabled = false
                 autoexpCentered.enabled = false
                 autoExpoWinSizeCombo.enabled = false
-                exposureCompSlider.enabled = false
                 autoexpManual.opacity = 0.1
                 autoexpCentered.opacity = 0.1
-                exposureCompSlider.opacity = 0.1
-                exposureCompTextValue.opacity = 0.1
             }
             autoExpROITimer.start()
+        }
+        onExtensionTabVisible:{
+            if(visible)
+                getCurrentValuesFromCamera()
         }
     }
 
@@ -134,7 +109,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 450
         style: econscrollViewStyle
         Item {
             height: 1500
@@ -152,9 +127,9 @@ Item {
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                 }
-
-                Row{
-                    spacing: 50
+                Grid {
+                    columns: 2
+                    spacing: 20
                     ExclusiveGroup { id: sensorInputGroup }
                     RadioButton {
                         id: sensorStandard
@@ -165,25 +140,46 @@ the device will be in normal range."
                         exclusiveGroup: sensorInputGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            sensorStandardModeSelected()
+                            see3camcu22.setSensorMode(See3Camcu22.SENSOR_STANDARD)
+                            defaultValue.enabled = true
                         }
                         Keys.onReturnPressed: {
-                            sensorStandardModeSelected()
+                            see3camcu22.setSensorMode(See3Camcu22.SENSOR_STANDARD)
+                            defaultValue.enabled = true
                         }
                     }
                     RadioButton {
-                        id: sensorHdrDlo
+                        id: sensorHdrlfm
                         style:  econRadioButtonStyle
-                        text: qsTr("HDR")
-                        tooltip: "When the sensor is operated in HDR mode, the dynamic range of the
-device will be high."
+                        text: qsTr("HDR+LFM")
+                        opacity: enabled ? 1 : 0.5
+                        tooltip:"When the sensor is operated in this mode dynamic range will be greater than standard mode as well as this mode has effective LFM feature"
                         exclusiveGroup: sensorInputGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            sensorHDRModeSelected()
+                            see3camcu22.setSensorMode(See3Camcu22.SENSOR_HDRLFM)
+                            defaultValue.enabled = true
                         }
                         Keys.onReturnPressed: {
-                            sensorHDRModeSelected()
+                            see3camcu22.setSensorMode(See3Camcu22.SENSOR_HDRLFM)
+                            defaultValue.enabled = true
+                        }
+                    }
+                    RadioButton {
+                        id: sensorHiHdr
+                        style:  econRadioButtonStyle
+                        text: qsTr("Hi-HDR")
+                        opacity: enabled ? 1 : 0.5
+                        tooltip: "When the sensor is operated in this mode dynamic range will be greater than HDR+LFM mode. Hi-HDR mode also has LFM feature similar to HDR+LFM mode but comparatively lesser effective."
+                        exclusiveGroup: sensorInputGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            see3camcu22.setSensorMode(See3Camcu22.SENSOR_HiHDR)
+                            defaultValue.enabled = true
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu22.setSensorMode(See3Camcu22.SENSOR_HiHDR)
+                            defaultValue.enabled = true
                         }
                     }
                 }
@@ -216,7 +212,7 @@ selected."
                         }
                     }
                     RadioButton {
-                        id: cameraModeSlave
+                        id: cameraModeTrigger
                         style:  econRadioButtonStyle
                         text: qsTr("Trigger")
                         tooltip: "The devices starts streaming when external trigger pulse is applied. There will be no streaming
@@ -224,10 +220,12 @@ when no external trigger pulse is applied."
                         exclusiveGroup: cameraModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                             setTriggerMode()
+                            defaultValue.enabled = true
+                            setTriggerMode()
                         }
                         Keys.onReturnPressed: {
-                              setTriggerMode()
+                            defaultValue.enabled = true
+                            setTriggerMode()
                         }
                     }
                 }
@@ -253,10 +251,10 @@ camera."
                         exclusiveGroup: specialModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            see3camcu20.setSpecialMode(See3Camcu20.SPECIAL_NORMAL)
+                            see3camcu22.setSpecialMode(See3Camcu22.SPECIAL_NORMAL)
                         }
                         Keys.onReturnPressed: {
-                            see3camcu20.setSpecialMode(See3Camcu20.SPECIAL_NORMAL)
+                            see3camcu22.setSpecialMode(See3Camcu22.SPECIAL_NORMAL)
                         }
                     }
                     RadioButton {
@@ -269,11 +267,11 @@ stream is composed of grey shades"
                         activeFocusOnPress: true
                         onClicked: {
                             defaultValue.enabled = true
-                            see3camcu20.setSpecialMode(See3Camcu20.SPECIAL_GREYSCALE)
+                            see3camcu22.setSpecialMode(See3Camcu22.SPECIAL_GREYSCALE)
                         }
                         Keys.onReturnPressed: {
                             defaultValue.enabled = true
-                            see3camcu20.setSpecialMode(See3Camcu20.SPECIAL_GREYSCALE)
+                            see3camcu22.setSpecialMode(See3Camcu22.SPECIAL_GREYSCALE)
                         }
                     }
                 }
@@ -297,11 +295,11 @@ stream is composed of grey shades"
                         style: econCheckBoxStyle
                         onClicked:{
                             defaultValue.enabled = true
-                            see3camcu20.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                            see3camcu22.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                         }
                         Keys.onReturnPressed: {
                             defaultValue.enabled = true
-                            see3camcu20.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                            see3camcu22.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                         }
                     }
                     CheckBox {
@@ -312,81 +310,13 @@ stream is composed of grey shades"
                         style: econCheckBoxStyle
                         onClicked:{
                             defaultValue.enabled = true
-                            see3camcu20.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                            see3camcu22.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                         }
                         Keys.onReturnPressed: {
                             defaultValue.enabled = true
-                            see3camcu20.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                            see3camcu22.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                         }
                     }
-                }
-                Text {
-                    id: strobe
-                    text: "--- Strobe ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    Layout.alignment: Qt.AlignCenter
-                    opacity: 0.50196078431373
-                }
-                Column{
-                    spacing: 15
-                    ExclusiveGroup { id: strobesGrp }
-                    Row{
-                        RadioButton {
-                            exclusiveGroup: strobesGrp
-                            checked: false
-                            id: strobeFlashVidoStreaming
-                            text: "Flash for Video Streaming"
-                            tooltip: "When Flash for Video Streaming is selected, it switches ON the LED while video is streaming."
-                            activeFocusOnPress: true
-                            style: econRadioButtonStyle
-                            onClicked: {
-                                defaultValue.enabled = true
-                                see3camcu20.setStrobeMode(See3Camcu20.STROBE_FLASH_VIDEO)
-                            }
-                            Keys.onReturnPressed: {
-                                defaultValue.enabled = true
-                                see3camcu20.setStrobeMode(See3Camcu20.STROBE_FLASH_VIDEO)
-                            }
-                        }
-                    }                    
-                    Row{
-                        RadioButton {
-                            exclusiveGroup: strobesGrp
-                            checked: false
-                            id: strobeTorch
-                            text: "Torch"
-                            tooltip: "When Torch is selected, the LED will switch ON and it acts as a torch."
-                            activeFocusOnPress: true
-                            style: econRadioButtonStyle
-                            onClicked: {                                
-                                see3camcu20.setStrobeMode(See3Camcu20.STROBE_TORCH)
-                            }
-                            Keys.onReturnPressed: {                                
-                                see3camcu20.setStrobeMode(See3Camcu20.STROBE_TORCH)
-                            }
-                        }
-                    }
-                    Row{
-                        RadioButton {
-                            exclusiveGroup: strobesGrp
-                            checked: false
-                            id: strobeOff
-                            text: "OFF"
-                            tooltip: "When OFF is selected, it disables all the strobe controls"
-                            activeFocusOnPress: true
-                            style: econRadioButtonStyle
-                            onClicked: {
-                                see3camcu20.setStrobeMode(See3Camcu20.STROBE_OFF)
-                            }
-                            Keys.onReturnPressed: {
-                                see3camcu20.setStrobeMode(See3Camcu20.STROBE_OFF)
-                            }
-                        }
-                    }
-
                 }
                 Text {
                     id: roiAutoExpMode
@@ -400,47 +330,47 @@ stream is composed of grey shades"
                 }
 
                 Row{
-                      spacing:60
-                      ExclusiveGroup { id: roiExpogroup }
-                      RadioButton {
-                          exclusiveGroup: roiExpogroup
-                          id: autoexpCentered
-                          text: "Centered"
-                          tooltip: "In this mode, the centered region-based exposure value will be
+                    spacing:60
+                    ExclusiveGroup { id: roiExpogroup }
+                    RadioButton {
+                        exclusiveGroup: roiExpogroup
+                        id: autoexpCentered
+                        text: "Centered"
+                        tooltip: "In this mode, the centered region-based exposure value will be
 applied to the frame."
-                          activeFocusOnPress: true
-                          style: econRadioButtonStyle
-                          opacity: enabled ? 1 : 0.1
-                          // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
-                          // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
-                          // winSize is required only for manual mode
-                          onClicked: {
-                              see3camcu20.setROIAutoExposure(See3Camcu20.AutoExpCentered, 0, 0, 0, 0, 0);
-                              autoExpoWinSizeCombo.enabled = false
-                          }
-                          Keys.onReturnPressed: {
-                              see3camcu20.setROIAutoExposure(See3Camcu20.AutoExpCentered, 0, 0, 0, 0, 0);
-                              autoExpoWinSizeCombo.enabled = false
-                          }
-                      }
-                      RadioButton {
-                          exclusiveGroup: roiExpogroup
-                          id: autoexpManual
-                          text: "Manual"
-                          tooltip: "In this mode, you can select the ROI and at that region, the exposure
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
+                        // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
+                        // winSize is required only for manual mode
+                        onClicked: {
+                            see3camcu22.setROIAutoExposure(See3Camcu22.AutoExpCentered, 0, 0, 0, 0, 0);
+                            autoExpoWinSizeCombo.enabled = false
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu22.setROIAutoExposure(See3Camcu22.AutoExpCentered, 0, 0, 0, 0, 0);
+                            autoExpoWinSizeCombo.enabled = false
+                        }
+                    }
+                    RadioButton {
+                        exclusiveGroup: roiExpogroup
+                        id: autoexpManual
+                        text: "Manual"
+                        tooltip: "In this mode, you can select the ROI and at that region, the exposure
 value will be applied to the entire frame."
-                          activeFocusOnPress: true
-                          style: econRadioButtonStyle
-                          opacity: enabled ? 1 : 0.1
-                          onClicked: {
-                              see3camcu20.setROIAutoExposure(See3Camcu20.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
-                              autoExpoWinSizeCombo.enabled = true                              
-                          }
-                          Keys.onReturnPressed: {
-                              see3camcu20.setROIAutoExposure(See3Camcu20.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
-                              autoExpoWinSizeCombo.enabled = true                              
-                          }
-                      }
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        onClicked: {
+                            see3camcu22.setROIAutoExposure(See3Camcu22.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
+                            autoExpoWinSizeCombo.enabled = true
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu22.setROIAutoExposure(See3Camcu22.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
+                            autoExpoWinSizeCombo.enabled = true
+                        }
+                    }
                 }
                 Text {
                     id: windowSizeText
@@ -468,57 +398,11 @@ value will be applied to the entire frame."
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
-                    onCurrentIndexChanged: {                        
+                    onCurrentIndexChanged: {
                         if(skipUpdateUIOnExpWindowSize){
-                            see3camcu20.setROIAutoExposure(See3Camcu20.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
+                            see3camcu22.setROIAutoExposure(See3Camcu22.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
                         }
                         skipUpdateUIOnExpWindowSize = true
-                    }
-                }
-                // Added by Sankari: 14 Feb 2018 - Added exposure compensation
-
-                Text {
-                    id: exposureCompTextTitle
-                    text: "--- Exposure Compensation ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    Layout.alignment: Qt.AlignCenter
-                    opacity: 0.50196078431373
-                }
-                Row{
-                    spacing:35
-                    Slider {
-                        activeFocusOnPress: true
-                        updateValueWhileDragging: false
-                        id: exposureCompSlider
-                        opacity: enabled ? 1 : 0.1
-                        width: 150
-                        stepSize: 1
-                        style:econSliderStyle
-                        minimumValue: expCompMinValue
-                        maximumValue: expCompMaxValue
-                        onValueChanged:  {
-                            exposureCompTextValue.text = exposureCompSlider.value
-                            if(skipUpdateUIOnExpComp){
-                                see3camcu20.setExposureCompensation(exposureCompTextValue.text)
-                            }
-                            skipUpdateUIOnExpComp = true
-                        }
-                    }
-                    TextField {
-                        id: exposureCompTextValue
-                        text: exposureCompSlider.value
-                        font.pixelSize: 10
-                        font.family: "Ubuntu"
-                        smooth: true
-                        horizontalAlignment: TextInput.AlignHCenter
-                        enabled: false
-                        opacity: exposureCompSlider.enabled ? 1 : 0.1
-                        style: econTextFieldStyle
-                        onTextChanged: {
-                        }
                     }
                 }
 
@@ -543,10 +427,10 @@ value will be applied to the entire frame."
                         style:econSliderStyle
                         minimumValue: colorValMin
                         maximumValue: colorValMax
-                        onValueChanged:  {                            
+                        onValueChanged:  {
                             colorKillTextField.text = colourKillValSlider.value
                             if(skipUpdateUIOnColorKillVal){
-                                see3camcu20.setColourKill(colourKillValSlider.value)
+                                see3camcu22.setColourKill(colourKillValSlider.value)
                             }
                             skipUpdateUIOnColorKillVal = true
                         }
@@ -595,10 +479,10 @@ value will be applied to the entire frame."
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
-                    onCurrentIndexChanged: {                        
+                    onCurrentIndexChanged: {
                         root.stillBurstLength(burstLengthCombo.currentIndex + 1) // combobox index starts from 0
                         if(skipUpdateUIOnBurstLength){
-                            see3camcu20.setBurstLength(burstLengthCombo.currentText)
+                            see3camcu22.setBurstLength(burstLengthCombo.currentText)
                         }
                         skipUpdateUIOnBurstLength = true
                     }
@@ -620,28 +504,26 @@ value will be applied to the entire frame."
                         id: denoiseEnable
                         style:  econRadioButtonStyle
                         text:   qsTr("Enable")
-                        tooltip: "When it is enabled, the noise in the image preview will get blur."
                         exclusiveGroup: denoiseControlGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            see3camcu20.setDenoiseCtrlMode(See3Camcu20.DenoiseEnable)
+                            see3camcu22.setDenoiseCtrlMode(See3Camcu22.DenoiseEnable)
                         }
                         Keys.onReturnPressed: {
-                            see3camcu20.setDenoiseCtrlMode(See3Camcu20.DenoiseEnable)
+                            see3camcu22.setDenoiseCtrlMode(See3Camcu22.DenoiseEnable)
                         }
                     }
                     RadioButton {
                         id: denoiseDisable
                         style:  econRadioButtonStyle
                         text: qsTr("Disable")
-                        tooltip: "When it is disabled, the preview will be noisy but it retains more details."
                         exclusiveGroup: denoiseControlGroup
                         activeFocusOnPress: true
-                        onClicked: {                            
-                            see3camcu20.setDenoiseCtrlMode(See3Camcu20.DenoiseDisable)
+                        onClicked: {
+                            see3camcu22.setDenoiseCtrlMode(See3Camcu22.DenoiseDisable)
                         }
-                        Keys.onReturnPressed: {                            
-                            see3camcu20.setDenoiseCtrlMode(See3Camcu20.DenoiseDisable)
+                        Keys.onReturnPressed: {
+                            see3camcu22.setDenoiseCtrlMode(See3Camcu22.DenoiseDisable)
                         }
                     }
                 }
@@ -656,66 +538,54 @@ value will be applied to the entire frame."
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                 }
-                Row{
-                    spacing: 90
-                    ExclusiveGroup { id: lscModeControlGroup }
+                Grid{
+                    spacing:20
+                    columns :2
+                    ExclusiveGroup { id: lscMode }
                     RadioButton {
-                        id: lscModeAuto
-                        style:  econRadioButtonStyle
-                        text:   qsTr("Auto")
-                        tooltip: "In this mode, the lens correction will be applied automatically according to
-the lighting condition present in the scene."
-                        exclusiveGroup: lscModeControlGroup
+                        exclusiveGroup: lscMode
+                        id: warmWhiteMode
+                        text: "Warm White"
+                        tooltip: "This Lens shading correction setting should be used when the scene is at 2700K to 3000K color temperature range."
                         activeFocusOnPress: true
-                        onClicked: {                            
-                            see3camcu20.setLSCMode(See3Camcu20.LSC_AUTO)
-                        }
-                        Keys.onReturnPressed: {
-                            see3camcu20.setLSCMode(See3Camcu20.LSC_AUTO)
-                        }
-                    }
-                    RadioButton {
-                        id: lscModeManual
-                        style:  econRadioButtonStyle
-                        text: qsTr("Manual")
-                        tooltip: "In this mode, you can select the lens correction setting appropriate to
-the lighting condition, when the lens correction setting applied in the auto mode is not appropriate"
-                        exclusiveGroup: lscModeControlGroup
-                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
                         onClicked: {
-                            setLSCModesBasedOnComboIndexSelection()
+                            see3camcu22.setLSCMode(See3Camcu22.LSC_WARMWHITE)
                         }
                         Keys.onReturnPressed: {
-                            setLSCModesBasedOnComboIndexSelection()
+                            see3camcu22.setLSCMode(See3Camcu22.LSC_WARMWHITE)
                         }
                     }
-                }
-                Text {
-                    id: lscModeManualModeText
-                    text: "Light Source:"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    opacity: (lscModeManual.enabled && lscModeManual.checked) ? 1 : 0.1
-                }
-                ComboBox
-                {
-                    id: lscModeCombo
-                    enabled: (lscModeManual.enabled && lscModeManual.checked) ? true : false
-                    opacity: (lscModeManual.enabled && lscModeManual.checked) ? 1 : 0.1
-                    model: ListModel {
-                        ListElement { text: "DayLight" }
-                        ListElement { text: "CWF Light" }
-                        ListElement { text: "A Light" }
-                    }
-                    activeFocusOnPress: true
-                    style: econComboBoxStyle
-                    onCurrentIndexChanged: {                        
-                        if(skipUpdateUIOnLSCMode){
-                            setLSCModesBasedOnComboIndexSelection()
+                    RadioButton {
+                        exclusiveGroup: lscMode
+                        id: brightWhiteMode
+                        text: "Bright  White"
+                        tooltip: " This Lens shading correction setting should be used when the scene is at 3100K to 4500K color temperature range."
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        onClicked: {
+                            see3camcu22.setLSCMode(See3Camcu22.LSC_BRIGHTWHITE)
                         }
-                        skipUpdateUIOnLSCMode = true
+                        Keys.onReturnPressed: {
+                            see3camcu22.setLSCMode(See3Camcu22.LSC_BRIGHTWHITE)
+                        }
+                    }
+                    RadioButton {
+                        exclusiveGroup: lscMode
+                        id: dayLightMode
+                        text: "Day Light"
+                        tooltip: " This Lens shading correction setting should be used when scene is at 4600K to 6500K color temperature range"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        onClicked: {
+                            see3camcu22.setLSCMode(See3Camcu22.LSC_DAYLIGHT)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu22.setLSCMode(See3Camcu22.LSC_DAYLIGHT)
+                        }
                     }
                 }
 
@@ -731,40 +601,40 @@ the lighting condition, when the lens correction setting applied in the auto mod
                 }
 
                 Row{
-                      spacing:90
-                      ExclusiveGroup { id: antiFlickerModegroup }
-                      RadioButton {
-                          exclusiveGroup: antiFlickerModegroup
-                          id: antiFlickerModeAuto
-                          text: "Auto"
-                          tooltip: "In auto mode, the device will automatically switch between the flicker
+                    spacing:90
+                    ExclusiveGroup { id: antiFlickerModegroup }
+                    RadioButton {
+                        exclusiveGroup: antiFlickerModegroup
+                        id: antiFlickerModeAuto
+                        text: "Auto"
+                        tooltip: "In auto mode, the device will automatically switch between the flicker
 frequencies if the flicker is detected in preview."
-                          activeFocusOnPress: true
-                          style: econRadioButtonStyle
-                          opacity: enabled ? 1 : 0.1
-                          onClicked: {
-                              see3camcu20.setAntiFlickerMode(See3Camcu20.AntiFlickerAuto);
-                          }
-                          Keys.onReturnPressed: {
-                              see3camcu20.setAntiFlickerMode(See3Camcu20.AntiFlickerAuto);
-                          }
-                      }
-                      RadioButton {
-                          exclusiveGroup: antiFlickerModegroup
-                          id: antiFlickerModeManual
-                          text: "Manual"
-                          tooltip: "In manual mode, the flicker frequency must be chosen manually to
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        onClicked: {
+                            see3camcu22.setAntiFlickerMode(See3Camcu22.AntiFlickerAuto);
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu22.setAntiFlickerMode(See3Camcu22.AntiFlickerAuto);
+                        }
+                    }
+                    RadioButton {
+                        exclusiveGroup: antiFlickerModegroup
+                        id: antiFlickerModeManual
+                        text: "Manual"
+                        tooltip: "In manual mode, the flicker frequency must be chosen manually to
 avoid the flickering in the preview."
-                          activeFocusOnPress: true
-                          style: econRadioButtonStyle
-                          opacity: enabled ? 1 : 0.1
-                          onClicked: {
-                              setAntiFlickerMode()
-                          }
-                          Keys.onReturnPressed: {
-                              setAntiFlickerMode()
-                          }
-                      }
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        onClicked: {
+                            setAntiFlickerMode()
+                        }
+                        Keys.onReturnPressed: {
+                            setAntiFlickerMode()
+                        }
+                    }
                 }
 
                 Text {
@@ -787,7 +657,7 @@ avoid the flickering in the preview."
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
-                    onCurrentIndexChanged: {                        
+                    onCurrentIndexChanged: {
                         if(skipUpdateUIOnAntiFlickerMode){
                             setAntiFlickerMode()
                         }
@@ -820,13 +690,13 @@ avoid the flickering in the preview."
                         tooltip: "Click to view the firmware version of the camera"
                         style: ButtonStyle {
                             background: Rectangle {
-                            border.width: control.activeFocus ? 3 :0
-                            color: "#222021"
-                            border.color: control.activeFocus ? "#ffffff" : "#222021"
-                            radius: 5
+                                border.width: control.activeFocus ? 3 :0
+                                color: "#222021"
+                                border.color: control.activeFocus ? "#ffffff" : "#222021"
+                                radius: 5
                             }
                             label: Image {
-                            source: "images/f_wversion_selected.png"
+                                source: "images/f_wversion_selected.png"
                             }
                         }
                         onClicked: {
@@ -843,13 +713,13 @@ avoid the flickering in the preview."
                         tooltip: "Click to view the Serial Number"
                         style: ButtonStyle {
                             background: Rectangle {
-                            border.width: control.activeFocus ? 3 :0
-                            color: "#222021"
-                            border.color: control.activeFocus ? "#ffffff" : "#222021"
-                            radius: 5
+                                border.width: control.activeFocus ? 3 :0
+                                color: "#222021"
+                                border.color: control.activeFocus ? "#ffffff" : "#222021"
+                                radius: 5
                             }
                             label: Image {
-                            source: "images/serial_no_selected.png"
+                                source: "images/serial_no_selected.png"
                             }
                         }
                         onClicked: {
@@ -881,7 +751,6 @@ avoid the flickering in the preview."
             }
         }
     }
-
 
     Component {
         id: econComboBoxStyle
@@ -1002,59 +871,52 @@ avoid the flickering in the preview."
         }
     }
 
-    See3Camcu20 {
-        id: see3camcu20
+    See3Camcu22 {
+        id: see3camcu22
         onDenoiseModeChanged:{
-            if(denoiseMode == See3Camcu20.DenoiseEnable){
+            if(denoiseMode == See3Camcu22.DenoiseEnable){
                 denoiseEnable.checked = true
-            }else if(denoiseMode == See3Camcu20.DenoiseDisable){
+            }else if(denoiseMode == See3Camcu22.DenoiseDisable){
                 denoiseDisable.checked = true
             }
         }
 
         onSensorModeReceived:{
-            if(sensorMode == See3Camcu20.SENSOR_STANDARD){
+            if(sensorMode == See3Camcu22.SENSOR_STANDARD){
                 sensorStandard.checked = true
-                exposureCompSlider.enabled = true
-                exposureCompSlider.opacity = 1
-                exposureCompTextValue.opacity = 1
-            }else if(sensorMode == See3Camcu20.SENSOR_HDR_DLO){
-                sensorHdrDlo.checked = true
-                exposureCompSlider.enabled = false
-                exposureCompSlider.opacity = 0.1
-                exposureCompTextValue.opacity = 0.1
+            }else if(sensorMode == See3Camcu22.SENSOR_HDRLFM){
+                sensorHdrlfm.checked = true
+            }else if(sensorMode == See3Camcu22.SENSOR_HiHDR){
+                sensorHiHdr.checked = true
             }
         }
         onCameraModeReceived:{
-            if(cameraMode == See3Camcu20.CAMERA_MASTER){
+            if(cameraMode == See3Camcu22.CAMERA_MASTER){
                 cameraModeMaster.checked = true
-            }else if(cameraMode == See3Camcu20.CAMERA_SLAVE){
-                cameraModeSlave.checked = true
+            }else if(cameraMode == See3Camcu22.CAMERA_TRIGGER){
+                cameraModeTrigger.checked = true
             }
         }
         onSpecialModeReceived:{
-            if(specialMode == See3Camcu20.SPECIAL_NORMAL){
+            if(specialMode == See3Camcu22.SPECIAL_NORMAL){
                 specialModeNormal.checked = true
-            }else if(specialMode == See3Camcu20.SPECIAL_GREYSCALE){
+            }else if(specialMode == See3Camcu22.SPECIAL_GREYSCALE){
                 specialModeGreyscale.checked = true
             }
         }
         onFlipMirrorModeChanged:{
             currentFlipMirrorMode(flipMirrorMode)
         }
-        onStrobeModeChanged:{
-            currentStrobeMode(strobeMode)
-        }
-        onRoiAutoExpModeChanged:{           
-            if(roiMode == See3Camcu20.AutoExpCentered){
+        onRoiAutoExpModeChanged:{
+            if(roiMode == See3Camcu22.AutoExpCentered){
                 autoexpCentered.checked = true
-            }else if(roiMode == See3Camcu20.AutoExpManual){
-                skipUpdateUIOnExpWindowSize = false                
+            }else if(roiMode == See3Camcu22.AutoExpManual){
+                skipUpdateUIOnExpWindowSize = false
                 autoexpManual.checked = true
                 autoExpoWinSizeCombo.currentIndex = winSize - 1
                 skipUpdateUIOnExpWindowSize = true
             }
-            else if(roiMode == See3Camcu20.AutoExpDisabled){
+            else if(roiMode == See3Camcu22.AutoExpDisabled){
                 autoexpCentered.enabled = false
                 autoexpManual.enabled = false
                 autoExpoWinSizeCombo.enabled = false
@@ -1078,10 +940,16 @@ avoid the flickering in the preview."
         onSetdefaultValueFailed:{
             displayMessageBox(qsTr("Failure"), qsTr("Setting default value is failed"))
         }
-        onExposureCompValue:{
-            skipUpdateUIOnExpComp = false
-            exposureCompSlider.value = exposureCompensation
-            skipUpdateUIOnExpComp = true
+        onDisableHDR: {
+            if(hdrstatus){
+                sensorHdrlfm.enabled = false
+                sensorHiHdr.enabled = false
+                sensorStandard.checked = true
+            }
+            else{
+                sensorHdrlfm.enabled = true
+                sensorHiHdr.enabled = true
+            }
         }
     }
 
@@ -1091,48 +959,18 @@ avoid the flickering in the preview."
         messageDialog.open()
     }
 
-    function sensorStandardModeSelected(){
-        see3camcu20.setSensorMode(See3Camcu20.SENSOR_STANDARD)
-        defaultValue.enabled = true
-        if(autoExposureMode){
-            exposureCompSlider.enabled = true
-            exposureCompSlider.opacity = 1
-            exposureCompTextValue.opacity = 1
-        }else{
-            exposureCompSlider.enabled = false
-            exposureCompSlider.opacity = 0.1
-            exposureCompTextValue.opacity = 0.1
-        }
-    }
-
-    function sensorHDRModeSelected(){
-        see3camcu20.setSensorMode(See3Camcu20.SENSOR_HDR_DLO)
-        defaultValue.enabled = true
-        exposureCompSlider.enabled = false
-        exposureCompSlider.opacity = 0.1
-        exposureCompTextValue.opacity = 0.1
-    }
-
     function currentLSCMode(Mode){
-        skipUpdateUIOnLSCMode = false
         switch(Mode){
-        case See3Camcu20.LSC_AUTO:
-            lscModeAuto.checked = true
+        case See3Camcu22.LSC_WARMWHITE:
+            warmWhiteMode.checked = true
             break;
-        case See3Camcu20.LSC_DAYLIGHT:
-            lscModeManual.checked = true
-            lscModeCombo.currentIndex  = 0
+        case See3Camcu22.LSC_BRIGHTWHITE:
+            brightWhiteMode.checked = true
             break;
-        case See3Camcu20.LSC_CWFLIGHT:
-            lscModeManual.checked = true
-            lscModeCombo.currentIndex  = 1
-            break;
-        case See3Camcu20.LSC_ALIGHT:
-            lscModeManual.checked = true
-            lscModeCombo.currentIndex  = 2
+        case See3Camcu22.LSC_DAYLIGHT:
+            dayLightMode.checked = true
             break;
         }
-        skipUpdateUIOnLSCMode = true
     }
 
     function getSerialNumber() {
@@ -1145,60 +983,32 @@ avoid the flickering in the preview."
         messageDialog.open()
     }
 
-    function setLSCModesBasedOnComboIndexSelection(){
-        if(lscModeCombo.currentIndex == 0)
-        {
-            see3camcu20.setLSCMode(See3Camcu20.LSC_DAYLIGHT)
-        }else if(lscModeCombo.currentIndex == 1)
-        {
-            see3camcu20.setLSCMode(See3Camcu20.LSC_CWFLIGHT)
-        }else if(lscModeCombo.currentIndex == 2)
-        {
-            see3camcu20.setLSCMode(See3Camcu20.LSC_ALIGHT)
-        }
-    }
-
-    function currentAntiFlickerMode(flickerMode){ 
+    function currentAntiFlickerMode(flickerMode){
         switch(flickerMode){
-            case See3Camcu20.AntiFlickerAuto:
-                antiFlickerModeAuto.checked = true
-                break
-            case See3Camcu20.AntiFlicker50Hz:
-                antiFlickerModeManual.checked = true
-                skipUpdateUIOnAntiFlickerMode = false
-                antiFlickerCombo.currentIndex = 0
-                skipUpdateUIOnAntiFlickerMode = true
-                break
-            case See3Camcu20.AntiFlicker60Hz:
-                antiFlickerModeManual.checked = true
-                skipUpdateUIOnAntiFlickerMode = false
-                antiFlickerCombo.currentIndex = 1
-                skipUpdateUIOnAntiFlickerMode = true
-                break
-         }
+        case See3Camcu22.AntiFlickerAuto:
+            antiFlickerModeAuto.checked = true
+            break
+        case See3Camcu22.AntiFlicker50Hz:
+            antiFlickerModeManual.checked = true
+            skipUpdateUIOnAntiFlickerMode = false
+            antiFlickerCombo.currentIndex = 0
+            skipUpdateUIOnAntiFlickerMode = true
+            break
+        case See3Camcu22.AntiFlicker60Hz:
+            antiFlickerModeManual.checked = true
+            skipUpdateUIOnAntiFlickerMode = false
+            antiFlickerCombo.currentIndex = 1
+            skipUpdateUIOnAntiFlickerMode = true
+            break
+        }
     }
 
     // set anti flicker mode in the camera based on anti flicker index in combobox
-    function setAntiFlickerMode(){        
+    function setAntiFlickerMode(){
         if(antiFlickerCombo.currentIndex == 0)
-          see3camcu20.setAntiFlickerMode(See3Camcu20.AntiFlicker50Hz)
+            see3camcu22.setAntiFlickerMode(See3Camcu22.AntiFlicker50Hz)
         else
-          see3camcu20.setAntiFlickerMode(See3Camcu20.AntiFlicker60Hz)
-    }
-
-    // selecting strobe mode
-    function currentStrobeMode(mode){
-        switch(mode){
-        case See3Camcu20.STROBE_OFF:
-            strobeOff.checked = true
-            break;
-        case See3Camcu20.STROBE_FLASH_VIDEO:
-            strobeFlashVidoStreaming.checked = true
-            break;      
-        case See3Camcu20.STROBE_TORCH:
-            strobeTorch.checked = true
-            break;
-        }
+            see3camcu22.setAntiFlickerMode(See3Camcu22.AntiFlicker60Hz)
     }
 
     // Flip mirror modes
@@ -1206,64 +1016,60 @@ avoid the flickering in the preview."
     {
         switch(mode)
         {
-            case See3Camcu20.SetBothFlipEnable:
-                 flipCtrlVertical.checked = true
-                 flipCtrlHorizotal.checked = true
-                break;
-            case See3Camcu20.SetVertiFlip:
-                flipCtrlVertical.checked = true
-                flipCtrlHorizotal.checked = false
-                break;
-            case See3Camcu20.SetHorzFlip:
-                 flipCtrlVertical.checked = false
-                 flipCtrlHorizotal.checked = true
-                break;
-            case See3Camcu20.SetBothFlipDisable:
-                flipCtrlVertical.checked = false
-                flipCtrlHorizotal.checked = false
-                break;
+        case See3Camcu22.SetBothFlipEnable:
+            flipCtrlVertical.checked = true
+            flipCtrlHorizotal.checked = true
+            break;
+        case See3Camcu22.SetVertiFlip:
+            flipCtrlVertical.checked = true
+            flipCtrlHorizotal.checked = false
+            break;
+        case See3Camcu22.SetHorzFlip:
+            flipCtrlVertical.checked = false
+            flipCtrlHorizotal.checked = true
+            break;
+        case See3Camcu22.SetBothFlipDisable:
+            flipCtrlVertical.checked = false
+            flipCtrlHorizotal.checked = false
+            break;
         }
     }
-
-    function setMasterMode(){
-        see3camcu20.setCameraMode(See3Camcu20.CAMERA_MASTER)
-        root.checkForTriggerMode(false)
-        root.captureBtnEnable(true)
-        root.videoRecordBtnEnable(true)
-    }
-
     function setTriggerMode(){
-        defaultValue.enabled = true
-        see3camcu20.setCameraMode(See3Camcu20.CAMERA_SLAVE)
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        see3camcu22.setCameraMode(See3Camcu22.CAMERA_TRIGGER)
+    }
+
+    function setMasterMode(){
+        root.checkForTriggerMode(false)
+        root.captureBtnEnable(true)
+        root.videoRecordBtnEnable(true)
+        see3camcu22.setCameraMode(See3Camcu22.CAMERA_MASTER)
     }
 
     function setToDefaultValues(){
         root.checkForTriggerMode(false)
+        defaultValue.enabled = false
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
-        defaultValue.enabled = false
-        if(see3camcu20.setToDefaultValues()){
-            see3camcu20.getAutoExpROIModeAndWindowSize()
+        if(see3camcu22.setToDefaultValues()){
+            see3camcu22.getAutoExpROIModeAndWindowSize()
             getCurrentValuesFromCamera()
         }
         defaultValue.enabled = true
     }
 
     function getCurrentValuesFromCamera(){
-        see3camcu20.getSensorMode()
-        see3camcu20.getCameraMode()
-        see3camcu20.getSpecialMode()
-        see3camcu20.getOrientation()
-        see3camcu20.getStrobeMode()
-        see3camcu20.getColourKill()
-        see3camcu20.getExposureCompensation()
-        see3camcu20.getBurstLength()
-        see3camcu20.getAntiFlickerMode()
-        see3camcu20.getDenoiseCtrlMode()
-        see3camcu20.getLSCMode()
+        see3camcu22.getSensorMode()
+        see3camcu22.getCameraMode()
+        see3camcu22.getSpecialMode()
+        see3camcu22.getOrientation()
+        see3camcu22.getColourKill()
+        see3camcu22.getBurstLength()
+        see3camcu22.getAntiFlickerMode()
+        see3camcu22.getDenoiseCtrlMode()
+        see3camcu22.getLSCMode()
     }
 
     Component.onCompleted:{
@@ -1271,6 +1077,7 @@ avoid the flickering in the preview."
         getCurrentValuesFromCamera()
     }
 }
+
 
 
 

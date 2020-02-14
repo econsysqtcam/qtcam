@@ -172,7 +172,7 @@ void Cameraproperty::checkforDevice() {
                         cameraMap.insert(qDevCount,QString::number(deviceIndex,10));
                         deviceNodeMap.insert(deviceIndex,(char*)m_querycap.bus_info);
                         availableCam.append(cameraName);
-                        metaCapture = true;
+                        metaCapture = false;
                     }
 
                     // Added by Navya : 24th Jan 2020
@@ -181,7 +181,7 @@ void Cameraproperty::checkforDevice() {
                     if(!metaCapture){
                         deviceIndex++;
                     }
-                    metaCapture = false;
+                    metaCapture = true;
                     close();
 
                 } else {

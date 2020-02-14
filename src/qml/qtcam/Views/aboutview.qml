@@ -51,6 +51,7 @@ Item {
         opacity: 1
         action: aboutAction
         activeFocusOnPress : true
+        tooltip: "Click here to see the Qtcam current version"
         style: ButtonStyle {
             background: Rectangle {
                 border.width: control.activeFocus ? 1 :0
@@ -73,6 +74,7 @@ Item {
         opacity: 1
         action: exitAction
         activeFocusOnPress : true
+        tooltip : "Click here to exit the Application"
         style: ButtonStyle {
             background: Rectangle {
                 border.width: control.activeFocus ? 1 :0

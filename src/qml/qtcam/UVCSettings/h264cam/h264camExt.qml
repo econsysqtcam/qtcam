@@ -294,6 +294,8 @@ Item {
                         exclusiveGroup: roiExpogroup
                         id: autoexpFull
                         text: "Full"
+                        tooltip: "In this mode, the full region-based exposure value will be applied to the
+frame."
                         enabled:hdrCombo.currentIndex == 0 ?1 :0
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
@@ -312,6 +314,8 @@ Item {
                         exclusiveGroup: roiExpogroup
                         id: autoexpManual
                         text: "Manual"
+                        tooltip: "In this mode, you can select the ROI and at that region the exposure
+value will be applied to the entire frame"
                         enabled:hdrCombo.currentIndex == 0 ?1 :0
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
@@ -373,6 +377,7 @@ Item {
                         checked: false
                         id: gainLcg
                         text: "LCG"
+                        tooltip: "LCG (Low conversion gain) is most suitable for scenes with high illumination. Since this mode is suitable for bright scenes it has low sensitivity and high Dynamic range."
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {
@@ -387,6 +392,7 @@ Item {
                         checked: false
                         id: gainHcg
                         text: "HCG"
+                        tooltip: "HCG (High conversion gain) is most suitable for low scenes. Since this mode is suitable for low light scenes it has high sensitivity and low Dynamic range."
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {
@@ -415,6 +421,7 @@ Item {
                         id: flipCtrlHorizotal
                         activeFocusOnPress : true
                         text: "Horizontal"
+                        tooltip: "This control flips the preview left or right."
                         style: econCheckBoxStyle
                         opacity: enabled ? 1 :0.1
                         onClicked:{
@@ -428,6 +435,7 @@ Item {
                         id: flipCtrlVertical
                         activeFocusOnPress : true
                         text: "Vertical"
+                        tooltip: "This control flips the preview up or down."
                         style: econCheckBoxStyle
                         opacity: enabled ? 1 :0.1
                         onClicked:{
@@ -444,6 +452,7 @@ Item {
                         id: defaultValue
                         activeFocusOnPress : true
                         text: "Default"
+                        tooltip: "Click here to get the Default Values of available controls"
                         style: econButtonStyle
                         opacity: 1
                         implicitHeight: 35
