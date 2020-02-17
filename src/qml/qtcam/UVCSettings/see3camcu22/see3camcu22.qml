@@ -135,8 +135,6 @@ Item {
                         id: sensorStandard
                         style:  econRadioButtonStyle
                         text:   qsTr("Standard")
-                        tooltip: "When the sensor is operated in standard mode, the dynamic range of
-the device will be in normal range."
                         exclusiveGroup: sensorInputGroup
                         activeFocusOnPress: true
                         onClicked: {
@@ -153,7 +151,6 @@ the device will be in normal range."
                         style:  econRadioButtonStyle
                         text: qsTr("HDR+LFM")
                         opacity: enabled ? 1 : 0.5
-                        tooltip:"When the sensor is operated in this mode dynamic range will be greater than standard mode as well as this mode has effective LFM feature"
                         exclusiveGroup: sensorInputGroup
                         activeFocusOnPress: true
                         onClicked: {
@@ -170,7 +167,6 @@ the device will be in normal range."
                         style:  econRadioButtonStyle
                         text: qsTr("Hi-HDR")
                         opacity: enabled ? 1 : 0.5
-                        tooltip: "When the sensor is operated in this mode dynamic range will be greater than HDR+LFM mode. Hi-HDR mode also has LFM feature similar to HDR+LFM mode but comparatively lesser effective."
                         exclusiveGroup: sensorInputGroup
                         activeFocusOnPress: true
                         onClicked: {
@@ -200,8 +196,6 @@ the device will be in normal range."
                         id: cameraModeMaster
                         style:  econRadioButtonStyle
                         text:   qsTr("Master")
-                        tooltip: "The application starts streaming the video, when the master mode is
-selected."
                         exclusiveGroup: cameraModeGroup
                         activeFocusOnPress: true
                         onClicked: {
@@ -214,9 +208,7 @@ selected."
                     RadioButton {
                         id: cameraModeTrigger
                         style:  econRadioButtonStyle
-                        text: qsTr("Trigger")
-                        tooltip: "The devices starts streaming when external trigger pulse is applied. There will be no streaming
-when no external trigger pulse is applied."
+                        text: qsTr("Trigger")                       
                         exclusiveGroup: cameraModeGroup
                         activeFocusOnPress: true
                         onClicked: {
@@ -245,9 +237,7 @@ when no external trigger pulse is applied."
                     RadioButton {
                         id: specialModeNormal
                         style:  econRadioButtonStyle
-                        text:   qsTr("Normal")
-                        tooltip: "In this mode, the normal unprocessed UYVY image stream from the
-camera."
+                        text:   qsTr("Normal")                     
                         exclusiveGroup: specialModeGroup
                         activeFocusOnPress: true
                         onClicked: {
@@ -260,9 +250,7 @@ camera."
                     RadioButton {
                         id: specialModeGreyscale
                         style:  econRadioButtonStyle
-                        text: qsTr("Greyscale")
-                        tooltip: "In this mode, the normal preview is desaturated, and the image
-stream is composed of grey shades"
+                        text: qsTr("Greyscale")                      
                         exclusiveGroup: specialModeGroup
                         activeFocusOnPress: true
                         onClicked: {
@@ -291,7 +279,6 @@ stream is composed of grey shades"
                         id: flipCtrlHorizotal
                         activeFocusOnPress : true
                         text: "Horizontal"
-                        tooltip: "This mode flips the preview left or right"
                         style: econCheckBoxStyle
                         onClicked:{
                             defaultValue.enabled = true
@@ -306,7 +293,6 @@ stream is composed of grey shades"
                         id: flipCtrlVertical
                         activeFocusOnPress : true
                         text: "Vertical"
-                        tooltip: "This mode flips the preview vertically up or down."
                         style: econCheckBoxStyle
                         onClicked:{
                             defaultValue.enabled = true
@@ -335,9 +321,7 @@ stream is composed of grey shades"
                     RadioButton {
                         exclusiveGroup: roiExpogroup
                         id: autoexpCentered
-                        text: "Centered"
-                        tooltip: "In this mode, the centered region-based exposure value will be
-applied to the frame."
+                        text: "Centered"                   
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         opacity: enabled ? 1 : 0.1
@@ -356,9 +340,7 @@ applied to the frame."
                     RadioButton {
                         exclusiveGroup: roiExpogroup
                         id: autoexpManual
-                        text: "Manual"
-                        tooltip: "In this mode, you can select the ROI and at that region, the exposure
-value will be applied to the entire frame."
+                        text: "Manual"                       
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         opacity: enabled ? 1 : 0.1
@@ -546,7 +528,6 @@ value will be applied to the entire frame."
                         exclusiveGroup: lscMode
                         id: warmWhiteMode
                         text: "Warm White"
-                        tooltip: "This Lens shading correction setting should be used when the scene is at 2700K to 3000K color temperature range."
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         opacity: enabled ? 1 : 0.1
@@ -561,7 +542,6 @@ value will be applied to the entire frame."
                         exclusiveGroup: lscMode
                         id: brightWhiteMode
                         text: "Bright  White"
-                        tooltip: " This Lens shading correction setting should be used when the scene is at 3100K to 4500K color temperature range."
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         opacity: enabled ? 1 : 0.1
@@ -576,7 +556,6 @@ value will be applied to the entire frame."
                         exclusiveGroup: lscMode
                         id: dayLightMode
                         text: "Day Light"
-                        tooltip: " This Lens shading correction setting should be used when scene is at 4600K to 6500K color temperature range"
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         opacity: enabled ? 1 : 0.1
@@ -607,8 +586,6 @@ value will be applied to the entire frame."
                         exclusiveGroup: antiFlickerModegroup
                         id: antiFlickerModeAuto
                         text: "Auto"
-                        tooltip: "In auto mode, the device will automatically switch between the flicker
-frequencies if the flicker is detected in preview."
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         opacity: enabled ? 1 : 0.1
@@ -623,8 +600,6 @@ frequencies if the flicker is detected in preview."
                         exclusiveGroup: antiFlickerModegroup
                         id: antiFlickerModeManual
                         text: "Manual"
-                        tooltip: "In manual mode, the flicker frequency must be chosen manually to
-avoid the flickering in the preview."
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         opacity: enabled ? 1 : 0.1

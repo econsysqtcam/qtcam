@@ -91,7 +91,6 @@ Item {
                 checked: false
                 id: flashModeStrobe
                 text: "Strobe"
-                tooltip: "When you select the Strobe mode, the LED is switched ON for each frame exposure time while video streaming"
                 activeFocusOnPress: true
                 style: econRadioButtonStyle
                 onClicked: {
@@ -108,7 +107,6 @@ Item {
                 checked: false
                 id: flashModeTorch
                 text: "Torch"
-                tooltip: "When you select the Torch mode, the LED is switched ON until the control is disabled"
                 activeFocusOnPress: true
                 style: econRadioButtonStyle
                 onClicked: {
@@ -125,7 +123,6 @@ Item {
                 checked: false
                 id: flashModeOff
                 text: "OFF"
-                tooltip: "Disables both flash controls."
                 activeFocusOnPress: true
                 style: econRadioButtonStyle
                 onClicked: {

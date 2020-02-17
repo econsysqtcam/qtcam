@@ -3,7 +3,6 @@ Qtcam Application - 22.0.15
 * Added fixes for See3CAM_20CUG issues.
 * Added support for See3CAM_CU22 camera.
 * Added fix for the preview hang issue while swiching between resolutions for See3CAM_CU30 camera and See3CAM_CU22 camera.
-* Added tooltip for Extension Controls.
 * Rendering the preview using Opengl Shaders.
 
 Qtcam Application - 22.0.14

@@ -88,7 +88,6 @@ Item {
                     id: rdoModeMaster
                     style:  econRadioButtonStyle
                     text:   qsTr("Master")
-                    tooltip: "After choosing master mode, the application starts video streaming. This is a simple mode of operation for the camera without any external trigger capability. "
                     exclusiveGroup: streamModeGroup
                     activeFocusOnPress: true
                     onClicked: {
@@ -102,7 +101,6 @@ Item {
                     id: rdoModeTrigger
                     style:  econRadioButtonStyle
                     text: qsTr("Trigger")
-                    tooltip: "In trigger mode, Frames will be out only when external hardware pulses are given to PIN 5 of CN3."
                     exclusiveGroup: streamModeGroup
                     activeFocusOnPress: true
                     onClicked: {
@@ -137,7 +135,6 @@ Item {
                     id: rdoModeOff
                     style:  econRadioButtonStyle
                     text:   qsTr("OFF")
-                    tooltip:"It disables the flash mode"
                     exclusiveGroup: flashModeGroup
                     activeFocusOnPress: true
                     onClicked: {
@@ -151,7 +148,6 @@ Item {
                     id: rdoModeOn
                     style:  econRadioButtonStyle
                     text: qsTr("ON")
-                    tooltip:"When this control is selected, the LED ON time is set based on the current manual exposure value."
                     exclusiveGroup: flashModeGroup
                     activeFocusOnPress: true
                     onClicked: {
@@ -180,7 +176,6 @@ Item {
                     id: flipHorizontal
                     activeFocusOnPress : true
                     text: "Horizontal"
-                    tooltip: "This control flips the preview left or right."
                     style: econCheckBoxStyle
                     onClicked:{
                         see3cam20cug.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
@@ -193,7 +188,6 @@ Item {
                     id: flipVertical
                     activeFocusOnPress : true
                     text: "Vertical"
-                    tooltip: "This control flips the preview up or down."
                     style: econCheckBoxStyle
                     onClicked:{
                         see3cam20cug.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)

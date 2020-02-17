@@ -90,7 +90,6 @@ Item {
                     id: rdoModeMaster
                     style:  econRadioButtonStyle
                     text:   qsTr("Master")
-                    tooltip: "After choosing master mode, the application starts video streaming. This is a simple mode of operation for the camera without any external trigger capability. "
                     exclusiveGroup: streamModeGroup
                     activeFocusOnPress: true
                     onClicked: {
@@ -105,7 +104,6 @@ Item {
                     id: rdoModeTrigger
                     style:  econRadioButtonStyle
                     text: qsTr("Trigger")
-                    tooltip: "In trigger mode, Frames will be out only when external hardware pulses are given to PIN 5 of CN3."
                     exclusiveGroup: streamModeGroup
                     activeFocusOnPress: true
                     onClicked: {
@@ -141,7 +139,6 @@ Item {
                     id: rdoModeOff
                     style:  econRadioButtonStyle
                     text:   qsTr("OFF")
-                    tooltip: "Disables both flash controls."
                     exclusiveGroup: flashModeGroup
                     activeFocusOnPress: true
                     onClicked: {
@@ -155,7 +152,6 @@ Item {
                     id: rdoModeStrobe
                     style:  econRadioButtonStyle
                     text: qsTr("Strobe")
-                    tooltip: "When you select the Strobe mode, the LED is switched ON for each frame exposure time while video streaming"
                     exclusiveGroup: flashModeGroup
                     activeFocusOnPress: true
                     onClicked: {
@@ -169,7 +165,6 @@ Item {
                     id: rdoModeTorch
                     style:  econRadioButtonStyle
                     text: qsTr("Torch")
-                    tooltip: "When you select the Torch mode, the LED is switched ON until the control is disabled"
                     exclusiveGroup: flashModeGroup
                     activeFocusOnPress: true
                     onClicked: {

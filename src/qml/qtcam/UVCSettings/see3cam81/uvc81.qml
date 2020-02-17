@@ -170,7 +170,6 @@ Item {
                     checked: false
                     id: radioNormal
                     text: "Normal"
-                    tooltip: "In this mode, the normal unprocessed UYVY or MJPEG image stream from the camera"
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
@@ -184,9 +183,7 @@ Item {
                     exclusiveGroup: specialEffectsGrp
                     checked: false
                     id: radioGreyscale
-                    text: "Greyscale"
-                    tooltip: "In this mode, the normal preview is desaturated, and the image
-stream is composed of gray shades"
+                    text: "Greyscale"                  
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
@@ -215,7 +212,6 @@ stream is composed of gray shades"
                     id: flipCtrlVertical
                     activeFocusOnPress : true
                     text: "Vertical \nFlip"
-                     tooltip: "This control flips the preview up or down."
                     style: econCheckBoxStyle
                     onClicked:{
                         seecam81.setFlipMirrorMode(flipCtrlVertical.checked, mirrorCtrlHorizontal.checked)
@@ -232,7 +228,6 @@ stream is composed of gray shades"
                     id: mirrorCtrlHorizontal
                     activeFocusOnPress : true
                     text: "Horizontal \nMirror"
-                     tooltip: "This control flips the preview left or right."
                     style: econCheckBoxStyle
                     onClicked:{
                         seecam81.setFlipMirrorMode(flipCtrlVertical.checked, mirrorCtrlHorizontal.checked)
@@ -265,7 +260,6 @@ stream is composed of gray shades"
                     checked: false
                     id: strobeFlashVidoStreaming
                     text: "Flash for Video Streaming"
-                    tooltip: "When you select the Strobe mode, the LED is switched ON for each frame exposure time while video streaming"
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
@@ -284,7 +278,6 @@ stream is composed of gray shades"
                     checked: false
                     id: strobeTorch
                     text: "Torch"
-                    tooltip: "When you select the Torch mode, the LED is switched ON until the control is disabled"
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
@@ -303,7 +296,6 @@ stream is composed of gray shades"
                     checked: false
                     id: strobeOff
                     text: "OFF"
-                     tooltip: "Disables both flash controls."
                     activeFocusOnPress: true
                     style: econRadioButtonStyle
                     onClicked: {
@@ -446,7 +438,6 @@ stream is composed of gray shades"
                     id: focusStatusButton
                     activeFocusOnPress : true
                     text: "Focus Status"
-                    tooltip: " If the camera finished focusing means it will display  “Focus Succeeded” otherwise it will display  “Focus busy”."
                     style: econButtonStyle
                     enabled: true
                     opacity: 1
@@ -498,7 +489,6 @@ stream is composed of gray shades"
                       exclusiveGroup: roiAfgroup
                       id: afCentered
                       text: "Centered"
-                       tooltip: "In this mode,the focus point will be in the middle of the frame"
                       activeFocusOnPress: true
                       style: econRadioButtonStyle
                       opacity: afCentered.enabled ? 1 : 0.1
@@ -516,7 +506,6 @@ stream is composed of gray shades"
                       exclusiveGroup: roiAfgroup
                       id: afManual
                       text: "Manual"
-                      tooltip: "In this mode,user the select the region to be focussed by clicking on the preview "
                       activeFocusOnPress: true
                       style: econRadioButtonStyle
                       opacity: afManual.enabled ? 1 : 0.1
