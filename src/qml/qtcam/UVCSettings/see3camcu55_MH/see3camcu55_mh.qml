@@ -81,10 +81,8 @@ Item {
             Grid {
                 x: 23
                 y: 235
-
                 columns: 2
                 spacing: 15
-
                 ExclusiveGroup { id: streamModeGroup }
                 RadioButton {
                     id: rdoModeMaster
@@ -113,7 +111,6 @@ Item {
                         setTriggerMode()
                     }
                 }
-
             }
             Row{
                 Layout.alignment: Qt.AlignCenter
@@ -130,10 +127,8 @@ Item {
             Grid {
                 x: 23
                 y: 235
-
                 columns: 2
                 spacing: 15
-
                 ExclusiveGroup { id: flashModeGroup }
                 RadioButton {
                     id: rdoModeOff

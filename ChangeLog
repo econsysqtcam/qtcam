@@ -1,3 +1,10 @@
+Qtcam Application - 22.0.16
+---------------------------
+* Added Disable option in ROI Exposure for Hyperyon.
+* Implemented support to change the frameRate while capturing still in Hyperyon.
+* Disabled "i" key for image capture while UI is in video Record Mode.
+* Fixed issue of failing Set Request for Exposure in See3CAM_CU30 camera.
+ 
 Qtcam Application - 22.0.15
 ---------------------------
 * Added fixes for See3CAM_20CUG issues.

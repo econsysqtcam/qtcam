@@ -723,27 +723,27 @@ Item {
                             }
                         }
                         onCurrentIndexChanged: {
-    				// Skip doing things when exposure combo index changed calls when no selection of any camera
-				if(exposureComboEnable){
-					root.selectMenuIndex(exposureAutoControlId,currentIndex)
-		                        if(currentText.toString() != "Auto Mode") {
-		                            root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())					    
-		                            root.autoExposureSelected(false)
-		                            JS.autoExposureSelected = false
-		                            exposure_absolute.opacity = 1
-		                            exposure_Slider.opacity = 1
-		                            exposure_Slider.enabled = true
-		                            exposure_value.opacity = 1
-		                        } else {
-		                            root.autoExposureSelected(true)
-		                            JS.autoExposureSelected = true
-		                            exposure_absolute.opacity = 0.1
-		                            exposure_Slider.opacity = 0.1
-		                            exposure_Slider.enabled = false
-		                            exposure_value.opacity = 0
-		                            exposure_value.enabled = false
-		                        }
-			     }
+                            // Skip doing things when exposure combo index changed calls when no selection of any camera
+                            if(exposureComboEnable){
+                                root.selectMenuIndex(exposureAutoControlId,currentIndex)
+                                if(currentText.toString() != "Auto Mode") {
+                                    root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())
+                                    root.autoExposureSelected(false)
+                                    JS.autoExposureSelected = false
+                                    exposure_absolute.opacity = 1
+                                    exposure_Slider.opacity = 1
+                                    exposure_Slider.enabled = true
+                                    exposure_value.opacity = 1
+                                } else {
+                                    root.autoExposureSelected(true)
+                                    JS.autoExposureSelected = true
+                                    exposure_absolute.opacity = 0.1
+                                    exposure_Slider.opacity = 0.1
+                                    exposure_Slider.enabled = false
+                                    exposure_value.opacity = 0
+                                    exposure_value.enabled = false
+                                }
+                            }
                         }
                     }
                     Image {
@@ -1290,10 +1290,10 @@ Item {
             ledFreqValueChangeProperty = false
             focusLogitechValueChangeProperty = false
             focusValueChangeProperty = false
-	    focusAutoChangeProperty = false
+            focusAutoChangeProperty = false
             powerLineComboEnable = false
 	    // Skip doing things when exposure combo index changed calls when no selection of any camera
-	    exposureComboEnable = false
+            exposureComboEnable = false
             ledModeComboEnable = false
         }
     }

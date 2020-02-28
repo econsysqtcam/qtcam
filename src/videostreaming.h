@@ -265,6 +265,12 @@ public:
     uint previewFrameSkipCount;
     uint previewFrameToSkip;
     bool skippingPreviewFrame;
+    enum fpsChange {
+        FPS_30 = 0x00,
+        FPS_60 = 0x01,
+        FPS_DEFAULT =0x02
+    };
+    Q_ENUMS(fpsChange)
 
 private:
     qreal m_t;
@@ -392,7 +398,7 @@ private:
     bool stopRenderOnMakeShot;
     bool onY12Format;
     bool windowResized;
-    uint resizedWidth,resizedHeight;
+    uint resizedWidth,resizedHeight,changeFPSForHyperyon;
 
 
 private slots:
@@ -552,6 +558,8 @@ public slots:
      * @param value
      */
     void selectMenuIndex(unsigned int id, int value);
+
+    void setFpsOnCheckingFormat(QString stillFmt);
     void vidCapFormatChanged(QString idx);
     void setStillVideoSize(QString stillValue,QString stillFormat);
     void lastPreviewResolution(QString resolution,QString format);
@@ -564,7 +572,7 @@ public slots:
      * @brief frameIntervalChanged
      * @param idx
      */
-    void frameIntervalChanged(int idx);
+    void frameIntervalChanged(int idx ,uint fpsSetForHyperyon);
 
     void recordVideo();
       /**

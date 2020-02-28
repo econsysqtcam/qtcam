@@ -648,7 +648,6 @@ bool v4l2::set_interval(unsigned type, v4l2_fract interval)
 bool v4l2::get_interval(unsigned type, v4l2_fract &interval)
 {
 	v4l2_streamparm parm;
-
 	parm.type = type;
 	if (ioctl(VIDIOC_G_PARM, &parm) >= 0 &&
 	    (parm.parm.capture.capability & V4L2_CAP_TIMEPERFRAME)) {

@@ -564,11 +564,14 @@ Rectangle {
                         }
                         else{
                             if(captureVideoRecordRootObject.captureBtnVisible && !getTriggerMode ){//Restricts in case of Trigger Modes for FSCAM_CU135 camera.
+                                keyEventFiltering = false
                                 mouseClickCapture()
                             } else if(captureVideoRecordRootObject.recordBtnVisible && !getTriggerMode ){
                                 videoRecordBegin()
+                                keyEventFiltering = true         // Added by Navya : To avoid capturing image when video record mode is selected.
                             } else if(captureVideoRecordRootObject.recordStopBtnVisible){
                                 videoSaveVideo()
+                                keyEventFiltering = true
                             }
                         }
                     }else if(mouse.button == Qt.RightButton){
@@ -706,6 +709,8 @@ Rectangle {
                         vidstreamproperty.displayEncoderList()
                         //Added by Dhurka - 24th Oct 2016 - Push Auto mode item in image quality settings for ascella camera
                         addAutoModeMenuItem();
+                        //Added by Navya : 18 Feb 2020 -- enabling UVC Settings as it is getting disabled once after device unplugged,leading to disabling exposure control set request for See3CAM_CU30.
+                        enableUVCSettings = true
                         //Added by Sankari - 06th Mar 2016
                         queryUvcControls();
                         //Added by Dhurka - 20th Oct 2016
@@ -1032,7 +1037,7 @@ Rectangle {
         if (!vidFormatChanged){
             vidstreamproperty.setResoultion(str)
         }
-        vidstreamproperty.frameIntervalChanged(fps)
+        vidstreamproperty.frameIntervalChanged(fps,Videostreaming.FPS_DEFAULT)
         vidstreamproperty.startAgain()
     }
 
@@ -1511,6 +1516,7 @@ Rectangle {
     function imageCapture(shotType)
     {
         seqAni.stop()
+        vidstreamproperty.setFpsOnCheckingFormat(stillSettingsRootObject.stillClorComboValue)
         vidstreamproperty.setStillVideoSize(stillSettingsRootObject.stillOutputTextValue, stillSettingsRootObject.stillColorComboIndexValue)
         switch(shotType)
         {

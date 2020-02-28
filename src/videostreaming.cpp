@@ -119,7 +119,7 @@ Videostreaming::Videostreaming() : m_t(0)
     retrieveFrame=false;
     frameMjpeg = false;
     windowResized = false;
-
+    changeFPSForHyperyon = FPS_DEFAULT;
     // Modified by Sankari : Dec 5 2018, converted TJPF_RGB to TJPF_RGBA and use RGB[RGBA] shader
     pf = TJPF_RGBA;
     warmup = 1;
@@ -2129,7 +2129,7 @@ void Videostreaming::doAfterChangeFPSAndShot(){
         stopCapture();
         vidCapFormatChanged(lastFormat);
         setResoultion(lastPreviewSize);
-        frameIntervalChanged(lastFPSValue.toUInt());
+        frameIntervalChanged(lastFPSValue.toUInt(),FPS_DEFAULT);
         startAgain();
     }
 }
@@ -2336,7 +2336,8 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
         stopCapture();
         vidCapFormatChanged(stillOutFormat);
         setResoultion(stillSize);
-        stopRenderOnMakeShot = true;
+        if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB)
+            frameIntervalChanged(lastFPSValue.toUInt(),changeFPSForHyperyon);
         startAgain();
     }
 }
@@ -2372,7 +2373,7 @@ void  Videostreaming::changeFPSandTakeShot(QString filePath,QString imgFormatTyp
         stopCapture();
         vidCapFormatChanged(stillOutFormat);
         setResoultion(stillSize);
-        frameIntervalChanged(fpsIndex);
+        frameIntervalChanged(fpsIndex,FPS_DEFAULT);
         startAgain();
         fpsChangedForStill = true;
     }else{
@@ -2943,7 +2944,7 @@ void Videostreaming::enumerateFPSList(){
     fpsList.setStringList(availableFPS);
 }
 
-void Videostreaming::frameIntervalChanged(int idx)
+void Videostreaming::frameIntervalChanged(int idx ,uint setFps)
 {
     v4l2_frmivalenum frmival;
     emit logDebugHandle("Pixel Format:"+ QString::number(m_pixelformat));
@@ -2952,6 +2953,10 @@ void Videostreaming::frameIntervalChanged(int idx)
     emit logDebugHandle("IDX Value:"+QString::number(idx));
     if (enum_frameintervals(frmival, m_pixelformat, m_width, m_height, idx)
             && frmival.type == V4L2_FRMIVAL_TYPE_DISCRETE) {
+            if(setFps == FPS_30)
+                frmival.discrete.denominator=30;
+            else if(setFps == FPS_60)
+                 frmival.discrete.denominator=60;
         if (set_interval(m_buftype, frmival.discrete)) {
             m_interval = frmival.discrete;
         }
@@ -3302,7 +3307,9 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings){
             setResoultion(lastPreviewSize);
             m_renderer->renderBufferFormat = CommonEnums::NO_RENDER;
         }
-        startAgain();
+        if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB)
+            frameIntervalChanged(lastFPSValue.toUInt(),FPS_DEFAULT);
+         startAgain();
     }
 }
 
@@ -3393,6 +3400,28 @@ void Videostreaming::widthChangedEvent(int width){
   * @param height- resized window height
   * */
 void Videostreaming::heightChangedEvent(int height){
-    windowResized =true;
-    resizedHeight = height;
+     windowResized =true;
+     resizedHeight = height;
+}
+
+/** Added by Navya : 28 Feb 2020
+  * API to change the framerate while capturing still in cross Resolution for Hyperyon
+  * @param height- resized window height
+  * */
+void Videostreaming :: setFpsOnCheckingFormat(QString stillFmt){
+
+    if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB && m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY){
+        if(stillFmt != "UYVY (UYVY 4:2:2)"){
+            if(width == 640 && height == 360){
+                 changeFPSForHyperyon = FPS_60;
+            }
+            else{
+                changeFPSForHyperyon = FPS_30;
+            }
+        }
+        else{
+            changeFPSForHyperyon = FPS_DEFAULT;
+        }
+    }else
+        changeFPSForHyperyon = FPS_DEFAULT;
 }

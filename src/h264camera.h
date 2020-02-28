@@ -123,7 +123,8 @@ public:
 
     enum camROIAutoExpMode {
         ROI_FULL = 0x00,
-        ROI_MANUAL = 0x01
+        ROI_MANUAL = 0x01,
+        ROI_DISABLE =0x02,
     };
     Q_ENUMS(camROIAutoExpMode)
 

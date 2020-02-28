@@ -294,11 +294,10 @@ Item {
                         exclusiveGroup: roiExpogroup
                         id: autoexpFull
                         text: "Full"
-                        enabled:hdrCombo.currentIndex == 0 ?1 :0
+                        enabled:true
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
-                        opacity: enabled ? 1 : 0.1
-
+                        opacity: 1
                         onClicked: {
                             h264camId.setROIAutoExposureMode(H264camera.ROI_FULL)
 
@@ -312,10 +311,10 @@ Item {
                         exclusiveGroup: roiExpogroup
                         id: autoexpManual
                         text: "Manual"
-                        enabled:hdrCombo.currentIndex == 0 ?1 :0
+                        enabled:true
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
-                        opacity: enabled ? 1 : 0.1
+                        opacity: 1
                         onClicked: {
                             h264camId.setROIAutoExposureMode(H264camera.ROI_MANUAL)
                             
@@ -342,8 +341,8 @@ Item {
                 ComboBox
                 {
                     id: autoExpoWinSizeCombo
-                    enabled: (autoexpManual.enabled && autoexpManual.checked && hdrCombo.currentIndex == 0) ? true : false
-                    opacity: (autoexpManual.enabled && autoexpManual.checked && hdrCombo.currentIndex == 0) ? 1 : 0.1
+                    enabled: (autoexpManual.enabled && autoexpManual.checked ) ? true : false
+                    opacity: (autoexpManual.enabled && autoexpManual.checked ) ? 1 : 0.1
                     model: ListModel{
                         id:roiwinsize
                     }
@@ -789,6 +788,9 @@ Item {
             case H264camera.ROI_MANUAL:
                 autoexpManual.checked = true
                 break
+            case H264camera.ROI_DISABLE:
+                autoexpFull.checked = false
+                autoexpManual.checked = false
             }
         }
     }

@@ -143,6 +143,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
+                    root.keyEventFiltering = true
                     if((mouseX > (camera_selected.paintedWidth/2)) && !record_stop.visible) {
                         video_selected.visible = true;
                         camera_selected.visible = false;
@@ -162,6 +163,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
+                    root.keyEventFiltering = false
                     if((mouseX < (video_selected.paintedWidth/2)) && !record_stop.visible) {
                         video_selected.visible = false;
                         camera_selected.visible = true;
@@ -342,6 +344,7 @@ Item {
 
     function captureBtnSelected() {
         if(!record_stop.visible) {
+            root.keyEventFiltering = false
             video_selected.visible = false;
             camera_selected.visible = true;
             capture.visible = true
@@ -351,6 +354,7 @@ Item {
 
     function videoBtnSelected() {
         if(!record_stop.visible) {
+            root.keyEventFiltering = true
             video_selected.visible = true;
             camera_selected.visible = false;
             capture.visible = false
