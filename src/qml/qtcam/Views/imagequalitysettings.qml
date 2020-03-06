@@ -1316,6 +1316,7 @@ Item {
         }
 
     }
+
     function setCameraControls(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID)
     {
         switch(controlType)

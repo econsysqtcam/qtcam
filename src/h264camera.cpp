@@ -322,10 +322,10 @@ bool H264Camera::setROIAutoExposureMode(QString autoexpROIMode){
  */
 bool H264Camera::getROIAutoExposureMode(uint queryType){
     __u8 expROIMode;
-
+    //Added by M VISHNUMURALI since hdr processing takes more time need to wait to get updated value.
+    sleep(1);
     if(getValueCmd(V4L2_CID_XU_EXPOSURE_ROI_MODE, queryType, expROIMode)){
         uint roiMode = expROIMode;
-
         emit roiModeReceived(queryType, roiMode);
         return true;
     }

@@ -38,6 +38,11 @@ Item {
                 h264camId.setROIExposureCoordinates(previewwindowWidth, previewwindowHeight, videoStreamWidth, videoStreamHeight, x, y)
             }
         }
+        //Added by M.VISHNUMURALI :Inorder to enable/disable roiAutoExpoUI according to AutoExpo settings.
+        onAutoExposureSelected:
+        {
+            h264camId.getROIAutoExposureMode(H264camera.UVC_GET_CUR)
+        }
     }
 
     ScrollView{
@@ -242,6 +247,8 @@ Item {
                             h264camId.setHDRMode(currentIndex)
                         }
                         skipUpdateUIOnHDR = true
+                        //Added by M.VISHNUMURALI :Inorder to enable/disable roiAutoExpoUI according to HDR settings.
+                        h264camId.getROIAutoExposureMode(H264camera.UVC_GET_CUR)
                     }
                 }
 
@@ -282,7 +289,6 @@ Item {
                     font.family: "Ubuntu"
                     color: "#ffffff"
                     smooth: true
-                    enabled:hdrCombo.currentIndex == 0 ? 1 : 0
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                 }
@@ -294,7 +300,6 @@ Item {
                         exclusiveGroup: roiExpogroup
                         id: autoexpFull
                         text: "Full"
-                        enabled:true
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         opacity: 1
@@ -311,7 +316,6 @@ Item {
                         exclusiveGroup: roiExpogroup
                         id: autoexpManual
                         text: "Manual"
-                        enabled:true
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         opacity: 1
@@ -778,23 +782,31 @@ Item {
 
     }
 
-
+//Function edited by M.Vishnumurali :For enabling/disabling ui according to AutoExpo and HDR mode
     function queryForRoiMode(queryType, expMode){
         if(queryType == H264camera.UVC_GET_CUR){
             switch(expMode){
             case H264camera.ROI_FULL:
                 autoexpFull.checked = true
+                autoexpFull.enabled = true
+                autoexpManual.enabled = true
                 break
             case H264camera.ROI_MANUAL:
                 autoexpManual.checked = true
+                autoexpFull.enabled = true
+                autoexpManual.enabled = true
                 break
             case H264camera.ROI_DISABLE:
                 autoexpFull.checked = false
                 autoexpManual.checked = false
+                autoexpFull.enabled = false
+                autoexpManual.enabled = false
             }
+            //Added by M.Vishnumurali: to reduce opacity when roiui is enabled/disabled
+            autoexpManual.opacity = autoexpManual.enabled ? 1:0.1
+            autoexpFull.opacity = autoexpFull.enabled ? 1:0.1
         }
     }
-
 
     function queryForWindowSize(queryType, windowSize){
         switch(queryType){
