@@ -1,6 +1,7 @@
 Qtcam Application - 22.0.17
 ---------------------------
 * Added Fix for Disable option in ROI Exposure for Hyperyon.
+* Disabled Default button in extension settings for See3CAM_CU22.
 
 Qtcam Application - 22.0.16
 ---------------------------

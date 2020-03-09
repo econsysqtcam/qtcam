@@ -139,11 +139,9 @@ Item {
                         activeFocusOnPress: true
                         onClicked: {
                             see3camcu22.setSensorMode(See3Camcu22.SENSOR_STANDARD)
-                            defaultValue.enabled = true
                         }
                         Keys.onReturnPressed: {
                             see3camcu22.setSensorMode(See3Camcu22.SENSOR_STANDARD)
-                            defaultValue.enabled = true
                         }
                     }
                     RadioButton {
@@ -155,11 +153,9 @@ Item {
                         activeFocusOnPress: true
                         onClicked: {
                             see3camcu22.setSensorMode(See3Camcu22.SENSOR_HDRLFM)
-                            defaultValue.enabled = true
                         }
                         Keys.onReturnPressed: {
                             see3camcu22.setSensorMode(See3Camcu22.SENSOR_HDRLFM)
-                            defaultValue.enabled = true
                         }
                     }
                     RadioButton {
@@ -171,11 +167,9 @@ Item {
                         activeFocusOnPress: true
                         onClicked: {
                             see3camcu22.setSensorMode(See3Camcu22.SENSOR_HiHDR)
-                            defaultValue.enabled = true
                         }
                         Keys.onReturnPressed: {
                             see3camcu22.setSensorMode(See3Camcu22.SENSOR_HiHDR)
-                            defaultValue.enabled = true
                         }
                     }
                 }
@@ -212,11 +206,9 @@ Item {
                         exclusiveGroup: cameraModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            defaultValue.enabled = true
                             setTriggerMode()
                         }
                         Keys.onReturnPressed: {
-                            defaultValue.enabled = true
                             setTriggerMode()
                         }
                     }
@@ -254,11 +246,9 @@ Item {
                         exclusiveGroup: specialModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            defaultValue.enabled = true
                             see3camcu22.setSpecialMode(See3Camcu22.SPECIAL_GREYSCALE)
                         }
                         Keys.onReturnPressed: {
-                            defaultValue.enabled = true
                             see3camcu22.setSpecialMode(See3Camcu22.SPECIAL_GREYSCALE)
                         }
                     }
@@ -281,11 +271,9 @@ Item {
                         text: "Horizontal"
                         style: econCheckBoxStyle
                         onClicked:{
-                            defaultValue.enabled = true
                             see3camcu22.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                         }
                         Keys.onReturnPressed: {
-                            defaultValue.enabled = true
                             see3camcu22.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                         }
                     }
@@ -295,11 +283,9 @@ Item {
                         text: "Vertical"
                         style: econCheckBoxStyle
                         onClicked:{
-                            defaultValue.enabled = true
                             see3camcu22.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                         }
                         Keys.onReturnPressed: {
-                            defaultValue.enabled = true
                             see3camcu22.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                         }
                     }
@@ -639,23 +625,8 @@ Item {
                         skipUpdateUIOnAntiFlickerMode = true
                     }
                 }
-                Row{
-                    Layout.alignment: Qt.AlignCenter
-                    Button {
-                        id: defaultValue
-                        opacity: 1
-                        activeFocusOnPress : true
-                        text: "Default"
-                        tooltip: "Click to set default values in extension controls"
-                        style: econButtonStyle
-                        onClicked:{
-                            setToDefaultValues()
-                        }
-                        Keys.onReturnPressed: {
-                            setToDefaultValues()
-                        }
-                    }
-                }
+
+    //Edited by M.Vishnu Murali: Removed Default button due to some issues in See3CAM_CU22
 
                 Row{
                     Button {
@@ -912,9 +883,6 @@ Item {
         onLscModeChanged:{
             currentLSCMode(lscMode)
         }
-        onSetdefaultValueFailed:{
-            displayMessageBox(qsTr("Failure"), qsTr("Setting default value is failed"))
-        }
         onDisableHDR: {
             if(hdrstatus){
                 sensorHdrlfm.enabled = false
@@ -1021,18 +989,6 @@ Item {
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
         see3camcu22.setCameraMode(See3Camcu22.CAMERA_MASTER)
-    }
-
-    function setToDefaultValues(){
-        root.checkForTriggerMode(false)
-        defaultValue.enabled = false
-        root.captureBtnEnable(true)
-        root.videoRecordBtnEnable(true)
-        if(see3camcu22.setToDefaultValues()){
-            see3camcu22.getAutoExpROIModeAndWindowSize()
-            getCurrentValuesFromCamera()
-        }
-        defaultValue.enabled = true
     }
 
     function getCurrentValuesFromCamera(){

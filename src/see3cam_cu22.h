@@ -28,7 +28,6 @@
 #define GET_DENOISE_MODE_CU22       0x15
 #define SET_LSCMODE_CU22            0x14
 #define GET_LSCMODE_CU22            0x13
-#define SET_TO_DEFAULT_CU22         0xFF
 
 
 class See3CAM_CU22 : public QObject
@@ -130,8 +129,6 @@ public slots:
     bool setLSCMode(uint lscMode);
     bool getLSCMode();
 
-    bool setToDefaultValues();
-
 signals:
     void sensorModeReceived(uint sensorMode);
     void cameraModeReceived(uint cameraMode);
@@ -144,7 +141,6 @@ signals:
     void antiFlickerModeChanged(uint flickerMode);
     void denoiseModeChanged(uint denoiseMode);
     void lscModeChanged(uint lscMode);
-    void setdefaultValueFailed();
     void exposureCompValue(uint exposureCompensation);
     void disableHDR(bool hdrstatus);
 };

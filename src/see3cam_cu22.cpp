@@ -595,34 +595,7 @@ bool See3CAM_CU22::getAntiFlickerMode()
  * @brief See3CAM_CU22::setToDefaultValues - set the extension control values to default
  * @return  true/false
  */
-bool See3CAM_CU22::setToDefaultValues()
-{
-    // hid validation
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    //Initialize buffers
-    initializeBuffers();
-
-    // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU22; /* camera id */
-    g_out_packet_buf[2] = SET_TO_DEFAULT_CU22; /* set default command  */
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6]==SET_FAIL) {
-            emit setdefaultValueFailed();
-            return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU22 &&
-            g_in_packet_buf[1] == SET_TO_DEFAULT_CU22 &&
-            g_in_packet_buf[6] == SET_SUCCESS) {
-            return true;
-        }
-    }
-    return false;
-}
+//Edited by M.Vishnu Murali(09/03/2020) : Removed function due to some issues in See3CAM_CU22
 
 /**
  * @brief See3CAM_CU22::setDenoiseCtrlMode - set denoise mode into the camera
