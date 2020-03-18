@@ -316,7 +316,7 @@ bool H264Camera::setROIAutoExposureMode(QString autoexpROIMode){
 }
 
 /**
- * @brief H264Camera::setROIAutoExposureMode
+ * @brief H264Camera::getROIAutoExposureMode
  * @param queryType - UVC_GET_CUR / UVC_GET_DEF / UVC_GET_MIN / UVC_GET_MAX/ UVC_GET_RES
 * @return true/false
  */

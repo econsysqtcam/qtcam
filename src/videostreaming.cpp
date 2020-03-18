@@ -60,6 +60,7 @@
 #define min(a,b) ((a)<(b)?(a):(b))
 #endif
 
+int h264DecodeRet;
 
 QStringListModel Videostreaming::resolution;
 QStringListModel Videostreaming::stillOutputFormat;
@@ -70,7 +71,7 @@ int Videostreaming::deviceNumber;
 QString Videostreaming::camDeviceName;
 bool isStillFrame = false;
 
-typedef void (*ftopict) (int * out, uint8_t *pic, int width) ;
+typedef void (*ftopict) (int * out, uint8_t *pic, int width);
 
 //Added by Dhurka
 /**
@@ -110,7 +111,6 @@ Videostreaming::Videostreaming() : m_t(0)
     m_displayCaptureDialog = false;
     retrieveframeStoreCam=false;
     onY12Format = false;
-    stopRenderOnMakeShot = false;
     m_saveImage = false;
     m_VideoRecord = false;
     retrieveframeStoreCamInCross = false;
@@ -176,10 +176,36 @@ void Videostreaming::updateBuffer(){
 * updateBuffer - if frame is received, render frame otherwise stop rendering
 */
 void FrameRenderer::updateBuffer(){
-    if(gotFrame){
-        updateStop = false;
-    }else{
-        updateStop = true;
+    if(renderBufferFormat == CommonEnums::BUFFER_RENDER_360P){   //Added by Navya : 16 March 2020 -- Split yuyv data only for 640x480/640x360 resolution.
+        if(renderMutex.tryLock()){
+            if(yuvBuffer != NULL){
+                if(gotFrame){
+                    updateStop = false;   // If frame is available , draw in screen. otherwise no need to draw anything.
+                }else{
+                    updateStop = true;
+                }
+                u_int8_t *pyuv = yuvBuffer;
+                const u_int8_t *pyuv_end = pyuv + (videoResolutionwidth*videoResolutionHeight*2);
+                int j = 0, k = 0; // destination
+                for( ; pyuv < pyuv_end;  ) {
+                    yBuffer[j] = *(pyuv); // y
+                    uBuffer[k] = *(pyuv + 1); // u
+                    yBuffer[++j] = *(pyuv + 2); // y
+                    vBuffer[k] = *(pyuv + 3); // v
+                    ++j;
+                    ++k;
+                    pyuv += 4;
+               }
+            }
+            renderMutex.unlock();
+        }
+    }
+    else{
+        if(gotFrame){
+            updateStop = false;
+        }else{
+            updateStop = true;
+        }
     }
 }
 
@@ -250,14 +276,20 @@ void Videostreaming::sync()
 FrameRenderer::~FrameRenderer()
 {    
     // Free buffers finally
+    if(yBuffer){ free(yBuffer); yBuffer = NULL;}
+    if(uBuffer){ free(uBuffer); uBuffer = NULL;}
+    if(vBuffer){ free(vBuffer); vBuffer = NULL;}
     if(yuvBuffer){free(yuvBuffer); yuvBuffer = NULL;}
     if(greyBuffer){free(greyBuffer); greyBuffer = NULL;}
     if(rgbaDestBuffer){free(rgbaDestBuffer); rgbaDestBuffer = NULL;}
     delete m_shaderProgram;
+    delete m_programYUYV;
 }
 
-
-FrameRenderer::FrameRenderer(): m_t(0){  
+FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
+    yBuffer = NULL;
+    uBuffer = NULL;
+    vBuffer = NULL;
     yuvBuffer = NULL;
     greyBuffer = NULL;
     rgbaDestBuffer = NULL;
@@ -267,6 +299,7 @@ FrameRenderer::FrameRenderer(): m_t(0){
     m_videoResolnChange = false;
     windowStatusChanged  = false;
     m_shaderProgram = NULL;
+    m_programYUYV = NULL;
     y16BayerFormat = false;
 }
 
@@ -318,6 +351,155 @@ void FrameRenderer::selectedCameraEnum(CommonEnums::ECameraNames selectedDeviceE
 {
     currentlySelectedEnumValue = selectedDeviceEnum;
 }
+
+/**
+ * Added by Navya : 16th March 2020
+ * @brief FrameRenderer::drawBufferFor360p - Rendering y,u,v textures individually since there is an aliasing effect in preview due to yuvtexture for 640x480 resolution alone.
+ */
+void FrameRenderer::drawBufferFor360p(){
+    if (!m_programYUYV) {
+        initializeOpenGLFunctions();
+        m_programYUYV = new QOpenGLShaderProgram();
+        m_programYUYV->addShaderFromSourceCode(QOpenGLShader::Vertex,
+                                                 "attribute vec4 a_position;\n"
+                                                 "attribute vec2 a_texCoord;\n"
+                                                 "varying vec2 v_texCoord;\n"
+                                                 "void main()\n"
+                                                 "{\n"
+                                                 "gl_Position = a_position;\n"
+                                                 "v_texCoord = a_texCoord;\n"
+                                                 "}\n");
+        m_programYUYV->addShaderFromSourceCode(QOpenGLShader::Fragment,
+                                                 "#ifdef GL_ES\n"
+                                                 "precision highp float;\n"
+                                                 "#endif\n"
+
+                                                 "varying vec2 v_texCoord;\n"
+                                                 "uniform sampler2D y_texture;\n"
+                                                 "uniform sampler2D u_texture;\n"
+                                                 "uniform sampler2D v_texture;\n"
+
+
+                                                 "void main()\n"
+                                                 "{\n"
+                                                 "float r, g, b, y, u, v;\n"
+
+                                                 //We had put the Y values of each pixel to the R,G,B components by
+                                                 //GL_LUMINANCE, that's why we're pulling it from the R component,
+                                                 //we could also use G or Ba_position
+                                                 "y = texture2D(y_texture, v_texCoord).r;\n"
+
+                                                 //We had put the U and V values of each pixel to the A and R,G,B
+                                                 //components of the texture respectively using GL_LUMINANCE_ALPHA.
+                                                 //Since U,V bytes are interspread in the texture, this is probably
+                                                 //the fastest way to use them in the shader
+                                                 "u = texture2D(u_texture, v_texCoord).r - 0.5;\n"
+                                                 "v = texture2D(v_texture, v_texCoord).r - 0.5;\n"
+
+                                                 //The numbers are just YUV to RGB conversion constants
+                                                 "r = y + 1.5701 * v;\n"
+                                                 "g = y - 0.1870 * u - 0.4664 * v;\n"
+                                                 "b = y + 1.8556 * u;\n"
+                                                 "gl_FragColor = vec4(r,g,b,1.0);\n"
+                                                 "}\n");
+
+
+        m_programYUYV->bindAttributeLocation("a_position", 0);
+        m_programYUYV->bindAttributeLocation("a_texCoord", 1);
+        m_programYUYV->link();
+
+        mPositionLoc = m_programYUYV->attributeLocation("a_position");
+        mTexCoordLoc = m_programYUYV->attributeLocation("a_texCoord");
+
+        /*********** Y-Texture**************/
+        glEnable(GL_TEXTURE_2D);
+        samplerLocY = m_programYUYV->uniformLocation("y_texture");
+        GLuint yTextureId;
+        glGenTextures (1, &yTextureId); // Generate a texture object
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture (GL_TEXTURE_2D, yTextureId);
+
+        /*********** U-Texture**************/
+        glEnable(GL_TEXTURE_2D);
+        samplerLocU = m_programYUYV->uniformLocation("u_texture");
+        GLuint uTextureId;
+        glGenTextures (1, &uTextureId); // Generate a texture object
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture (GL_TEXTURE_2D, uTextureId);
+
+        /*********** V-Texture**************/
+        glEnable(GL_TEXTURE_2D);
+        samplerLocV = m_programYUYV->uniformLocation("v_texture");
+        GLuint vTextureId;
+        glGenTextures (1, &vTextureId); // Generate a texture object
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture (GL_TEXTURE_2D, vTextureId);
+        updateStop = true;
+    }
+     renderyuyvMutex.lock();
+
+    int skipFrames =4;
+    m_programYUYV->bind();
+
+    glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
+    glVertexAttribPointer(mTexCoordLoc, 2, GL_FLOAT, false, 8, mVerticesDataTextCord);
+
+    m_programYUYV->enableAttributeArray(0);
+    m_programYUYV->enableAttributeArray(1);
+
+    glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
+    if (yBuffer != NULL && uBuffer != NULL && vBuffer != NULL){
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG)){
+            skipFrames = frame;
+        }
+        else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
+             goto skip;
+        else{
+            skipFrames = 4;
+        }
+        if(gotFrame && !updateStop && skipFrames >3){
+            // set active texture and give input y buffer
+            glActiveTexture(GL_TEXTURE1);
+            glUniform1i(samplerLocY, 1);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth, videoResolutionHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, yBuffer);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            // set active texture and give input u buffer
+            glActiveTexture(GL_TEXTURE2);
+            glUniform1i(samplerLocU, 2);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth/2, videoResolutionHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, uBuffer);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            // set active texture and give input v buffer
+            glActiveTexture(GL_TEXTURE3);
+            glUniform1i(samplerLocV, 3);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth/2, videoResolutionHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, vBuffer);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+        }
+    }
+skip:
+    m_programYUYV->disableAttributeArray(0);
+    m_programYUYV->disableAttributeArray(1);
+
+    m_programYUYV->removeAllShaders();
+    m_programYUYV->release();
+
+    // Not strictly needed for this example, but generally useful for when
+    // mixing with raw OpenGL.
+    m_window->resetOpenGLState();
+    renderyuyvMutex.unlock();
+}
+
 /**
  * @brief FrameRenderer::drawRGBABUffer - Shader for RGBA buffer and render
  */
@@ -341,6 +523,7 @@ void FrameRenderer::drawRGBBUffer(){
     glTexParameteri(GL_TEXTURE_2D,        GL_TEXTURE_WRAP_S,            GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D,        GL_TEXTURE_WRAP_T,            GL_CLAMP_TO_EDGE);
 
+      glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if(renderyuyvMutex.tryLock()){
         if(rgbaDestBuffer){
             glTexImage2D(GL_TEXTURE_2D, 0,  GL_RGBA, videoResolutionwidth, videoResolutionHeight, 0,GL_RGBA , GL_UNSIGNED_BYTE, rgbaDestBuffer);
@@ -380,13 +563,17 @@ void FrameRenderer::drawYUYVBUffer(){
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+    glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if(renderyuyvMutex.tryLock()){
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
         if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG)){
             skipFrames = frame;
-        }else{
+        }
+        else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
+             goto skip;
+        else{
             skipFrames = 4;
         }
         if (yuvBuffer != NULL){
@@ -399,6 +586,7 @@ void FrameRenderer::drawYUYVBUffer(){
     }
     else{
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+skip:   renderyuyvMutex.unlock();
     }
     m_shaderProgram->disableAttributeArray(0);
     m_shaderProgram->disableAttributeArray(1);
@@ -428,6 +616,7 @@ void FrameRenderer::drawUYVYBUffer(){
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+    glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if(renderyuyvMutex.tryLock()){
 
         // Added by Navya -- 18 Sep 2019
@@ -476,6 +665,7 @@ void FrameRenderer::drawY8BUffer(){
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+    glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if(renderyuyvMutex.tryLock()){
         if (greyBuffer != NULL){
             glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth ,videoResolutionHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, greyBuffer);
@@ -516,6 +706,10 @@ void FrameRenderer::changeShader(){
     if(m_shaderProgram){
         delete m_shaderProgram;
         m_shaderProgram = NULL;
+    }
+    if(m_programYUYV){
+        delete m_programYUYV;
+        m_programYUYV = NULL;
     }
 
     if(y16BayerFormat){
@@ -827,7 +1021,7 @@ void FrameRenderer::shaderUYVY(){
 void FrameRenderer::paint()
 {
     if(gotFrame){
-        if(m_formatChange){
+        if(m_formatChange | m_videoResolnChange){  // Call to change Shader on format and Resolution change
             m_formatChange = false;
             changeShader();
         }
@@ -850,7 +1044,6 @@ void FrameRenderer::paint()
                 windowStatusChanged = false;
             }
         }
-        glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
         if(renderBufferFormat == CommonEnums::RGB_BUFFER_RENDER){ // RGBA
             drawRGBBUffer();
         }else if(renderBufferFormat == CommonEnums::YUYV_BUFFER_RENDER){ // YUYV
@@ -859,6 +1052,8 @@ void FrameRenderer::paint()
             drawUYVYBUffer();
         }else if(renderBufferFormat == CommonEnums::GREY_BUFFER_RENDER){ // Y8
             drawY8BUffer();
+        }else if(renderBufferFormat == CommonEnums::BUFFER_RENDER_360P){ // Render 360p resoln
+            drawBufferFor360p();
         }
     }
 }
@@ -2018,7 +2213,10 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         }else{
             switch(pixformat){
             case V4L2_PIX_FMT_YUYV:{
-                m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
+                if(width == 640 && height == 480){
+                    m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
+                }else
+                    m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
                 memcpy(m_renderer->yuvBuffer, (uint8_t *)inputbuffer, width*height*2);/* directly giving yuyv to render */
             }
                 break;
@@ -2040,15 +2238,37 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 break;
 
             case V4L2_PIX_FMT_UYVY:{   // directly giving uyvy data for rendering
-                m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
-                memcpy(m_renderer->yuvBuffer, (uint8_t *)inputbuffer, width*height*2);/* directly giving uyvy to render */
+                if(width == 640 && (height == 480 | height == 360)){
+                    m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
+                    uint8_t *ptmp = (uint8_t *)inputbuffer;
+                    uint8_t *pfmb = yuyvBuffer;
+                    for(int h=0;h<height;h++)             /* uyvy to yuyv conversion */
+                    {
+                        int w=0;
+                        for(w=0;w<(width*2);w+=4)
+                        {
+                            pfmb[0] = ptmp[1]; /* Y0 */
+                            pfmb[1] = ptmp[0]; /* U */
+                            pfmb[2] = ptmp[3]; /* Y1 */
+                            pfmb[3] = ptmp[2]; /* V */
+                            ptmp += 4;
+                            pfmb += 4;
+                        }
+                    }
+                    memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+                }else{
+                    m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
+                    memcpy(m_renderer->yuvBuffer, (uint8_t *)inputbuffer, width*height*2);/* directly giving uyvy to render */
+                }
             }
                 break;
             case V4L2_PIX_FMT_H264:{
-                m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
+                if(width == 640 && height == 360){
+                    m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
+                }else
+                    m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
                 // check - decode h264 to yuyv available
-
-                h264Decode->decodeH264(yuv420pdestBuffer, (uint8_t *) inputbuffer, bytesUsed); /* decode h264 to yuv420p */
+                h264DecodeRet = h264Decode->decodeH264(yuv420pdestBuffer, (uint8_t *) inputbuffer, bytesUsed); /* decode h264 to yuv420p */
                 h264Decode->yu12_to_yuyv(yuyvBuffer, yuv420pdestBuffer, width, height); /*yuv420p to yuyv conversion */
                 memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
             }
@@ -2087,7 +2307,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 break;
             }
         }
-        if(m_renderer->renderBufferFormat == CommonEnums::YUYV_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::UYVY_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::GREY_BUFFER_RENDER){
+        if(m_renderer->renderBufferFormat == CommonEnums::YUYV_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::UYVY_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::GREY_BUFFER_RENDER || m_renderer->renderBufferFormat== CommonEnums::BUFFER_RENDER_360P){
             if(m_VideoRecord){
                 if(videoEncoder!=NULL) {
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
@@ -2637,6 +2857,21 @@ void Videostreaming::stopCapture() {
         tempSrcBuffer = NULL;
     }
 
+    if(m_renderer->yBuffer != NULL){
+        free(m_renderer->yBuffer);
+        m_renderer->yBuffer = NULL;
+    }
+
+
+    if(m_renderer->uBuffer != NULL){
+        free(m_renderer->uBuffer);
+        m_renderer->uBuffer = NULL;
+    }
+
+    if(m_renderer->vBuffer != NULL){
+        free(m_renderer->vBuffer);
+        m_renderer->vBuffer = NULL;
+    }
     m_renderer->gotFrame = false;
     m_renderer->updateStop = true;
 
@@ -2714,6 +2949,11 @@ void Videostreaming::startAgain() {
     m_renderer->videoResolutionHeight = m_height;
 
     int buffLength = m_width * m_height;
+     int buffHalfLength = (m_width * m_height)/ 2;
+
+    m_renderer->yBuffer = (uint8_t*)malloc(buffLength);
+    m_renderer->uBuffer = (uint8_t*)malloc(buffHalfLength);
+    m_renderer->vBuffer = (uint8_t*)malloc(buffHalfLength);
     m_renderer->yuvBuffer = (uint8_t*)malloc(buffLength*2);
     m_renderer->greyBuffer = (uint8_t*)malloc(buffLength);
 
@@ -3115,9 +3355,9 @@ void Videostreaming::setSampleRate(uint index){
     audioinput.setSampleRate(index);
 }
 
-void Videostreaming::recordVideo(){
-    if(width !=320 && height != 240 ){
-        if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY){    // Added by Navya : 25 Nov 2019 -- To configure the source format accordingly.
+void Videostreaming::recordVideo(){  // Added by Navya : 25 Nov 2019 -- To configure the source format accordingly.
+    if(width !=320 && height != 240 ){   //Stop recording video in 320x240 resolution for See3CAM_20CUG camera.
+        if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY && (width != 640 && (height !=480 | height != 360))){    // Added by Navya :  16 March 2020 -passing yuyv data for uyvy format in 640x480 reolution alone to avoid aliasing effect in preview.
             videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->UYVY_BUFFER);
         }
         else if(m_capSrcFormat.fmt.pix.pixelformat==V4L2_PIX_FMT_GREY){

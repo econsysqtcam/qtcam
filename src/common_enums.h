@@ -76,7 +76,8 @@ public:
         RGB_BUFFER_RENDER = 1, // rgba
         YUYV_BUFFER_RENDER,
         UYVY_BUFFER_RENDER,
-        GREY_BUFFER_RENDER
+        GREY_BUFFER_RENDER,
+        BUFFER_RENDER_360P  // render for 360p resoln alone
     }ERenderBuffer;
 	
     Q_ENUMS(ERenderBuffer)

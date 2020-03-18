@@ -1,3 +1,8 @@
+Qtcam Application - 22.0.18
+---------------------------
+* Added fix to avoid aliasing effect in preview for 640x480 resolution.
+* Added fix to avoid Green frame while switching between resolutions in H264 format for Hyperyon.
+* Added fix to avoid flicker while switching between resolutions in MJPG format in Hyperyon.
 Qtcam Application - 22.0.17
 ---------------------------
 * Added Fix for Disable option in ROI Exposure for Hyperyon.

@@ -79,6 +79,7 @@ public:
     void drawYUYVBUffer();
     void drawUYVYBUffer();
     void drawY8BUffer();
+    void drawBufferFor360p();
     void clearShader();
     void changeShader();
     void shaderRGB();
@@ -146,7 +147,8 @@ public:
     bool getPreviewFrameWindow;
 
     // shader program
-    QOpenGLShaderProgram *m_shaderProgram;    
+    QOpenGLShaderProgram *m_shaderProgram;
+    QOpenGLShaderProgram *m_programYUYV;
 
 private:    
     qreal m_t;
@@ -157,6 +159,9 @@ private:
     int mPositionLoc;
     int mTexCoordLoc;
 
+    GLint samplerLocY;
+    GLint samplerLocU;
+    GLint samplerLocV;
     GLint samplerLocYUYV;
     GLint samplerLocUYVY;
     GLint samplerLocRGB;
