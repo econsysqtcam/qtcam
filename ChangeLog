@@ -1,3 +1,6 @@
+Qtcam Application - 22.0.19
+---------------------------
+*Removed HDR + LFM mode from extension settings for See3CAM_CU22.
 Qtcam Application - 22.0.18
 ---------------------------
 * Added fix to avoid aliasing effect in preview for 640x480 resolution.

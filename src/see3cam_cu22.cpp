@@ -23,7 +23,7 @@
 
 /**
  * @brief See3CAM_CU22::setSensorMode - setting sensor mode
- * @param sensorMode - standard/hdr+lfm/Hi-hdr  mode
+ * @param sensorMode - standard/Hi-hdr  mode
  * @return true/false
  */
 bool See3CAM_CU22::setSensorMode(sensorModes  sensorMode)

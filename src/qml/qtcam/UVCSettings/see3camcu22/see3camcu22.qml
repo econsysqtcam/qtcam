@@ -130,7 +130,7 @@ Item {
                 Grid {
                     columns: 2
                     spacing: 20
-                    ExclusiveGroup { id: sensorInputGroup }
+                    ExclusiveGroup { id: sensorInputGroup } //Last Edited by M VishnuMurali(24 Mar 2020)
                     RadioButton {
                         id: sensorStandard
                         style:  econRadioButtonStyle
@@ -142,20 +142,6 @@ Item {
                         }
                         Keys.onReturnPressed: {
                             see3camcu22.setSensorMode(See3Camcu22.SENSOR_STANDARD)
-                        }
-                    }
-                    RadioButton {
-                        id: sensorHdrlfm
-                        style:  econRadioButtonStyle
-                        text: qsTr("HDR+LFM")
-                        opacity: enabled ? 1 : 0.5
-                        exclusiveGroup: sensorInputGroup
-                        activeFocusOnPress: true
-                        onClicked: {
-                            see3camcu22.setSensorMode(See3Camcu22.SENSOR_HDRLFM)
-                        }
-                        Keys.onReturnPressed: {
-                            see3camcu22.setSensorMode(See3Camcu22.SENSOR_HDRLFM)
                         }
                     }
                     RadioButton {
@@ -830,8 +816,6 @@ Item {
         onSensorModeReceived:{
             if(sensorMode == See3Camcu22.SENSOR_STANDARD){
                 sensorStandard.checked = true
-            }else if(sensorMode == See3Camcu22.SENSOR_HDRLFM){
-                sensorHdrlfm.checked = true
             }else if(sensorMode == See3Camcu22.SENSOR_HiHDR){
                 sensorHiHdr.checked = true
             }
@@ -885,12 +869,10 @@ Item {
         }
         onDisableHDR: {
             if(hdrstatus){
-                sensorHdrlfm.enabled = false
                 sensorHiHdr.enabled = false
                 sensorStandard.checked = true
             }
             else{
-                sensorHdrlfm.enabled = true
                 sensorHiHdr.enabled = true
             }
         }
