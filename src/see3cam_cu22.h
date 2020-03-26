@@ -47,7 +47,7 @@ public:
 
     enum sensorModes {
         SENSOR_STANDARD = 0x01,
-        SENSOR_HiHDR = 0x03
+        SENSOR_HDR = 0x03
     };
     Q_ENUMS(sensorModes)
 

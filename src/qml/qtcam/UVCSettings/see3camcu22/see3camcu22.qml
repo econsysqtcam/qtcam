@@ -146,20 +146,20 @@ Item {
                             defaultValue.enabled = true
                         }
                     }
-                    RadioButton {
-                        id: sensorHiHdr
+                    RadioButton {   //Last edited by M Vishnu Murali(26/03/2020):Added tooltip and changed name from HI-HDR to HDR
+                        id: sensorHdr
                         style:  econRadioButtonStyle
-                        text: qsTr("Hi-HDR")
+                        text: qsTr("HDR")
                         tooltip: "When the sensor is operated in this mode dynamic range will be greater than Standard mode as well as this mode has LFM feature."
                         opacity: enabled ? 1 : 0.5
                         exclusiveGroup: sensorInputGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            see3camcu22.setSensorMode(See3Camcu22.SENSOR_HiHDR)
+                            see3camcu22.setSensorMode(See3Camcu22.SENSOR_HDR)
                             defaultValue.enabled = true
                         }
                         Keys.onReturnPressed: {
-                            see3camcu22.setSensorMode(See3Camcu22.SENSOR_HiHDR)
+                            see3camcu22.setSensorMode(See3Camcu22.SENSOR_HDR)
                             defaultValue.enabled = true
                         }
                     }
@@ -844,8 +844,8 @@ Item {
         onSensorModeReceived:{
             if(sensorMode == See3Camcu22.SENSOR_STANDARD){
                 sensorStandard.checked = true
-            }else if(sensorMode == See3Camcu22.SENSOR_HiHDR){
-                sensorHiHdr.checked = true
+            }else if(sensorMode == See3Camcu22.SENSOR_HDR){
+                sensorHdr.checked = true
             }
         }
         onCameraModeReceived:{
@@ -900,11 +900,11 @@ Item {
         }
         onDisableHDR: {
             if(hdrstatus){
-                sensorHiHdr.enabled = false
+                sensorHdr.enabled = false
                 sensorStandard.checked = true
             }
             else{
-                sensorHiHdr.enabled = true
+                sensorHdr.enabled = true
             }
         }
     }
