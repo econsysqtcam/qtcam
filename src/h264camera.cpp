@@ -315,18 +315,29 @@ bool H264Camera::setROIAutoExposureMode(QString autoexpROIMode){
     return setCurrentValueCmd(V4L2_CID_XU_EXPOSURE_ROI_MODE, expMode);
 }
 
+/*Added by M Vishnu Murali(20/03/2020): Since sleep is used in "getROIAutoExposureMode" inorder to avoid blocking GUI thread function
+is moved to seperate thread*/
+/**
+ * @brief H264Camera::runGetROIAutoExposureMode
+ * @param queryType - UVC_GET_CUR / UVC_GET_DEF / UVC_GET_MIN / UVC_GET_MAX/ UVC_GET_RES
+ * @return void
+ */
+void H264Camera::runGetROIAutoExposureMode(uint queryType)
+{
+    QtConcurrent::run(getROIAutoExposureMode,this,queryType);
+}
 /**
  * @brief H264Camera::getROIAutoExposureMode
  * @param queryType - UVC_GET_CUR / UVC_GET_DEF / UVC_GET_MIN / UVC_GET_MAX/ UVC_GET_RES
 * @return true/false
  */
-bool H264Camera::getROIAutoExposureMode(uint queryType){
+bool H264Camera::getROIAutoExposureMode(H264Camera *temp,uint queryType){
     __u8 expROIMode;
     //Added by M VISHNUMURALI since hdr processing takes more time need to wait to get updated value.
     sleep(1);
-    if(getValueCmd(V4L2_CID_XU_EXPOSURE_ROI_MODE, queryType, expROIMode)){
+    if(temp->getValueCmd(V4L2_CID_XU_EXPOSURE_ROI_MODE, queryType, expROIMode)){
         uint roiMode = expROIMode;
-        emit roiModeReceived(queryType, roiMode);
+        emit temp->roiModeReceived(queryType, roiMode);
         return true;
     }
     else

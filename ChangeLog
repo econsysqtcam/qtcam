@@ -1,3 +1,8 @@
+Qtcam Application - 22.0.20
+---------------------------
+* Added fix for preview corruption while changing AutoExposureMode in Hyperyon.
+* Added fix for Hyperyon Cross Resolution bug.
+
 Qtcam Application - 22.0.19
 ---------------------------
 *Removed HDR + LFM mode from extension settings for See3CAM_CU22.

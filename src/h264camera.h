@@ -6,6 +6,7 @@
 #include <QDebug>
 #include "videostreaming.h"
 #include <errno.h>
+#include <QtConcurrentRun>
 
 #define UVC_RC_UNDEFINED                    0x00
 #define UVC_SET_CUR                         0x01
@@ -172,8 +173,10 @@ public slots:
     bool setROIExposureWindowSize(QString windowSize);
     bool setROIExposureCoordinates(uint previewRenderWidth, uint previewRenderHeight, uint videoResolutionWidth, uint videoResolutionHeight, uint xCord, uint yCord);
 
-    bool getROIAutoExposureMode(uint queryType);
+    static bool getROIAutoExposureMode(H264Camera *temp,uint queryType);
+//    bool getROIAutoExposureMode(uint queryType);
     bool getROIExposureWindowSize(uint queryType);
+    void runGetROIAutoExposureMode(uint queryType);
 
     bool setHorizontalFlip(bool hFlipCheck);
     bool getHorizontalFlip(uint queryType);

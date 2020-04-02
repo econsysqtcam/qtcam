@@ -174,6 +174,7 @@ class Videostreaming :  public QQuickItem, public v4l2
 {
     Q_OBJECT
     Q_PROPERTY(qreal t READ t WRITE setT NOTIFY tChanged)
+
 public:
     struct buffer {
         unsigned planes;

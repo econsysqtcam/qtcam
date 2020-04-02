@@ -41,7 +41,7 @@ Item {
         //Added by M.VISHNUMURALI :Inorder to enable/disable roiAutoExpoUI according to AutoExpo settings.
         onAutoExposureSelected:
         {
-            h264camId.getROIAutoExposureMode(H264camera.UVC_GET_CUR)
+            h264camId.runGetROIAutoExposureMode(H264camera.UVC_GET_CUR)
         }
     }
 
@@ -248,7 +248,7 @@ Item {
                         }
                         skipUpdateUIOnHDR = true
                         //Added by M.VISHNUMURALI :Inorder to enable/disable roiAutoExpoUI according to HDR settings.
-                        h264camId.getROIAutoExposureMode(H264camera.UVC_GET_CUR)
+                        h264camId.runGetROIAutoExposureMode(H264camera.UVC_GET_CUR)
                     }
                 }
 
@@ -901,7 +901,7 @@ Item {
         h264camId.getNoiseReductionValue(valueToGet)
         h264camId.getH264Quality(valueToGet)
         h264camId.getDewarpMode(valueToGet)
-        h264camId.getROIAutoExposureMode(valueToGet)
+        h264camId.runGetROIAutoExposureMode(valueToGet)
         h264camId.getROIExposureWindowSize(valueToGet)
     }
 

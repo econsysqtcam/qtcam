@@ -213,7 +213,7 @@ void FrameRenderer::updateBuffer(){
 *   When sequential animation 't' value changed, this function is called [Q_PROPERTY]
 */
 void Videostreaming::setT(qreal t)
-{    
+{
     if (t == m_t)
         return;
     m_t = t;
@@ -228,7 +228,7 @@ void Videostreaming::setT(qreal t)
 * handleWindowChanged - This will be called when QQuickItem::windowChanged signal fires.
 */
 void Videostreaming::handleWindowChanged(QQuickWindow *win)
-{    
+{
     if (win) {
         connect(win, &QQuickWindow::beforeSynchronizing, this, &Videostreaming::sync, Qt::DirectConnection);
         connect(win, &QQuickWindow::sceneGraphInvalidated, this, &Videostreaming::cleanup, Qt::DirectConnection);
@@ -249,7 +249,7 @@ void Videostreaming::handleWindowChanged(QQuickWindow *win)
 * cleanup - This will be called when QQuickItem::sceneGraphInvalidated signal fires.
 */
 void Videostreaming::cleanup()
-{    
+{
     if (m_renderer) {
         delete m_renderer;
         m_renderer = 0;
@@ -260,7 +260,7 @@ void Videostreaming::cleanup()
 * sync - This will be called when QQuickItem::beforeSynchronizing signal fires.
 */
 void Videostreaming::sync()
-{    
+{
     if (!m_renderer) {
         m_renderer = new FrameRenderer();
         m_renderer->videoResolutionwidth = 640; // need to check this assignment is needed.
@@ -274,7 +274,7 @@ void Videostreaming::sync()
 
 
 FrameRenderer::~FrameRenderer()
-{    
+{
     // Free buffers finally
     if(yBuffer){ free(yBuffer); yBuffer = NULL;}
     if(uBuffer){ free(uBuffer); uBuffer = NULL;}
@@ -313,7 +313,7 @@ FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
  * @param *destWindowWidth - to store target window viewport width
  * @param *destWindowHeight - to store target window viewport height
  */
-void FrameRenderer::calculateViewport(int vidResolutionWidth, int vidResolutionHeight, int windowWidth, int windowHeight, int *x, int *y, int *destWindowWidth, int *destWindowHeight){    
+void FrameRenderer::calculateViewport(int vidResolutionWidth, int vidResolutionHeight, int windowWidth, int windowHeight, int *x, int *y, int *destWindowWidth, int *destWindowHeight){
     int original_width = vidResolutionWidth;
     int original_height = vidResolutionHeight;
     int bound_width = windowWidth;
@@ -689,7 +689,7 @@ void FrameRenderer::drawY8BUffer(){
 /**
  * @brief FrameRenderer::clearShader - remove allshader
  */
-void FrameRenderer::clearShader(){    
+void FrameRenderer::clearShader(){
     if(m_shaderProgram){
         if (m_shaderProgram->isLinked()) {
             m_shaderProgram->release();
@@ -744,7 +744,7 @@ void FrameRenderer::changeShader(){
 /**
  * @brief FrameRenderer::shaderRGB - shader to draw RGB buffer
  */
-void FrameRenderer::shaderRGB(){   
+void FrameRenderer::shaderRGB(){
     if (!m_shaderProgram) {
         initializeOpenGLFunctions();
 
@@ -790,7 +790,7 @@ void FrameRenderer::shaderRGB(){
 /**
  * @brief FrameRenderer::shaderYUYV - shader to draw YUYV buffer
  */
-void FrameRenderer::shaderYUYV(){   
+void FrameRenderer::shaderYUYV(){
     if(!m_shaderProgram){
         initializeOpenGLFunctions();
         m_shaderProgram = new QOpenGLShaderProgram();
@@ -1090,7 +1090,7 @@ void FrameRenderer::getDisplayRenderArea(int *displayX, int *displayY, int *dest
     *destHeight = destWindowHeight;
 }
 
-void Videostreaming::setDevice(QString deviceName) {    
+void Videostreaming::setDevice(QString deviceName) {
     close();
     deviceName.append(QString::number(deviceNumber,10));
     if(open(deviceName,false)) {
@@ -1111,11 +1111,11 @@ void Videostreaming::setDevice(QString deviceName) {
     }
 }
 
-void Videostreaming::getFirstDevice(int deviceNode) {    
+void Videostreaming::getFirstDevice(int deviceNode) {
     deviceNumber = deviceNode;
 }
 
-void Videostreaming::getCameraName(QString deviceName){    
+void Videostreaming::getCameraName(QString deviceName){
     camDeviceName=deviceName;
 }
 
@@ -1135,7 +1135,7 @@ double Videostreaming::getTimeInSecs()
 * @param: buffersize - input buffer size
 * return true/false
 */
-bool Videostreaming::saveRawFile(void *inputBuffer, int buffersize){    
+bool Videostreaming::saveRawFile(void *inputBuffer, int buffersize){
     if(inputBuffer == NULL){
         return false;
     }
@@ -1154,10 +1154,10 @@ bool Videostreaming::saveRawFile(void *inputBuffer, int buffersize){
 }
 
 /**
-* SaveIRImage 
+* SaveIRImage
 * return true/false
 */
-bool Videostreaming::saveIRImage(){    
+bool Videostreaming::saveIRImage(){
     if(!bayerIRBuffer){
         return false;
     }
@@ -1185,7 +1185,7 @@ bool Videostreaming::saveIRImage(){
 }
 
 
-void Videostreaming::setPreviewBgrndArea(int width, int height, bool sidebarAvailable){    
+void Videostreaming::setPreviewBgrndArea(int width, int height, bool sidebarAvailable){
     if(m_renderer){
         if(windowResized){  //Update Application width and height only when window is resized.
             m_renderer->windowStatusChanged = true;
@@ -1377,7 +1377,7 @@ void Videostreaming::capFrame()
             }
         }
     }
-    
+
     // Taking single shot or burst shot - Skip frames if needed
 
     if(((m_frame > frameToSkip) && m_snapShot) || ((m_frame > frameToSkip) && m_burstShot)){
@@ -2405,7 +2405,7 @@ void Videostreaming::getFrameRates() {
         m_fps = (100 * (m_frame - m_lastFrame)) / (res.tv_sec * 100 + res.tv_usec / 10000);
         m_lastFrame = m_frame;
         m_tv = tv;
-    }    
+    }
     ++m_frame;
     ++m_renderer->frame;
     m_renderer->fps = m_fps;
@@ -2413,7 +2413,7 @@ void Videostreaming::getFrameRates() {
 }
 
 bool Videostreaming::startCapture()
-{    
+{
     __u32 buftype = m_buftype;
     v4l2_requestbuffers req;
     unsigned int i;
@@ -2524,7 +2524,7 @@ void Videostreaming::updatePreviewFrameSkip(uint previewSkip){
 }
 
 
-void Videostreaming::makeShot(QString filePath,QString imgFormatType) {    
+void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     captureTime.start();
     // Added by Sankari : to set still skip
     emit stillSkipCount(stillSize, lastPreviewSize, stillOutFormat);
@@ -2557,7 +2557,9 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
         vidCapFormatChanged(stillOutFormat);
         setResoultion(stillSize);
         if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB)
+        {
             frameIntervalChanged(lastFPSValue.toUInt(),changeFPSForHyperyon);
+        }
         startAgain();
     }
 }
@@ -2750,7 +2752,7 @@ void Videostreaming::formatSaveSuccess(bool burstFlag) {
 }
 
 bool Videostreaming::getInterval(struct v4l2_fract &interval)
-{    
+{
     if (m_has_interval)
         interval = m_interval;
     return m_has_interval;
@@ -2829,7 +2831,7 @@ void Videostreaming::displayFrame() {
     }
 }
 
-void Videostreaming::stopCapture() {    
+void Videostreaming::stopCapture() {
 
     if(h264Decode!=NULL){
         h264Decode->closeFile();
@@ -2971,7 +2973,7 @@ void Videostreaming::startAgain() {
 
 }
 
-void Videostreaming::lastPreviewResolution(QString resolution,QString format) {    
+void Videostreaming::lastPreviewResolution(QString resolution,QString format) {
     lastPreviewSize = resolution;
     lastFormat = format;
     emit logDebugHandle("Last Resolution displayed at::"+resolution);
@@ -2986,7 +2988,7 @@ void Videostreaming::lastFPS(QString fps) {
 }
 
 void Videostreaming::setResoultion(QString resolution)
-{    
+{
 
     emit logDebugHandle("Resolution set at::"+resolution);
     v4l2_format fmt;
@@ -3187,20 +3189,31 @@ void Videostreaming::enumerateFPSList(){
 void Videostreaming::frameIntervalChanged(int idx ,uint setFps)
 {
     v4l2_frmivalenum frmival;
-    emit logDebugHandle("Pixel Format:"+ QString::number(m_pixelformat));
-    emit logDebugHandle("Width:"+ QString::number(m_width));
-    emit logDebugHandle("Height:"+ QString::number(m_height));
-    emit logDebugHandle("IDX Value:"+QString::number(idx));
-    if (enum_frameintervals(frmival, m_pixelformat, m_width, m_height, idx)
-            && frmival.type == V4L2_FRMIVAL_TYPE_DISCRETE) {
-            if(setFps == FPS_30)
-                frmival.discrete.denominator=30;
-            else if(setFps == FPS_60)
-                 frmival.discrete.denominator=60;
-        if (set_interval(m_buftype, frmival.discrete)) {
-            m_interval = frmival.discrete;
+    __u32 pixFmt = m_pixelformat;
+        emit logDebugHandle("Pixel Format:"+ QString::number(m_pixelformat));
+        emit logDebugHandle("Width:"+ QString::number(m_width));
+        emit logDebugHandle("Height:"+ QString::number(m_height));
+        emit logDebugHandle("IDX Value:"+QString::number(idx));
+    if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB) //Added by M Vishnu Murali (01/04/2020):For enumerating fps for still capture.
+        switch(stillOutFormat.toInt())
+        {
+        case 0:pixFmt =V4L2_PIX_FMT_UYVY;
+                    break;
+        case 1:pixFmt =V4L2_PIX_FMT_MJPEG;
+                    break;
+        case 2:pixFmt =V4L2_PIX_FMT_H264;
+                    break;
         }
-    }
+        if (enum_frameintervals(frmival, pixFmt, m_width, m_height, idx)
+                && frmival.type == V4L2_FRMIVAL_TYPE_DISCRETE) {
+                if(setFps == FPS_30)
+                    frmival.discrete.denominator=30;
+                else if(setFps == FPS_60)
+                     frmival.discrete.denominator=60;
+            if (set_interval(m_buftype, frmival.discrete)) {
+                m_interval = frmival.discrete;
+            }
+        }
 }
 
 void Videostreaming::cameraFilterControls(bool actualValue) {
@@ -3343,7 +3356,7 @@ void Videostreaming::setStillVideoSize(QString stillValue, QString stillFormat) 
 }
 
 
-void Videostreaming::enumerateAudioProperties(){    
+void Videostreaming::enumerateAudioProperties(){
     audioinput.audio_init();
 }
 
@@ -3375,7 +3388,7 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
     if(videoFormatType.isEmpty()) {
         videoFormatType = "avi";        //Application never enters in this condition
     }
-#if !LIBAVCODEC_VER_AT_LEAST(54, 25)   
+#if !LIBAVCODEC_VER_AT_LEAST(54, 25)
     switch(videoEncoderType) {
     case 0:
         videoEncoderType = CODEC_ID_MJPEG;
@@ -3384,7 +3397,7 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
         videoEncoderType = CODEC_ID_H264;
         break;
     }
-#else    
+#else
     switch(videoEncoderType) {
     case 0:
         videoEncoderType = AV_CODEC_ID_MJPEG;
@@ -3432,7 +3445,7 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
         }
     }
 }
-void Videostreaming::recordStop() {    
+void Videostreaming::recordStop() {
     emit videoRecord(fileName);
     m_VideoRecord = false;
     videoEncoder->m_recStop = true;
@@ -3646,22 +3659,26 @@ void Videostreaming::heightChangedEvent(int height){
 
 /** Added by Navya : 28 Feb 2020
   * API to change the framerate while capturing still in cross Resolution for Hyperyon
-  * @param height- resized window height
+  * @param stillFmt- Selected still format
   * */
 void Videostreaming :: setFpsOnCheckingFormat(QString stillFmt){
-
     if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB && m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY){
-        if(stillFmt != "UYVY (UYVY 4:2:2)"){
-            if(width == 640 && height == 360){
+        if(stillFmt != "UYVY (UYVY 4:2:2)")
+        {
+            if(width == 640 && height == 352)
+            {
                  changeFPSForHyperyon = FPS_60;
             }
-            else{
+            else
+            {
                 changeFPSForHyperyon = FPS_30;
             }
         }
-        else{
+        else
+        {
             changeFPSForHyperyon = FPS_DEFAULT;
         }
-    }else
+    }
+    else
         changeFPSForHyperyon = FPS_DEFAULT;
 }

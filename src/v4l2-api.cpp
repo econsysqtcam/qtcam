@@ -439,8 +439,8 @@ bool v4l2::enum_frameintervals(v4l2_frmivalenum &frm, __u32 init_pixfmt, __u32 w
 		frm.index = index;
 	} else {
 		frm.index++;
-	}
-	return ioctl(VIDIOC_ENUM_FRAMEINTERVALS, &frm) >= 0;
+    }
+    return ioctl(VIDIOC_ENUM_FRAMEINTERVALS, &frm) >= 0;
 }
 
 bool v4l2::reqbufs_user(v4l2_requestbuffers &reqbuf, __u32 buftype, int count)
