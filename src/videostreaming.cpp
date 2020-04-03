@@ -3194,16 +3194,19 @@ void Videostreaming::frameIntervalChanged(int idx ,uint setFps)
         emit logDebugHandle("Width:"+ QString::number(m_width));
         emit logDebugHandle("Height:"+ QString::number(m_height));
         emit logDebugHandle("IDX Value:"+QString::number(idx));
-    if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB) //Added by M Vishnu Murali (01/04/2020):For enumerating fps for still capture.
+    if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB && changefps) //Added by M Vishnu Murali (01/04/2020):For enumerating fps for still capture.
+    {
+        changefps = false;
         switch(stillOutFormat.toInt())
         {
         case 0:pixFmt =V4L2_PIX_FMT_UYVY;
-                    break;
+            break;
         case 1:pixFmt =V4L2_PIX_FMT_MJPEG;
-                    break;
+            break;
         case 2:pixFmt =V4L2_PIX_FMT_H264;
-                    break;
+            break;
         }
+    }
         if (enum_frameintervals(frmival, pixFmt, m_width, m_height, idx)
                 && frmival.type == V4L2_FRMIVAL_TYPE_DISCRETE) {
                 if(setFps == FPS_30)
@@ -3662,10 +3665,12 @@ void Videostreaming::heightChangedEvent(int height){
   * @param stillFmt- Selected still format
   * */
 void Videostreaming :: setFpsOnCheckingFormat(QString stillFmt){
-    if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB && m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY){
+    if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB && m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY)
+    {
+        changefps = true;
         if(stillFmt != "UYVY (UYVY 4:2:2)")
         {
-            if(width == 640 && height == 352)
+            if(width == 640 && (height == 360||height == 352))
             {
                  changeFPSForHyperyon = FPS_60;
             }
@@ -3673,10 +3678,6 @@ void Videostreaming :: setFpsOnCheckingFormat(QString stillFmt){
             {
                 changeFPSForHyperyon = FPS_30;
             }
-        }
-        else
-        {
-            changeFPSForHyperyon = FPS_DEFAULT;
         }
     }
     else
