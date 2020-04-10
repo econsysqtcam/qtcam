@@ -146,11 +146,10 @@ Item {
                             defaultValue.enabled = true
                         }
                     }
-                    RadioButton {   //Last edited by M Vishnu Murali(26/03/2020):Added tooltip and changed name from HI-HDR to HDR
+                    RadioButton {   //Last edited by M Vishnu Murali(10/04/2020):Removed tooltip since ubuntu 14.04 doesnt support.
                         id: sensorHdr
                         style:  econRadioButtonStyle
                         text: qsTr("HDR")
-                        tooltip: "When the sensor is operated in this mode dynamic range will be greater than Standard mode as well as this mode has LFM feature."
                         opacity: enabled ? 1 : 0.5
                         exclusiveGroup: sensorInputGroup
                         activeFocusOnPress: true
