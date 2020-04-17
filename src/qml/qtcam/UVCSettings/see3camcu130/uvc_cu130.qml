@@ -41,6 +41,9 @@ Item {
     // Added by Sankari: 12 Apr 2017 - To skip setting frame rate when getting the framerate value.
     property bool skipUpdateUIFrameRate: false
 
+    property bool skipUpdateUIFlickerCtrl:false
+    property int  flickerCtrl
+
     Connections
     {
         target: root
@@ -777,6 +780,38 @@ Item {
                         }
                     }
                 }
+                //Added by M.VishnuMurali(15/04/2020):UI for Flicker Detection Mode settings
+                Text {
+                    id: flickerctrlField
+                    text: "-- Flicker Detection Control --"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+
+                ComboBox
+                {
+                    id: flickercombo
+                    opacity: 1
+                    enabled: true
+                    model: ListModel {
+                        ListElement { text: "AUTO" }
+                        ListElement { text: "50Hz" }
+                        ListElement { text: "60Hz" }
+                        ListElement { text: "DISABLE" }
+                    }
+                    activeFocusOnPress: true
+                    style: econComboBoxStyle
+                    onCurrentIndexChanged: {
+                        if(skipUpdateUIFlickerCtrl){
+                           setFlickerDetectionFn();
+                        }
+                    }
+                }
+
                 Row{
                     Layout.alignment: Qt.AlignCenter
                     Button {
@@ -976,10 +1011,10 @@ Item {
 
     See3CamCu130 {
         id: seecamcu130
-        onSceneModeValue: {
+        onSceneModeValue:{
             defaultSceneMode(sceneMode)
         }
-        onEffectModeValue: {
+        onEffectModeValue:{
             defaultEffectMode(effectMode)
         }
         onFlipMirrorModeChanged:{
@@ -1065,6 +1100,20 @@ Item {
                 }
             }
         }
+        onFlickerDetectionMode:{
+
+            skipUpdateUIFlickerCtrl = false
+            if(flickerMode == See3CamCu130.MODE_AUTO){
+                flickercombo.currentIndex = 0
+            }else if(flickerMode == See3CamCu130.MODE_50Hz){
+                flickercombo.currentIndex  = 1
+            }else if(flickerMode == See3CamCu130.MODE_60Hz){
+                flickercombo.currentIndex  = 2
+            }else if(flickerMode == See3CamCu130.MODE_DISABLE){
+                flickercombo.currentIndex  = 3
+            }else{ }
+            skipUpdateUIFlickerCtrl = true;
+        }
 
     }
 	
@@ -1102,6 +1151,7 @@ Item {
 
     Component.onCompleted:{
         getValuesFromCamera()
+        root.disablePowerLineFreq()
     }
 
     function displayMessageBox(title, text){
@@ -1276,5 +1326,25 @@ Item {
         seecamcu130.getFrameRateCtrlValue()
         seecamcu130.getFaceDetectMode()
         seecamcu130.getSmileDetectMode()
+        seecamcu130.getFlickerDetection()
+    }
+//Added by M.VishnuMurali(15/04/2020):For setting Flicker detection mode
+    function setFlickerDetectionFn()
+    {
+        switch(flickercombo.currentIndex){
+        case 0:
+            flickerCtrl = See3CamCu130.MODE_AUTO
+            break
+        case 1:
+            flickerCtrl = See3CamCu130.MODE_50Hz
+            break
+        case 2:
+            flickerCtrl = See3CamCu130.MODE_60Hz
+            break
+        case 3:
+            flickerCtrl = See3CamCu130.MODE_DISABLE
+            break
+        }
+        seecamcu130.setFlickerDetection(flickerCtrl)
     }
 }

@@ -86,6 +86,9 @@
 #define GET_SUCCESS		0x01
 
 
+#define SET_FLICKER_DETECTION_CU130           0x1A
+#define GET_FLICKER_DETECTION_CU130           0x19
+
 class See3CAM_CU130 : public QObject
 {
     Q_OBJECT
@@ -189,6 +192,14 @@ public:
     };
     Q_ENUMS(camSmileDetectEmbedDataMode)
 
+    enum camFlickerMode {
+         MODE_AUTO = 0x00,
+         MODE_50Hz =0x01,
+         MODE_60Hz =0x02,
+         MODE_DISABLE =0x03
+       };
+       Q_ENUMS(camFlickerMode)
+
 signals:
      void sceneModeValue(uint sceneMode);
      void effectModeValue(uint effectMode);
@@ -203,6 +214,7 @@ signals:
      void frameRateCtrlValueReceived(uint frameRateCtrlValue);     
      void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
      void smileDetectModeValue(uint smileDetectMode, uint smileDetectEmbedDataValue);
+     void flickerDetectionMode(uint flickerMode);
 
 public slots:
     bool setSceneMode(const sceneModes& sceneMode);
@@ -241,6 +253,9 @@ public slots:
     bool getSmileDetectMode();
 
     bool enableDisableFaceRectangle(bool enableFaceRect);
+
+    bool setFlickerDetection(camFlickerMode flickerMode);
+    bool getFlickerDetection();
 };
 
 #endif // SEE3CAM_CU130_H

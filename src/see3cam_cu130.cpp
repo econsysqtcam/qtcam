@@ -911,6 +911,73 @@ bool See3CAM_CU130::enableDisableFaceRectangle(bool enableFaceRect){
     }
     return false;
 }
+//Added by M VISHNUMURALI(15/04/2020)
+/**
+ * @brief See3CAM_CU135::setFlickerDetection - setting flicker control
+ * @param flickerMode - Mode we are going to set
+ * @return true/false
+ */
+bool See3CAM_CU130::setFlickerDetection(See3CAM_CU130::camFlickerMode flickerMode)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU130; /* camera id */
+    g_out_packet_buf[2] = SET_FLICKER_DETECTION_CU130; /* set flicker detection command */
+    g_out_packet_buf[3] = flickerMode; /* flicker detection mode to set */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU130 &&
+            g_in_packet_buf[1]==SET_FLICKER_DETECTION_CU130 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_CU130::getFlickerDetection - getting the flicker control we set,from the camera.
+ * @return true/false
+ */
+bool See3CAM_CU130::getFlickerDetection()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU130; /* camera id */
+    g_out_packet_buf[2] = GET_FLICKER_DETECTION_CU130; /* get flicker detection command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU130 &&
+            g_in_packet_buf[1]==GET_FLICKER_DETECTION_CU130 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {
+            emit flickerDetectionMode(g_in_packet_buf[2]);
+            return true;
+        }
+    }
+    return false;
+}
 
 /**
  * @brief See3CAM_CU130::initializeBuffers - Initialize input and output buffers

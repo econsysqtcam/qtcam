@@ -1,3 +1,7 @@
+Qtcam Application - 22.0.21
+---------------------------
+* Implemented Flicker Detection Mode for See3CAM_CU130
+
 Qtcam Application - 22.0.20
 ---------------------------
 * Added fix for preview corruption while changing AutoExposureMode in Hyperyon.
