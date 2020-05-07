@@ -1,3 +1,8 @@
+Qtcam Application - 22.0.22
+---------------------------
+* Added fix to avoid image capture while application is in recording mode.
+*Added fix for cu135 when changed from trigger mode to master mode Image capturing even when application is in recording mode.
+
 Qtcam Application - 22.0.21
 ---------------------------
 * Implemented Flicker Detection Mode for See3CAM_CU130

@@ -1026,6 +1026,7 @@ Item {
         root.checkForTriggerMode(false)
         seecamcu135.setToDefault()
         getValuesFromCamera()
+        root.keyEventFiltering = true
     }
 
     // Enable Face detect embed data

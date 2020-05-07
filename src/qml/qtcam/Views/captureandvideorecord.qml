@@ -76,6 +76,7 @@ Item {
         id: videoRecord
         enabled: record.enabled ?  true : false
         onTriggered: {
+            video_selected_Mousearea.enabled =false
             root.videoRecordBegin()
         }
     }
@@ -85,6 +86,7 @@ Item {
         enabled: record_stop.visible ? true : false
         onTriggered: {
             root.videoSaveVideo()
+            video_selected_Mousearea.enabled = true
         }
     }
 
@@ -161,6 +163,7 @@ Item {
             opacity: 1
             visible: false
             MouseArea {
+                id:video_selected_Mousearea
                 anchors.fill: parent
                 onClicked: {
                     root.keyEventFiltering = false
@@ -329,6 +332,8 @@ Item {
         {
             record.enabled = enable
             record.opacity = enable ? 1 : 0.5
+            if(recordBtnVisible)
+                root.keyEventFiltering = true
         }
     }
 
