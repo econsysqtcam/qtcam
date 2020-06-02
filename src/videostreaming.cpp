@@ -734,6 +734,7 @@ void FrameRenderer::changeShader(){
         case V4L2_PIX_FMT_H264:
         case V4L2_PIX_FMT_Y12:
         case V4L2_PIX_FMT_SGRBG8:
+        case V4L2_PIX_FMT_SBGGR8: //Added by M Vishnu Murali: See3CAM_10CUG_CH uses respective pixel format 
             shaderYUYV();
             drawYUYVBUffer(); // To fix white color corruption drawing intially
             break;
@@ -2173,7 +2174,6 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
 
         // cu40 cam - flag
         if(m_renderer->y16BayerFormat){ // y16 - 10bit bayer
-
             m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
 
             y16BayerDestBuffer = (unsigned char *)malloc(width * height * 3);
@@ -2220,7 +2220,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 memcpy(m_renderer->yuvBuffer, (uint8_t *)inputbuffer, width*height*2);/* directly giving yuyv to render */
             }
                 break;
-
+            case V4L2_PIX_FMT_SBGGR8:   //Added by M Vishnu Murali(02/06/2020): For Proper rendering of See3CAM_10CUG_CH cam
             case V4L2_PIX_FMT_SGRBG8:{  // BA8 to yuyv conversion
                 m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
                 destBuffer = (uint8_t *)malloc(width * height * 3);
