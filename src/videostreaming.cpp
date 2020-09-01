@@ -761,6 +761,10 @@ void FrameRenderer::shaderRGB(){
                                                  "v_texCoord = a_texCoord;\n"
                                                  "}\n");
         m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Fragment,
+                                                 "#ifdef GL_ES\n"
+                                                 "precision highp float;\n"
+                                                 "#endif\n"
+
                                                  "varying vec2 v_texCoord;"
                                                  "uniform sampler2D texture;"
                                                  "vec4 color;"
@@ -1026,7 +1030,6 @@ void FrameRenderer::paint()
             m_formatChange = false;
             changeShader();
         }
-
         // Calculate render preview area only when resolution changed,side bar opened/closed and preview window changes.
         int x, y, winWidth, winHeight;
         if(m_videoResolnChange || sidebarStateChanged || windowStatusChanged){
