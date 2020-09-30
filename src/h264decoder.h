@@ -30,6 +30,8 @@ extern "C" {
 #include "libswscale/swscale.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/dict.h"
+#include "libavutil/avutil.h"
+#include "libavutil/imgutils.h"
 }
 
 
@@ -43,7 +45,7 @@ public:
    bool initH264Decoder(unsigned width,unsigned height);
    int decodeH264(uint8_t *out_buf, uint8_t *in_buf, int buf_size);
    void yu12_to_yuyv(u_int8_t *out, u_int8_t *in, int width, int height);
-
+    int libav_decode(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacket *pkt);
 protected:
       AVCodecContext *pH264CodecCtx;
       AVCodec *pH264Codec;

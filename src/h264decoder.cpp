@@ -56,7 +56,11 @@ bool H264Decoder::initH264Decoder(unsigned width, unsigned height)
     avcodec_get_context_defaults(pH264CodecCtx);
 #endif
 
-    pH264CodecCtx->flags2 |= CODEC_FLAG2_FAST;
+#if !LIBAVCODEC_VER_AT_LEAST(58,0)
+	pH264CodecCtx->flags2 |= CODEC_FLAG2_FAST;
+#else
+	pH264CodecCtx->flags2 |= AV_CODEC_FLAG2_FAST;
+#endif
 
 #if !LIBAVCODEC_VER_AT_LEAST(54, 25)
     pH264CodecCtx->pix_fmt = PIX_FMT_YUV420P;
@@ -90,7 +94,14 @@ bool H264Decoder::initH264Decoder(unsigned width, unsigned height)
     avcodec_get_frame_defaults(pH264picture);
 #endif
 
-    h264PictureSize = avpicture_get_size(pH264CodecCtx->pix_fmt, pH264CodecCtx->width, pH264CodecCtx->height);
+#if LIBAVUTIL_VER_AT_LEAST(54,6)
+    h264PictureSize = av_image_get_buffer_size(pH264CodecCtx->pix_fmt, width, height, 1);
+#else
+    h264PictureSize = avpicture_get_size(pH264CodecCtx->pix_fmt, width, height);
+#endif
+    pH264CodecCtx->width = width;
+    pH264CodecCtx->height = height;
+
     h264pictureBuf = new uint8_t[h264PictureSize];
     if(h264pictureBuf==0)
     {
@@ -156,6 +167,36 @@ void H264Decoder::yu12_to_yuyv(u_int8_t *out, u_int8_t *in, int width, int heigh
     }
 }
 
+int H264Decoder::libav_decode(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacket *pkt)
+{
+#if LIBAVCODEC_VER_AT_LEAST(57,64)
+    int ret;
+
+    *got_frame = 0;
+
+    if (pkt)
+    {
+            ret = avcodec_send_packet(avctx, pkt);
+            // In particular, we don't expect AVERROR(EAGAIN), because we read all
+            // decoded frames with avcodec_receive_frame() until done.
+            if (ret < 0)
+                    return ret == AVERROR_EOF ? 0 : ret;
+    }
+
+    ret = avcodec_receive_frame(avctx, frame);
+    if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF)
+            return ret;
+    if (ret >= 0)
+            *got_frame = 1;
+
+    return ret;
+
+#else
+    return avcodec_decode_video2(avctx ,frame, got_frame, pkt);
+
+#endif
+}
+
 int H264Decoder::decodeH264(u_int8_t *outBuf, u_int8_t *inBuf, int bufSize)
 {
     AVPacket avpkt;
@@ -167,7 +208,7 @@ int H264Decoder::decodeH264(u_int8_t *outBuf, u_int8_t *inBuf, int bufSize)
 
     int gotPicture = 0;
 
-    int len = avcodec_decode_video2(pH264CodecCtx, pH264picture, &gotPicture, &avpkt);
+    int len = libav_decode(pH264CodecCtx,pH264picture,&gotPicture,&avpkt);
     if(len < 0)
     {
         return len;
@@ -175,8 +216,14 @@ int H264Decoder::decodeH264(u_int8_t *outBuf, u_int8_t *inBuf, int bufSize)
 
     if(gotPicture)
     {
+#if LIBAVUTIL_VER_AT_LEAST(54,6)
+        av_image_copy_to_buffer(outBuf, h264PictureSize,
+                                     (const unsigned char * const*) pH264picture->data, pH264picture->linesize,
+                                     pH264CodecCtx->pix_fmt, pH264CodecCtx->width, pH264CodecCtx->height, 1);
+#else
         avpicture_layout((AVPicture *) pH264picture, pH264CodecCtx->pix_fmt
             ,pH264CodecCtx->width, pH264CodecCtx->height, outBuf, h264PictureSize);
+#endif
         return len;
     }
     else
@@ -193,9 +240,9 @@ void H264Decoder::closeFile()
 
 void H264Decoder::initVars()
 {
-    pH264CodecCtx = 0;
-    pH264Codec = 0;
-    pH264picture = 0;
+    pH264CodecCtx = NULL;
+    pH264Codec = NULL;
+    pH264picture = NULL;
 }
 
 
@@ -204,11 +251,11 @@ void H264Decoder::freeFrame()
     if(h264pictureBuf)
     {
         delete[] h264pictureBuf;
-        h264pictureBuf = 0;
+        h264pictureBuf = NULL;
     }
     if(pH264picture)
     {
         av_free(pH264picture);
-        pH264picture = 0;
+        pH264picture = NULL;
     }
 }

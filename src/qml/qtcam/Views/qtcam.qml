@@ -672,6 +672,7 @@ Rectangle {
             onCurrentIndexChanged: {
                 if(currentIndex.toString() != "-1" && currentIndex.toString() != "0") {
                     if(oldIndex!=currentIndex) {
+                        seqAni.restart
                         // when switching camera make "exposureAutoAvailable" as false
                         imageSettingsRootObject.exposureAutoAvailable = false
                         seqAni.running = true
