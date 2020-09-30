@@ -1,3 +1,8 @@
+Qtcam Application - 22.0.25
+---------------------------
+*Added fix for Inconsistently corruption occurs while switching to Record mode from Preview mode in Hyperyon Dual stream.
+
+
 Qtcam Application - 22.0.24
 ---------------------------
 *Added fix for crash while streaming mjpeg on embedded boards.
