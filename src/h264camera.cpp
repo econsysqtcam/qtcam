@@ -35,6 +35,30 @@ H264Camera::~H264Camera()
 
 }
 
+bool H264Camera::setCbrMode(QString cbrValue)
+{
+    __u16 value;
+    value =  cbrValue.toUShort();
+    return setCurrentValueCmd(V4L2_CID_XU_CBR, value);
+}
+
+bool H264Camera::getCbrMode(uint queryType)
+{
+    __u8 outputCbrVal;
+
+    if(getValueCmd(V4L2_CID_XU_CBR, queryType, outputCbrVal))
+    {
+        uint cbrValue = outputCbrVal;
+        emit cbrValueReceived(queryType, cbrValue);
+        return true;
+    }
+    else
+    {
+        emit cbrValueReceived(NULL, NULL);
+        return false;
+    }
+}
+
 /**
  * @brief H264Camera::initUVCExtensionUnit
  * @param vobj - pass video stream class object
@@ -76,7 +100,10 @@ bool H264Camera::getBitrate(uint queryType){
         return true;
     }
     else
+    {
+        emit bitrateValueReceived(NULL, NULL);
         return false;
+    }
 }
 
 /**
@@ -100,12 +127,15 @@ bool H264Camera::getQFactor(uint queryType){
     __u8 outputQFactorVal;
 
     if(getValueCmd(V4L2_CID_XU_QFACTOR, queryType, outputQFactorVal)){
-	uint qFactorValue = outputQFactorVal;	
+        uint qFactorValue = outputQFactorVal;
         emit qFactorReceived(queryType, qFactorValue);
         return true;
     }
     else
+    {
+        emit qFactorReceived(NULL,NULL);
         return false;
+    }
 }
 
 
@@ -136,7 +166,11 @@ bool H264Camera::getH264Quality(uint queryType){
         return true;
     }
     else
+    {
+        emit h264QualityReceived(NULL,NULL);
         return false;
+    }
+
 }
 
 bool H264Camera::setHorizontalFlip(bool hFlipCheck){

@@ -64,6 +64,7 @@ Cameraproperty::Cameraproperty(bool enableLog) {
 Cameraproperty::~Cameraproperty() {
 
 }
+
 //Added by Dhurka - 13th Oct 2016
 /**
  * @brief Cameraproperty::selectedDeviceEnum - This is used to send the Camera enum name to QML

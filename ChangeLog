@@ -1,3 +1,8 @@
+Qtcam Application - 22.0.26
+---------------------------
+*Added PID for enumetating extension unit HyperyonDualStream Device
+*Added CBR control for HyperyonDualStream Device
+
 Qtcam Application - 22.0.25
 ---------------------------
 *Added fix for Inconsistently corruption occurs while switching to Record mode from Preview mode in Hyperyon Dual stream.

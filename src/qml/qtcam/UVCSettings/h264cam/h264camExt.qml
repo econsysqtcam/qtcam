@@ -11,6 +11,7 @@ Item {
     width:268
     height:750
 
+    property bool skipUpdateInCamOnCbrChange:false
     property bool skipUpdateInCamOnQFactor: false
     property bool skipUpdateInCamOnBitrateChange: false
     property bool skipUpdateInCamOnNoiseReduceChange: false
@@ -21,10 +22,24 @@ Item {
     property int maxWindowValue
     property bool hFlipClick :true
     property bool vFlipClick :true
+    ListModel
+    {
+        id:data1
+         ListElement { text: "OFF" }
+         ListElement { text: "HDR 1X"}
+         ListElement { text: "HDR 2X"}
+    }
+    ListModel
+    {
+        id:data2
+         ListElement { text: "OFF" }
+         ListElement { text:"HDR2x"}
 
+    }
     Connections
     {
         target: root
+
         onTakeScreenShot:
         {
             root.imageCapture(CommonEnums.SNAP_SHOT);
@@ -98,7 +113,40 @@ Item {
                         validator: IntValidator {bottom: qFactorSlider.minimumValue; top: qFactorSlider.maximumValue}
                     }
                 }
-
+                Text {
+                    id: cbrModeText
+                    text: "--- CBR - MODE ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                ComboBox
+                {
+                    id: cbrCombo
+                    enabled: true
+                    opacity: 1
+                    model: ListModel {
+                        ListElement { text: "OFF" }
+                         ListElement { text: "ON" }
+                    }
+                    activeFocusOnPress: true
+                    style: econComboBoxStyle
+                    onCurrentIndexChanged:
+                    {
+                        if(skipUpdateInCamOnCbrChange)
+                        {
+                            h264camId.setCbrMode(cbrCombo.currentIndex)
+                            h264QualitySlider.enabled = cbrCombo.currentIndex==0?1:0
+                            h264QualitySlider.opacity = cbrCombo.currentIndex==0?1:0.1
+                            bitrateSlider.enabled = cbrCombo.currentIndex==0?1:0
+                            bitrateSlider.opacity = cbrCombo.currentIndex==0?1:0.1
+                        }
+                        skipUpdateInCamOnCbrChange = true
+                    }
+                }
                 Text {
                     id: bitrateText
                     text: "--- H.264 Bitrate ---"
@@ -235,11 +283,6 @@ Item {
                     id: hdrCombo
                     enabled: true
                     opacity: 1
-                    model: ListModel {
-                        ListElement { text: "OFF" }
-                        ListElement { text: "HDR 1X" }
-                        ListElement { text: "HDR 2X" }
-                    }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
                     onCurrentIndexChanged: {
@@ -370,6 +413,7 @@ Item {
 
                 ExclusiveGroup { id: gainGrp }
                 Row{
+                    id:gain_grp
                     spacing: 35
                     RadioButton {
                         exclusiveGroup: gainGrp
@@ -552,15 +596,39 @@ Item {
 
     H264camera{
         id: h264camId
+        onCbrValueReceived:{
+            if(queryType==0 && cbrValue == 0)
+            {
+                cbrCombo.enabled = false
+                cbrCombo.opacity = 0.1
+            }
+            else
+                queryCbrControl(queryType,cbrValue)
+        }
         onBitrateValueReceived:{
+            if(queryType === 0 && bitrateValue === 0)
+             {
+                 bitrateSlider.enabled = false;
+                 bitrateSlider.opacity = 0.1
+             }
             queryForBitrateControl(queryType, bitrateValue)
         }
 
         onQFactorReceived:{
-            queryForQFactorControl(queryType, qFactorValue)
+            if(queryType === 0 && qFactorValue === 0)
+             {
+                 qFactorSlider.enabled = false;
+                 qFactorSlider.opacity = 0.1
+             }
+             queryForQFactorControl(queryType, qFactorValue)
         }
 
         onH264QualityReceived:{
+            if(queryType === 0 && qualityValue === 0)
+             {
+                 h264QualitySlider.enabled = false;
+                 h264QualitySlider.opacity = 0.1
+             }
             queryForH264QualityControl(queryType, qualityValue)
         }
 
@@ -725,7 +793,27 @@ Item {
         }
         skipUpdateInCamOnh264Quality = true
     }
-
+    function queryCbrControl(queryType, cbrVal)
+    {
+        if(queryType == H264camera.UVC_GET_CUR){
+            switch(cbrVal){
+            case H264camera.CBR_OFF:
+                cbrCombo.currentIndex = 0
+                h264QualitySlider.enabled = true
+                h264QualitySlider.opacity = 1
+                bitrateSlider.enabled = true
+                bitrateSlider.opacity = 1
+                break
+            case H264camera.CBR_ON:
+                cbrCombo.currentIndex = 1
+                h264QualitySlider.enabled = false
+                h264QualitySlider.opacity = 0.1
+                bitrateSlider.enabled = false
+                bitrateSlider.opacity = 0.1
+                break
+            }
+        }
+    }
     function queryForHDRControl(queryType, hdrVal){
         if(queryType == H264camera.UVC_GET_CUR){
             switch(hdrVal){
@@ -889,9 +977,8 @@ Item {
 
     }
 
-
     function getValuesFromCamera(valueToGet){
-
+        h264camId.getCbrMode(valueToGet)
         h264camId.getBitrate(valueToGet)
         h264camId.getQFactor(valueToGet)
         h264camId.getHDRMode(valueToGet)
@@ -932,6 +1019,9 @@ Item {
         h264camId.initUVCExtensionUnit(root.vidstreamObj)
         getMinMaxStepSizeValues()
         getValuesFromCamera(H264camera.UVC_GET_CUR)
+        hdrCombo.model=(qFactorSlider.enabled && bitrateSlider.enabled)?data1:data2
+        gain_grp.enabled = (qFactorSlider.enabled && bitrateSlider.enabled)?1:0
+        gain_grp.opacity = (qFactorSlider.enabled && bitrateSlider.enabled)?1:0.1
     }
     Component.onDestruction:{
         h264camId.deInitUVCExtensionUnit()

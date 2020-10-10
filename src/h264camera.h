@@ -36,6 +36,7 @@
 #define XU_ROI_EXPOSURE_ON                  0xD0
 #define XU_ROI_EXPOSURE_WINDOW_SIZE         0xE0
 
+#define V4L2_CID_XU_CBR                     0x11
 #define EXTENSION_UNIT_ID                   3
 
 class H264Camera: public QObject, public v4l2
@@ -90,6 +91,12 @@ public:
         UVC_GET_RES = 0x84
     };
     Q_ENUMS(getValueQueryType)
+    enum cbrMode
+    {
+        CBR_OFF = 0x00,
+        CBR_ON = 0x01
+    };
+    Q_ENUMS(cbrMode)
 
     enum hdrModes{
         HDR_OFF = 0x00,
@@ -130,7 +137,8 @@ public:
     Q_ENUMS(camROIAutoExpMode)
 
 
-signals:    
+signals:
+    void cbrValueReceived(uint queryType, uint cbrValue);
     void bitrateValueReceived(uint queryType, uint bitrateValue);
     void qFactorReceived(uint queryType, uint qFactorValue);
     void h264QualityReceived(uint queryType, uint qualityValue);
@@ -147,6 +155,9 @@ signals:
     void disableHFlipControl();
 
 public slots:
+
+    bool setCbrMode(QString cbrValue);
+    bool getCbrMode(uint queryType);
 
     bool setBitrate(QString bitrateValue);
     bool getBitrate(uint queryType);

@@ -59,7 +59,6 @@
 #include "see3camcu55_mh.h"
 #include "see3cam_20cug.h"
 #include "see3cam_cu22.h"
-
 //*! \mainpage Qtcam - A econ's camera product
 // *
 // * \section See3CAM_10CUG
@@ -110,7 +109,6 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_CU55>("econ.camera.see3camcu55", 1, 0, "See3camCu55");
     // Added by Navya :08 July 2019
     qmlRegisterType<See3CAM_CU55_MH>("econ.camera.see3camcu55mh",1,0,"See3camcu55MH");
-
     // Added by Sankari: 27 July 2017
     qmlRegisterType<See3CAM_CU20>("econ.camera.see3camcu20", 1, 0, "See3Camcu20");
     qmlRegisterType<See3CAM_CU22>("econ.camera.see3camcu22", 1, 0, "See3Camcu22");

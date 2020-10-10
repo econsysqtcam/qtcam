@@ -1291,7 +1291,8 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/see3cam20cug/see3cam_20cug.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU22) { // Added By Navya : 11 Dec 2019
             see3cam = Qt.createComponent("../UVCSettings/see3camcu22/see3camcu22.qml").createObject(root)
-        }else {
+        }
+        else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
         see3cam.visible = false
