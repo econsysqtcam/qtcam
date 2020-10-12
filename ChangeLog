@@ -1,7 +1,11 @@
+Qtcam Application - 22.0.27
+---------------------------
+*Added Fix H264 Quality was disabled when CBR mode was active.
+
 Qtcam Application - 22.0.26
 ---------------------------
-*Added PID for enumetating extension unit HyperyonDualStream Device
-*Added CBR control for HyperyonDualStream Device
+*Added PID for enumetating extension unit HyperyonDualStream Device.
+*Added CBR control for HyperyonDualStream Device.
 
 Qtcam Application - 22.0.25
 ---------------------------

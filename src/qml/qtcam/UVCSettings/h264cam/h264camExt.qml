@@ -141,8 +141,6 @@ Item {
                             h264camId.setCbrMode(cbrCombo.currentIndex)
                             h264QualitySlider.enabled = cbrCombo.currentIndex==0?1:0
                             h264QualitySlider.opacity = cbrCombo.currentIndex==0?1:0.1
-                            bitrateSlider.enabled = cbrCombo.currentIndex==0?1:0
-                            bitrateSlider.opacity = cbrCombo.currentIndex==0?1:0.1
                         }
                         skipUpdateInCamOnCbrChange = true
                     }
@@ -283,7 +281,8 @@ Item {
                     id: hdrCombo
                     enabled: true
                     opacity: 1
-                    activeFocusOnPress: true
+
+                   activeFocusOnPress: true
                     style: econComboBoxStyle
                     onCurrentIndexChanged: {
                         if(skipUpdateUIOnHDR){
@@ -293,6 +292,7 @@ Item {
                         //Added by M.VISHNUMURALI :Inorder to enable/disable roiAutoExpoUI according to HDR settings.
                         h264camId.runGetROIAutoExposureMode(H264camera.UVC_GET_CUR)
                     }
+
                 }
 
                 Text {
@@ -801,15 +801,11 @@ Item {
                 cbrCombo.currentIndex = 0
                 h264QualitySlider.enabled = true
                 h264QualitySlider.opacity = 1
-                bitrateSlider.enabled = true
-                bitrateSlider.opacity = 1
                 break
             case H264camera.CBR_ON:
                 cbrCombo.currentIndex = 1
                 h264QualitySlider.enabled = false
                 h264QualitySlider.opacity = 0.1
-                bitrateSlider.enabled = false
-                bitrateSlider.opacity = 0.1
                 break
             }
         }
