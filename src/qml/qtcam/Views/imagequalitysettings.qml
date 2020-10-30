@@ -1144,15 +1144,10 @@ Item {
                         opacity: enabled ? 1 : 0.1
                         onValueChanged: {
                             if(focusValueChangeProperty) {
-                                if(!autoSelect_focus.checked || root.selectedDeviceEnumValue == CommonEnums.ECON_CX3_RDX_V5680) {
+                                if(!autoSelect_focus.checked ) {
                                     root.changeCameraSettings(focusControlId,value.toString())
-                                } else {
-                                    focus_Slider.enabled = false
-                                    focus_Slider.opacity = 0.1                                    
-                                    focus_value.opacity = 0
                                 }
                             }
-                            focusValueChangeProperty = true
                         }
                     }
                     TextField {
@@ -1587,11 +1582,9 @@ Item {
     function focusAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         focusauto.opacity = 1
-        if(root.selectedDeviceEnumValue === CommonEnums.ECON_CX3_RDX_V5680) {
-            focus_Slider.opacity = 1
-            focus_Slider.enabled = true
-            focus_value.opacity = 1            
-        }
+        focus_Slider.opacity = 1      //Edited by M.Vishnu Murali: Removed "if" condition as the control wont be enabled if device has only manual focus.
+        focus_Slider.enabled = true
+        focus_value.opacity = 1
         focusControlId = controlID
         focus_Slider.minimumValue = controlMinValue
         focus_Slider.maximumValue = controlMaxValue

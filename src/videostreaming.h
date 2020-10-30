@@ -280,6 +280,7 @@ public:
     Q_ENUMS(fpsChange)
 
 private:
+    QFuture <int >threadMonitor;        //Added by M.Vishnu Murali:In order to moitor functions running in seperate thread.
     qreal m_t;
     __u8 m_bufReqCount;
     FrameRenderer *m_renderer;

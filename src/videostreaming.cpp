@@ -61,7 +61,6 @@
 #endif
 
 int h264DecodeRet;
-
 QStringListModel Videostreaming::resolution;
 QStringListModel Videostreaming::stillOutputFormat;
 QStringListModel Videostreaming::videoOutputFormat;
@@ -534,8 +533,7 @@ void FrameRenderer::drawRGBBUffer(){
         renderyuyvMutex.unlock();
     }
     else{
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
-        renderyuyvMutex.unlock();
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData); //Edited by M.Vishnu Murali:Removed renderyuyvMutex.unlock() as it is leading to improper buffer updations especially at high resolutions.
     }
     m_shaderProgram->disableAttributeArray(0);
     m_shaderProgram->disableAttributeArray(1);
@@ -573,7 +571,10 @@ void FrameRenderer::drawYUYVBUffer(){
             skipFrames = frame;
         }
         else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
-             goto skip;
+        {
+            renderyuyvMutex.unlock();   //Added by M.Vishnu Murali: Inorder to unlock Qmutex when decoding fails.
+            goto skip;
+        }
         else{
             skipFrames = 4;
         }
@@ -587,8 +588,8 @@ void FrameRenderer::drawYUYVBUffer(){
     }
     else{
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
-skip:   renderyuyvMutex.unlock();
     }
+skip:
     m_shaderProgram->disableAttributeArray(0);
     m_shaderProgram->disableAttributeArray(1);
     // Not strictly needed for this example, but generally useful for when
@@ -2153,7 +2154,8 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                     frameSkip = true;
                     memcpy(tempSrcBuffer, (unsigned char *)inputbuffer, bytesUsed);
                     if(m_renderer && m_renderer->rgbaDestBuffer){
-                        QtConcurrent::run(jpegDecode, this, &m_renderer->rgbaDestBuffer, tempSrcBuffer, bytesUsed);
+                        //Added by M.vishnu Murali: threadMonitor used for monitor jpegDecode() in seperate thread.
+                        threadMonitor=QtConcurrent::run(jpegDecode, this, &m_renderer->rgbaDestBuffer, tempSrcBuffer, bytesUsed);
                     }
                 }else{
                 }
@@ -2836,7 +2838,7 @@ void Videostreaming::displayFrame() {
 }
 
 void Videostreaming::stopCapture() {
-
+    threadMonitor.waitForFinished();   //Added by M.Vishnu Murali:Inorder to finish jpegDecoding then stop else preview corruption will occur
     if(h264Decode!=NULL){
         h264Decode->closeFile();
         delete h264Decode;

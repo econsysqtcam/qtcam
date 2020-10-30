@@ -27,6 +27,7 @@
 H264Camera::H264Camera()
 {
   gvobj = NULL;
+  av_log_set_level(AV_LOG_QUIET); //Added by M.Vishnu Murali:In order to suppress warnings from libavcodec.
 }
 
 
