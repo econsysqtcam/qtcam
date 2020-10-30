@@ -1,3 +1,10 @@
+Qtcam Application - 22.0.28
+---------------------------
+*Changed all png images with incorrect icc profile.
+*Suppressed libavcodec warnings.
+*Added fix for live preview corruption in 18.04 when swicted between Preview and Record node in Hypreyon Dual Stream.
+*Added fix for manual focus issue in See3CAM_CU55MH.
+
 Qtcam Application - 22.0.27
 ---------------------------
 *Added Fix H264 Quality was disabled when CBR mode was active.

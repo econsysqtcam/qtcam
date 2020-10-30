@@ -126,6 +126,9 @@ You can build your application in two ways
 7.  Execute the application.
     sudo ./Qtcam    
 
+Note:
+   *if qmake path is not found, use command "qtpaths --find-exe qmake".It will show qmake executable path.
+
 4. Installation
 Note: If qtcam is already installed, remove the qtcam accessory files using following commands and follow 4.1 section.
 $ sudo rm -rf /usr/share/qml
