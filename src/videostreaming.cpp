@@ -152,10 +152,13 @@ Videostreaming::Videostreaming() : m_t(0)
     m_capImage = NULL;
     frameSkip = false;
     tempSrcBuffer = NULL;
+    startFrame = true;
+    _bytesUsed = 0;
     connect(this, &QQuickItem::windowChanged, this, &Videostreaming::handleWindowChanged);
     connect(&audioinput, SIGNAL(captureAudio()), this, SLOT(doEncodeAudio()));
     connect(this, SIGNAL(captureVideo()), this, SLOT(recordVideo()));
     videoEncoder=new VideoEncoder();
+    m_convertData = NULL;
 }
 
 Videostreaming::~Videostreaming()
@@ -533,7 +536,7 @@ void FrameRenderer::drawRGBBUffer(){
         renderyuyvMutex.unlock();
     }
     else{
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData); //Edited by M.Vishnu Murali:Removed renderyuyvMutex.unlock() as it is leading to improper buffer updations especially at high resolutions.
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData); //Edited by M.Vishnu Murali:Removed renderyuyvMutex.unlock() as it is leading to improper buffer allocations especially at high resolutions.
     }
     m_shaderProgram->disableAttributeArray(0);
     m_shaderProgram->disableAttributeArray(1);
@@ -1293,6 +1296,16 @@ void Videostreaming::capFrame()
         }
     }
         break;
+    case V4L2_PIX_FMT_MJPEG:
+    {
+        validFrame = true;
+        _bytesUsed = buf.bytesused;
+        if(startFrame)
+        {
+            allocBuffers();
+            startFrame = false;
+        }
+    }break;
     default:
         validFrame = true;
         // To do: for other color spaces
@@ -1391,8 +1404,10 @@ void Videostreaming::capFrame()
 
         /*Added by Navya: 27 Mar 2019
            Checking whether the frame is still/preview. */
-
-        temp_Buffer = (unsigned char *)malloc(width * height * 2);
+	if(width * height * 2<buf.bytesused)
+        	temp_Buffer = (unsigned char *)malloc(buf.bytesused);//width * height * 2);
+	else
+		temp_Buffer = (unsigned char *)malloc(width * height * 2);
         memcpy(temp_Buffer,(unsigned char *)m_buffers[buf.index].start[0],buf.bytesused);
 
         if(buf.bytesused>0){
@@ -1621,7 +1636,10 @@ int Videostreaming::jpegDecode(Videostreaming *obj, unsigned char **pic, unsigne
         _h = h;
 
         jpegsize[0] = srcSize;
-        memcpy(jpegbuf[0], srcbuf, srcSize); /* Important Step */
+        if(srcSize<tjBufSize(tilew, tileh,subsamp))
+            memcpy(jpegbuf[0], srcbuf, srcSize); /* Important Step */
+        else
+            memcpy(jpegbuf[0], srcbuf, tjBufSize(tilew, tileh,subsamp));
 
         if(w == tilew)
             _tilew = _w;
@@ -1782,8 +1800,9 @@ int Videostreaming::decomp(Videostreaming *obj,unsigned char **jpegbuf,
 
 bailout:
     if(handle)
-        tjDestroy(handle);
-
+    {    tjDestroy(handle);
+         handle = NULL;
+    }
     return retval;
 }
 
@@ -2146,6 +2165,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG){
             if(bytesUsed <= HEADERFRAME1) {
                 emit logCriticalHandle("Ignoring empty buffer");
+                startFrame=false ;
                 return false;
             }
             if(((uint8_t *) inputbuffer)[0] == 0xFF && ((uint8_t *) inputbuffer)[1] == 0xD8){
@@ -2399,6 +2419,29 @@ void Videostreaming::freeBuffers(unsigned char *destBuffer, unsigned char *copyB
         copyBuffer = NULL;
         destBuffer = NULL;
     }
+}
+
+void Videostreaming::allocBuffers()
+{
+    m_renderer->videoResolutionwidth = m_width;
+    m_renderer->videoResolutionHeight = m_height;
+
+    int buffLength = m_width * m_height;
+     int buffHalfLength = (m_width * m_height)/ 2;
+
+    m_renderer->yBuffer = (uint8_t*)realloc(m_renderer->yBuffer,buffLength);
+    m_renderer->uBuffer = (uint8_t*)realloc(m_renderer->uBuffer,buffHalfLength);
+    m_renderer->vBuffer = (uint8_t*)realloc(m_renderer->vBuffer,buffHalfLength);
+    m_renderer->yuvBuffer = (uint8_t*)realloc(m_renderer->yuvBuffer,buffLength*2);
+    m_renderer->greyBuffer = (uint8_t*)realloc(m_renderer->greyBuffer,buffLength);
+
+    m_renderer->rgbaDestBuffer = (unsigned char *)realloc(m_renderer->rgbaDestBuffer,m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 4);
+    if((m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 2)<_bytesUsed)
+            tempSrcBuffer = (unsigned char *)realloc(tempSrcBuffer,_bytesUsed);
+    else
+            tempSrcBuffer =(unsigned char *)realloc(tempSrcBuffer,m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 2);
+    yuyvBuffer = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
+    yuyvBuffer_Y12 = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
 }
 
 void Videostreaming::getFrameRates() {
@@ -2839,6 +2882,7 @@ void Videostreaming::displayFrame() {
 
 void Videostreaming::stopCapture() {
     threadMonitor.waitForFinished();   //Added by M.Vishnu Murali:Inorder to finish jpegDecoding then stop else preview corruption will occur
+    startFrame = true;
     if(h264Decode!=NULL){
         h264Decode->closeFile();
         delete h264Decode;
@@ -2946,31 +2990,22 @@ void Videostreaming::closeDevice() {
             m_capNotifier = NULL;
             m_capImage = NULL;
         }
+        if(m_convertData)
+        {
         v4lconvert_destroy(m_convertData);
+        m_convertData =NULL;
+    }
         close();
     }
 }
 
 void Videostreaming::startAgain() {
 
-    m_renderer->videoResolutionwidth = m_width;
-    m_renderer->videoResolutionHeight = m_height;
-
-    int buffLength = m_width * m_height;
-     int buffHalfLength = (m_width * m_height)/ 2;
-
-    m_renderer->yBuffer = (uint8_t*)malloc(buffLength);
-    m_renderer->uBuffer = (uint8_t*)malloc(buffHalfLength);
-    m_renderer->vBuffer = (uint8_t*)malloc(buffHalfLength);
-    m_renderer->yuvBuffer = (uint8_t*)malloc(buffLength*2);
-    m_renderer->greyBuffer = (uint8_t*)malloc(buffLength);
-
-    m_renderer->rgbaDestBuffer = (unsigned char *)malloc(m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 4);
-    tempSrcBuffer = (unsigned char *)malloc(m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 2);
-
-    yuyvBuffer = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
-    yuyvBuffer_Y12 = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
-
+    m_renderer->renderyuyvMutex.lock();
+    m_renderer->gotFrame = false;
+    m_renderer->updateStop = true;
+    allocBuffers();
+    m_renderer->renderyuyvMutex.unlock();
     if(openSuccess) {
         displayFrame();
     }
@@ -3300,15 +3335,12 @@ void Videostreaming::cameraFilterControls(bool actualValue) {
 }
 
 QString Videostreaming::getSettings(unsigned int id) {
+    int tries = IOCTL_RETRY;
     struct v4l2_control c;
     c.id = id;
     c.value = 0;
-    if (ioctl(VIDIOC_G_CTRL, &c)) {
-        //v4l2_queryctrl qctrl;
-        //qctrl.id = id;
-        emit logCriticalHandle("Unable to get the Value, setting the Default value: "+ QString::number(c.value,10));
-        return QString::number(c.value,10);
-    }
+	while((ioctl(VIDIOC_G_CTRL, &c)<0)&&tries--)	
+        emit logCriticalHandle("Unable to get the Value, Retrying...");
     QString value = QString::number(c.value,10);
     return value;
 }

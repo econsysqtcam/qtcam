@@ -25,6 +25,7 @@
 #include <linux/uvcvideo.h>
 #include <libv4lconvert.h>
 
+#define IOCTL_RETRY 7
 class v4l2
 {
 public:

@@ -1,3 +1,8 @@
+Qtcam Application - 22.0.29
+---------------------------
+*Added support for See3CAM_130D and See3CAM_24CUG.
+*Added See3CAM_160_EVALKIT PID.
+
 Qtcam Application - 22.0.28
 ---------------------------
 *Changed all png images with incorrect icc profile.

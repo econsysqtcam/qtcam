@@ -54,6 +54,8 @@ public:
         ECAM22_USB,
         SEE3CAM_CU55,  // SEE3CAM_AR0521
         // Added by Navya
+                SEE3CAM_130D,
+            SEE3CAM_24CUG,
         FSCAM_CU135, // STORECAM_1335
         SEE3CAM_CU55_MH, // cu55 monochrome
         SEE3CAM_CU22,

@@ -289,6 +289,7 @@ private:
     uint8_t *yuv420pdestBuffer;
     unsigned short int *bayerIRBuffer;
 
+    __u32 _bytesUsed;
     __u32 m_pixelformat;
     __u32 m_width, m_height;
     __u32 m_buftype;
@@ -318,6 +319,7 @@ private:
     bool openSuccess;
     bool updateOnce;
     bool m_snapShot;
+    bool startFrame;
 
     bool updateStop;
     bool makeSnapShot;
@@ -394,7 +396,7 @@ private:
 
     int findMax(QList<int> *llist);
     void freeBuffers(unsigned char *destBuffer,unsigned char *copyBuffer);
-
+    void allocBuffers();
     void getFileName(QString filePath,QString imgFormatType);
     void setFilePath(QString filePath);
     QString getFilePath();

@@ -59,6 +59,8 @@
 #include "see3camcu55_mh.h"
 #include "see3cam_20cug.h"
 #include "see3cam_cu22.h"
+#include "see3cam_130d.h"
+#include "see3cam_24cug.h"
 //*! \mainpage Qtcam - A econ's camera product
 // *
 // * \section See3CAM_10CUG
@@ -121,6 +123,9 @@ int main(int argc, char *argv[])
     qmlRegisterType<AboutPage>("econ.camera.about", 1, 0, "AboutPage");
 
     qmlRegisterType<AudioInput>("econ.camera.audioinput", 1, 0, "Audioinput");
+    //Added by M.Vishnu Murali
+    qmlRegisterType<See3CAM_130D>("econ.camera.see3cam130D", 1, 0, "See3Cam130D");
+    qmlRegisterType<See3CAM_24CUG>("econ.camera.see3cam24cug", 1, 0, "See3Cam24CUG");
     //Added by Dhurka - 13th Oct 2016
     /**
      * @brief qmlRegisterType<CommonEnums> - Access the ENUM list to QML

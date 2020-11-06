@@ -96,6 +96,9 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c126"),CommonEnums::SEE3CAM_CU22);
     //Added by M Vishnu Murali
     cameraEnumMap.insert(econVid + (",c129"),CommonEnums::ECAM22_USB); //hyperyon Dual stream device
+    cameraEnumMap.insert(econVid + (",c0d6"),CommonEnums::SEE3CAM_130D);
+    cameraEnumMap.insert(econVid + (",C128"),CommonEnums::SEE3CAM_24CUG);
+    cameraEnumMap.insert(econVid + (",D400"),CommonEnums::NONE);//See3CAM_160_EVALKIT
 }
 
 unsigned int uvccamera::getTickCount()
