@@ -31,7 +31,9 @@
 using namespace std;
 static int64_t audioPts = 0;
 
-
+#if LIBAVCODEC_VER_AT_LEAST(58, 54)
+    #define CODEC_FLAG_GLOBAL_HEADER AV_CODEC_FLAG_GLOBAL_HEADER
+#endif
 /**
   gop: maximal interval in frames between keyframes
 **/

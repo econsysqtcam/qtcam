@@ -1145,7 +1145,7 @@ bool See3CAM_130D::setExposureCompensation(unsigned int exposureCompValue){
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
             g_in_packet_buf[1]==SET_EXPOSURE_COMPENSATION &&
-            g_in_packet_buf[6]==SET_SUCCESS) {\
+            g_in_packet_buf[6]==SET_SUCCESS) {
             emit indicateCommandStatus("Success", "Exposure compensation value is set successfully");
             return true;
         }

@@ -4,6 +4,7 @@
 Alsa::Alsa()
 {
     mixer = NULL;
+    cap_elem = NULL;
 }
 
 Alsa::~Alsa()
@@ -53,6 +54,13 @@ int Alsa::initializeMixer(QString cardName){
         qDebug()<<"Failed to attach:"<<err;
         return err;
     }
+
+    for (cap_elem = snd_mixer_first_elem(mixer); cap_elem; cap_elem = snd_mixer_elem_next(cap_elem))
+    {
+               if(strcmp (snd_mixer_selem_get_name (cap_elem), "Capture") == 0)
+                     break;
+    }
+
     return 0;
 }
 
@@ -64,26 +72,24 @@ int Alsa::initializeMixer(QString cardName){
 int Alsa::setAlsaVolume(long volume)
 {
     int err;
-    snd_mixer_elem_t *elem;
 
     if(mixer == NULL){
         return -1;
     }
 
-    elem = snd_mixer_first_elem(mixer);
-    if(elem == NULL){
+    if(cap_elem == NULL){
         return -1;
     }
 
     long min=0, max=0;
-    err = snd_mixer_selem_get_capture_volume_range(elem, &min, &max); // get min, max volume range
+    err = snd_mixer_selem_get_capture_volume_range(cap_elem, &min, &max); // get min, max volume range
     if(err<0)
     {
        qDebug()<<"Failed to get volume range:"<<err;
        return err;
     }
 
-    err=snd_mixer_selem_set_capture_volume_all(elem, volume*max/100); // set volume
+    err=snd_mixer_selem_set_capture_volume_all(cap_elem, volume*max/100); // set volume
     if(err<0)
     {
        qDebug()<<"Failed to set capture volume:"<<err;
@@ -101,23 +107,20 @@ int Alsa::setAlsaMute(bool mute)
 {
 
     int err;
-    snd_mixer_elem_t *elem;
 
     if(mixer == NULL){
         return -1;
     }
 
-    elem = snd_mixer_first_elem(mixer);
-
-    if(elem == NULL){
+    if(cap_elem == NULL){
         return -1;
     }
 
-    if (snd_mixer_selem_has_capture_switch(elem)) {
+    if (snd_mixer_selem_has_capture_switch(cap_elem)) {
         if(mute){            
-            err=snd_mixer_selem_set_capture_switch_all(elem, 0);
+            err=snd_mixer_selem_set_capture_switch_all(cap_elem, 0);
         }else{             
-            err=snd_mixer_selem_set_capture_switch_all(elem, 1);
+            err=snd_mixer_selem_set_capture_switch_all(cap_elem, 1);
         }
         if(err<0)
         {
@@ -141,14 +144,13 @@ int Alsa::getMuteStatus()
         return -1;
     }
 
-    elem = snd_mixer_first_elem(mixer);
 
-    if(elem == NULL){
+    if(cap_elem == NULL){
         return -1;
     }
 
     int value;
-    err = snd_mixer_selem_get_capture_switch(elem, SND_MIXER_SCHN_FRONT_LEFT, &value);
+    err = snd_mixer_selem_get_capture_switch(cap_elem, SND_MIXER_SCHN_FRONT_LEFT, &value);
     if(err<0)
     {
         qDebug()<<"Failed to get capture mute status:"<<err;
@@ -171,14 +173,11 @@ int Alsa::getAlsaVolume(long *min, long *max)
         return -1;
     }
 
-    snd_mixer_elem_t *elem;
-    elem = snd_mixer_first_elem(mixer);
-
-    if(elem == NULL){
+    if(cap_elem == NULL){
         return -1;
     }
 
-    err = snd_mixer_selem_get_capture_volume_range(elem, min, max);
+    err = snd_mixer_selem_get_capture_volume_range(cap_elem, min, max);
     if(err<0)
     {
        qDebug()<<"Failed to get volume range:"<<err;
@@ -186,11 +185,11 @@ int Alsa::getAlsaVolume(long *min, long *max)
     }
 
     long value;
-    err=snd_mixer_selem_get_capture_volume(elem, SND_MIXER_SCHN_FRONT_CENTER, &value);
+    err=snd_mixer_selem_get_capture_volume(cap_elem, SND_MIXER_SCHN_FRONT_LEFT, &value);
 
     if(err<0)
     {
-        qDebug()<<"Failed to get capture volume:"<<err;
+        qDebug()<<"1-Failed to get capture volume:"<<err;
         return err;
     }
 

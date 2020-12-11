@@ -1560,19 +1560,19 @@ value in the text box and click the Set button"
     {
         switch(mode)
         {
-            case See3Cam130D.FLIP_ON_MIRROR_ON:
+            case See3Cam130D.FLIP_BOTHFLIP_ENABLE:
                  flipCtrlVertical.checked = true
                  flipCtrlHorizotal.checked = true
                 break;
-            case See3Cam130D.FLIP_OFF_MIRROR_ON:
+            case See3Cam130D.FLIP_VERTFLIP:
                 flipCtrlVertical.checked = true
                 flipCtrlHorizotal.checked = false
                 break;
-            case See3Cam130D.FLIP_ON_MIRROR_OFF:
+            case See3Cam130D.FLIP_HORZFLIP:
                  flipCtrlVertical.checked = false
                  flipCtrlHorizotal.checked = true
                 break;
-            case See3Cam130D.FLIP_OFF_MIRROR_OFF:
+            case See3Cam130D.FLIP_BOTHFLIP_DISABLE:
                 flipCtrlVertical.checked = false
                 flipCtrlHorizotal.checked = false
                 break;
@@ -1671,7 +1671,6 @@ value in the text box and click the Set button"
         seecam130D.getAFRectMode()
         seecam130D.getFlipMode()
         seecam130D.getStreamMode()
-        // Added by Sankari: 12 Dec 2018. To get preview in master mode
         root.startUpdatePreviewInMasterMode()
         seecam130D.getFaceDetectMode()
         seecam130D.getSmileDetectMode()
@@ -1823,7 +1822,6 @@ value in the text box and click the Set button"
         }else{
             autoexpManual.enabled = false
             autoexpFull.enabled = false
-            autoexpFace.enabled = false
             autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 0.1
             autoexpFull.opacity = 0.1
@@ -1880,7 +1878,8 @@ value in the text box and click the Set button"
              enableDisableAutoExposureControls(autoExposureSelect)
          }
          onEnableFaceRectafterBurst:{
-             seecam130D.enableDisableFaceRectangle(true)
+             if(rectEnable.checked)     //Added by M.Vishnu Murali: Inorder to avoid enabling Rectangle eventhough it is disabled by user.
+                seecam130D.enableDisableFaceRectangle(true)
          }
     }
 

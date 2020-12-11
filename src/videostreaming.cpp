@@ -1557,7 +1557,6 @@ int Videostreaming::jpegDecode(Videostreaming *obj, unsigned char **pic, unsigne
 
     int retval = 0;
     obj->m_renderer->renderyuyvMutex.lock();
-
     tjhandle handle = NULL;
     tjtransform *t = NULL;
 

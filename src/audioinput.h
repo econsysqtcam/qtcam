@@ -114,7 +114,7 @@ typedef struct _audio_buff_t
 }audio_buff_t;
 
 static int source_index;
-
+static int sink_index;
 
 class AudioInput : public QObject
 {

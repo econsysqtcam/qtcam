@@ -15,6 +15,7 @@ class Alsa : public QObject
 
 private:
     snd_mixer_t *mixer;
+    snd_mixer_elem_t *cap_elem;
 
 public:
     Alsa();

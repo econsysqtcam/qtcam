@@ -1,3 +1,11 @@
+Qtcam Application - 23.0.0
+---------------------------
+*Added Stream modes for See3CAM_24CUG.
+*Changed strobe control for See3CAM_24CUG.
+*Added fix for See3cam_130D AF Rectangle was displayed in the preview even though it was disabled.
+*Added fix: Flip control was not getting updated when hardware default was pressed.
+*Added fix: When we click Hardware default, Focus absolute slider was enabled in Auto mode.
+
 Qtcam Application - 22.0.29
 ---------------------------
 *Added support for See3CAM_130D and See3CAM_24CUG.

@@ -42,6 +42,7 @@ extern "C" {
 #include "libswscale/swscale.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/dict.h"
+//#include "libavcodec/version.h"
 #if LIBAVUTIL_VER_AT_LEAST(52,2)
     #include "libavutil/channel_layout.h"
 #endif

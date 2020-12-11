@@ -1662,6 +1662,12 @@ Item {
             focus_Slider.enabled = true
             focus_value.opacity = 1            
         }
+        else
+        {
+            focus_Slider.opacity = 0.1
+            focus_Slider.enabled = false
+            focus_value.opacity = 0.1
+        }
     }
     function exposureAutoPriorityUIUpdate(controlID,controlDefaultValue)
     {

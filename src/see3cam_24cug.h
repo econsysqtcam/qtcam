@@ -68,7 +68,12 @@
 #define GET_BURST_LENGTH_24CUG               0x19
 #define SET_BURST_LENGTH_24CUG               0x1A
 
+#define GET_STREAM_MADE_24CUG                0x1B
+#define SET_STREAM_MADE_24CUG                0x1C
+
 #define SET_TO_DEFAULT_24CUG                 0xFF
+
+//#define SET_OS_CODE                              0x70
 
 class See3CAM_24CUG :public QObject
 {
@@ -83,6 +88,12 @@ private:
 
 public:
     explicit See3CAM_24CUG(QObject *parent = 0);
+
+    enum streamModes {
+       MODE_MASTER =0x00,
+       MODE_TRIGGER =0x01
+    };
+    Q_ENUMS(streamModes)
 
     enum sceneModes
     {
@@ -177,6 +188,7 @@ signals:
     void smileDetectModeValue(uint smileDetectMode, uint smileDetectEmbedDataValue);
     void flashModeValue(uint flashMode);
     void flickerDetectionMode(uint flickerMode);
+    void streamModeValue(uint streamMode);
 
 public slots:
     bool getSceneMode();
@@ -216,13 +228,13 @@ public slots:
     bool getFlickerDetection();
     bool setFlickerDetection(camFlickerMode flickerMode);
 
-//    bool enableDisableFaceRectangle(bool enableFaceRect);
-
     bool getFlashState();
     bool setFlashState(flashStateValues flashMode);
 
-    bool setToDefault();
+    bool getStreamMode();
+    bool setStreamMode(streamModes streamMode);
 
+    bool setToDefault();
 };
 
 #endif // SEE3CAM_24CUG_H

@@ -188,6 +188,14 @@ public:
     };
     Q_ENUMS(camAFRectMode)
 
+    enum camFlipMode {
+        FLIP_BOTHFLIP_ENABLE =0x03,
+        FLIP_HORZFLIP = 0x01,
+        FLIP_VERTFLIP =0x02 ,
+        FLIP_BOTHFLIP_DISABLE =0x00
+    };
+    Q_ENUMS(camFlipMode)
+
 signals:
     void sceneModeValue(uint sceneMode);
     void effectModeValue(uint effectMode);

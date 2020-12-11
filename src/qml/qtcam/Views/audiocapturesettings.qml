@@ -173,7 +173,7 @@ Item {
                                   }
 
 
-                                  audioSettings.updateSupportedInfo(audioDevicesList.currentIndex)
+                                  audioSettings.updateSupportedInfo(currentIndex)
                                   root.audioDeviceSelected(currentIndex);
                                   root.setSampleRate(sampleFmtList.currentText)
                                   root.setChannelCount(channelCountList.currentText)

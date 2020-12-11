@@ -880,36 +880,67 @@ bool See3CAM_24CUG::setFlashState(See3CAM_24CUG::flashStateValues flashMode)
 
 }
 
-//bool See3CAM_24CUG::enableDisableFaceRectangle(bool enableFaceRect)
-//{
+bool See3CAM_24CUG::getStreamMode()
+{
+    uint streamMode;
 
-//    // hid validation
-//    if(uvccamera::hid_fd < 0)
-//    {
-//        return false;
-//    }
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
 
-//    //Initialize buffers
-//    initializeBuffers();
+    //Initialize buffers
+    initializeBuffers();
 
-//    // fill buffer values
-//    g_out_packet_buf[1] = CAMERA_CONTROL_24CUG; /* camera id */
-//    g_out_packet_buf[2] = ENABLE_DISABLE_MODE_FACE_RECTANGLE_24CUG; /* pass enable/disable command */
-//    if(enableFaceRect)
-//        g_out_packet_buf[3] = ENABLE_FACE_RECTANGLE_24CUG; /* enable auto focus rect */
-//    else
-//        g_out_packet_buf[3] = DISABLE_FACE_RECTANGLE_24CUG; /* disable auto focus rect */
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_24CUG;  /* set camera control code */
+    g_out_packet_buf[2] = GET_STREAM_MADE_24CUG ; /* get stream mode code */
 
-//    // send request and get reply from camera
-//    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-//        if (g_in_packet_buf[6]==SET_FAIL) {
-//            return false;
-//        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_24CUG &&
-//            g_in_packet_buf[1]==ENABLE_DISABLE_MODE_FACE_RECTANGLE_24CUG &&
-//            g_in_packet_buf[6]==SET_SUCCESS) {\
-//            return true;
-//        }
-//    }
-//    return false;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_24CUG &&
+            g_in_packet_buf[1]==GET_STREAM_MADE_24CUG  &&
+            g_in_packet_buf[6]==GET_SUCCESS) {
+            streamMode = g_in_packet_buf[2];
+            emit streamModeValue(streamMode);
+            return true;
+        }
+    }
+    return false;
 
-//}
+}
+
+bool See3CAM_24CUG::setStreamMode(See3CAM_24CUG::streamModes streamMode)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] =CAMERA_CONTROL_24CUG; /* set camera control code */
+    g_out_packet_buf[2] = GET_STREAM_MADE_24CUG ; /* set stream mode code */
+    g_out_packet_buf[3] = streamMode; /* actual stream mode */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_24CUG &&
+            g_in_packet_buf[1]==GET_STREAM_MADE_24CUG  &&
+            g_in_packet_buf[6]==SET_SUCCESS) {
+
+            return true;
+        }
+    }
+
+    return false;
+
+}
