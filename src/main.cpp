@@ -23,6 +23,7 @@
 #include <QtWidgets/QWidget>
 #include <QIcon>
 #include <QStandardPaths>
+#include<QProcess>
 #include "qtquick2applicationviewer.h"
 #include "cameraproperty.h"
 #include "videostreaming.h"
@@ -69,9 +70,18 @@
 // * \section See3CAM_10CUG
 // * Bayer Camera
 
-
 int main(int argc, char *argv[])
 {
+    /*Indentifying OS version*/
+    QProcess process;
+    process.start("bash", QStringList() << "-c" << "cat /etc/os-release | grep \"PRETTY_NAME\" "); //Reading os-release file for checking OS
+    process.waitForFinished(2);
+    char *os_name = strdup(process.readAllStandardOutput());
+    bool is20_04detected =false;
+
+    if(strstr(os_name,"20.04"))
+         is20_04detected = true;
+
     QApplication app(argc, argv);
     qmlRegisterType<Cameraproperty>("econ.camera.property",1,0,"Camproperty");
     qmlRegisterType<Videostreaming>("econ.camera.stream", 1, 0, "Videostreaming");
@@ -152,6 +162,12 @@ int main(int argc, char *argv[])
 
     Videostreaming vs;   
     AudioInput audio;
+    
+    if(is20_04detected)
+        viewer.rootContext()->setContextProperty("is20_04detcted", QVariant(true));
+    else {
+         viewer.rootContext()->setContextProperty("is20_04detcted", QVariant(false));
+    }
     viewer.rootContext()->setContextProperty("resolutionModel", &vs.resolution);
     viewer.rootContext()->setContextProperty("stillOutputFormatModel", &vs.stillOutputFormat);
     viewer.rootContext()->setContextProperty("videoOutputFormatModel", &vs.videoOutputFormat);

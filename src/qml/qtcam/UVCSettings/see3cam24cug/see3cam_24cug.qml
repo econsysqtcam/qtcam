@@ -29,6 +29,16 @@ Item {
 
     Connections
     {
+        target: vidstreamproperty
+        onTriggerShotCap:
+        {
+             imageCapture(CommonEnums.SNAP_SHOT)
+        }
+
+    }
+
+    Connections
+    {
         target: root
         onTakeScreenShot:
         {
@@ -105,52 +115,7 @@ Item {
             y:5
             spacing:20
 
-            Text {
-                id: scene_mode
-                text: "--- Scene Mode ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
 
-
-            Grid {
-                columns: 2
-                spacing: 50
-
-                ExclusiveGroup { id: sceneInputGroup }
-                RadioButton {
-                    id: sceneNormal
-                    style:  econRadioButtonStyle
-                    text:   qsTr("Normal")
-                    exclusiveGroup: sceneInputGroup
-                    activeFocusOnPress: true
-                    onClicked: {
-                        see3cam24cug.setSceneMode(See3Cam24CUG.SCENE_NORMAL)
-                    }
-                    Keys.onReturnPressed: {
-                        see3cam24cug.setSceneMode(See3Cam24CUG.SCENE_NORMAL)
-                    }
-                }
-                RadioButton {
-                    id: sceneDoc
-                    style:  econRadioButtonStyle
-                    text: qsTr("Document")
-                    exclusiveGroup: sceneInputGroup
-                    activeFocusOnPress: true
-                    onClicked: {
-                        see3cam24cug.setSceneMode(See3Cam24CUG.SCENE_DOCUMENT)
-                    }
-                    Keys.onReturnPressed: {
-                        see3cam24cug.setSceneMode(See3Cam24CUG.SCENE_DOCUMENT)
-                    }
-
-                }
-
-            }
             Row{
                 Layout.alignment: Qt.AlignCenter
                 Text {
@@ -1092,8 +1057,12 @@ Item {
         onStreamModeValue:{
             if(streamMode == See3Cam24CUG.MODE_MASTER){
                 rdoModeMaster.checked = true
+                root.startUpdatePreviewInMasterMode()
+                root.disableStillProp(true)
             }else if(streamMode == See3Cam24CUG.MODE_TRIGGER){
+                root.disableStillProp(false)
                 rdoModeTrigger.checked = true
+                root.stopUpdatePreviewInTriggerMode()
             }
         }
         onSendEffectMode:{
@@ -1121,9 +1090,6 @@ Item {
         }
         onSendDenoiseValue:{
             deNoiseSlider.value = denoiseValue
-        }
-        onSceneModeValue: {
-            currentSceneMode(sceneMode)
         }
         onQFactorValue:{
             skipUpdateUIQFactor = false
@@ -1355,19 +1321,6 @@ Item {
         getAutoExpsoureControlValues.start()
     }
 
-    function currentSceneMode(mode)
-    {
-        switch(mode)
-        {
-        case See3Cam24CUG.SCENE_NORMAL:
-            sceneNormal.checked = true
-            break;
-        case See3Cam24CUG.SCENE_DOCUMENT:
-            sceneDoc.checked = true
-            break;
-        }
-    }
-
     function setFlickerDetectionFn()
     {
         switch(flickercombo.currentIndex){
@@ -1406,7 +1359,6 @@ Item {
     function getCameraValues(){
         see3cam24cug.getEffectMode()
         see3cam24cug.getDenoiseValue()
-        see3cam24cug.getSceneMode()
         see3cam24cug.getAutoExpROIModeAndWindowSize()
         see3cam24cug.getBurstLength()
         see3cam24cug.getQFactor()
@@ -1421,15 +1373,20 @@ Item {
     }
 
     function setMasterMode(){
+  root.disableStillProp(true)
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
         see3cam24cug.setStreamMode(See3Cam24CUG.MODE_MASTER)
+        root.startUpdatePreviewInMasterMode()
     }
     function setTriggerMode(){
+  	root.disableStillProp(false)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
         see3cam24cug.setStreamMode(See3Cam24CUG.MODE_TRIGGER)
+        root.stopUpdatePreviewInTriggerMode()
     }
     Connections{
         target: root

@@ -331,6 +331,7 @@ private:
     bool tempMsgBoxValue;
     bool m_VideoRecord;
     bool previewStop;
+    bool trigger_mode;
 
     QSocketNotifier *m_capNotifier;
 
@@ -637,6 +638,8 @@ public slots:
     void doEncodeAudio();
 
 signals:
+    void   triggerShotCap();
+
 
     // from qml file , rendering animation duration t changed
     void tChanged();

@@ -13,9 +13,6 @@
 #define SMILE_THRESHOLD_MAX 75
 #define DEFAULT_SMILE_THRESHOLD 40
 
-#define GET_SCENEMODE_24CUG                  0x01
-#define SET_SCENEMODE_24CUG                  0x02
-
 #define GET_SPECIALEFFECT_24CUG              0x03
 #define SET_SPECIALEFFECT_24CUG              0x04
 
@@ -95,13 +92,6 @@ public:
     };
     Q_ENUMS(streamModes)
 
-    enum sceneModes
-    {
-        SCENE_NORMAL = 0x01,
-        SCENE_DOCUMENT = 0x0C
-    };
-    Q_ENUMS(sceneModes)
-
     enum specialEffects
     {
         EFFECT_NORMAL = 0x01,
@@ -175,7 +165,6 @@ public:
 signals:
     void sendEffectMode(uint effectMode);
     void sendDenoiseValue(uint denoiseValue);
-    void sceneModeValue(uint sceneMode);
     void roiAutoExpModeValue(uint roiMode, uint winSize);
     void burstLengthValue(uint burstLength);
     void qFactorValue(uint qFactor);
@@ -191,8 +180,6 @@ signals:
     void streamModeValue(uint streamMode);
 
 public slots:
-    bool getSceneMode();
-    bool setSceneMode(const sceneModes& sceneMode);
 
     bool getEffectMode();
     bool setEffectMode(const specialEffects& specialEffect);

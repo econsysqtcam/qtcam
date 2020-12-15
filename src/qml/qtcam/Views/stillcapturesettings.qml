@@ -341,6 +341,13 @@ Item {
         {
             stillproperties.visible = status;
         }
+        onDisableStillProp: //Added by M.VishnuMurali: for disabling still resolution ComboBox and colorspace ComboBox.
+        {
+        		color_comp_box.enabled = status
+        		color_comp_box.opacity = (color_comp_box.enabled  ? 1:0.1)
+        		output_value.enabled = status
+        		output_value.opacity = (output_value.enabled ? 1:0.1)
+        }
     }
     Connections
     {

@@ -12,66 +12,6 @@ See3CAM_24CUG::See3CAM_24CUG(QObject *parent)
 
 }
 
-bool See3CAM_24CUG::getSceneMode()
-{
-    // hid validation
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    //Initialize buffers
-    initializeBuffers();
-
-    // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_24CUG; /* camera id */
-    g_out_packet_buf[2] = GET_SCENEMODE_24CUG; /* get scene mode command */
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH))
-    {
-        if (g_in_packet_buf[6]==GET_FAIL)
-        {
-            return false;
-        }
-        else if(g_in_packet_buf[0] == CAMERA_CONTROL_24CUG &&g_in_packet_buf[1]==GET_SCENEMODE_24CUG &&
-            g_in_packet_buf[6]==GET_SUCCESS)
-        {
-            emit sceneModeValue(g_in_packet_buf[2]);
-            return true;
-        }
-    }
-    return false;
-}
-
-bool See3CAM_24CUG::setSceneMode(const See3CAM_24CUG::sceneModes &sceneMode)
-{
-    // hid validation
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    //Initialize buffers
-    initializeBuffers();
-
-    // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_24CUG; /* Camera control id */
-    g_out_packet_buf[2] = SET_SCENEMODE_24CUG; /* Set scene mode command */
-    g_out_packet_buf[3] = sceneMode; /* Scene mode to set */
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6]==SET_FAIL) {
-            return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_24CUG &&
-            g_in_packet_buf[1]==SET_SCENEMODE_24CUG &&
-            g_in_packet_buf[6]==SET_SUCCESS) {
-            return true;
-        }
-    }
-    return false;
-}
 
 bool See3CAM_24CUG::getEffectMode()
 {
@@ -925,16 +865,16 @@ bool See3CAM_24CUG::setStreamMode(See3CAM_24CUG::streamModes streamMode)
 
     // fill buffer values
     g_out_packet_buf[1] =CAMERA_CONTROL_24CUG; /* set camera control code */
-    g_out_packet_buf[2] = GET_STREAM_MADE_24CUG ; /* set stream mode code */
+    g_out_packet_buf[2] = SET_STREAM_MADE_24CUG ; /* set stream mode code */
     g_out_packet_buf[3] = streamMode; /* actual stream mode */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
 
-        if (g_in_packet_buf[6]==GET_FAIL) {
+        if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_24CUG &&
-            g_in_packet_buf[1]==GET_STREAM_MADE_24CUG  &&
+            g_in_packet_buf[1]==SET_STREAM_MADE_24CUG  &&
             g_in_packet_buf[6]==SET_SUCCESS) {
 
             return true;

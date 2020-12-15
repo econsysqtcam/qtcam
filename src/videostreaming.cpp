@@ -159,6 +159,7 @@ Videostreaming::Videostreaming() : m_t(0)
     connect(this, SIGNAL(captureVideo()), this, SLOT(recordVideo()));
     videoEncoder=new VideoEncoder();
     m_convertData = NULL;
+    trigger_mode = false;
 }
 
 Videostreaming::~Videostreaming()
@@ -1250,6 +1251,7 @@ void Videostreaming::capFrame()
 
         return;
     }
+    
     if (again) {
         return;
     }
@@ -1545,6 +1547,12 @@ void Videostreaming::capFrame()
     // signal to update preview width and height in qml
     if(windowResized){
         emit setWindowSize(resizedWidth,resizedHeight);
+    }
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode) //Added by M.VishnuMurali: For capturing trigger mode images.
+    {
+    	m_renderer->gotFrame = false;
+        emit   triggerShotCap();
+
     }
     m_timer.start(2000);
 }
@@ -3524,11 +3532,13 @@ void Videostreaming::stopUpdatePreview() {
 }
 
 void Videostreaming::triggerModeEnabled() {
+    trigger_mode = true;
     stopUpdatePreview();
 }
 
 void Videostreaming::masterModeEnabled() {
     m_renderer->updateStop = false;
+    trigger_mode = false;
 }
 //Added by Dhurka - 13th Oct 2016
 /**

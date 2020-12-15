@@ -1,3 +1,9 @@
+Qtcam Application - 23.0.1
+---------------------------
+*Removed Scene mode for See3CAM_24CUG.
+*Images will be captured and stored when device is in Trigger mode for See3CAM_24CUG.
+*Disabled Still resolution and colorspace combobox when device is in trigger mode.
+ 
 Qtcam Application - 23.0.0
 ---------------------------
 *Added Stream modes for See3CAM_24CUG.
