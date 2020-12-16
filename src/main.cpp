@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
     /*Indentifying OS version*/
     QProcess process;
     process.start("bash", QStringList() << "-c" << "cat /etc/os-release | grep \"PRETTY_NAME\" "); //Reading os-release file for checking OS
-    process.waitForFinished(2);
+    process.waitForFinished();
     char *os_name = strdup(process.readAllStandardOutput());
     bool is20_04detected =false;
 
