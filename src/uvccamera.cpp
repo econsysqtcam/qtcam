@@ -99,6 +99,8 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c0d6"),CommonEnums::SEE3CAM_130D);
     cameraEnumMap.insert(econVid + (",C128"),CommonEnums::SEE3CAM_24CUG);
     cameraEnumMap.insert(econVid + (",D400"),CommonEnums::NONE);//See3CAM_160_EVALKIT
+    cameraEnumMap.insert(econVid + (",C180"),CommonEnums::SEE3CAM_CU81);
+    cameraEnumMap.insert(econVid + (",C058"),CommonEnums::ECAM51A_USB);
 }
 
 unsigned int uvccamera::getTickCount()
@@ -516,7 +518,7 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
     /*
      * Correcting OS code supported cameras
      */
-    if(selectedDeviceEnum == CommonEnums::SEE3CAM_11CUG || selectedDeviceEnum == CommonEnums::SEE3CAM_12CUNIR || selectedDeviceEnum == CommonEnums::ECON_1MP_BAYER_RGB  || selectedDeviceEnum == CommonEnums::ECON_1MP_MONOCHROME || selectedDeviceEnum == CommonEnums::SEE3CAM_CU51 ||selectedDeviceEnum == CommonEnums::SEE3CAM_24CUG)
+    if(selectedDeviceEnum == CommonEnums::SEE3CAM_CU81||selectedDeviceEnum == CommonEnums::SEE3CAM_11CUG || selectedDeviceEnum == CommonEnums::SEE3CAM_12CUNIR || selectedDeviceEnum == CommonEnums::ECON_1MP_BAYER_RGB  || selectedDeviceEnum == CommonEnums::ECON_1MP_MONOCHROME || selectedDeviceEnum == CommonEnums::SEE3CAM_CU51 ||selectedDeviceEnum == CommonEnums::SEE3CAM_24CUG)
     {                                
         ret = sendOSCode();
         if (ret == false) {

@@ -271,6 +271,7 @@ public slots:
 
     bool getAntiFlickerMode();
     bool setAntiFlickerMode(camAntiFlickerMode antiFlickerMode);
+
 };
 #endif // SEE3CAM_130D_H
 

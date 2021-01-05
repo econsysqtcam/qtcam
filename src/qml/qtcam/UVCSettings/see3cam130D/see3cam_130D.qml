@@ -38,6 +38,7 @@ Item {
         {
             if(seecam130D.enableDisableFaceRectangle(false)){
                 root.imageCapture(CommonEnums.BURST_SHOT);
+
             }
         }
         onGetVideoPinStatus:

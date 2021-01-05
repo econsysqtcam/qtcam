@@ -25,7 +25,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <libevdev-1.0/libevdev/libevdev.h>
-
+#include <QCollator>
 QStringListModel Cameraproperty::modelCam;
 bool Cameraproperty::saveLog;
 int Cameraproperty::event_fd;
@@ -151,12 +151,17 @@ void Cameraproperty::checkforDevice() {
     int deviceIndex = 1;
     bool metaCapture = false;
     availableCam.clear();
+
+    QCollator collator;             //Added by M.Vishnu Murali: for sorting alphanumeric values.
+    collator.setNumericMode(true);
+
     if(qDir.cd("/sys/class/video4linux/")) {
         QStringList filters,list;
         filters << "video*";
         qDir.setNameFilters(filters);
         list << qDir.entryList(filters,QDir::Dirs ,QDir::Name);
-        qSort(list.begin(), list.end());
+
+        std::sort(list.begin(),list.end(),collator); //Changed by M.Vishnu Murali: Inorder to properly sort alphanumeric values.
         deviceBeginNumber = list.value(0).mid(5).toInt();   //Fetching all values after "video"
         deviceEndNumber = list.value(list.count()-1).mid(5).toInt();
         for(int qDevCount=deviceBeginNumber;qDevCount<=deviceEndNumber;qDevCount++) {
@@ -175,7 +180,6 @@ void Cameraproperty::checkforDevice() {
                         availableCam.append(cameraName);
                         metaCapture = false;
                     }
-
                     // Added by Navya : 24th Jan 2020
                     // Increasing the deviceIndex only if the /dev/video node is VideoCapture Node.
 

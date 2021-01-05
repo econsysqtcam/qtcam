@@ -165,7 +165,6 @@ qint64 AudioInfo::writeData(const char *data, qint64 len)
 
 }
 
-
 AudioInput::AudioInput()
 {
     audio_buff = NULL;
@@ -889,7 +888,7 @@ int AudioInput::getCards(void)
 
 
 bool AudioInput::updateSupportedInfo(uint currentIndex)
-{   
+{
     getCards();
     QString cardName;
     QMap<int, QString>::iterator cardNameIterator;

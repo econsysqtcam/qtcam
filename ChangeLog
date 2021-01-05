@@ -1,3 +1,8 @@
+Qtcam Application - 24.0.0
+---------------------------
+*Added support for See3CAM_CU81 and ECAM51A_USB.
+*Added fix for not enumerating all the devices connected to the host.
+
 Qtcam Application - 23.0.1
 ---------------------------
 *Removed Scene mode for See3CAM_24CUG.

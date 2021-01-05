@@ -62,6 +62,8 @@
 #include "see3cam_cu22.h"
 #include "see3cam_130d.h"
 #include "see3cam_24cug.h"
+#include "see3cam_cu81.h"
+#include "ecam51a_usb.h"
 //*! \mainpage Qtcam - A econ's camera product
 // *
 // * \section See3CAM_10CUG
@@ -136,6 +138,8 @@ int main(int argc, char *argv[])
     //Added by M.Vishnu Murali
     qmlRegisterType<See3CAM_130D>("econ.camera.see3cam130D", 1, 0, "See3Cam130D");
     qmlRegisterType<See3CAM_24CUG>("econ.camera.see3cam24cug", 1, 0, "See3Cam24CUG");
+    qmlRegisterType<See3CAM_CU81>("econ.camera.see3camcu81", 1, 0, "See3CamCU81");
+    qmlRegisterType<ecam51A_USB>("econ.camera.ecam51a_usb",1,0,"Ecam51AUSB");//while exposing to qml it is must that first letter should be in caps.
     //Added by Dhurka - 13th Oct 2016
     /**
      * @brief qmlRegisterType<CommonEnums> - Access the ENUM list to QML

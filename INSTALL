@@ -65,25 +65,24 @@ In addition to that, we collected some other useful  information related to the 
 
 In order to run Qtcam application, your system must have:
 
-1. Qt 5.5.1
-2. Operating System: Linux (Tested on Ubuntu 12.04, 14.04, 16.04 versions)
+1. Qt 5.9.1
+2. Operating System: Linux (Tested on Ubuntu 14.04, 16.04 ,18.04 versions)
 
 3.2. Dependencies
 
 To run the Qtcam application your system should meet the following dependencies.
 
-3.2.1. Install Qt5.5.1 framework
+3.2.1. Install Qt5.9.1 framework
 
 Initially download the Qt package from the below link as per your system requirement,
-For 32 Bit - http://download.qt.io/archive/qt/5.5/5.5.1/qt-opensource-linux-x86-5.5.1.run
-For 64 Bit - http://download.qt.io/archive/qt/5.5/5.5.1/qt-opensource-linux-x64-5.5.1.run
+For 64 Bit -  http://download.qt.io/official_releases/qt/5.9/5.9.1/qt-opensource-linux-x64-5.9.1.run
 
 
 To configure Qt, If permission is not given for user set it by using chmod command.
 
-# chmod u+x  qt-opensource-linux-x86-5.5.1.run
+# chmod u+x  qt-opensource-linux-x86-5.9.1.run
 (or)
-# chmod u+x  qt-opensource-linux-x64-5.5.1.run
+# chmod u+x  qt-opensource-linux-x64-5.9.1.run
 Then double click the downloaded binary and install it to your local system.
 
 3.2.2. Run following command to install following list of dependency packages
@@ -110,7 +109,7 @@ You can build your application in two ways
 
 3.3.1 Using Qt Creator:
 1. Open the project in your Qt creator.
-2. Provide your qmake path in the Tool->Options.(/home/@user/Qt5.5.1/5.5.1/gcc_64/bin/qmake)
+2. Provide your qmake path in the Tool->Options.(/home/@user/Qt5.9.1/5.9.1/gcc_64/bin/qmake)
 3. Set LAUNCHPAD macro in common.h to 0 in "src" directory.
 4. Right click in your project, click qmake.
 5. Right click in your project, click build
@@ -120,7 +119,7 @@ You can build your application in two ways
 1.  Goto your git clone path.
 2.  cd src/
 3.  Set LAUNCHPAD macro in common.h to 0.
-4.  qmake,(For example, /home/@user/Qt5.5.1/5.5.1/gcc_64/bin/qmake)
+4.  qmake,(For example, /home/@user/Qt5.9.1/5.9.1/gcc_64/bin/qmake)
 5.  make clean
 6.  make
 7.  Execute the application.
