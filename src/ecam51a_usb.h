@@ -85,7 +85,7 @@ public:
     static uint AFStatus;
     QFuture <bool >threadMonitor;
 
-    explicit ecam51A_USB(QObject *parent = nullptr);
+    explicit ecam51A_USB(QObject *parent = NULL);
     ~ecam51A_USB();
     enum getValueQueryType{
         UVC_GET_CUR = 0x81,
