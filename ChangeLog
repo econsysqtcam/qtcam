@@ -1,3 +1,7 @@
+Qtcam Application - 24.0.1
+---------------------------
+*Added fix for disabling AF rect while stillcapture for See3CAM_130D.
+
 Qtcam Application - 24.0.0
 ---------------------------
 *Added support for See3CAM_CU81 and ECAM51A_USB.

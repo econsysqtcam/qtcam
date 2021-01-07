@@ -8,7 +8,7 @@ import QtQuick.Layouts 1.1
 import cameraenum 1.0
 
 Item {
-    id: see3cam30Id
+
     width:268
     height:750
     property int denoiseMin: 0
@@ -37,8 +37,8 @@ Item {
         onTakeScreenShot:
         {
             if(seecam130D.enableDisableFaceRectangle(false)){
-                root.imageCapture(CommonEnums.BURST_SHOT);
-
+                seecam130D.enable_disablerect(false)
+                burstShotTimer.start()
             }
         }
         onGetVideoPinStatus:
@@ -53,6 +53,10 @@ Item {
             stillImageFormat.push("raw")
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
+        }
+        onAfterBurst:
+        {
+            seecam130D.enable_disablerect(true)
         }
     }
 

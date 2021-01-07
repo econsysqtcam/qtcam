@@ -79,6 +79,8 @@
 #define GET_ANTIFLICKER_130D                0x26
 #define SET_ANTIFLICKER_130D                0x27
 
+#define ENABLE_DISABLE_AF_RECT               0x30
+
 class See3CAM_130D : public QObject
 {
     Q_OBJECT
@@ -272,6 +274,7 @@ public slots:
     bool getAntiFlickerMode();
     bool setAntiFlickerMode(camAntiFlickerMode antiFlickerMode);
 
+    bool enable_disablerect(bool value);
 };
 #endif // SEE3CAM_130D_H
 

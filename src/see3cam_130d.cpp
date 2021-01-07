@@ -1314,3 +1314,32 @@ bool See3CAM_130D::setAntiFlickerMode(See3CAM_130D::camAntiFlickerMode antiFlick
         }
     }
 }
+
+bool See3CAM_130D::enable_disablerect(bool value)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* camera id */
+    g_out_packet_buf[2] = ENABLE_DISABLE_AF_RECT;
+    g_out_packet_buf[3] = value;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
+            g_in_packet_buf[1] == ENABLE_DISABLE_AF_RECT &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+}
+
