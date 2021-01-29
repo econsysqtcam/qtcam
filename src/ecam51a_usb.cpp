@@ -216,7 +216,6 @@ int ecam51A_USB::read_sensor_reg(unsigned int reg_address, unsigned char *reg_da
     {
         return false;
     }
-
     // Control Type
     data[0] = SENSOR_DEVICE_ADDRESS_FOR_READ_OPERATION;
     // Sensor Sub Address Byte Number
@@ -476,7 +475,7 @@ bool ecam51A_USB::selectFocusMode(uint mode)
 bool ecam51A_USB::getFocusPosition()
 {
     __u16 FocusPosition;
-    unsigned char reg_value;
+    unsigned char reg_value =0;
     unsigned int timeout = 10;
 
     write_sensor_reg(SENSOR_CMD_ACK_REG_ADDR_5M, DATA_FOR_SETTING_CMD_ACK_5M);//0x3023

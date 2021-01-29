@@ -19,6 +19,27 @@ Item
                 getSensorID()
          }
     }
+    Connections
+    {
+        target: root
+        onTakeScreenShot:
+        {
+                root.imageCapture(CommonEnums.BURST_SHOT);
+        }
+        onGetVideoPinStatus:
+        {
+            root.enableVideoPin(true);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("raw")
+            stillImageFormat.push("png")
+            root.insertStillImageFormat(stillImageFormat);
+        }
+    }
     ScrollView
     {
         id: scrollview
@@ -62,6 +83,7 @@ Item
                         maualFocus_grid.opacity = 1
                         auto_focus_grid.enabled = false
                         auto_focus_grid.opacity = 0.1
+                         ecam51AUSBId.getFocusPosition()
                       }
                     Keys.onReturnPressed:  {
                         ecam51AUSBId.selectFocusMode(Ecam51AUSB.MANUAL_FOCUS_SELECT)
@@ -129,7 +151,7 @@ Item
                         opacity: 1
                         activeFocusOnPress : true
                         text: "Get Status"
-                        tooltip: "Click to get AF"
+                        tooltip: "Click to get AF status"
                         style: econButtonStyle
                         onClicked:
                         {
@@ -189,6 +211,7 @@ Item
                         onValueChanged:
                         {
                             ecam51AUSBId.setManualFocusPosition(manualfocusSlider.value)
+                            ecam51AUSBId.getFocusPosition()
                         }
                     }
                     TextField
@@ -471,7 +494,6 @@ Item
             }
             else
             {
-                console.log("In else")
                 dio_status_textfield.text = "LOW"
                 dio_status_textfield.color = "red"
             }
@@ -666,6 +688,7 @@ Item
         {
             ecam51AUSBId.rungetAFStatus()
             ecam51AUSBId.getGPIStatus()
+            ecam51AUSBId.getFocusPosition()
             stop()
         }
     }

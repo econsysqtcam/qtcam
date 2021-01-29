@@ -43,7 +43,7 @@
 #include <QTimer>
 #include <QAudioDeviceInfo>
 #include <QAudioInput>
-
+#include <QProcess>
 #include "audioinput.h"
 
 
@@ -379,11 +379,16 @@ void AudioInput::pa_sourcelist_cb(pa_context *c, const pa_source_info *l, int eo
     /* This function connects to the pulse server */
     if(pa_context_connect(pa_ctx, NULL, (pa_context_flags_t)0x0000U, NULL) < 0)
     {
-        fprintf(stderr,"AUDIO: PULSE - unable to connect to server: pa_context_connect failed\n");
-        finish(pa_ctx, pa_ml);
-        return -1;
+        process.start("bash", QStringList() << "-c" << "sudo pulseaudio -D");
+        process.waitForFinished();
+        if(process.exitStatus() <0)
+        {
+            fprintf(stderr,"AUDIO: PULSE - unable to connect to server: pa_context_connect failed\n");
+            finish(pa_ctx, pa_ml);
+            return -1;
+        }
+        pa_context_connect(pa_ctx, NULL, (pa_context_flags_t)0x0000U, NULL);
     }
-
     /*
      * This function defines a callback so the server will tell us
      * it's state.

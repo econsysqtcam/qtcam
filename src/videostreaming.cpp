@@ -1248,10 +1248,8 @@ void Videostreaming::capFrame()
 
         emit deviceUnplugged("Disconnected","Device Not Found");
         emit logCriticalHandle("Device disconnected");
-
         return;
     }
-    
     if (again) {
         return;
     }
@@ -1482,6 +1480,11 @@ void Videostreaming::capFrame()
             m_snapShot = false;
             retrieveShot = false;
             if(m_burstNumber == m_burstLength){
+                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode) //Added by M.Vishnu Murali:for 24CUG in trigger mode consider the preview settings while
+                {                                                                             //saving image.
+                    stillSize=lastPreviewSize;
+                    stillOutFormat = lastFormat;
+                }
                 if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
                 {
                     if(m_displayCaptureDialog){
@@ -1551,6 +1554,7 @@ void Videostreaming::capFrame()
     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode) //Added by M.VishnuMurali: For capturing trigger mode images.
     {
     	m_renderer->gotFrame = false;
+        m_renderer->updateStop = true;
         emit   triggerShotCap();
 
     }
@@ -2605,12 +2609,15 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     triggerShot = false;
     changeFpsAndShot = false;
     m_displayCaptureDialog = true;
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG&&trigger_mode)
+        return;
 
     if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {
         m_renderer->updateStop = true;
         stopCapture();
         vidCapFormatChanged(stillOutFormat);
+
         setResoultion(stillSize);
         if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB)
         {
@@ -3590,6 +3597,7 @@ void Videostreaming::retrieveFrameFromStoreCam() {
  *                        false - switch to preview
  */
 void Videostreaming::switchToStillPreviewSettings(bool stillSettings){
+
 
     if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {

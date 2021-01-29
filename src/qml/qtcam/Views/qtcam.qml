@@ -1297,9 +1297,8 @@ signal disableStillProp(bool status);
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_24CUG) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam24cug/see3cam_24cug.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU81) {
-                    console.log("Creating")
                     see3cam = Qt.createComponent("../UVCSettings/see3cam_cu81/see3cam_cu81.qml").createObject(root)
-        }else if(selectedDeviceEnumValue == CommonEnums.ECAM51A_USB) {
+        }else if(selectedDeviceEnumValue == CommonEnums.ECAM51A_USB || selectedDeviceEnumValue == CommonEnums.ECAM51B_USB ) {
             see3cam = Qt.createComponent("../UVCSettings/ecam51A_USB/ecam51A_usb.qml").createObject(root)
         }
         else {

@@ -32,7 +32,7 @@ Item {
         target: vidstreamproperty
         onTriggerShotCap:
         {
-             imageCapture(CommonEnums.SNAP_SHOT)
+             root.imageCapture(CommonEnums.SNAP_SHOT)
         }
 
     }
@@ -378,6 +378,16 @@ Item {
                     Keys.onReturnPressed: {
                         root.checkForTriggerMode(true)
                         setTriggerMode()
+                    }
+                }
+                CheckBox
+                {
+                    id:autofunctionlock
+                    style: econCheckBoxStyle
+                    text: "AutoFunctionLock"
+                    onCheckedChanged:
+                    {
+                        see3cam24cug.setStreamMode( rdoModeMaster.checked?See3Cam24CUG.MODE_MASTER:See3Cam24CUG.MODE_TRIGGER,autofunctionlock.checked)
                     }
                 }
             }
@@ -1064,6 +1074,7 @@ Item {
                 rdoModeTrigger.checked = true
                 root.stopUpdatePreviewInTriggerMode()
             }
+            autofunctionlock.checked = autoFunctionLock
         }
         onSendEffectMode:{
             switch(effectMode){
@@ -1377,15 +1388,16 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
-        see3cam24cug.setStreamMode(See3Cam24CUG.MODE_MASTER)
+        see3cam24cug.setStreamMode(See3Cam24CUG.MODE_MASTER,autofunctionlock.checked)
         root.startUpdatePreviewInMasterMode()
     }
     function setTriggerMode(){
-  	root.disableStillProp(false)
+    root.disableStillProp(false)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
         root.stopUpdatePreviewInTriggerMode()
-        see3cam24cug.setStreamMode(See3Cam24CUG.MODE_TRIGGER)
+        see3cam24cug.setStreamMode(See3Cam24CUG.MODE_TRIGGER,autofunctionlock.checked)
+        displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document See3CAM_24CUG_Trigger_Mode"))
         root.stopUpdatePreviewInTriggerMode()
     }
     Connections{

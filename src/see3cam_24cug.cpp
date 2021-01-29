@@ -57,7 +57,7 @@ bool See3CAM_24CUG::setEffectMode(const See3CAM_24CUG::specialEffects &specialEf
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_24CUG; /* Camera control id */
     g_out_packet_buf[2] = SET_SPECIALEFFECT_24CUG; /* Set effect mode command */
-    g_out_packet_buf[3] = specialEffect; /* Scene mode to set */
+    g_out_packet_buf[3] = specialEffect; /* SpecialEffect to set */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -823,6 +823,7 @@ bool See3CAM_24CUG::setFlashState(See3CAM_24CUG::flashStateValues flashMode)
 bool See3CAM_24CUG::getStreamMode()
 {
     uint streamMode;
+    bool autoFunctionLock;
 
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -845,7 +846,8 @@ bool See3CAM_24CUG::getStreamMode()
             g_in_packet_buf[1]==GET_STREAM_MADE_24CUG  &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             streamMode = g_in_packet_buf[2];
-            emit streamModeValue(streamMode);
+            autoFunctionLock = g_in_packet_buf[3];
+            emit streamModeValue(streamMode,autoFunctionLock);
             return true;
         }
     }
@@ -853,7 +855,7 @@ bool See3CAM_24CUG::getStreamMode()
 
 }
 
-bool See3CAM_24CUG::setStreamMode(See3CAM_24CUG::streamModes streamMode)
+bool See3CAM_24CUG::setStreamMode(See3CAM_24CUG::streamModes streamMode, bool autoFunctionLock)
 {
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -867,6 +869,7 @@ bool See3CAM_24CUG::setStreamMode(See3CAM_24CUG::streamModes streamMode)
     g_out_packet_buf[1] =CAMERA_CONTROL_24CUG; /* set camera control code */
     g_out_packet_buf[2] = SET_STREAM_MADE_24CUG ; /* set stream mode code */
     g_out_packet_buf[3] = streamMode; /* actual stream mode */
+    g_out_packet_buf[4] = autoFunctionLock;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -876,7 +879,6 @@ bool See3CAM_24CUG::setStreamMode(See3CAM_24CUG::streamModes streamMode)
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_24CUG &&
             g_in_packet_buf[1]==SET_STREAM_MADE_24CUG  &&
             g_in_packet_buf[6]==SET_SUCCESS) {
-
             return true;
         }
     }

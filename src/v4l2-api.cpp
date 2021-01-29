@@ -541,7 +541,6 @@ bool v4l2::streamon(__u32 buftype)
 {
 	return ioctl("Start Streaming", VIDIOC_STREAMON, &buftype);
 }
-
 bool v4l2::streamoff(__u32 buftype)
 {
 	return ioctl("Stop Streaming", VIDIOC_STREAMOFF, &buftype);

@@ -1,3 +1,9 @@
+Qtcam Application - 24.0.2
+---------------------------
+*Changed Stream mode control for See3CAM_24CUG.
+*Added autofocuslock control for See3CAM_24CUG.
+*Added Connections in qml for ECAM51A_USB. 
+
 Qtcam Application - 24.0.1
 ---------------------------
 *Added fix for disabling AF rect while stillcapture for See3CAM_130D.

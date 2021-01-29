@@ -6,6 +6,7 @@
 #include <pulse/pulseaudio.h>
 #include <QAudioFormat>
 #include <QAudioDeviceInfo>
+#include <QProcess>
 #include "videoencoder.h"
 #include "alsa.h"
 
@@ -171,7 +172,7 @@ private:
     VideoEncoder vidEncoderCopy;
 
     QTimer *timer;
-
+    QProcess process;
 
 public slots:
     audio_buff_t *audio_get_buffer();

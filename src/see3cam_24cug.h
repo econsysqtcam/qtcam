@@ -177,7 +177,7 @@ signals:
     void smileDetectModeValue(uint smileDetectMode, uint smileDetectEmbedDataValue);
     void flashModeValue(uint flashMode);
     void flickerDetectionMode(uint flickerMode);
-    void streamModeValue(uint streamMode);
+    void streamModeValue(uint streamMode,bool autoFunctionLock);
 
 public slots:
 
@@ -219,7 +219,7 @@ public slots:
     bool setFlashState(flashStateValues flashMode);
 
     bool getStreamMode();
-    bool setStreamMode(streamModes streamMode);
+    bool setStreamMode(streamModes streamMode , bool autoFunctionLock);
 
     bool setToDefault();
 };

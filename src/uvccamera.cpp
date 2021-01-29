@@ -101,6 +101,7 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",D400"),CommonEnums::NONE);//See3CAM_160_EVALKIT
     cameraEnumMap.insert(econVid + (",C180"),CommonEnums::SEE3CAM_CU81);
     cameraEnumMap.insert(econVid + (",C058"),CommonEnums::ECAM51A_USB);
+    cameraEnumMap.insert(econVid + (",c05c"),CommonEnums::ECAM51B_USB);
 }
 
 unsigned int uvccamera::getTickCount()
