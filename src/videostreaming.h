@@ -410,7 +410,7 @@ private:
     bool onY12Format;
     bool windowResized;
     uint resizedWidth,resizedHeight,changeFPSForHyperyon;
-
+    bool check_jpeg_header(void *inputbuffer, __u32 bytesUsed);
 
 private slots:
     void handleWindowChanged(QQuickWindow *win); 

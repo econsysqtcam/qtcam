@@ -1194,7 +1194,6 @@ bool Videostreaming::saveIRImage(){
     return true;
 }
 
-
 void Videostreaming::setPreviewBgrndArea(int width, int height, bool sidebarAvailable){
     if(m_renderer){
         if(windowResized){  //Update Application width and height only when window is resized.
@@ -1249,6 +1248,13 @@ void Videostreaming::capFrame()
         emit deviceUnplugged("Disconnected","Device Not Found");
         emit logCriticalHandle("Device disconnected");
         return;
+    }
+
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode) //Added by M.VishnuMurali: For capturing trigger mode images.
+    {
+        m_renderer->gotFrame = false;
+        m_renderer->updateStop = true;
+        emit   triggerShotCap();
     }
     if (again) {
         return;
@@ -1551,13 +1557,7 @@ void Videostreaming::capFrame()
     if(windowResized){
         emit setWindowSize(resizedWidth,resizedHeight);
     }
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode) //Added by M.VishnuMurali: For capturing trigger mode images.
-    {
-    	m_renderer->gotFrame = false;
-        m_renderer->updateStop = true;
-        emit   triggerShotCap();
 
-    }
     m_timer.start(2000);
 }
 
@@ -2174,12 +2174,8 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         frameMjpeg = true;
         m_renderer->renderBufferFormat = CommonEnums::RGB_BUFFER_RENDER;
         if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG){
-            if(bytesUsed <= HEADERFRAME1) {
-                emit logCriticalHandle("Ignoring empty buffer");
-                startFrame=false ;
-                return false;
-            }
-            if(((uint8_t *) inputbuffer)[0] == 0xFF && ((uint8_t *) inputbuffer)[1] == 0xD8){
+            if(check_jpeg_header(inputbuffer,bytesUsed))
+            {
                 if(!frameSkip){
                     getFrameRates();
                     frameSkip = true;
@@ -2191,9 +2187,9 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 }else{
                 }
             }
-            else{
+            else
                 return false;
-            }
+
         }
 
         return true;
@@ -2754,6 +2750,20 @@ void Videostreaming::setImageFormatType(QString imgFormatType){
 
 QString Videostreaming::getImageFormatType(){
     return m_imgFormatType;
+}
+//Added by M.VishnuMurali:moved jpeg header checking to seperate function
+bool Videostreaming::check_jpeg_header(void *inputbuffer, __u32 bytesUsed)
+{
+    if(bytesUsed <= HEADERFRAME1)
+    {
+        emit logCriticalHandle("Ignoring empty buffer");
+        startFrame=false ;
+        return false;
+    }
+    for(int i=0;i<8;++i)
+        if(((uint8_t *) inputbuffer)[i] == 0xFF && ((uint8_t *) inputbuffer)[i+1] == 0xD8)
+           return true;
+    return false;
 }
 
 void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint burstLength){
@@ -3544,8 +3554,9 @@ void Videostreaming::triggerModeEnabled() {
 }
 
 void Videostreaming::masterModeEnabled() {
-    m_renderer->updateStop = false;
     trigger_mode = false;
+     m_snapShot = false;
+     m_renderer->updateStop = false;
 }
 //Added by Dhurka - 13th Oct 2016
 /**

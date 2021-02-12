@@ -355,7 +355,10 @@ signal disableStillProp(bool status);
             captureBtnEnable(true)
             videoRecordBtnEnable(true)
             webcamKeyAccept = true
-            keyEventFiltering = false
+            if(getTriggerMode)
+                keyEventFiltering = true
+            else
+                 keyEventFiltering = false
             messageDialog.title = _title.toString()
             messageDialog.text = _text.toString()
             messageDialog.visible = true

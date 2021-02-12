@@ -17,8 +17,8 @@ Item {
     property int qFactorMax: 96
     property int frameRateMin: 1
     property int frameRateMax: 120
-    property int expoCompMin: 8000
-    property int expoCompMax: 1000000
+    property int expoCompMin: 50
+    property int expoCompMax: 100000000
     property bool skipUpdateUIOnExpWindowSize: false
     property bool skipUpdateUIOnBurstLength: false
     property bool skipUpdateUIQFactor : false
@@ -296,7 +296,7 @@ Item {
                 spacing: 9
                 Text {
                     id: exposureCompText
-                    text: "value(µs)[8000 - 1000000]"
+                    text: "value(µs)[50 - 100000000]"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -321,6 +321,8 @@ Item {
                     id: exposureCompSet
                     activeFocusOnPress : true
                     text: "Set"
+                    tooltip: "You can set the required exposure compensation value by changing the
+value in the text box and click the Set button"
                     style: econButtonStyle
                     enabled: true
                     opacity: 1
@@ -372,11 +374,9 @@ Item {
                     exclusiveGroup: streamModeGroup
                     activeFocusOnPress: true
                     onClicked: {
-                        root.checkForTriggerMode(true)
                         setTriggerMode()
                     }
                     Keys.onReturnPressed: {
-                        root.checkForTriggerMode(true)
                         setTriggerMode()
                     }
                 }
@@ -1069,10 +1069,16 @@ Item {
                 rdoModeMaster.checked = true
                 root.startUpdatePreviewInMasterMode()
                 root.disableStillProp(true)
+                root.captureBtnEnable(true)
+                root.videoRecordBtnEnable(true)
+                root.checkForTriggerMode(false)
             }else if(streamMode == See3Cam24CUG.MODE_TRIGGER){
                 root.disableStillProp(false)
                 rdoModeTrigger.checked = true
                 root.stopUpdatePreviewInTriggerMode()
+                root.captureBtnEnable(false)
+                root.videoRecordBtnEnable(false)
+                root.checkForTriggerMode(true)
             }
             autofunctionlock.checked = autoFunctionLock
         }
@@ -1278,7 +1284,7 @@ Item {
     function enableFaceDetectEmbedData(){
         if(see3cam24cug.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){
             if(faceDetectEmbedData.checked){
-                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_CU30_Face_and_Smile_Detection for more details"))
+                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_24CUG_Face_and_Smile_Detection for more details"))
             }
         }
     }
@@ -1296,7 +1302,7 @@ Item {
         if(see3cam24cug.setSmileDetection(true, smileDetectEmbedData.checked)){
             if(smileDetectEmbedData.checked){
                 messageDialog.title = qsTr("Status")
-                messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_CU30_Face_and_Smile_Detection for more details")
+                messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_24CUG_Face_and_Smile_Detection for more details")
                 messageDialog.open()
             }
         }
@@ -1363,6 +1369,7 @@ Item {
     function setDefaultValues(){
         defaultValue.enabled = false //To avoid multiple clicks over Default button
         see3cam24cug.setToDefault()
+        root.keyEventFiltering = false
         getCameraValues()
         defaultValue.enabled = true
     }
@@ -1376,7 +1383,7 @@ Item {
         see3cam24cug.getOrientation()
         see3cam24cug.getFrameRateCtrlValue()
         see3cam24cug.getFlickerDetection()
-        see3cam24cug.getExposureCompensation()
+        getexposureCompFrameRateCtrlTimer.start()
         see3cam24cug.getFaceDetectMode()
         see3cam24cug.getSmileDetectMode()
         see3cam24cug.getFlashState()
@@ -1384,7 +1391,7 @@ Item {
     }
 
     function setMasterMode(){
-  root.disableStillProp(true)
+        root.disableStillProp(true)
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
@@ -1392,13 +1399,13 @@ Item {
         root.startUpdatePreviewInMasterMode()
     }
     function setTriggerMode(){
-    root.disableStillProp(false)
+        root.disableStillProp(false)
+        root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
         root.stopUpdatePreviewInTriggerMode()
         see3cam24cug.setStreamMode(See3Cam24CUG.MODE_TRIGGER,autofunctionlock.checked)
         displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document See3CAM_24CUG_Trigger_Mode"))
-        root.stopUpdatePreviewInTriggerMode()
     }
     Connections{
         target: root
@@ -1418,6 +1425,9 @@ Item {
         }
         onVideoColorSpaceChanged:{
             getexposureCompFrameRateCtrlTimer.start()
+        }
+        onAfterRecordVideo:{
+            root.keyEventFiltering = true
         }
     }
 }

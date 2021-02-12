@@ -6,8 +6,8 @@
 
 #define CAMERA_CONTROL_24CUG 0xA8
 
-#define EXPOSURECOMP_MIN 8000
-#define EXPOSURECOMP_MAX 1000000
+#define EXPOSURECOMP_MIN 50
+#define EXPOSURECOMP_MAX 100000000
 
 #define SMILE_THRESHOLD_MIN 40
 #define SMILE_THRESHOLD_MAX 75
@@ -149,8 +149,8 @@ public:
     Q_ENUMS(camSmileDetectEmbedDataMode)
 
     enum flashStateValues{
-         FLASHMODE_STROBE = 0x00,
-        FLASHMODE_OFF = 0x01
+        FLASHMODE_OFF = 0x00,
+         FLASHMODE_STROBE = 0x01
      };
      Q_ENUMS(flashStateValues)
 
