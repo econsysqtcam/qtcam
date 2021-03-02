@@ -1,3 +1,7 @@
+Qtcam Application - 24.0.4
+---------------------------
+*Added fix for Preview during Trigger Mode in MJPEG for See3CAM_24CUG.
+
 Qtcam Application - 24.0.3
 ---------------------------
 *Updated Exposure Compensation value for See3CAM_24CUG.

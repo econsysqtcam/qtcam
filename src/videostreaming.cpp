@@ -1731,7 +1731,10 @@ bailout:
     }
 
     obj->m_renderer->renderyuyvMutex.unlock();
-    obj->m_renderer->gotFrame = true;
+    if(!obj->trigger_mode)
+    {
+        obj->m_renderer->gotFrame = true;
+    }
     obj->frameSkip = false;
     return retval;
 }
