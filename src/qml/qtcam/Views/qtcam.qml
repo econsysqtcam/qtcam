@@ -352,7 +352,7 @@ signal disableStillProp(bool status);
 
         onTitleTextChanged:{
             vidstreamproperty.enabled = true
-            if(!getTriggerMode)
+            if(!getTriggerMode)                 //Added by Nivedha: 09 Mar 2021 -- To enable capture and video record button only for master mode
             {
                 captureBtnEnable(true)
                 videoRecordBtnEnable(true)
@@ -432,7 +432,7 @@ signal disableStillProp(bool status);
                 uvc_settings.enabled = true
                 uvc_settings.opacity = 1
             }
-            captureVideoRecordRootObject.captureBtnSelected()
+            captureVideoRecordRootObject.captureBtnSelected()       //Added by Nivedha: 09 Mar 2021 -- To enable camera button as default when device is unplugged and reconnected
             if(sideBarItems.visible){ // only when side bar items visible
                 //When device is unplugged,need to destroy the active camera qml and create default qml file
                 if(see3cam){
@@ -546,7 +546,7 @@ signal disableStillProp(bool status);
         // Added by Navya : 11 Feb 2020
         // Disabling capturing images while switching Resolutions (false - disable ,true -enable )
         onSignalToSwitchResoln:{
-            if(!getTriggerMode)
+            if(!getTriggerMode)             //Added by Nivedha: 09 Mar 2021 -- To enable capture and video record button only for master mode
             {
                 if(switchResoln){
                     keyEventFiltering = false
@@ -1439,7 +1439,7 @@ signal disableStillProp(bool status);
 
     Keys.onReleased: {
         if(event.key === Qt.Key_I) {
-            if((!keyEventFiltering  && !getTriggerMode)) {
+            if((!keyEventFiltering  && !getTriggerMode)) {      //Added by Nivedha: 09 Mar 2021 -- To enable capturing images only for master mode
                 mouseClickCapture()
             }
         }
@@ -1644,7 +1644,7 @@ signal disableStillProp(bool status);
         else
         {
             keyEventFiltering = false;
-            seqAni.start()
+            seqAni.start()                  //Added by Nivedha: 09 Mar 2021 -- To start sequential animation which was stopped during image capture in trigger mode
         }
     }
 

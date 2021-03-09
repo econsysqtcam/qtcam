@@ -3559,7 +3559,7 @@ void Videostreaming::triggerModeEnabled() {
 void Videostreaming::masterModeEnabled() {
     trigger_mode = false;
      m_snapShot = false;
-     m_renderer->gotFrame = true;
+     m_renderer->gotFrame = true;        // Added by Nivedha : 09 Mar 2021 -- To get preview when changed from trigger mode to master mode.
      m_renderer->updateStop = false;
 }
 //Added by Dhurka - 13th Oct 2016
