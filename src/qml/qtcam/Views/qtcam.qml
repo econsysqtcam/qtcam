@@ -352,8 +352,11 @@ signal disableStillProp(bool status);
 
         onTitleTextChanged:{
             vidstreamproperty.enabled = true
-            captureBtnEnable(true)
-            videoRecordBtnEnable(true)
+            if(!getTriggerMode)
+            {
+                captureBtnEnable(true)
+                videoRecordBtnEnable(true)
+            }
             webcamKeyAccept = true
             if(getTriggerMode)
                 keyEventFiltering = true
@@ -429,6 +432,7 @@ signal disableStillProp(bool status);
                 uvc_settings.enabled = true
                 uvc_settings.opacity = 1
             }
+            captureVideoRecordRootObject.captureBtnSelected()
             if(sideBarItems.visible){ // only when side bar items visible
                 //When device is unplugged,need to destroy the active camera qml and create default qml file
                 if(see3cam){
@@ -542,13 +546,16 @@ signal disableStillProp(bool status);
         // Added by Navya : 11 Feb 2020
         // Disabling capturing images while switching Resolutions (false - disable ,true -enable )
         onSignalToSwitchResoln:{
-            if(switchResoln){
-                keyEventFiltering = false
-                captureBtnEnable(true)
-            }
-            else {
-                keyEventFiltering = true
-                captureBtnEnable(false)
+            if(!getTriggerMode)
+            {
+                if(switchResoln){
+                    keyEventFiltering = false
+                    captureBtnEnable(true)
+                }
+                else {
+                    keyEventFiltering = true
+                    captureBtnEnable(false)
+                }
             }
         }
 
@@ -1432,7 +1439,7 @@ signal disableStillProp(bool status);
 
     Keys.onReleased: {
         if(event.key === Qt.Key_I) {
-            if((!keyEventFiltering)) {
+            if((!keyEventFiltering  && !getTriggerMode)) {
                 mouseClickCapture()
             }
         }
@@ -1635,7 +1642,10 @@ signal disableStillProp(bool status);
         if(mode)
             keyEventFiltering = true;
         else
+        {
             keyEventFiltering = false;
+            seqAni.start()
+        }
     }
 
     //Added by Navya - 3rd June 2019 -- Disabling powerLine Frequency due to mismatch in set and get controls from HID and v4l2.
