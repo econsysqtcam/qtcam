@@ -110,6 +110,7 @@ public:
     __u32 width,height;
      __u32 x1,y1;
     bool gotFrame;
+    bool triggermodeFlag;
     bool copied;
     unsigned fps;
 
@@ -332,6 +333,7 @@ private:
     bool m_VideoRecord;
     bool previewStop;
     bool trigger_mode;
+    int triggermode_skipframes;
 
     QSocketNotifier *m_capNotifier;
 
@@ -636,6 +638,8 @@ public slots:
     bool setUvcExtControlValue(struct uvc_xu_control_query xquery);
 
     void doEncodeAudio();
+    void triggerModeSkipframes();
+
 
 signals:
     void   triggerShotCap();

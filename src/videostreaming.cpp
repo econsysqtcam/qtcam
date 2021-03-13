@@ -160,6 +160,7 @@ Videostreaming::Videostreaming() : m_t(0)
     videoEncoder=new VideoEncoder();
     m_convertData = NULL;
     trigger_mode = false;
+    triggermode_skipframes = 0;
 }
 
 Videostreaming::~Videostreaming()
@@ -297,6 +298,7 @@ FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
     greyBuffer = NULL;
     rgbaDestBuffer = NULL;
     gotFrame = false;
+    triggermodeFlag = false;
     updateStop = true;
     m_formatChange = false;
     m_videoResolnChange = false;
@@ -1031,7 +1033,7 @@ void FrameRenderer::shaderUYVY(){
 */
 void FrameRenderer::paint()
 {
-    if(gotFrame){
+    if(gotFrame && !triggermodeFlag){               //Added by Nivedha : 12 Mar 2021 -- To avoid getting preview in trigger mode.
         if(m_formatChange | m_videoResolnChange){  // Call to change Shader on format and Resolution change
             m_formatChange = false;
             changeShader();
@@ -1254,7 +1256,10 @@ void Videostreaming::capFrame()
     {
         m_renderer->gotFrame = false;
         m_renderer->updateStop = true;
-        emit   triggerShotCap();
+        if(triggermode_skipframes)
+                    triggermode_skipframes--;
+        else
+            emit triggerShotCap();
     }
     if (again) {
         return;
@@ -2853,6 +2858,8 @@ void Videostreaming::displayFrame() {
         }
         return void();
     }
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode)
+        triggerModeSkipframes();            //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when format changed in trigger mode.
 
     if (getInterval(interval))
         set_interval(buftype, interval);
@@ -3071,6 +3078,8 @@ void Videostreaming::setResoultion(QString resolution)
     m_height = height;
     try_fmt(fmt);
     s_fmt(fmt);
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode)
+        triggerModeSkipframes();            //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when format changed in trigger mode.
     m_renderer->m_videoResolnChange = true;
 }
 
@@ -3169,6 +3178,8 @@ void Videostreaming::vidCapFormatChanged(QString idx)
     fmt.fmt.pix.pixelformat = desc.pixelformat;
     try_fmt(fmt);
     s_fmt(fmt);
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode)
+        triggerModeSkipframes();             //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when format changed in trigger mode.
     if(!makeSnapShot){
         updateVidOutFormat();
     }
@@ -3551,13 +3562,23 @@ void Videostreaming::stopUpdatePreview() {
     m_renderer->updateStop = true;
 }
 
+void Videostreaming::triggerModeSkipframes() {
+    triggermode_skipframes = 3;
+}
+
 void Videostreaming::triggerModeEnabled() {
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG)
+    {
+        triggerModeSkipframes();                //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when trigger mode is enabled.
+        m_renderer->triggermodeFlag = true;
+    }
     trigger_mode = true;
     stopUpdatePreview();
 }
 
 void Videostreaming::masterModeEnabled() {
     trigger_mode = false;
+    m_renderer->triggermodeFlag = false;
      m_snapShot = false;
      m_renderer->gotFrame = true;        // Added by Nivedha : 09 Mar 2021 -- To get preview when changed from trigger mode to master mode.
      m_renderer->updateStop = false;

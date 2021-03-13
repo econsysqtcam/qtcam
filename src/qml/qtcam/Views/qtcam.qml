@@ -1439,7 +1439,7 @@ signal disableStillProp(bool status);
 
     Keys.onReleased: {
         if(event.key === Qt.Key_I) {
-            if((!keyEventFiltering  && !getTriggerMode)) {      //Added by Nivedha: 09 Mar 2021 -- To enable capturing images only for master mode
+            if((!keyEventFiltering  && !getTriggerMode && captureVideoRecordRootObject.captureBtnVisible)) {      //Added by Nivedha: 09 Mar 2021 -- To enable capturing images only for master mode
                 mouseClickCapture()
             }
         }
