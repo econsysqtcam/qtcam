@@ -1261,6 +1261,10 @@ void Videostreaming::capFrame()
         else
             emit triggerShotCap();
     }
+    else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode)
+    {
+        m_renderer->gotFrame = true;
+    }
     if (again) {
         return;
     }
@@ -3564,6 +3568,10 @@ void Videostreaming::stopUpdatePreview() {
 
 void Videostreaming::triggerModeSkipframes() {
     triggermode_skipframes = 3;
+}
+
+void Videostreaming::updatepreview() {
+    makeSnapShot = false;
 }
 
 void Videostreaming::triggerModeEnabled() {

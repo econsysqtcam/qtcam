@@ -1,5 +1,5 @@
-#ifndef ECAM51A_USB_H
-#define ECAM51A_USB_H
+#ifndef ECAM51_USB_H
+#define ECAM51_USB_H
 
 #include "videostreaming.h"
 #include <QObject>
@@ -46,6 +46,8 @@
 #define EEPROM_DEVICE_ADDRESS_FOR_WRITE_OPERATION 	0xA1
 #define EEPROM_FW_START_ADDRESS				0x0000
 #define EEPROM_FW_END_ADDRESS				0x8000
+#define EEPROM_51B_FWV_REG_ADDRESS1         0x0094
+#define EEPROM_51B_FWV_REG_ADDRESS2         0x0095
 #define EEPROM_FWV_REG_ADDRESS1				0x0096
 #define EEPROM_FWV_REG_ADDRESS2				0x0097
 #define EEPROM_FWV_REG_ADDRESS3				0x0098
@@ -75,7 +77,7 @@
 
 #define EXT_BUTTONS_REG_ADDR				0x8107
 
-class ecam51A_USB : public QObject , public v4l2
+class ecam51_USB : public QObject , public v4l2
 {
     Q_OBJECT
 public:
@@ -85,8 +87,8 @@ public:
     static uint AFStatus;
     QFuture <bool >threadMonitor;
 
-    explicit ecam51A_USB(QObject *parent = NULL);
-    ~ecam51A_USB();
+    explicit ecam51_USB(QObject *parent = NULL);
+    ~ecam51_USB();
     enum getValueQueryType{
         UVC_GET_CUR = 0x81,
         UVC_GET_DEF = 0x87,
@@ -148,20 +150,21 @@ private:
     int diagnostic_control(int diagnostic_option);
     bool getControlValue(__u8 controlId, __u8 queryType, uint numberOfValues, __u8 *outputValues);
     int auto_focus_control(int focus_options);
+
 signals:
     void  manualFocusPosition(uint FocusPosition);
     void autoFocusStatus(uint AFStatus);
     void titleTextChanged(QString _title, QString _text);
     void gpioStatus(uint value);
 public slots:
+
     void initUVCExtensionUnit(Videostreaming  *vobj);
     void deInitUVCExtensionUnit();
 
-    bool getFirmwareVersion();
     bool getSensorId();
 
     void rungetAFStatus();
-    static bool getAFStatus(ecam51A_USB *device);
+    static bool getAFStatus(ecam51_USB *device);
     bool selectFocusMode(uint mode);
 
     bool getFocusPosition();
@@ -169,6 +172,9 @@ public slots:
 
     bool getGPIStatus();
     bool controlGPO(uint GPIONumber, uint Value);
+
+    bool readFirmwareVersion51aUSB();
+    bool readFirmwareVersion51bUSB();
 };
 
-#endif // ECAM51A_USB_H
+#endif // ECAM51_USB_H

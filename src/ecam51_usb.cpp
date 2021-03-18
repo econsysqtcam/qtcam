@@ -1,18 +1,18 @@
-#include "ecam51a_usb.h"
+#include "ecam51_usb.h"
 
-uint ecam51A_USB::AFStatus;
+uint ecam51_USB::AFStatus;
 
-ecam51A_USB::ecam51A_USB(QObject *parent) : QObject(parent)
+ecam51_USB::ecam51_USB(QObject *parent) : QObject(parent)
 {
     gvobj = NULL;
 }
 
-ecam51A_USB::~ecam51A_USB()
+ecam51_USB::~ecam51_USB()
 {
         threadMonitor.waitForFinished();
 }
 
-bool ecam51A_USB::getControlValue(__u8 controlId, __u8 queryType, uint numberOfValues, __u8 *outputValues)
+bool ecam51_USB::getControlValue(__u8 controlId, __u8 queryType, uint numberOfValues, __u8 *outputValues)
 {
     if(!gvobj)
       return false;
@@ -64,7 +64,7 @@ bool ecam51A_USB::getControlValue(__u8 controlId, __u8 queryType, uint numberOfV
  *  Returns	:	  int
  *  Description	: Control function for autofocus mode control
  */
-int ecam51A_USB::auto_focus_control(int focus_option)
+int ecam51_USB::auto_focus_control(int focus_option)
 {
     unsigned char focus_status, reg_value;
     //unsigned int sensor_addr = 0;
@@ -165,7 +165,7 @@ int ecam51A_USB::auto_focus_control(int focus_option)
     return true;
 }
 
-unsigned char ecam51A_USB::reg_read_eeprom(__u16 reg_address)
+unsigned char ecam51_USB::reg_read_eeprom(__u16 reg_address)
 {
     unsigned char data[]={0x00, 0x00, 0x00, 0x00};
 
@@ -193,7 +193,7 @@ unsigned char ecam51A_USB::reg_read_eeprom(__u16 reg_address)
 
 }
 
-int ecam51A_USB::read_sensor_reg(unsigned int reg_address, unsigned char *reg_data)
+int ecam51_USB::read_sensor_reg(unsigned int reg_address, unsigned char *reg_data)
 {
     unsigned char data[]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
@@ -240,7 +240,7 @@ int ecam51A_USB::read_sensor_reg(unsigned int reg_address, unsigned char *reg_da
     return true;
 }
 
-bool ecam51A_USB::write_sensor_reg(unsigned int reg_address, unsigned char reg_data)
+bool ecam51_USB::write_sensor_reg(unsigned int reg_address, unsigned char reg_data)
 {
     unsigned char data[]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
@@ -266,7 +266,7 @@ bool ecam51A_USB::write_sensor_reg(unsigned int reg_address, unsigned char reg_d
     return true;
 }
 
-bool ecam51A_USB::write_gpo_register(unsigned int reg_addr, unsigned char reg_data)
+bool ecam51_USB::write_gpo_register(unsigned int reg_addr, unsigned char reg_data)
 {
     unsigned char data[]={0x00,0x00,0x00,0x00};
     data[0] = REG_CONTROL_WRITE_REGISTER;
@@ -279,7 +279,7 @@ bool ecam51A_USB::write_gpo_register(unsigned int reg_addr, unsigned char reg_da
     return true;
 }
 
-int ecam51A_USB::read_key_status_register()
+int ecam51_USB::read_key_status_register()
 {
     int value=0;
     unsigned char data[]={0x00,(EXT_BUTTONS_REG_ADDR & 0xFF), (EXT_BUTTONS_REG_ADDR>>8), 0x00};
@@ -304,7 +304,7 @@ int ecam51A_USB::read_key_status_register()
     return value;
 }
 
-int ecam51A_USB::clear_key_status_register(unsigned char value)
+int ecam51_USB::clear_key_status_register(unsigned char value)
 {
    unsigned char data[]={0x00,(EXT_BUTTONS_REG_ADDR & 0xFF), (EXT_BUTTONS_REG_ADDR>>8), 0x00};
 
@@ -335,7 +335,7 @@ int ecam51A_USB::clear_key_status_register(unsigned char value)
    return true;
 }
 
-int ecam51A_USB::diagnostic_control(int diagnostic_option)
+int ecam51_USB::diagnostic_control(int diagnostic_option)
 {
     unsigned char sensor_id1_value, sensor_id2_value;
     switch(diagnostic_option)
@@ -369,7 +369,7 @@ int ecam51A_USB::diagnostic_control(int diagnostic_option)
     return FAILURE;
 }
 
-void ecam51A_USB::initUVCExtensionUnit(Videostreaming *vobj)
+void ecam51_USB::initUVCExtensionUnit(Videostreaming *vobj)
 {
     if(!vobj)
         return;
@@ -377,12 +377,12 @@ void ecam51A_USB::initUVCExtensionUnit(Videostreaming *vobj)
     sensor_mode_selection();
 }
 
-void ecam51A_USB::deInitUVCExtensionUnit()
+void ecam51_USB::deInitUVCExtensionUnit()
 {
     gvobj = NULL;
 }
 
-bool ecam51A_USB::sensor_mode_selection()
+bool ecam51_USB::sensor_mode_selection()
 {
     unsigned char data[]={REG_CONTROL_WRITE_REGISTER,(SENSOR_MODE_SELECT_REG_ADDR & 0xFF), (SENSOR_MODE_SELECT_REG_ADDR>>8), 0x09};
 
@@ -399,7 +399,7 @@ bool ecam51A_USB::sensor_mode_selection()
     return true;
 }
 
-bool ecam51A_USB::getSensorId()
+bool ecam51_USB::getSensorId()
 {
     int sensor_id1,sensor_id2,SensorId=0;
 
@@ -420,12 +420,12 @@ bool ecam51A_USB::getSensorId()
     return true;
 }
 
-void ecam51A_USB::rungetAFStatus()
+void ecam51_USB::rungetAFStatus()
 {
         threadMonitor=QtConcurrent::run(getAFStatus,this);
 }
 
-bool ecam51A_USB::getAFStatus(ecam51A_USB *device)
+bool ecam51_USB::getAFStatus(ecam51_USB *device)
 {
     int status;
     do
@@ -459,7 +459,7 @@ bool ecam51A_USB::getAFStatus(ecam51A_USB *device)
     return true;
 }
 
-bool ecam51A_USB::selectFocusMode(uint mode)
+bool ecam51_USB::selectFocusMode(uint mode)
 {
     if(auto_focus_control(mode)==FAILURE)
     {
@@ -472,7 +472,7 @@ bool ecam51A_USB::selectFocusMode(uint mode)
  *  Returns	:	true or false
  *  Description	:  to get the Manual Focus Position
  */
-bool ecam51A_USB::getFocusPosition()
+bool ecam51_USB::getFocusPosition()
 {
     __u16 FocusPosition;
     unsigned char reg_value =0;
@@ -502,7 +502,7 @@ bool ecam51A_USB::getFocusPosition()
         return false;
 }
 
-bool ecam51A_USB::setManualFocusPosition(uint FocusPosition)
+bool ecam51_USB::setManualFocusPosition(uint FocusPosition)
 {
     unsigned char reg_value;
     unsigned int timeout = 10;
@@ -528,7 +528,7 @@ bool ecam51A_USB::setManualFocusPosition(uint FocusPosition)
     }
 }
 
-bool ecam51A_USB::getGPIStatus()
+bool ecam51_USB::getGPIStatus()
 {
     int gpi_status =0,GPIStatus=0;
 
@@ -561,7 +561,7 @@ bool ecam51A_USB::getGPIStatus()
     return false;
 }
 
-bool ecam51A_USB::controlGPO(uint GPIONumber, uint Value)
+bool ecam51_USB::controlGPO(uint GPIONumber, uint Value)
 {
     unsigned int reg_addr;
     unsigned char reg_data;
@@ -582,10 +582,64 @@ bool ecam51A_USB::controlGPO(uint GPIONumber, uint Value)
     return false;
 }
 
-bool ecam51A_USB::getFirmwareVersion()
+bool ecam51_USB::readFirmwareVersion51bUSB()
 {
-    int outputValues[4];
     _title = "Firmware Version";
+    int outputValues[6];
+    unsigned short int sdk_ver=0, svn_ver=0;
+
+    if((outputValues[0] = reg_read_eeprom(EEPROM_51B_FWV_REG_ADDRESS1)) == FAILURE)
+     {
+            sprintf(g_buff, "Error in reading EEPROM Firmware Version register1: %x", EEPROM_51B_FWV_REG_ADDRESS1);
+            perror(g_buff);
+            return false;
+     }
+    if((outputValues[1] = reg_read_eeprom(EEPROM_51B_FWV_REG_ADDRESS2)) == FAILURE)
+     {
+            sprintf(g_buff, "Error in reading EEPROM Firmware Version register2: %x", EEPROM_51B_FWV_REG_ADDRESS2);
+            perror(g_buff);
+            return false;
+     }
+    if((outputValues[2] = reg_read_eeprom(EEPROM_FWV_REG_ADDRESS1)) == FAILURE)
+     {
+            sprintf(g_buff, "Error in reading EEPROM Firmware Version register3: %x", EEPROM_FWV_REG_ADDRESS1);
+            perror(g_buff);
+            return false;
+     }
+    if((outputValues[3] = reg_read_eeprom(EEPROM_FWV_REG_ADDRESS2)) == FAILURE)
+     {
+            sprintf(g_buff, "Error in reading EEPROM Firmware Version register4: %x", EEPROM_FWV_REG_ADDRESS2);
+            perror(g_buff);
+            return false;
+     }
+    if((outputValues[4] = reg_read_eeprom(EEPROM_FWV_REG_ADDRESS3)) == FAILURE)
+     {
+            sprintf(g_buff, "Error in reading EEPROM Firmware Version register5: %x", EEPROM_FWV_REG_ADDRESS3);
+            perror(g_buff);
+            return false;
+     }
+    if((outputValues[5] = reg_read_eeprom(EEPROM_FWV_REG_ADDRESS4)) == FAILURE)
+     {
+            sprintf(g_buff, "Error in reading EEPROM Firmware Version register6: %x", EEPROM_FWV_REG_ADDRESS4);
+            perror(g_buff);
+            return false;
+     }
+    _text.clear();
+    _text.append(QString::number(outputValues[0]).append(".").append(QString::number(outputValues[1])));
+    _text.append(".");
+
+    sdk_ver = (outputValues[2]<<8)+outputValues[3];
+    svn_ver = (outputValues[4]<<8)+outputValues[5];
+
+    _text.append(QString::number(sdk_ver).append(".").append(QString::number(svn_ver)));
+    emit titleTextChanged(_title, _text);
+    return true;
+}
+
+bool ecam51_USB::readFirmwareVersion51aUSB()
+{
+    _title = "Firmware Version";
+    int outputValues[4];
 
     if((outputValues[0] = reg_read_eeprom(EEPROM_FWV_REG_ADDRESS1)) == FAILURE)
      {
@@ -595,30 +649,29 @@ bool ecam51A_USB::getFirmwareVersion()
      }
     if((outputValues[1] = reg_read_eeprom(EEPROM_FWV_REG_ADDRESS2)) == FAILURE)
      {
-            sprintf(g_buff, "Error in reading EEPROM Firmware Version register1: %x", EEPROM_FWV_REG_ADDRESS1);
+            sprintf(g_buff, "Error in reading EEPROM Firmware Version register2: %x", EEPROM_FWV_REG_ADDRESS2);
             perror(g_buff);
             return false;
      }
     if((outputValues[2] = reg_read_eeprom(EEPROM_FWV_REG_ADDRESS3)) == FAILURE)
      {
-            sprintf(g_buff, "Error in reading EEPROM Firmware Version register1: %x", EEPROM_FWV_REG_ADDRESS1);
+            sprintf(g_buff, "Error in reading EEPROM Firmware Version register3: %x", EEPROM_FWV_REG_ADDRESS3);
             perror(g_buff);
             return false;
      }
     if((outputValues[3] = reg_read_eeprom(EEPROM_FWV_REG_ADDRESS4)) == FAILURE)
      {
-            sprintf(g_buff, "Error in reading EEPROM Firmware Version register1: %x", EEPROM_FWV_REG_ADDRESS1);
+            sprintf(g_buff, "Error in reading EEPROM Firmware Version register4: %x", EEPROM_FWV_REG_ADDRESS4);
             perror(g_buff);
             return false;
      }
     _text.clear();
-
     _text.append("Firmware Version: 20");
+
     _text.append(QString::number(outputValues[0]).append(".").append(QString::number(outputValues[1])));
     _text.append(".");
 
     _text.append(QString::number(outputValues[2]).append(".").append(QString::number(outputValues[3])));
-
     emit titleTextChanged(_title, _text);
     return true;
 }

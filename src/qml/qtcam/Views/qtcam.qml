@@ -751,7 +751,7 @@ signal disableStillProp(bool status);
                         createExtensionUnitQml(selectedDeviceEnumValue) //setting ondemand mode in fscamcu135 qml oncompleted.
                         vidstreamproperty.startAgain() // Then start preview
                         getStillImageFormats();
-
+                        vidstreamproperty.updatepreview()
                         // Added by Sankari: 12 Feb 2018 - initialize a socket notifier to get key from camera.
                         keyEvent.initializeToGetKey();
 
@@ -1309,7 +1309,10 @@ signal disableStillProp(bool status);
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU81) {
                     see3cam = Qt.createComponent("../UVCSettings/see3cam_cu81/see3cam_cu81.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.ECAM51A_USB || selectedDeviceEnumValue == CommonEnums.ECAM51B_USB ) {
-            see3cam = Qt.createComponent("../UVCSettings/ecam51A_USB/ecam51A_usb.qml").createObject(root)
+            see3cam = Qt.createComponent("../UVCSettings/ecam51_USB/ecam51_usb.qml").createObject(root)
+            see3cam.selectedDeviceEnumVal(selectedDeviceEnumValue)
+        }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_160) {
+            see3cam = Qt.createComponent("../UVCSettings/see3cam160/see3cam_160.qml").createObject(root)
         }
         else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
@@ -1362,6 +1365,8 @@ signal disableStillProp(bool status);
         case CommonEnums.SEE3CAM_130D: //Added by M.VishnuMurali
         case CommonEnums.SEE3CAM_24CUG:
         case CommonEnums.SEE3CAM_CU81:
+
+        case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
             break;
         }

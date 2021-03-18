@@ -24,13 +24,10 @@
 #define SET_QFACTOR_CU81            0x0C
 #define GET_ORIENTATION_CU81        0x0D
 #define SET_ORIENTATION_CU81        0x0E
-#define GET_TEMPERATURE_CU81        0x0F
 #define GET_EXPCOMPENSATION_CU81    0x10
 #define SET_EXPCOMPENSATION_CU81    0x11
 #define GET_FRAMERATE_CU81          0x12
 #define SET_FRAMERATE_CU81          0x13
-#define GET_STROBE_CU81             0x14
-#define SET_STROBE_CU81             0x15
 #define GET_ANTIFLICKER_CU81        0x16
 #define SET_ANTIFLICKER_CU81        0x17
 #define SET_DEFAULTS_CU81           0xFF
@@ -42,8 +39,6 @@ private:
         unsigned char g_out_packet_buf[BUFFER_LENGTH];
         unsigned char g_in_packet_buf[BUFFER_LENGTH];
         void initializeBuffers();
-        QFuture <bool>threadMonitor;
-
 public:
         See3CAM_CU81();
         ~See3CAM_CU81();
@@ -88,13 +83,6 @@ public:
         };
         Q_ENUMS(camAntiFlickerMode)
 
-
-        enum flashStateValues{
-             FLASHMODE_ENABLE = 0x00,
-            FLASHMODE_TORCH = 0x01,
-            FLASHMODE_STROBE = 0x02
-         };
-         Q_ENUMS(flashStateValues)
 signals:
         void sendCameraModeValue(uint cameraMode);
         void sentEffectMode(uint effectMode);
@@ -105,13 +93,11 @@ signals:
         void flipMirrorModeChanged(uint flipMirrorMode);
         void frameRateCtrlValueReceived(uint frameRateCtrlValue);
         void antiFlickerModeChanged(uint flickerMode);
-        void flashModeValue(uint flashMode);
 
         void indicateCommandStatus(QString title, QString text);
         void indicateExposureValueRangeFailure(QString title, QString text);
         void exposureCompValueReceived(uint exposureCompensation);
 
-        void sendCurrentTemperature(int tempValue);
 public slots:
         bool getCameraMode();
         bool setCameraMode(const See3CAM_CU81::cameraModes &cameraMode);
@@ -134,17 +120,11 @@ public slots:
         bool getFlipMode();
         bool setFlipMode(bool horzModeSel, bool vertiModeSel);
 
-        void runGetCurrentTemperature();
-        static bool getCurrentTemperature(See3CAM_CU81 *device);
-
         bool getExposureCompensation();
         bool setExposureCompensation(unsigned int exposureCompValue);
 
         bool getFrameRateCtrlValue();
         bool setFrameRateCtrlValue(uint frameRate);
-
-        bool getFlashState();
-        bool setFlashState(flashStateValues flashMode);
 
         bool getAntiFlickerMode();
         bool setAntiFlickerMode(camAntiFlickerMode antiFlickerMode);

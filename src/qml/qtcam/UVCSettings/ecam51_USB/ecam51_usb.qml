@@ -4,12 +4,14 @@ import QtQuick.Controls.Styles 1.0
 import QtQuick.Dialogs 1.1
 import QtQuick.Layouts 1.1
 import cameraenum 1.0
-import econ.camera.ecam51a_usb 1.0
+import econ.camera.ecam51_usb 1.0
+
 Item
 {
 
 //    width:268
 //    height:750
+    property int selectedDevice;
 
     Action
     {
@@ -24,7 +26,7 @@ Item
         target: root
         onTakeScreenShot:
         {
-                root.imageCapture(CommonEnums.BURST_SHOT);
+                root.imageCapture(CommonEnums.SNAP_SHOT);
         }
         onGetVideoPinStatus:
         {
@@ -78,15 +80,15 @@ Item
                     exclusiveGroup: afGroup
                     activeFocusOnPress: true
                     onClicked: {
-                        ecam51AUSBId.selectFocusMode(Ecam51AUSB.MANUAL_FOCUS_SELECT)
+                        ecam51USBId.selectFocusMode(Ecam51USB.MANUAL_FOCUS_SELECT)
                         maualFocus_grid.enabled = true
                         maualFocus_grid.opacity = 1
                         auto_focus_grid.enabled = false
                         auto_focus_grid.opacity = 0.1
-                         ecam51AUSBId.getFocusPosition()
+                         ecam51USBId.getFocusPosition()
                       }
                     Keys.onReturnPressed:  {
-                        ecam51AUSBId.selectFocusMode(Ecam51AUSB.MANUAL_FOCUS_SELECT)
+                        ecam51USBId.selectFocusMode(Ecam51USB.MANUAL_FOCUS_SELECT)
                         maualFocus_grid.enabled = true
                         maualFocus_grid.opacity = 1
                         auto_focus_grid.enabled = false
@@ -101,14 +103,14 @@ Item
                     exclusiveGroup: afGroup
                     activeFocusOnPress: true
                     onClicked: {
-                         ecam51AUSBId.selectFocusMode(Ecam51AUSB.SINGLE_TRIGGER_AUTO_FOCUS_SELECT)
+                         ecam51USBId.selectFocusMode(Ecam51USB.SINGLE_TRIGGER_AUTO_FOCUS_SELECT)
                         auto_focus_grid.enabled = true
                         auto_focus_grid.opacity = 1
                         maualFocus_grid.enabled = false
                         maualFocus_grid.opacity = 0.1
                       }
                     Keys.onReturnPressed:  {
-                        ecam51AUSBId.selectFocusMode(Ecam51AUSB.SINGLE_TRIGGER_AUTO_FOCUS_SELECT)
+                        ecam51USBId.selectFocusMode(Ecam51USB.SINGLE_TRIGGER_AUTO_FOCUS_SELECT)
                         auto_focus_grid.enabled = true
                         auto_focus_grid.opacity = 1
                         maualFocus_grid.enabled = false
@@ -135,14 +137,14 @@ Item
                         style: econButtonStyle
                         onClicked:
                         {
-                            ecam51AUSBId.selectFocusMode(Ecam51AUSB.SINGLE_TRIGGER_AUTO_FOCUS_SELECT)
-                            ecam51AUSBId.rungetAFStatus()
+                            ecam51USBId.selectFocusMode(Ecam51USB.SINGLE_TRIGGER_AUTO_FOCUS_SELECT)
+                            ecam51USBId.rungetAFStatus()
                         }
 
                         Keys.onReturnPressed:
                         {
-                            ecam51AUSBId.selectFocusMode(Ecam51AUSB.SINGLE_TRIGGER_AUTO_FOCUS_SELECT)
-                            ecam51AUSBId.rungetAFStatus()
+                            ecam51USBId.selectFocusMode(Ecam51USB.SINGLE_TRIGGER_AUTO_FOCUS_SELECT)
+                            ecam51USBId.rungetAFStatus()
                         }
                     }
                     Button
@@ -155,11 +157,11 @@ Item
                         style: econButtonStyle
                         onClicked:
                         {
-                            ecam51AUSBId.rungetAFStatus()
+                            ecam51USBId.rungetAFStatus()
                         }
                         Keys.onReturnPressed:
                         {
-                            ecam51AUSBId.rungetAFStatus()
+                            ecam51USBId.rungetAFStatus()
                         }
                     }
                     Text
@@ -210,8 +212,8 @@ Item
                         maximumValue: 255
                         onValueChanged:
                         {
-                            ecam51AUSBId.setManualFocusPosition(manualfocusSlider.value)
-                            ecam51AUSBId.getFocusPosition()
+                            ecam51USBId.setManualFocusPosition(manualfocusSlider.value)
+                            ecam51USBId.getFocusPosition()
                         }
                     }
                     TextField
@@ -340,11 +342,11 @@ Item
                 style: econButtonStyle
                 onClicked:
                 {
-                    ecam51AUSBId.getGPIStatus()
+                    ecam51USBId.getGPIStatus()
                 }
                 Keys.onReturnPressed:
                 {
-                    ecam51AUSBId.getGPIStatus()
+                    ecam51USBId.getGPIStatus()
                 }
             }
             Text
@@ -372,11 +374,11 @@ Item
                     style: econButtonStyle
                     onClicked:
                     {
-                        ecam51AUSBId.controlGPO(1<<3,Ecam51AUSB.SET)
+                        ecam51USBId.controlGPO(1<<3,Ecam51USB.SET)
                     }
                     Keys.onReturnPressed:
                     {
-                        ecam51AUSBId.controlGPO(1<<3,Ecam51AUSB.SET)
+                        ecam51USBId.controlGPO(1<<3,Ecam51USB.SET)
                     }
                 }
                 Button
@@ -389,11 +391,11 @@ Item
                     style: econButtonStyle
                     onClicked:
                     {
-                        ecam51AUSBId.controlGPO(1<<3,Ecam51AUSB.CLEAR)
+                        ecam51USBId.controlGPO(1<<3,Ecam51USB.CLEAR)
                     }
                     Keys.onReturnPressed:
                     {
-                        ecam51AUSBId.controlGPO(1<<3,Ecam51AUSB.CLEAR)
+                        ecam51USBId.controlGPO(1<<3,Ecam51USB.CLEAR)
                     }
                 }
             }
@@ -453,9 +455,9 @@ Item
             }
         }//END of ColumnLayout
     }//END of ScrollView
-    Ecam51AUSB
+    Ecam51USB
     {
-        id:ecam51AUSBId
+        id:ecam51USBId
 
         onTitleTextChanged:
         {
@@ -463,7 +465,7 @@ Item
         }
         onAutoFocusStatus:
         {
-            if(AFStatus===Ecam51AUSB.MANUAL_FOCUS_)
+            if(AFStatus===Ecam51USB.MANUAL_FOCUS_)
             {
                 manualFocus.checked = true
                 maualFocus_grid.enabled = true
@@ -471,14 +473,14 @@ Item
                 auto_focus_grid.enabled = false
                 auto_focus_grid.opacity = 0.1
             }
-            else if((AFStatus === Ecam51AUSB.AF_SINGLE_TRIGGER_FOCUSED)||(AFStatus === Ecam51AUSB.AF_SINGLE_TRIGGER_FOCUSING))
+            else if((AFStatus === Ecam51USB.AF_SINGLE_TRIGGER_FOCUSED)||(AFStatus === Ecam51USB.AF_SINGLE_TRIGGER_FOCUSING))
             {
                 autoFocusTrigger.checked = true
                 auto_focus_grid.enabled = true
                 auto_focus_grid.opacity = 1
                 maualFocus_grid.enabled = false
                 maualFocus_grid.opacity = 0.1
-                autofocus_txt_field.text =(AFStatus === Ecam51AUSB.AF_SINGLE_TRIGGER_FOCUSED)?"Focused":"Focusing"
+                autofocus_txt_field.text =(AFStatus === Ecam51USB.AF_SINGLE_TRIGGER_FOCUSED)?"Focused":"Focusing"
             }
         }
         onManualFocusPosition:
@@ -521,14 +523,21 @@ Item
             }
         }
     }
+    function selectedDeviceEnumVal(selectedDeviceEnumValue) {
+        selectedDevice = selectedDeviceEnumValue
+    }
+
     function getSensorID()
     {
-        ecam51AUSBId.getSensorId()
+        ecam51USBId.getSensorId()
         messageDialog.open()
     }
     function getFirmwareVer()
     {
-       ecam51AUSBId .getFirmwareVersion()
+        if(selectedDevice == CommonEnums.ECAM51A_USB)
+            ecam51USBId.readFirmwareVersion51aUSB()
+        else
+            ecam51USBId.readFirmwareVersion51bUSB()
     }
     function displayMessageBox(title, text)
     {
@@ -686,20 +695,20 @@ Item
         interval: 500
         onTriggered:
         {
-            ecam51AUSBId.rungetAFStatus()
-            ecam51AUSBId.getGPIStatus()
-            ecam51AUSBId.getFocusPosition()
+            ecam51USBId.rungetAFStatus()
+            ecam51USBId.getGPIStatus()
+            ecam51USBId.getFocusPosition()
             stop()
         }
     }
     Component.onCompleted:
     {
-        ecam51AUSBId.initUVCExtensionUnit(root.vidstreamObj)
+        ecam51USBId.initUVCExtensionUnit(root.vidstreamObj)
         getCamValuesTimer.start()
 
     }
     Component.onDestruction:{
-        ecam51AUSBId.deInitUVCExtensionUnit()
+        ecam51USBId.deInitUVCExtensionUnit()
     }
 
 }

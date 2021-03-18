@@ -1,15 +1,11 @@
 #include "see3cam_cu81.h"
-#include <QtConcurrent>
-#include <QFuture>
-static bool stop_thread = false;
+
 See3CAM_CU81::See3CAM_CU81()
 {
 }
 
 See3CAM_CU81::~See3CAM_CU81()
 {
-     stop_thread = true;
-     threadMonitor.waitForFinished();
 }
 
 bool See3CAM_CU81::getCameraMode()
@@ -439,47 +435,6 @@ bool See3CAM_CU81::setFlipMode(bool horzModeSel, bool vertiModeSel)
     return false;
 }
 
-void See3CAM_CU81::runGetCurrentTemperature()
-{
-        threadMonitor = QtConcurrent::run(getCurrentTemperature,this);
-}
-
-bool See3CAM_CU81::getCurrentTemperature(See3CAM_CU81 *device)
-{
-        // hid validation
-        if(uvccamera::hid_fd < 0)
-        {
-            return false;
-        }
-        int currentTemperature =0;
-        while(!stop_thread)
-        {
-            //Initialize buffers
-            device->initializeBuffers();
-
-            // fill buffer values
-            device->g_out_packet_buf[1] = CAMERA_CONTROL_CU81; /* camera id */
-            device->g_out_packet_buf[2] = GET_TEMPERATURE_CU81; /* get Auto exposure ROI mode command  */
-
-
-            // send request and get reply from camera
-            if(device->uvc.sendHidCmd(device->g_out_packet_buf, device->g_in_packet_buf, BUFFER_LENGTH))
-            {
-                if (device->g_in_packet_buf[6]==GET_FAIL) {
-            }
-            else if(device->g_in_packet_buf[0] == CAMERA_CONTROL_CU81 &&
-                device->g_in_packet_buf[1]==GET_TEMPERATURE_CU81 &&
-                device->g_in_packet_buf[6]==GET_SUCCESS)
-                {
-                    currentTemperature = (device->g_in_packet_buf[4] << 8)|(device->g_in_packet_buf[5]<<0);
-                    emit device->sendCurrentTemperature(currentTemperature);
-                }
-            }
-            sleep(1);
-        }
-        return false;
-}
-
 bool See3CAM_CU81::getExposureCompensation()
 {
     // hid validation
@@ -607,61 +562,6 @@ bool See3CAM_CU81::setFrameRateCtrlValue(uint frameRate)
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU81 &&
             g_in_packet_buf[1]==SET_FRAMERATE_CU81 &&
-            g_in_packet_buf[6]==SET_SUCCESS) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool See3CAM_CU81::getFlashState()
-{
-    // hid validation
-        if(uvccamera::hid_fd < 0)
-        {
-            return false;
-        }
-
-        //Initialize buffers
-        initializeBuffers();
-
-        // fill buffer values
-        g_out_packet_buf[1] = CAMERA_CONTROL_CU81; /* camera id */
-        g_out_packet_buf[2] = GET_STROBE_CU81; /* get Auto exposure ROI mode command  */
-
-        // send request and get reply from camera
-        if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-            if (g_in_packet_buf[6]==GET_FAIL) {
-                return false;
-            } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU81 &&
-                g_in_packet_buf[1]==GET_STROBE_CU81 &&
-                g_in_packet_buf[6]==GET_SUCCESS) {
-                    emit flashModeValue(g_in_packet_buf[2]);
-                    return true;
-            }
-        }
-        return false;
-}
-
-bool See3CAM_CU81::setFlashState(See3CAM_CU81::flashStateValues flashMode)
-{
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    //Initialize the buffer
-    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
-
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU81; /* set camera control code */
-    g_out_packet_buf[2] = SET_STROBE_CU81; /* set flash status command code */
-    g_out_packet_buf[3] = flashMode; /* set flash state [off/storbe] */
-
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6]==SET_FAIL) {
-            return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU81 &&
-            g_in_packet_buf[1]==SET_STROBE_CU81 &&
             g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
         }

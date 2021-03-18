@@ -639,7 +639,7 @@ public slots:
 
     void doEncodeAudio();
     void triggerModeSkipframes();
-
+    void updatepreview();
 
 signals:
     void   triggerShotCap();

@@ -1,3 +1,11 @@
+Qtcam Application - 24.0.7
+---------------------------
+*Added fix for not getting preview during change from trigger to master mode for See3CAM_24CUG in certain PC's.
+*Added fix for burst shot to snap shot and implemented read firmware version for ecam51bUSB.
+*Removed temperature and strobe controls in See3Cam_CU81.
+*Added support for See3CAM_160.
+*Added fix for imageCapture while giving external trigger in See3CAM_CU55.
+
 Qtcam Application - 24.0.6
 ---------------------------
 *Added fix for image getting captured while changing from master to trigger mode and vice versa in See3CAM_24CUG.

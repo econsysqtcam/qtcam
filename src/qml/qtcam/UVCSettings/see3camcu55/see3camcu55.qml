@@ -51,10 +51,8 @@ Item {
         target: root
         onTakeScreenShot:
         {           
-	    if(!isWebKeyPressed){ // mouse click
-                see3camcu55.enableDisableFaceRectangle(false)
-                burstShotTimer.start()
-            }
+            see3camcu55.enableDisableFaceRectangle(false)
+            burstShotTimer.start()
         }
         onGetVideoPinStatus:
         {

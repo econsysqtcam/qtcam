@@ -208,7 +208,7 @@ Item
                         deNoiseTextField.text = deNoiseSlider.value
                         if(skipUpdateUIDenoise)
                         {
-                            see3camcu81.setDenoiseValue(deNoiseSlider.value)
+                            see3camcu81.setDenoise(deNoiseSlider.value)
                         }
                         skipUpdateUIDenoise = true
                     }
@@ -436,45 +436,6 @@ Item
             }
             Text
             {
-                 id: temperature_tile
-                 text: "--- Device Temperature ---"
-                 font.pixelSize: 14
-                 font.family: "Ubuntu"
-                 color: "#ffffff"
-                 smooth: true
-                 Layout.alignment: Qt.AlignCenter
-                 opacity: 0.50196078431373
-            }
-            Row
-            {
-                    spacing: 9
-                    Text
-                    {
-                        id: temperatureText
-                        text: "Temperature "
-                        font.pixelSize: 14
-                        font.family: "Ubuntu"
-                        color: "#ffffff"
-                        smooth: true
-                        width: 80
-                        wrapMode: Text.WordWrap
-                        opacity: 1
-                    }
-                    TextField
-                    {
-                        id: temperatureValue
-                        font.pixelSize: 10
-                        font.family: "Ubuntu"
-                        smooth: true
-                        horizontalAlignment: TextInput.AlignHCenter
-                        opacity: 1
-                        style: econTextFieldStyle
-                        implicitHeight: 25
-                        implicitWidth: 80
-                    }
-            }
-            Text
-            {
                  id: exposureCompTextTitle
                  text: "--- Exposure Compensation ---"
                  font.pixelSize: 14
@@ -527,89 +488,14 @@ Item
                         onClicked:
                         {
                             exposureCompSet.enabled = false
-                            setButtonClicked = true
                             see3camcu81.setExposureCompensation(exposureCompValue.text)
                             exposureCompSet.enabled = true
                         }
                         Keys.onReturnPressed:
                         {
                             exposureCompSet.enabled = false
-                            setButtonClicked = true
                             see3camcu81.setExposureCompensation(exposureCompValue.text)
                             exposureCompSet.enabled = true
-                        }
-                    }
-                }
-                Text
-                {
-                    id: flashCtrlText
-                    text: "--- Flash Control ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    Layout.alignment: Qt.AlignCenter
-                    opacity: 0.50196078431373
-                }
-
-                RowLayout
-                {
-                    x:25
-                    y:230
-                    spacing: 25
-                    ExclusiveGroup { id: flashGrp }
-                    Column
-                    {
-                        RadioButton
-                        {
-                            exclusiveGroup: flashGrp
-                            checked: false
-                            id: flashModeEnable
-                            text: "Enable"
-                            activeFocusOnPress: true
-                            style: econRadioButtonStyle
-                            onClicked: {
-                                see3camcu81.setFlashState(See3CamCU81.FLASHMODE_ENABLE)
-                            }
-                            Keys.onReturnPressed: {
-                                see3camcu81.setFlashState(See3CamCU81.FLASHMODE_ENABLE)
-                            }
-                        }
-                    }
-                    Column
-                    {
-                        RadioButton
-                        {
-                            exclusiveGroup: flashGrp
-                            checked: false
-                            id: flashModeTorch
-                            text: "Torch"
-                            activeFocusOnPress: true
-                            style: econRadioButtonStyle
-                            onClicked: {
-                                see3camcu81.setFlashState(See3CamCU81.FLASHMODE_TORCH)
-                            }
-                            Keys.onReturnPressed: {
-                                see3camcu81.setFlashState(See3CamCU81.FLASHMODE_TORCH)
-                            }
-                        }
-                    }
-                    Column
-                    {
-                        RadioButton
-                        {
-                            exclusiveGroup: flashGrp
-                            checked: false
-                            id: flashModeStrobe
-                            text: "Strobe"
-                            activeFocusOnPress: true
-                            style: econRadioButtonStyle
-                            onClicked: {
-                                see3camcu81.setFlashState(See3CamCU81.FLASHMODE_STROBE)
-                            }
-                            Keys.onReturnPressed: {
-                                see3camcu81.setFlashState(See3CamCU81.FLASHMODE_STROBE)
-                            }
                         }
                     }
                 }
@@ -856,9 +742,9 @@ Item
     function setAntiFlickerMode()
     {
         if(antiFlickerCombo.currentIndex === 0)
-          see3camcu81.setAntiFlickerMode(See3Cam130D.AntiFlicker50Hz)
+          see3camcu81.setAntiFlickerMode(See3CamCU81.AntiFlicker50Hz)
         else
-          see3camcu81.setAntiFlickerMode(See3Cam130D.AntiFlicker60Hz)
+          see3camcu81.setAntiFlickerMode(See3CamCU81.AntiFlicker60Hz)
     }
     function currentROIAutoExposureMode(roiMode, winSize)
     {
@@ -995,28 +881,9 @@ Item
                     break
              }
         }
-        onFlashModeValue:
-        {
-            switch(flashMode)
-            {
-            case See3CamCU81.FLASHMODE_TORCH:
-                flashModeTorch.checked = true
-                break;
-            case See3CamCU81.FLASHMODE_STROBE:
-                flashModeStrobe.checked = true
-                break;
-            case See3CamCU81.FLASHMODE_ENABLE:
-                flashModeEnable.checked = true
-                break;
-            }
-        }
         onExposureCompValueReceived:
         {
              exposureCompValue.text = exposureCompensation
-        }
-        onSendCurrentTemperature:
-        {
-            temperatureValue.text =  tempValue
         }
     }
 
@@ -1081,9 +948,7 @@ Item
         see3camcu81.getAutoExpROIModeAndWindowSize()
         see3camcu81.getBurstLength()
         see3camcu81.getFlipMode()
-        see3camcu81.getFlashState()
         see3camcu81.getAntiFlickerMode()
-       see3camcu81.runGetCurrentTemperature()
     }
     Component
     {

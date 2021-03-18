@@ -59,5 +59,4 @@ Known Issues/Bugs:
 8. In Ascella camera, When Black and white mode is set in UI[Extension settings], it reflects black and white mode in camera. Inconsistently, after launching and closing application continuously for several times, it is changed to normal effect mode.
 9. Inconsistently external trigger keys are not coming to application. In that time, not able to capture images when external key pressed and during smile trigger capture.
 10.During resolution switch, it is recommended to switch to next resolution only after preview appears for previous resolution switch in NileCAM30_USB camera.
-11.In See3CAM_24CUG, in certain PCs while changing from master to trigger mode and after unplugging and plugging again, the preview appears black.
-  
+
