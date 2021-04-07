@@ -2446,41 +2446,21 @@ void Videostreaming::allocBuffers()
     m_renderer->videoResolutionHeight = m_height;
 
     int buffLength = m_width * m_height;
-    int buffHalfLength = (m_width * m_height)/ 2;
+     int buffHalfLength = (m_width * m_height)/ 2;
 
-    switch(m_pixelformat){
-    case V4L2_PIX_FMT_MJPEG:
-        m_renderer->rgbaDestBuffer = (unsigned char *)realloc(m_renderer->rgbaDestBuffer,m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 4);
-        if((m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 2)<_bytesUsed)
+    m_renderer->yBuffer = (uint8_t*)realloc(m_renderer->yBuffer,buffLength);
+    m_renderer->uBuffer = (uint8_t*)realloc(m_renderer->uBuffer,buffHalfLength);
+    m_renderer->vBuffer = (uint8_t*)realloc(m_renderer->vBuffer,buffHalfLength);
+    m_renderer->yuvBuffer = (uint8_t*)realloc(m_renderer->yuvBuffer,buffLength*2);
+    m_renderer->greyBuffer = (uint8_t*)realloc(m_renderer->greyBuffer,buffLength);
+
+    m_renderer->rgbaDestBuffer = (unsigned char *)realloc(m_renderer->rgbaDestBuffer,m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 4);
+    if((m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 2)<_bytesUsed)
             tempSrcBuffer = (unsigned char *)realloc(tempSrcBuffer,_bytesUsed);
-        else
+    else
             tempSrcBuffer =(unsigned char *)realloc(tempSrcBuffer,m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 2);
-        break;
-    case V4L2_PIX_FMT_GREY:
-        m_renderer->greyBuffer = (uint8_t*)realloc(m_renderer->greyBuffer,buffLength);
-        m_renderer->yuvBuffer = (uint8_t*)realloc(m_renderer->yuvBuffer,buffLength*2);
-        break;
-    case V4L2_PIX_FMT_Y12:
-        m_renderer->yuvBuffer = (uint8_t*)realloc(m_renderer->yuvBuffer,buffLength*2);
-        yuyvBuffer_Y12 = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
-        yuyvBuffer = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
-        break;
-    case V4L2_PIX_FMT_UYVY:
-    case V4L2_PIX_FMT_YUYV:
-    case V4L2_PIX_FMT_Y16:
-    case V4L2_PIX_FMT_H264:
-    case V4L2_PIX_FMT_SGRBG8:
-    case V4L2_PIX_FMT_SBGGR8: //Added by M Vishnu Murali: See3CAM_10CUG_CH uses respective pixel format
-        if(width == 640 && (height == 480 | height == 360))
-        {
-            m_renderer->yBuffer = (uint8_t*)realloc(m_renderer->yBuffer,buffLength);
-            m_renderer->uBuffer = (uint8_t*)realloc(m_renderer->uBuffer,buffHalfLength);
-            m_renderer->vBuffer = (uint8_t*)realloc(m_renderer->vBuffer,buffHalfLength);
-        }
-        m_renderer->yuvBuffer = (uint8_t*)realloc(m_renderer->yuvBuffer,buffLength*2);
-        yuyvBuffer = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
-        break;
-    }
+    yuyvBuffer = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
+    yuyvBuffer_Y12 = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
 }
 
 void Videostreaming::getFrameRates() {
