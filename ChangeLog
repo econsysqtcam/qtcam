@@ -1,3 +1,7 @@
+Qtcam Application - 24.0.9
+---------------------------
+*Reverting allocBuffers() in videostreaming.cpp
+
 Qtcam Application - 24.0.8
 ---------------------------
 *Added support for e-CAM82_USB.
