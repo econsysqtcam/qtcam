@@ -54,7 +54,8 @@ SOURCES += main.cpp \
     see3cam_cu81.cpp \
     seecam_cu80.cpp \
     see3cam_160.cpp \
-    ecam51_usb.cpp
+    ecam51_usb.cpp \
+    ecam82_usb.cpp
 
 # Installation path
 # target.path =
@@ -109,7 +110,8 @@ HEADERS += \
     see3cam_24cug.h \
     see3cam_cu81.h \
     see3cam_160.h \
-    ecam51_usb.h
+    ecam51_usb.h \
+    ecam82_usb.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
@@ -182,4 +184,5 @@ OTHER_FILES += \
 DISTFILES += \
     qml/qtcam/UVCSettings/see3cam_cu81/see3cam_cu81.qml \
     qml/qtcam/UVCSettings/see3cam160/see3cam_160.qml \
-    qml/qtcam/UVCSettings/ecam51A_USB/ecam51_usb.qml
+    qml/qtcam/UVCSettings/ecam51A_USB/ecam51_usb.qml \
+    qml/qtcam/UVCSettings/ecam82_USB/ecam82_usb.qml

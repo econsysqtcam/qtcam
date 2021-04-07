@@ -1,3 +1,8 @@
+Qtcam Application - 24.0.8
+---------------------------
+*Added support for e-CAM82_USB.
+*Changed allocBuffers() in videostreaming.cpp
+
 Qtcam Application - 24.0.7
 ---------------------------
 *Added fix for not getting preview during change from trigger to master mode for See3CAM_24CUG in certain PC's.
