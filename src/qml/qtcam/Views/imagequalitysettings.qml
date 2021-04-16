@@ -78,6 +78,7 @@ Item {
     property bool focusAutoChangeProperty
     property bool usb3speed: false
     property bool enablePowerLineFreq : true
+    property bool hdrModeSelected : false
 
     property bool powerLineComboEnable
     // Skip doing things when exposure combo index changed calls when no selection of any camera
@@ -109,6 +110,9 @@ Item {
         id: messageDialog
         icon: StandardIcon.Information
         onAccepted: {
+            close()
+        }
+        Component.onCompleted:{
             close()
         }
     }
@@ -725,23 +729,28 @@ Item {
                         onCurrentIndexChanged: {
                             // Skip doing things when exposure combo index changed calls when no selection of any camera
                             if(exposureComboEnable){
-                                root.selectMenuIndex(exposureAutoControlId,currentIndex)
-                                if(currentText.toString() != "Auto Mode") {
-                                    root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())
-                                    root.autoExposureSelected(false)
-                                    JS.autoExposureSelected = false
-                                    exposure_absolute.opacity = 1
-                                    exposure_Slider.opacity = 1
-                                    exposure_Slider.enabled = true
-                                    exposure_value.opacity = 1
-                                } else {
-                                    root.autoExposureSelected(true)
-                                    JS.autoExposureSelected = true
-                                    exposure_absolute.opacity = 0.1
-                                    exposure_Slider.opacity = 0.1
-                                    exposure_Slider.enabled = false
-                                    exposure_value.opacity = 0
-                                    exposure_value.enabled = false
+                                if(hdrModeSelected && root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU81){
+                                    updateUIifHdrModeSelected()
+                                }
+                                else{
+                                    root.selectMenuIndex(exposureAutoControlId,currentIndex)
+                                    if(currentText.toString() != "Auto Mode" && currentText.toString() != "Aperture Priority Mode") {
+                                        root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())
+                                        root.autoExposureSelected(false)
+                                        JS.autoExposureSelected = false
+                                        exposure_absolute.opacity = 1
+                                        exposure_Slider.opacity = 1
+                                        exposure_Slider.enabled = true
+                                        exposure_value.opacity = 1
+                                    } else {
+                                        root.autoExposureSelected(true)
+                                        JS.autoExposureSelected = true
+                                        exposure_absolute.opacity = 0.1
+                                        exposure_Slider.opacity = 0.1
+                                        exposure_Slider.enabled = false
+                                        exposure_value.opacity = 0
+                                        exposure_value.enabled = false
+                                    }
                                 }
                             }
                         }
@@ -1129,6 +1138,7 @@ Item {
                                     focus_value.opacity = 1                                    
                                     if(focusAutoChangeProperty){
                                         root.changeCameraSettings(focusControlAutoId,0)
+                                        root.changeCameraSettings(focusControlId,focus_Slider.value)
                                     }
                                 }
 				focusAutoChangeProperty = true
@@ -1235,6 +1245,90 @@ Item {
         {
             videoFilter.visible = status;
         }
+        onDisableManualExpifHdrSelected:
+        {
+            hdrModeSelected = isHdrModeSelected;
+            if(hdrModeSelected ){
+                updateUIifHdrModeSelected()
+            }
+            else
+            {
+                exposure_auto.opacity = 1
+                exposureCombo.opacity = 1
+                exposureCombo.enabled = true
+            }
+        }
+
+        onDisableManualExp:
+        {
+            if(!isAutoExpSelected)
+            {
+                if(exposureCombo.currentText.toString() =="Auto Mode" || exposureCombo.currentText.toString() =="Aperture Priority Mode")
+                {
+                    if(exposureCombo.currentIndex == 0)
+                       exposureCombo.currentIndex = 1
+                    else
+                       exposureCombo.currentIndex = 0
+                }
+            }
+            else
+            {
+                if(exposureCombo.currentText.toString()=="Manual Mode" || exposureCombo.currentText.toString() == "Shutter Priority Mode")
+                {
+                    if(exposureCombo.currentIndex == 0)
+                        exposureCombo.currentIndex = 1
+                    else
+                        exposureCombo.currentIndex = 0
+                }
+            }
+        }
+        onDisableAutoFocus:
+        {
+            if(isAutoFocusSelected)
+            {
+                autoSelect_focus.checked = true
+                JS.autoFocusChecked = true
+                root.autoFocusSelected(true)
+                root.logInfo("Focus control set in Auto Mode")
+                focus_Slider.opacity = 0.1
+                focus_Slider.enabled = false
+                focus_value.opacity = 0.1
+            }
+            else
+            {
+                autoSelect_focus.checked = false
+                JS.autoFocusChecked = false
+                root.autoFocusSelected(false)
+                root.logInfo("Focus control set in Manual Mode")
+                focus_Slider.opacity = 1
+                focus_Slider.enabled = true
+                focus_value.opacity = 1
+            }
+        }
+
+        onDisableAwb:
+        {
+            root.cameraFilterControls(true)           //getting the control values to update awb manual slider
+            if(isAwbSelected)
+            {
+                autoSelect_wb.checked = true
+                JS.autoWhiteBalSelected = true
+                root.autoWhiteBalanceSelected(true)
+                root.logInfo("White Balance set to Auto Mode")
+                white_balance_Slider.opacity = 0.1
+                white_balance_Slider.enabled = false
+            }
+            else
+            {
+                autoSelect_wb.checked = false
+                JS.autoWhiteBalSelected = false
+                root.autoWhiteBalanceSelected(false)
+                root.logInfo("White Balance set to Manual Mode")
+                white_balance_Slider.opacity = 1
+                white_balance_Slider.enabled = true
+            }
+        }
+
     }
     Connections
     {
@@ -1310,6 +1404,22 @@ Item {
             queryctrlTimer.start()
         }
 
+    }
+
+    function updateUIifHdrModeSelected()
+    {
+        root.selectMenuIndex(exposureAutoControlId,0)
+        root.autoExposureSelected(true)
+        JS.autoExposureSelected = true
+        exposure_absolute.opacity = 0.1
+        exposure_Slider.opacity = 0.1
+        exposure_Slider.enabled = false
+        exposure_value.opacity = 0
+        exposure_value.enabled = false
+        exposureCombo.currentIndex = 0              //forcing to auto mode since manual mode is not supported in hdr
+        exposure_auto.opacity = 0.1
+        exposureCombo.opacity = 0.1
+//        exposureCombo.enabled = false
     }
 
     function setCameraControls(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID)
@@ -1724,17 +1834,20 @@ Item {
             while(menuitems.pop()){}
             exposureAutoControlId = controlID
             exposureCombo.currentIndex = controlDefaultValue
-            if(exposureCombo.currentIndex == 1){  // 0 - auto mode, 1 - manual mode
+            if(exposureCombo.currentText.toString()=="Manual Mode" || exposureCombo.currentText.toString()=="Shutter Priority Mode")
+            {
                 JS.autoExposureSelected = false
                 exposure_absolute.opacity = 1
                 exposure_Slider.enabled = true
                 exposure_Slider.opacity = 1
-                exposure_value.opacity = 1                
-            }else{
+                exposure_value.opacity = 1
+            }
+            else
+            {
                 JS.autoExposureSelected = true
                 exposure_Slider.enabled = false
                 exposure_Slider.opacity = 0.1
-                exposure_value.opacity = 0                
+                exposure_value.opacity = 0
             }
         }
     }
@@ -1816,8 +1929,8 @@ Item {
         powerLineCombo.opacity =0.1
         exposureCombo.opacity = 0.1
         menuitems = []
-        powerLineCombo.model = menuitems
-        exposureCombo.model = menuitems
+        //powerLineCombo.model = menuitems
+        //exposureCombo.model = menuitems
         exposure_Slider.enabled = false
         exposure_Slider.opacity = 0.1
         exposure_Slider.minimumValue = -65536

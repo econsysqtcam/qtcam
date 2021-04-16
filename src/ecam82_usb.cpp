@@ -80,7 +80,7 @@ bool ecam82_USB::readFirmwareVersion()
     _text.clear();
     _text.append(QString::number(data[0]).append(".").append(QString::number(data[1])));
     _text.append(".");
-    _text.append(QString::number(data[2]).append(QString::number(data[3])));
+    _text.append(QString::number((data[2]<<8)|data[3]));
     emit titleTextChanged(_title, _text);
 
     return true;

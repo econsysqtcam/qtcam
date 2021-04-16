@@ -629,6 +629,57 @@ void uvccamera::getFirmWareVersion() {
     emit titleTextChanged(_title,_text);
 }
 
+bool uvccamera::getUniqueId() {
+    emit logHandle(QtDebugMsg,"Unique Id:");
+    _title = tr("Unique Id");
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    bool timeout = true;
+    int ret = 0;
+    unsigned int start, end = 0;
+    QString uniqueId = "";
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+
+    //Set the Report Number
+    g_out_packet_buf[1] = GETCAMERA_UNIQUEID; 	/* Report Number */
+
+    /* Send a Report to the Device */
+    ret = write(hid_fd, g_out_packet_buf, BUFFER_LENGTH);
+    if (ret < 0) {
+        _text = tr("Device not available");
+        return false;
+    }
+    /* Read the Unique id from the device */
+    start = getTickCount();
+    while(timeout)
+    {
+        /* Get a report from the device */
+        ret = read(hid_fd, g_in_packet_buf, BUFFER_LENGTH);
+        if (ret < 0) {
+        } else {
+            if(g_in_packet_buf[0] == GETCAMERA_UNIQUEID) {
+                uniqueId.sprintf("%02x%02x%02x%02x",g_in_packet_buf[1],g_in_packet_buf[2],g_in_packet_buf[3],g_in_packet_buf[4]);
+                timeout = false;
+            }
+        }
+        end = getTickCount();
+        if(end - start > TIMEOUT)
+        {
+            timeout = false;
+            return false;
+        }
+    }
+    _text.clear();
+    _text.append(uniqueId);
+    emit titleTextChanged(_title,_text);
+    return true;
+
+}
+
 void uvccamera::getSerialNumber(){
      emit serialNumber("Serial Number: "+serialNumberMap.value(openNode));
 }

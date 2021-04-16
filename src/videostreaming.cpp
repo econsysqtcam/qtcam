@@ -38,6 +38,7 @@
 #include "uvccamera.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
+#define SEE3CAM160_MJPEG_MAXBYTESUSED       4193280
 
 /* MACRO FOR BAYER10 TO RGB24 */
 #define R(x, y, w)	y16BayerDestBuffer[0 + 3 * ((x) + (w) * (y))]
@@ -2455,10 +2456,15 @@ void Videostreaming::allocBuffers()
     m_renderer->greyBuffer = (uint8_t*)realloc(m_renderer->greyBuffer,buffLength);
 
     m_renderer->rgbaDestBuffer = (unsigned char *)realloc(m_renderer->rgbaDestBuffer,m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 4);
-    if((m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 2)<_bytesUsed)
-            tempSrcBuffer = (unsigned char *)realloc(tempSrcBuffer,_bytesUsed);
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_160)
+        tempSrcBuffer = (unsigned char *)realloc(tempSrcBuffer,SEE3CAM160_MJPEG_MAXBYTESUSED);
     else
+    {
+        if((m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 2)<_bytesUsed)
+            tempSrcBuffer = (unsigned char *)realloc(tempSrcBuffer,_bytesUsed);
+        else
             tempSrcBuffer =(unsigned char *)realloc(tempSrcBuffer,m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 2);
+    }
     yuyvBuffer = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
     yuyvBuffer_Y12 = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
 }
@@ -2920,7 +2926,7 @@ void Videostreaming::displayFrame() {
 
 void Videostreaming::stopCapture() {
     threadMonitor.waitForFinished();   //Added by M.Vishnu Murali:Inorder to finish jpegDecoding then stop else preview corruption will occur
-    startFrame = true;
+
     if(h264Decode!=NULL){
         h264Decode->closeFile();
         delete h264Decode;
@@ -3017,6 +3023,7 @@ void Videostreaming::stopCapture() {
     }
 
     m_renderer->renderyuyvMutex.unlock();
+    startFrame = true;
 }
 
 void Videostreaming::closeDevice() {

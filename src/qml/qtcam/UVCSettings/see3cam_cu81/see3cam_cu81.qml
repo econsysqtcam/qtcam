@@ -6,6 +6,7 @@ import econ.camera.uvcsettings 1.0
 import econ.camera.see3camcu81 1.0
 import cameraenum 1.0
 import QtQuick 2.0
+import "../../JavaScriptFiles/tempValue.js" as JS
 
 Item
 {
@@ -23,8 +24,8 @@ Item
     property int denoiseMax: 15
     property int qFactorMin: 10
     property int qFactorMax: 96
-    property int frameRateMin: 1
-    property int frameRateMax: 120
+    property int frameRateMin: 3
+    property int frameRateMax: 60
     property int expoCompMin: 8000
     property int expoCompMax: 1000000
 
@@ -68,9 +69,15 @@ Item
                     activeFocusOnPress: true
                     onClicked: {
                         see3camcu81.setCameraMode(See3CamCU81.HDR_MODE)
+                        root.disableManualExpifHdrSelected(true)
+                        disableAntiFlickerMode(true)
+                        extSettingsBasedOnAutoExposureSelectionInUVCSettings(JS.autoExposureSelected)
                     }
                     Keys.onReturnPressed:  {
                         see3camcu81.setCameraMode(See3CamCU81.HDR_MODE)
+                        root.disableManualExpifHdrSelected(true)
+                        disableAntiFlickerMode(true)
+                        extSettingsBasedOnAutoExposureSelectionInUVCSettings(JS.autoExposureSelected)
                     }
                 }
                 RadioButton
@@ -82,9 +89,19 @@ Item
                     activeFocusOnPress: true
                     onClicked: {
                         see3camcu81.setCameraMode(See3CamCU81.LINEAR_MODE)
+                        root.disableManualExpifHdrSelected(false)
+                        disableAntiFlickerMode(false)
+                        see3camcu81.getExposureCompensation()
+                        see3camcu81.getAntiFlickerMode()
+                        extSettingsBasedOnAutoExposureSelectionInUVCSettings(JS.autoExposureSelected)
                     }
                     Keys.onReturnPressed: {
                         see3camcu81.setCameraMode(See3CamCU81.LINEAR_MODE)
+                        root.disableManualExpifHdrSelected(false)
+                        disableAntiFlickerMode(false)
+                        see3camcu81.getExposureCompensation()
+                        see3camcu81.getAntiFlickerMode()
+                        extSettingsBasedOnAutoExposureSelectionInUVCSettings(JS.autoExposureSelected)
                     }
                 }
             }
@@ -262,10 +279,12 @@ Item
                       onClicked: {
                           see3camcu81.setROIAutoExposure(See3CamCU81.AutoExpFull, 0, 0, 0, 0, 0);
                           autoExpoWinSizeCombo.enabled = false
+                          autoExpoWinSizeCombo.opacity = 0.1
                       }
                       Keys.onReturnPressed: {
                           see3camcu81.setROIAutoExposure(See3CamCU81.AutoExpFull, 0, 0, 0, 0, 0);
                           autoExpoWinSizeCombo.enabled = false
+                          autoExpoWinSizeCombo.opacity = 0.1
                       }
                   }
                   RadioButton
@@ -279,10 +298,12 @@ Item
                       onClicked: {
                           see3camcu81.setROIAutoExposure(See3CamCU81.AutoExpManual, 0, 0, 0, 0, 0);
                           autoExpoWinSizeCombo.enabled = true
+                          autoExpoWinSizeCombo.opacity = 1
                       }
                       Keys.onReturnPressed: {
                           see3camcu81.setROIAutoExposure(See3CamCU81.AutoExpManual, 0, 0, 0, 0, 0);
                           autoExpoWinSizeCombo.enabled = true
+                          autoExpoWinSizeCombo.opacity = 1
                       }
                   }
             }
@@ -726,9 +747,9 @@ Item
                 getSerialNumber()
          }
     }
-    function setToDefaultValues()
+    function getValuesFromCamera()
     {
-        see3camcu81.setToDefault()
+        see3camcu81.getCameraMode()
         see3camcu81.getEffect()
         see3camcu81.getDenoise()
         see3camcu81.getQFactor()
@@ -738,13 +759,39 @@ Item
         see3camcu81.getExposureCompensation()
         see3camcu81.getFrameRateCtrlValue()
         see3camcu81.getAntiFlickerMode()
+        extSettingsBasedOnAutoExposureSelectionInUVCSettings(JS.autoExposureSelected)
     }
+
+    function setToDefaultValues()
+    {
+        see3camcu81.setToDefault()
+        getValuesFromCamera()
+    }
+
+    function disableAntiFlickerMode(isHdrModeSelected)
+    {
+        if(isHdrModeSelected)
+        {
+            antiFlickerModeAuto.enabled = false
+            antiFlickerModeAuto.opacity = 0.1
+            antiFlickerModeManual.enabled = false
+            antiFlickerModeManual.opacity = 0.1
+        }
+        else
+        {
+            antiFlickerModeAuto.enabled = true
+            antiFlickerModeAuto.opacity = 1
+            antiFlickerModeManual.enabled = true
+            antiFlickerModeManual.opacity = 1
+        }
+    }
+
     function setAntiFlickerMode()
     {
         if(antiFlickerCombo.currentIndex === 0)
-          see3camcu81.setAntiFlickerMode(See3CamCU81.AntiFlicker50Hz)
+            see3camcu81.setAntiFlickerMode(See3CamCU81.AntiFlicker50Hz)
         else
-          see3camcu81.setAntiFlickerMode(See3CamCU81.AntiFlicker60Hz)
+            see3camcu81.setAntiFlickerMode(See3CamCU81.AntiFlicker60Hz)
     }
     function currentROIAutoExposureMode(roiMode, winSize)
     {
@@ -780,15 +827,84 @@ Item
         messageDialog.open()
     }
 
+    function extSettingsBasedOnAutoExposureSelectionInUVCSettings(autoExposureChecked){
+        if(autoExposureChecked)
+        {
+            if(linear_mode.checked)
+            {
+                exposureCompSet.opacity = 1
+                exposureCompValue.opacity = 1
+                exposureCompText.opacity = 1
+                exposureCompSet.enabled = true
+                exposureCompValue.enabled = true
+                exposureCompText.enabled = true
+            }
+            else
+            {
+                exposureCompSet.opacity = 0.1
+                exposureCompValue.opacity = 0.1
+                exposureCompText.opacity = 0.1
+                exposureCompSet.enabled = false
+                exposureCompValue.enabled = false
+                exposureCompText.enabled = false
+            }
+            autoexpFull.opacity = 1
+            autoexpManual.opacity = 1
+            autoexpFull.enabled = true
+            autoexpManual.enabled = true
+        }
+        else
+        {
+            if(linear_mode.checked)
+            {
+                autoexpFull.opacity = 0.1
+                autoexpManual.opacity = 0.1
+                autoexpFull.enabled = false
+                autoexpManual.enabled = false
+            }
+            else
+            {
+                autoexpFull.opacity = 1
+                autoexpManual.opacity = 1
+                autoexpFull.enabled = true
+                autoexpManual.enabled = true
+            }
+            exposureCompSet.opacity = 0.1
+            exposureCompValue.opacity = 0.1
+            exposureCompText.opacity = 0.1
+            exposureCompSet.enabled = false
+            exposureCompValue.enabled = false
+            exposureCompText.enabled = false
+        }
+        if(autoexpManual.enabled && autoexpManual.checked && (autoexpManual.opacity == 1))
+        {
+            autoExpoWinSizeCombo.opacity = 1
+            autoExpoWinSizeCombo.enabled = true
+        }
+        else
+        {
+            autoExpoWinSizeCombo.opacity = 0.1
+            autoExpoWinSizeCombo.enabled = false
+        }
+    }
+
     See3CamCU81
     {
         id:see3camcu81
         onSendCameraModeValue:
         {
             if(cameraMode == See3CamCU81.HDR_MODE)
+            {
+                root.disableManualExpifHdrSelected(true)
+                disableAntiFlickerMode(true)
                 hdr_mode.checked = true
+            }
             else if(cameraMode == See3CamCU81.LINEAR_MODE)
+            {
+                root.disableManualExpifHdrSelected(false)
+                disableAntiFlickerMode(false)
                 linear_mode.checked = true
+            }
         }
         onSentEffectMode:
         {
@@ -923,6 +1039,27 @@ Item
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
+        onExtensionTabVisible:
+        {
+            if(visible)
+            {
+                getValuesFromCamera()
+            }
+        }
+        onMouseRightClicked:{
+            if(autoexpManual.enabled && autoexpManual.checked){
+                see3camcu81.setROIAutoExposure(See3CamCU81.AutoExpManual,width, height, x, y, autoExpoWinSizeCombo.currentText)
+            }
+        }
+        onVideoResolutionChanged:{
+            see3camcu81.getFrameRateCtrlValue()
+        }
+        onPreviewFPSChanged:{
+            see3camcu81.getFrameRateCtrlValue()
+        }
+        onVideoColorSpaceChanged:{
+            see3camcu81.getFrameRateCtrlValue()
+        }
     }
 
     Timer
@@ -936,19 +1073,13 @@ Item
             see3camcu81.getDenoise()
             see3camcu81.getQFactor()
             see3camcu81.getExposureCompensation()
-            see3camcu81.getFrameRateCtrlValue()
+            extSettingsBasedOnAutoExposureSelectionInUVCSettings(JS.autoExposureSelected)
             stop()
         }
     }
     Component.onCompleted:
     {
-        //getting valid effect mode and scene mode takes some time.
-        //So In timer, after 500 ms, getting effect mode and scene mode is done
-        getCamValuesTimer.start()
-        see3camcu81.getAutoExpROIModeAndWindowSize()
-        see3camcu81.getBurstLength()
-        see3camcu81.getFlipMode()
-        see3camcu81.getAntiFlickerMode()
+        root.disablePowerLineFreq()
     }
     Component
     {

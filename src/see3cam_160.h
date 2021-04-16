@@ -51,6 +51,9 @@
 #define CENTER_WEIGHTED_MODE_160    0x00
 #define CUSTOM_AREA_MODE_160        0x01
 
+#define GET_BURST_LENGTH_160        0x1A
+#define SET_BURST_LENGTH_160        0x1B
+
 #define MAX_WINDOW_SIZE             8
 
 #define READ_FIRMWARE_VERSION_160   0x19
@@ -173,6 +176,7 @@ signals:
     void afLockStatusChanged(uint lockStatus);
     void autoFocusRoiModeChanged(uint afRoiMode);
     void cafScanRangeModeChanged(uint scanRangeMode);
+    void burstLengthValue(uint burstLength);
 
 public slots:
     bool getAutoFocusMode();
@@ -215,6 +219,8 @@ public slots:
     bool setCenteredAutoFocusMode();
     bool setCustomAreaAutoFocus(int vidResolnWidth, int vidResolnHeight, uint xCord, uint yCord, QString winSize);
 
+    bool setBurstLength(uint burstLength);
+    bool getBurstLength();
 
 };
 

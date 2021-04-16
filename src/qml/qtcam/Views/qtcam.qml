@@ -226,7 +226,15 @@ Rectangle {
 
     signal cameraSelected();
 
-signal disableStillProp(bool status);
+    signal disableManualExpifHdrSelected(bool isHdrModeSelected);
+
+    signal disableManualExp(bool isAutoExpSelected);
+
+    signal disableAutoFocus(bool isAutoFocusSelected);
+
+    signal disableAwb(bool isAwbSelected);
+
+    signal disableStillProp(bool status);
     width:Screen.width
     height:Screen.height
     focus: true

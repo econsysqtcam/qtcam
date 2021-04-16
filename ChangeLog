@@ -1,3 +1,10 @@
+Qtcam Application - 24.0.10
+---------------------------
+*Removed Auto focus ROI and added burst length control for See3CAM_160.
+*Changed readFirmware() for e-cam82USB.
+*Bug fixes for e-cam82USB.
+*Added necessary changes for See3CAM_CU81.
+
 Qtcam Application - 24.0.9
 ---------------------------
 *Reverting allocBuffers() in videostreaming.cpp

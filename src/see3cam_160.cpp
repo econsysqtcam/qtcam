@@ -463,6 +463,7 @@ bool See3CAM_160::setCustomAreaAutoFocus(int vidResolnWidth, int vidResolnHeight
     g_out_packet_buf[2] = SET_AF_ROI_MODE_160; /* get auto focus roi command */
     g_out_packet_buf[3] = CUSTOM_AREA_MODE_160; /* value to set */
 
+    g_out_packet_buf[4] = focusWinXmax;
     g_out_packet_buf[5] = focusWinXmax >> 8;
     g_out_packet_buf[6] = focusWinYmin;
     g_out_packet_buf[7] = focusWinYmin >> 8;
@@ -964,6 +965,72 @@ bool See3CAM_160::setToDefault(){
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_160 &&
             g_in_packet_buf[1]==SET_TO_DEFAULT_160 &&
             g_in_packet_buf[6]==SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_160::setBurstLength - set burst length in camera
+ * @param burstLength - burst length - no of images to be taken.
+ * return true - success /false - failure
+ */
+bool See3CAM_160::setBurstLength(uint burstLength){
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_160; /* camera id */
+    g_out_packet_buf[2] = SET_BURST_LENGTH_160; /* set burst length command */
+    g_out_packet_buf[3] = burstLength; /* burst length value to set */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_160 &&
+            g_in_packet_buf[1]==SET_BURST_LENGTH_160 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_160::getBurstLength - get burst length from camera
+ * return true - success /false - failure
+ */
+bool See3CAM_160::getBurstLength()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_160; /* camera id */
+    g_out_packet_buf[2] = GET_BURST_LENGTH_160; /* get burst length command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_160 &&
+            g_in_packet_buf[1]==GET_BURST_LENGTH_160 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {
+            emit burstLengthValue(g_in_packet_buf[2]);
             return true;
         }
     }

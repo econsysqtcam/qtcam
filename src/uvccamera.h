@@ -270,6 +270,13 @@ public slots:
     void getFirmWareVersion();
 
     /**
+     * @brief Get the unique id of the camera
+     *  - Reads the unique id and emits the signal titleTextChanged(), "_text" variable of the signal
+     * contains the unique id.
+     */
+    bool getUniqueId();
+
+    /**
      * @brief getSerialNumber
      */
     void getSerialNumber();
