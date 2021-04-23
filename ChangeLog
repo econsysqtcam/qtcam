@@ -1,3 +1,9 @@
+Qtcam Application - 24.0.11
+---------------------------
+*Bug fixes for See3CAM_CU81.
+*Added Tooltips in extension settings for See3CAM_160.
+*Fixed Mute issue for e-cam51b_USB.
+
 Qtcam Application - 24.0.10
 ---------------------------
 *Removed Auto focus ROI and added burst length control for See3CAM_160.

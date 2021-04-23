@@ -450,10 +450,9 @@ bool ecam51_USB::getAFStatus(ecam51_USB *device)
         else
         {
             device->AFStatus = FAILURE;
-            usleep(100);
         }
         emit device->autoFocusStatus(device->AFStatus);
-
+        usleep(500);
     }while(device->AFStatus == AF_SINGLE_TRIGGER_FOCUSING);
 
     return true;

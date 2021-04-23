@@ -1849,6 +1849,9 @@ Item {
                 exposure_Slider.opacity = 0.1
                 exposure_value.opacity = 0
             }
+            if(hdrModeSelected && root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU81){
+                updateUIifHdrModeSelected()
+            }
         }
     }
 

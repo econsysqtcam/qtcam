@@ -334,6 +334,7 @@ private:
     bool previewStop;
     bool trigger_mode;
     int triggermode_skipframes;
+    int skipImageCapture;
 
     QSocketNotifier *m_capNotifier;
 

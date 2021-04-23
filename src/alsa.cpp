@@ -57,7 +57,8 @@ int Alsa::initializeMixer(QString cardName){
 
     for (cap_elem = snd_mixer_first_elem(mixer); cap_elem; cap_elem = snd_mixer_elem_next(cap_elem))
     {
-               if(strcmp (snd_mixer_selem_get_name (cap_elem), "Capture") == 0)
+               if((strcmp (snd_mixer_selem_get_name (cap_elem), "Capture") == 0) ||
+               (strcmp (snd_mixer_selem_get_name (cap_elem), "Mic") == 0))
                      break;
     }
 

@@ -162,6 +162,7 @@ Videostreaming::Videostreaming() : m_t(0)
     m_convertData = NULL;
     trigger_mode = false;
     triggermode_skipframes = 0;
+    skipImageCapture = 0;
 }
 
 Videostreaming::~Videostreaming()
@@ -1338,7 +1339,24 @@ void Videostreaming::capFrame()
     // prepare yuyv/rgba buffer and give to shader.
     if(!prepareBuffer(m_capSrcFormat.fmt.pix.pixelformat, m_buffers[buf.index].start[0], buf.bytesused)){
         qbuf(buf);
-        emit signalTograbPreviewFrame(retrieveframeStoreCam,true);  //Added by Navya  ---Querying the buffer again
+        if(skipImageCapture < 3)
+            emit signalTograbPreviewFrame(retrieveframeStoreCam,true);  //Added by Navya  ---Querying the buffer again
+        else
+        {
+            skipImageCapture = 0;
+            _title = "Failure";
+            _text = "Image not saved in the selected location";
+            emit logCriticalHandle("Still image not saved successfully");
+            emit titleTextChanged(_title,_text);
+            m_burstShot = false;
+            m_snapShot = false;
+            // after taking shot(s), restore preview resoln and format.
+            switchToStillPreviewSettings(false);
+            retrieveframeStoreCamInCross = false;
+            retrieveframeStoreCam = false;
+            emit signalTograbPreviewFrame(retrieveframeStoreCam,false);
+            return void();
+        }
         return;
     }
 
@@ -2779,8 +2797,11 @@ bool Videostreaming::check_jpeg_header(void *inputbuffer, __u32 bytesUsed)
         return false;
     }
     for(int i=0;i<8;++i)
+    {
         if(((uint8_t *) inputbuffer)[i] == 0xFF && ((uint8_t *) inputbuffer)[i+1] == 0xD8)
            return true;
+    }
+    skipImageCapture++;
     return false;
 }
 
@@ -3023,6 +3044,7 @@ void Videostreaming::stopCapture() {
     }
 
     m_renderer->renderyuyvMutex.unlock();
+    skipImageCapture =0;
     startFrame = true;
 }
 

@@ -19,6 +19,7 @@ Item
     property bool skipUpdateUIOnAntiFlickerMode:false
     property bool skipUpdateUIOnExpWindowSize: false
     property bool skipUpdateUIDenoise: false
+    property bool skipUpdateUIonGetCameraMode: false
 
     property int denoiseMin: 0
     property int denoiseMax: 15
@@ -749,7 +750,9 @@ Item
     }
     function getValuesFromCamera()
     {
-        see3camcu81.getCameraMode()
+        if(skipUpdateUIonGetCameraMode)
+            see3camcu81.getCameraMode()
+        skipUpdateUIonGetCameraMode= true
         see3camcu81.getEffect()
         see3camcu81.getDenoise()
         see3camcu81.getQFactor()
@@ -941,6 +944,7 @@ Item
         {
             skipUpdateUIOnBurstLength = false
             burstLengthCombo.currentIndex = burstLength - 1
+            skipUpdateUIOnBurstLength = true
         }
         onQFactorValue:
         {
@@ -1079,6 +1083,7 @@ Item
     }
     Component.onCompleted:
     {
+        see3camcu81.getCameraMode()                     //to disable exposurecombo if hdr mode is selected initially
         root.disablePowerLineFreq()
     }
     Component
