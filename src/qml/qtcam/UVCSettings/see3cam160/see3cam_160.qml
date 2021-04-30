@@ -128,7 +128,6 @@ Item {
                     enabled: true
                     opacity: 1
                     activeFocusOnPress : true
-                    tooltip: "Auto White Balance lock can be enabled and disabled by checking and unchecking the checkBox.\nUser can choose Auto Exposure Mode from the combo box list to see the change in preview."
                     text: "AWB Lock"
                     style: econCheckBoxStyle
                     onClicked:{
@@ -195,7 +194,6 @@ Item {
                 CheckBox {
                     id: afOff
                     activeFocusOnPress : true
-                    tooltip: "AF OFF can be used to enable or disable Auto Focus.\nUser can choose Manual focus Lens Position from the Combo box list when AfOff is checked."
                     text: "AF Off"
                     style: econCheckBoxStyle
                     onClicked:{
@@ -243,7 +241,6 @@ Item {
                 CheckBox {
                     id: afLock
                     activeFocusOnPress : true
-                    tooltip: "Auto Focus lock can be enabled and disabled by checking and unchecking the checkBox.\nUser can select the CAF range from the Combo box list."
                     enabled: true
                     opacity: enabled ? 1 : 0.1
                     text: "AF Lock"
@@ -319,7 +316,6 @@ Item {
                         id: radioContin
                         text: "Continuous"
                         activeFocusOnPress: true
-                        tooltip: "Continous auto focus mode can be selected by clicking this button."
                         style: radioButtonWordWrapStyle
                         enabled: true
                         opacity: enabled ? 1 : 0.1
@@ -340,7 +336,6 @@ Item {
                         id: radioOneshot
                         text: "One-Shot"
                         activeFocusOnPress: true
-                        tooltip: "One-Shot auto focus mode can be selected by clicking this button."
                         style: radioButtonWordWrapStyle
                         enabled: true
                         opacity: enabled ? 1 : 0.1
@@ -415,7 +410,6 @@ Item {
                 CheckBox {
                     id: aeLock
                     activeFocusOnPress : true
-                    tooltip: "Auto Exposure lock can be enabled and disabled by checking and unchecking the checkBox.\nUser can choose Auto Exposure Mode from the Combo box list to see the change in preview."
                     text: "AE Lock"
                     style: econCheckBoxStyle
                     onClicked:{
