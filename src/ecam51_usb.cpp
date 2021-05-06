@@ -401,18 +401,19 @@ bool ecam51_USB::sensor_mode_selection()
 
 bool ecam51_USB::getSensorId()
 {
-    int sensor_id1,sensor_id2,SensorId=0;
+    int sensor_id1,sensor_id2;
+    QString SensorId = "";
 
     sensor_id1 = diagnostic_control(DIAGNOSTIC_CNT_READ_SENSOR_ID1);
     sensor_id2 = diagnostic_control(DIAGNOSTIC_CNT_READ_SENSOR_ID2);
 
     if((sensor_id1 != FAILURE) && (sensor_id2 != FAILURE))
     {
-            SensorId = (sensor_id1 << 8) | sensor_id2;
+            SensorId.sprintf("%02x%02x",sensor_id1,sensor_id2);
             _title = "SensorID";
             _text.clear();
             _text.append("Sensor ID: ");
-            _text.append(QString::number(SensorId));
+            _text.append(SensorId);
 
             emit  titleTextChanged( _title,  _text);
             return true;
@@ -446,13 +447,13 @@ bool ecam51_USB::getAFStatus(ecam51_USB *device)
         {
             //AUTO FOCUS MODE
             device->AFStatus = AF_SINGLE_TRIGGER_FOCUSING; //AF_CONT_FOCUSING;
+            usleep(500000);
         }
         else
         {
             device->AFStatus = FAILURE;
         }
         emit device->autoFocusStatus(device->AFStatus);
-        usleep(500);
     }while(device->AFStatus == AF_SINGLE_TRIGGER_FOCUSING);
 
     return true;

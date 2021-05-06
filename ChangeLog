@@ -1,3 +1,8 @@
+Qtcam Application - 24.0.13
+---------------------------
+*Added 500ms delay for getAFStatus() for ecam51b_USB.
+*Fixed sensorID from getting printed as integer to hex for ecam51b_USB.
+
 Qtcam Application - 24.0.12
 ---------------------------
 *Removed tooltips for See3CAM_160.
