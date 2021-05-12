@@ -648,6 +648,7 @@ Item {
             see3cam160.setAFstatus(See3cam160.AF_OFF)
             root.disableAutoFocus(true)
         }
+	see3cam160.getAFlockstatus()
     }
 
     function setToDefaultValues(){

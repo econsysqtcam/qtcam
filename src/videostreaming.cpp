@@ -38,7 +38,7 @@
 #include "uvccamera.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
-#define SEE3CAM160_MJPEG_MAXBYTESUSED       4193280
+#define SEE3CAM160_MJPEG_MAXBYTESUSED       8589934592
 
 /* MACRO FOR BAYER10 TO RGB24 */
 #define R(x, y, w)	y16BayerDestBuffer[0 + 3 * ((x) + (w) * (y))]
@@ -1336,27 +1336,38 @@ void Videostreaming::capFrame()
         return;
     }
 
+    if(makeSnapShot || m_burstShot)
+    {
+        if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG){
+            if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG){
+                if(!check_jpeg_header(m_buffers[buf.index].start[0],buf.bytesused))
+                {
+                    skipImageCapture++;
+                }
+                if(skipImageCapture >= 3)
+                {
+                    skipImageCapture = 0;
+                    _title = "Failure";
+                    _text = "Image not saved in the selected location";
+                    emit logCriticalHandle("Still image not saved successfully");
+                    emit titleTextChanged(_title,_text);
+                    m_burstShot = false;
+                    m_snapShot = false;
+                    // after taking shot(s), restore preview resoln and format.
+                    switchToStillPreviewSettings(false);
+                    retrieveframeStoreCamInCross = false;
+                    retrieveframeStoreCam = false;
+                    emit signalTograbPreviewFrame(retrieveframeStoreCam,false);
+                    return void();
+                }
+            }
+        }
+    }
+
     // prepare yuyv/rgba buffer and give to shader.
     if(!prepareBuffer(m_capSrcFormat.fmt.pix.pixelformat, m_buffers[buf.index].start[0], buf.bytesused)){
         qbuf(buf);
-        if(skipImageCapture < 3)
-            emit signalTograbPreviewFrame(retrieveframeStoreCam,true);  //Added by Navya  ---Querying the buffer again
-        else
-        {
-            skipImageCapture = 0;
-            _title = "Failure";
-            _text = "Image not saved in the selected location";
-            emit logCriticalHandle("Still image not saved successfully");
-            emit titleTextChanged(_title,_text);
-            m_burstShot = false;
-            m_snapShot = false;
-            // after taking shot(s), restore preview resoln and format.
-            switchToStillPreviewSettings(false);
-            retrieveframeStoreCamInCross = false;
-            retrieveframeStoreCam = false;
-            emit signalTograbPreviewFrame(retrieveframeStoreCam,false);
-            return void();
-        }
+        emit signalTograbPreviewFrame(retrieveframeStoreCam,true);  //Added by Navya  ---Querying the buffer again
         return;
     }
 
@@ -2801,7 +2812,6 @@ bool Videostreaming::check_jpeg_header(void *inputbuffer, __u32 bytesUsed)
         if(((uint8_t *) inputbuffer)[i] == 0xFF && ((uint8_t *) inputbuffer)[i+1] == 0xD8)
            return true;
     }
-    skipImageCapture++;
     return false;
 }
 
