@@ -1,3 +1,8 @@
+Qtcam Application - 24.0.15
+---------------------------
+*Fixed for AEmetermode not setting to default value when manual mode is selected for See3cam_160.
+*Bug fixes for ecam51b_USB.
+
 Qtcam Application - 24.0.14
 ---------------------------
 *Fixed Images not saved in given location pop up issue while streaming.

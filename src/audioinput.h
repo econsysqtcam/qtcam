@@ -128,7 +128,7 @@ public:
    static QStringListModel audiosupportedFmtListModel;
    static QStringListModel audioChannelCountModel;
    static QStringList audioDeviceList;
-   static QList <int>cardNum;
+   static QStringList cardNum;
    static QMap<int, QString> audioDeviceMap;
    static QMap<QString, int> audioDeviceSampleRateMap;
    static QMap<QString, int> audioDeviceChannelsMap;

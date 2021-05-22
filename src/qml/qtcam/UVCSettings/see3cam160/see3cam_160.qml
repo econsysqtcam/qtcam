@@ -795,10 +795,10 @@ Item {
     }
 
     function getValuesFromCamera(){
+        see3cam160.getAEMeterMode()
         see3cam160.getAutoFocusMode()
         see3cam160.getAWBpresetMode()
         see3cam160.getAWBlockstatus()
-        see3cam160.getAEMeterMode()
         see3cam160.getAElockstatus()
         see3cam160.getFlickerMode()
         see3cam160.getQFactor()

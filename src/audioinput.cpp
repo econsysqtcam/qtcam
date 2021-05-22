@@ -72,7 +72,7 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 QStringListModel AudioInput::audioinputDeviceList;
 QStringListModel AudioInput::audiosupportedFmtListModel;
 QStringListModel AudioInput::audioChannelCountModel;
-QList<int> AudioInput::cardNum;
+QStringList AudioInput::cardNum;
 QStringList AudioInput::audioDeviceList;
 QMap<int, QString> AudioInput::audioDeviceMap;
 QMap<QString, int> AudioInput::audioDeviceSampleRateMap;
@@ -168,6 +168,7 @@ qint64 AudioInfo::writeData(const char *data, qint64 len)
 AudioInput::AudioInput()
 {
     audio_buff = NULL;
+    audio_context = NULL;
 }
 
 AudioInput::~AudioInput()
@@ -327,6 +328,9 @@ void AudioInput::pa_sourcelist_cb(pa_context *c, const pa_source_info *l, int eo
         }
 
         devIndex++;
+
+        const char *value = pa_proplist_gets(l->proplist, "device.string");
+        cardNum.append(value);
 
         /*fill device data*/
         audio_ctx->list_devices[audio_ctx->num_input_dev-1].id = l->index; /*saves dev id*/
@@ -821,7 +825,9 @@ void AudioInput::recordAudio(){
 }
 
 bool AudioInput::audio_init()
-{    
+{
+    cardNum.clear();
+    audio_close_pulseaudio();
     audioDeviceList.clear();
     audio_context = audio_init_pulseaudio();
     if(audio_context == NULL){
@@ -894,22 +900,15 @@ int AudioInput::getCards(void)
 
 bool AudioInput::updateSupportedInfo(uint currentIndex)
 {
-    getCards();
-    QString cardName;
-    QMap<int, QString>::iterator cardNameIterator;
-    for (cardNameIterator = audioCardMap.begin(); cardNameIterator != audioCardMap.end(); ++cardNameIterator)
-    {
-        if(cardNameIterator.key() == currentIndex){
-            cardName = cardNameIterator.value();
-            break;
-        }
-    }
+    QStringList cardName;
+    cardName.clear();
+    cardName = cardNum.at(currentIndex-1).split(":");
 
     // close mixer
     alsa.closeMixer();
 
     // opne, attach, load mixer
-    alsa.initializeMixer(cardName);
+    alsa.initializeMixer("hw:"+cardName.at(1));
 
     QString audioDeviceName;
     QMap<int, QString>::iterator audioDeviceNameIterator;
@@ -1088,7 +1087,7 @@ int AudioInput::audio_init_buffers(audio_context_t *audio_ctx)
     }
 
     /*free audio_buffers (if any)*/
-    audio_free_buffers;
+    audio_free_buffers();
 
     audio_buffers = (audio_buff_t *)calloc(AUDBUFF_NUM, sizeof(audio_buff_t));
     if(audio_buffers == NULL)

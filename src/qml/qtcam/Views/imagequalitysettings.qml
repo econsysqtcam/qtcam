@@ -1660,7 +1660,6 @@ Item {
     }
     function exposureAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
-        exposure_absolute.opacity = 1
         if(!exposureAutoAvailable){ // If a camera does not contain "exposure, auto" control, but having "exposure absolute" control, allow it change exposure value.
             exposure_Slider.opacity = 1
             exposure_Slider.enabled = true
