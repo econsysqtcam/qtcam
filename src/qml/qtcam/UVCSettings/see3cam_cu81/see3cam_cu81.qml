@@ -1069,22 +1069,17 @@ Item
     Timer
     {
         id: getCamValuesTimer
-        interval: 500
+        interval: 1000
         onTriggered:
         {
-            see3camcu81.getCameraMode()
-            see3camcu81.getEffect()
-            see3camcu81.getDenoise()
-            see3camcu81.getQFactor()
-            see3camcu81.getExposureCompensation()
-            extSettingsBasedOnAutoExposureSelectionInUVCSettings(JS.autoExposureSelected)
+            see3camcu81.getCameraMode()     //to disable exposurecombo if hdr mode is selected initially
             stop()
         }
     }
     Component.onCompleted:
     {
-        see3camcu81.getCameraMode()                     //to disable exposurecombo if hdr mode is selected initially
         root.disablePowerLineFreq()
+        getCamValuesTimer.start()
     }
     Component
     {

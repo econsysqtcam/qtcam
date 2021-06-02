@@ -38,7 +38,7 @@
 #include "uvccamera.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
-#define SEE3CAM160_MJPEG_MAXBYTESUSED       8589934592
+#define SEE3CAM160_MJPEG_MAXBYTESUSED       4193280
 
 /* MACRO FOR BAYER10 TO RGB24 */
 #define R(x, y, w)	y16BayerDestBuffer[0 + 3 * ((x) + (w) * (y))]
@@ -1283,6 +1283,13 @@ void Videostreaming::capFrame()
         qbuf(buf);
         retrieveFrame=true;
         emit signalTograbPreviewFrame(retrieveframeStoreCamInCross,true);
+        return;
+    }
+
+    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_160) &&
+            (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG) && (buf.bytesused > SEE3CAM160_MJPEG_MAXBYTESUSED))
+    {
+        qbuf(buf);
         return;
     }
 

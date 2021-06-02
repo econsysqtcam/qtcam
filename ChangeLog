@@ -1,3 +1,8 @@
+Qtcam Application - 24.0.16
+---------------------------
+*Fixed for application crash when changed from UYVY to MJPEG format in See3CAM_160 in 16.04(32 bit).
+*Fixed for application crash when See3CAM_CU81 is selected in 16.04(32 bit).
+
 Qtcam Application - 24.0.15
 ---------------------------
 *Fixed for AEmetermode not setting to default value when manual mode is selected for See3cam_160.
