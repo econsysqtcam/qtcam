@@ -42,6 +42,13 @@ Item
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
+	onExtensionTabVisible:
+        {
+            if(visible)
+            {
+                ecam51USBId.rungetAFStatus()
+            }
+        }
     }
     ScrollView
     {
