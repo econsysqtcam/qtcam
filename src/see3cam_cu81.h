@@ -45,8 +45,9 @@ public:
 
         enum cameraModes
         {
-            HDR_MODE = 0x00,
-            LINEAR_MODE =0x01
+            DAY_HDR_MODE = 0x00,
+            NIGHT_HDR_MODE = 0x01,
+            LINEAR_MODE =0x02
         };
         Q_ENUMS(cameraModes)
 

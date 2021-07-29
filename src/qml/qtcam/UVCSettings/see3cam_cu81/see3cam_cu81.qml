@@ -63,19 +63,39 @@ Item
                 ExclusiveGroup { id: cameraMode }
                 RadioButton
                 {
-                    id: hdr_mode
+                    id: day_hdr_mode
                     style:  econRadioButtonStyle
-                    text:   qsTr("HDR")
+                    text:   qsTr("Day-HDR")
                     exclusiveGroup: cameraMode
                     activeFocusOnPress: true
                     onClicked: {
-                        see3camcu81.setCameraMode(See3CamCU81.HDR_MODE)
+                        see3camcu81.setCameraMode(See3CamCU81.DAY_HDR_MODE)
                         root.disableManualExpifHdrSelected(true)
                         disableAntiFlickerMode(true)
                         extSettingsBasedOnAutoExposureSelectionInUVCSettings(JS.autoExposureSelected)
                     }
                     Keys.onReturnPressed:  {
-                        see3camcu81.setCameraMode(See3CamCU81.HDR_MODE)
+                        see3camcu81.setCameraMode(See3CamCU81.DAY_HDR_MODE)
+                        root.disableManualExpifHdrSelected(true)
+                        disableAntiFlickerMode(true)
+                        extSettingsBasedOnAutoExposureSelectionInUVCSettings(JS.autoExposureSelected)
+                    }
+                }
+                RadioButton
+                {
+                    id: night_hdr_mode
+                    style:  econRadioButtonStyle
+                    text:   qsTr("Night-HDR")
+                    exclusiveGroup: cameraMode
+                    activeFocusOnPress: true
+                    onClicked: {
+                        see3camcu81.setCameraMode(See3CamCU81.NIGHT_HDR_MODE)
+                        root.disableManualExpifHdrSelected(true)
+                        disableAntiFlickerMode(true)
+                        extSettingsBasedOnAutoExposureSelectionInUVCSettings(JS.autoExposureSelected)
+                    }
+                    Keys.onReturnPressed:  {
+                        see3camcu81.setCameraMode(See3CamCU81.NIGHT_HDR_MODE)
                         root.disableManualExpifHdrSelected(true)
                         disableAntiFlickerMode(true)
                         extSettingsBasedOnAutoExposureSelectionInUVCSettings(JS.autoExposureSelected)
@@ -896,11 +916,17 @@ Item
         id:see3camcu81
         onSendCameraModeValue:
         {
-            if(cameraMode == See3CamCU81.HDR_MODE)
+            if(cameraMode == See3CamCU81.DAY_HDR_MODE)
             {
                 root.disableManualExpifHdrSelected(true)
                 disableAntiFlickerMode(true)
-                hdr_mode.checked = true
+                day_hdr_mode.checked = true
+            }
+            else if(cameraMode == See3CamCU81.NIGHT_HDR_MODE)
+            {
+                root.disableManualExpifHdrSelected(true)
+                disableAntiFlickerMode(true)
+                night_hdr_mode.checked = true
             }
             else if(cameraMode == See3CamCU81.LINEAR_MODE)
             {
