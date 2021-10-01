@@ -61,6 +61,7 @@ public:
         ECAM51B_USB,
         ECAM82_USB,
         SEE3CAM_160,
+        SEE3CAM_CU27,
         FSCAM_CU135, // STORECAM_1335
         SEE3CAM_CU55_MH, // cu55 monochrome
         SEE3CAM_CU22,

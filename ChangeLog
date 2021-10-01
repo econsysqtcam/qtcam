@@ -1,3 +1,8 @@
+Qtcam Application - 24.0.18
+---------------------------
+*Added support for See3CAM_CU27.
+*e-cam83_USB bugfixes.
+
 Qtcam Application - 24.0.17
 ---------------------------
 *Added support for Night HDR mode for See3CAM_CU81.

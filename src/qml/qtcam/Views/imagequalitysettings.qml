@@ -175,8 +175,11 @@ Item {
             {
                 root.videoCaptureChildVisible = visible
                 root.imageSettingVisibleChanged();
+                if(root.selectedDeviceEnumValue == CommonEnums.ECAM82_USB && visible)
+                {
+                    root.cameraFilterControls(true)
+                }
             }
-
             Item {
                 height: focus_value.y + 85
                 GridLayout {
@@ -1810,6 +1813,8 @@ Item {
                 while(menuitems.pop()){}
                 powerLineComboControlId = controlID
                 powerLineComboEnable =  true
+                if(!hardwareDef.enabled)
+                    root.selectMenuIndex(powerLineComboControlId,controlDefaultValue)
             }
             else
             {
