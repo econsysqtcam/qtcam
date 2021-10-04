@@ -1322,9 +1322,9 @@ Rectangle {
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_160) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam160/see3cam_160.qml").createObject(root)
         }
-        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU27) {
-                    see3cam = Qt.createComponent("../UVCSettings/see3camcu27/see3camcu27.qml").createObject(root)
-                }
+//        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU27) {
+//                    see3cam = Qt.createComponent("../UVCSettings/see3camcu27/see3camcu27.qml").createObject(root)
+//                }
         else if(selectedDeviceEnumValue == CommonEnums.ECAM82_USB) {
             see3cam = Qt.createComponent("../UVCSettings/ecam82_USB/ecam82_usb.qml").createObject(root)
         }
