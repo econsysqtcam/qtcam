@@ -61,6 +61,7 @@
 #include "see3cam_20cug.h"
 #include "see3cam_cu22.h"
 #include "see3cam_130d.h"
+#include "see3cam_1332.h"
 #include "see3cam_24cug.h"
 #include "see3cam_cu81.h"
 #include "ecam51_usb.h"
@@ -140,6 +141,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<AudioInput>("econ.camera.audioinput", 1, 0, "Audioinput");
     //Added by M.Vishnu Murali
     qmlRegisterType<See3CAM_130D>("econ.camera.see3cam130D", 1, 0, "See3Cam130D");
+    qmlRegisterType<See3CAM_1332>("econ.camera.see3cam1332", 1, 0, "See3Cam1332");
     qmlRegisterType<See3CAM_24CUG>("econ.camera.see3cam24cug", 1, 0, "See3Cam24CUG");
     qmlRegisterType<See3CAM_CU81>("econ.camera.see3camcu81", 1, 0, "See3CamCU81");
     qmlRegisterType<ecam51_USB>("econ.camera.ecam51_usb",1,0,"Ecam51USB");

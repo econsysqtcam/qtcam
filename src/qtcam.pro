@@ -56,7 +56,8 @@ SOURCES += main.cpp \
     see3cam_160.cpp \
     ecam51_usb.cpp \
     ecam82_usb.cpp \
-    see3cam_cu27.cpp
+    see3cam_cu27.cpp \
+    see3cam_1332.cpp
 
 # Installation path
 # target.path =
@@ -113,7 +114,8 @@ HEADERS += \
     see3cam_160.h \
     ecam51_usb.h \
     ecam82_usb.h \
-    see3cam_cu27.h
+    see3cam_cu27.h \
+    see3cam_1332.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \

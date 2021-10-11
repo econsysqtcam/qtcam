@@ -65,6 +65,7 @@ public:
         FSCAM_CU135, // STORECAM_1335
         SEE3CAM_CU55_MH, // cu55 monochrome
         SEE3CAM_CU22,
+        SEE3CAM_1332,
         SEE3CAM_20CUG
     }ECameraNames;
     //Enum for capture shot type

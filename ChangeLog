@@ -1,3 +1,8 @@
+Qtcam Application - 24.0.19
+---------------------------
+*Added support for See3CAM_1332.
+*Changed HID command code for See3CAM_CU27 and enabled extension settings for the same.
+
 Qtcam Application - 24.0.18
 ---------------------------
 *Added support for See3CAM_CU27.

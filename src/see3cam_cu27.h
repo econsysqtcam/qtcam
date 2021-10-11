@@ -4,7 +4,7 @@
 #include <QObject>
 #include "uvccamera.h"
 
-#define CAMERA_CONTROL_CU27          0xAD
+#define CAMERA_CONTROL_CU27          0xAF
 
 #define SET_FAIL                    0x00
 #define SET_SUCCESS                 0x01
