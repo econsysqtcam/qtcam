@@ -7,7 +7,6 @@
 
 See3CAM_CU27::See3CAM_CU27()
 {
-    qDebug() << Q_FUNC_INFO;
 }
 
 See3CAM_CU27::~See3CAM_CU27()
@@ -49,7 +48,6 @@ bool See3CAM_CU27::getQFactor()
             g_in_packet_buf[1]==GET_Q_FACTOR_CU27 &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             emit qFactorValue(g_in_packet_buf[2]);
-            qDebug() << Q_FUNC_INFO << g_in_packet_buf[2];
             return true;
         }
     }
@@ -85,7 +83,6 @@ bool See3CAM_CU27::setQFactor(uint qFactor){
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU27 &&
             g_in_packet_buf[1]==SET_Q_FACTOR_CU27 &&
             g_in_packet_buf[6]==SET_SUCCESS) {
-            qDebug() << Q_FUNC_INFO << qFactor;
             return true;
         }
     }
@@ -120,7 +117,6 @@ bool See3CAM_CU27::getFlickerMode()
             g_in_packet_buf[1]==GET_FLICKER_DETECTION_CU27 &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             emit flickerModeChanged(g_in_packet_buf[2]);
-            qDebug() << Q_FUNC_INFO << g_in_packet_buf[2];
             return true;
         }
     }
@@ -157,7 +153,6 @@ bool See3CAM_CU27::setFlickerMode(camFlickerMode flickerMode)
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU27 &&
             g_in_packet_buf[1]==SET_FLICKER_DETECTION_CU27 &&
             g_in_packet_buf[6]==SET_SUCCESS) {
-            qDebug() << Q_FUNC_INFO << flickerMode;
             return true;
         }
     }
@@ -192,7 +187,6 @@ bool See3CAM_CU27::getAElockstatus()
             g_in_packet_buf[1]==GET_AE_LOCK_STATUS_CU27 &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             emit aeLockStatusChanged(g_in_packet_buf[2]);
-            qDebug() << Q_FUNC_INFO << g_in_packet_buf[2];
             return true;
         }
     }
@@ -227,7 +221,6 @@ bool See3CAM_CU27::setAElockstatus(aeLockStatus lockStatus)
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU27 &&
             g_in_packet_buf[1]==SET_AE_LOCK_STATUS_CU27 &&
             g_in_packet_buf[6]==SET_SUCCESS) {
-            qDebug() << Q_FUNC_INFO << lockStatus;
             return true;
         }
     }
@@ -261,7 +254,6 @@ bool See3CAM_CU27::getAEMeterMode()
             g_in_packet_buf[1]==GET_AE_METERING_MODE_CU27 &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             emit aeMeterModeChanged(g_in_packet_buf[2]);
-            qDebug() << Q_FUNC_INFO << g_in_packet_buf[2];
             return true;
         }
     }
@@ -296,7 +288,6 @@ bool See3CAM_CU27::setAEMeterMode(aeMeteringMode meterMode)
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU27 &&
             g_in_packet_buf[1]==SET_AE_METERING_MODE_CU27 &&
             g_in_packet_buf[6]==SET_SUCCESS) {
-            qDebug() << Q_FUNC_INFO << meterMode;
             return true;
         }
     }
@@ -330,7 +321,6 @@ bool See3CAM_CU27::getAWBlockstatus()
             g_in_packet_buf[1]==GET_AWB_LOCKSTATUS_CU27 &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             emit awbLockStatusChanged(g_in_packet_buf[2]);
-            qDebug() << Q_FUNC_INFO << g_in_packet_buf[2];
             return true;
         }
     }
@@ -365,7 +355,6 @@ bool See3CAM_CU27::setAWBlockstatus(awbLockStatus lockStatus)
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU27 &&
             g_in_packet_buf[1]==SET_AWB_LOCKSTATUS_CU27 &&
             g_in_packet_buf[6]==SET_SUCCESS) {
-            qDebug() << Q_FUNC_INFO << lockStatus;
             return true;
         }
     }
@@ -399,7 +388,6 @@ bool See3CAM_CU27::getAWBpresetMode()
             g_in_packet_buf[1]==GET_AWB_MODE_CU27 &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             emit awbPresetModeChanged(g_in_packet_buf[2]);
-            qDebug() << Q_FUNC_INFO << g_in_packet_buf[2];
             return true;
         }
     }
@@ -434,7 +422,6 @@ bool See3CAM_CU27::setAWBpresetMode(awbPresetMode awbMode)
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU27 &&
             g_in_packet_buf[1]==SET_AWB_MODE_CU27 &&
             g_in_packet_buf[6]==SET_SUCCESS) {
-            qDebug() << Q_FUNC_INFO << awbMode;
             return true;
         }
     }
@@ -447,7 +434,6 @@ bool See3CAM_CU27::setAWBpresetMode(awbPresetMode awbMode)
  */
 bool See3CAM_CU27::getFirmwareVersion()
 {
-    qDebug() << Q_FUNC_INFO;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -478,7 +464,6 @@ bool See3CAM_CU27::getFirmwareVersion()
             _text.append(QString::number(g_in_packet_buf[2]));              //ISP firmware version_BYTE_4
 
             emit titleTextChanged(_title, _text);
-            qDebug() << Q_FUNC_INFO << _title << _text;
             return true;
         }
     }
@@ -511,7 +496,6 @@ bool See3CAM_CU27::setToDefault(){
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU27 &&
             g_in_packet_buf[1]==SET_TO_DEFAULT_CU27 &&
             g_in_packet_buf[6]==SET_SUCCESS) {
-            qDebug() << Q_FUNC_INFO;
             return true;
         }
     }
@@ -545,7 +529,6 @@ bool See3CAM_CU27::setBurstLength(uint burstLength){
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU27 &&
             g_in_packet_buf[1]==SET_BURST_LENGTH_CU27 &&
             g_in_packet_buf[6]==SET_SUCCESS) {
-            qDebug() << Q_FUNC_INFO << burstLength;
             return true;
         }
     }
@@ -579,7 +562,6 @@ bool See3CAM_CU27::getBurstLength()
             g_in_packet_buf[1]==GET_BURST_LENGTH_CU27 &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             emit burstLengthValue(g_in_packet_buf[2]);
-            qDebug() << Q_FUNC_INFO << g_in_packet_buf[2];
             return true;
         }
     }

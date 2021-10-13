@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<ecam51_USB>("econ.camera.ecam51_usb",1,0,"Ecam51USB");
 
     qmlRegisterType<See3CAM_160>("econ.camera.see3cam160",1,0,"See3cam160");
-    qmlRegisterType<See3CAM_160>("econ.camera.see3camcu27",1,0,"See3camCU27");
+    qmlRegisterType<See3CAM_CU27>("econ.camera.see3camcu27",1,0,"See3camCU27");
     qmlRegisterType<ecam82_USB>("econ.camera.ecam82_usb",1,0,"Ecam82USB");//while exposing to qml it is must that first letter should be in caps.
     //Added by Dhurka - 13th Oct 2016
     /**
