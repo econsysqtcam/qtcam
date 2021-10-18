@@ -825,11 +825,11 @@ Item {
                             style: econRadioButtonStyle
                             opacity: enabled ? 1 : 0.1
                             onClicked: {
-                                fscamcu135.setROIAutoExposure(Fscamcu135.AutoExpManual, 0, 0, 0, 0, 0);
+                                fscamcu135.setROIAutoExposure(Fscamcu135.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                                 autoExpoWinSizeCombo.enabled = true
                             }
                             Keys.onReturnPressed: {
-                                fscamcu135.setROIAutoExposure(Fscamcu135.AutoExpManual, 0, 0, 0, 0, 0);
+                                fscamcu135.setROIAutoExposure(Fscamcu135.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                                 autoExpoWinSizeCombo.enabled = true
                             }
                         }

@@ -312,11 +312,11 @@ Item {
                     style: econRadioButtonStyle
                     opacity: enabled ? 1 : 0.1
                     onClicked: {
-                        nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpManual, 0, 0, 0, 0, 0);
+                        nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = true
                     }
                     Keys.onReturnPressed: {
-                        nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpManual, 0, 0, 0, 0, 0);
+                        nilecam30usb.setExpRoiModeNileCam30USB(NileCam30usb.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = true
                     }
                 }

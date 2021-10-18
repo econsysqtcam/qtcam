@@ -247,11 +247,11 @@ Item {
                     style: econRadioButtonStyle
                     opacity: enabled ? 1 : 0.1
                     onClicked: {
-                        see3cam24cug.setROIAutoExposure(See3Cam24CUG.AutoExpManual, 0, 0, 0, 0, 0);
+                        see3cam24cug.setROIAutoExposure(See3Cam24CUG.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = true
                     }
                     Keys.onReturnPressed: {
-                        see3cam24cug.setROIAutoExposure(See3Cam24CUG.AutoExpManual, 0, 0, 0, 0, 0);
+                        see3cam24cug.setROIAutoExposure(See3Cam24CUG.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = true
                     }
                 }
