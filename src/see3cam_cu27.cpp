@@ -567,3 +567,71 @@ bool See3CAM_CU27::getBurstLength()
     }
     return false;
 }
+
+
+/**
+ * @brief See3CAM_CU20::setDenoiseCtrlMode - set denoise mode into the camera
+ * @param deNoiseMode - denoise mode value to set
+ * @return true/false
+ */
+bool See3CAM_CU27::setDenoiseCtrlMode(denoiseModes  deNoiseMode)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU27; /* camera id */
+    g_out_packet_buf[2] = SET_DENOISE_MODE_CU27; /* set special mode command  */
+    g_out_packet_buf[3] = deNoiseMode; /* pass denoise mode value */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU27 &&
+            g_in_packet_buf[1] == SET_DENOISE_MODE_CU27 &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_CU20::getDenoiseCtrlMode - get denoise control mode
+ * @return true/false
+ */
+bool See3CAM_CU27::getDenoiseCtrlMode()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU27; /* camera id */
+    g_out_packet_buf[2] = GET_DENOISE_MODE_CU27; /* get special mode command  */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU27 &&
+            g_in_packet_buf[1] == GET_DENOISE_MODE_CU27 &&
+            g_in_packet_buf[6] == GET_SUCCESS) {
+            emit denoiseModeChanged(g_in_packet_buf[2]);
+            return true;
+        }
+    }
+    return false;
+}

@@ -1143,6 +1143,64 @@ bool See3CAM_30::getFrameRateCtrlValue()
     return false;
 }
 
+
+bool See3CAM_30::getFlashState()
+{
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+    memset(g_in_packet_buf, 0x00, sizeof(g_in_packet_buf));
+
+    //Set the Report Number
+    g_out_packet_buf[1] = CAMERA_CONTROL_30; /* camera control id */
+    g_out_packet_buf[2] = GETFLASH_STATUS_30; /* get strobe mode */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_30 &&
+            g_in_packet_buf[1]==GETFLASH_STATUS_30 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {
+            emit flashModeValue(g_in_packet_buf[2]);
+            return true;
+        }
+    }
+    return false;
+
+}
+
+bool See3CAM_30::setFlashState(See3CAM_30::flashStateValues flashMode)
+{
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+
+    g_out_packet_buf[1] = CAMERA_CONTROL_30; /* set camera control code */
+    g_out_packet_buf[2] = SETFLASH_STATUS_30; /* set flash status command code */
+    g_out_packet_buf[3] = flashMode; /* set flash state [off/storbe] */
+
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_30 &&
+            g_in_packet_buf[1]==SETFLASH_STATUS_30 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+
+}
+
 void See3CAM_30::initializeBuffers(){
     memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
     memset(g_in_packet_buf, 0x00, sizeof(g_in_packet_buf));

@@ -1,3 +1,8 @@
+Qtcam Application - 24.0.21
+---------------------------
+*Added FlashState control for See3CAM_30.
+*Added Denoise control for See3CAM_CU27.
+
 Qtcam Application - 24.0.20
 ---------------------------
 *Bug fix for See3CAM_1332.

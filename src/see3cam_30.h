@@ -163,6 +163,13 @@ public:
     };
     Q_ENUMS(camSmileDetectEmbedDataMode)
 
+    enum flashStateValues{
+         FLASHMODE_OFF = 0x00,
+         FLASHMODE_TORCH = 0x01,
+         FLASHMODE_STROBE = 0x02,
+     };
+     Q_ENUMS(flashStateValues)
+
 signals:
     void effectModeChanged(uint effectMode);
     void denoiseValueChanged(uint denoiseValue);
@@ -181,6 +188,7 @@ signals:
     void smileDetectModeValue(uint smileDetectMode, uint smileDetectEmbedDataValue);
     void indicateExposureValueRangeFailure(QString title, QString text);
     void frameRateChanged(uint frameRateCtrlMode);
+    void flashModeValue(uint flashMode);
 
 
 public slots:
@@ -225,6 +233,9 @@ public slots:
 
     bool setFrameRateCtrlValue(uint frameRate);
     bool getFrameRateCtrlValue();
+
+    bool setFlashState(flashStateValues flashMode);
+    bool getFlashState();
 
     bool enableDisableOverlayRect(bool enableOverlayRect);
 

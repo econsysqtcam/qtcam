@@ -312,6 +312,47 @@ Item {
                 }
 
                 Text {
+                    id: denoiseControlText
+                    text: "--- Denoise Control ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                Row{
+                    spacing: 80
+                    ExclusiveGroup { id: denoiseControlGroup }
+                    RadioButton {
+                        id: denoiseEnable
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Enable")
+                        exclusiveGroup: denoiseControlGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            see3camcu27.setDenoiseCtrlMode(See3camCU27.DenoiseEnable)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu27.setDenoiseCtrlMode(See3camCU27.DenoiseEnable)
+                        }
+                    }
+                    RadioButton {
+                        id: denoiseDisable
+                        style:  econRadioButtonStyle
+                        text: qsTr("Disable")
+                        exclusiveGroup: denoiseControlGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            see3camcu27.setDenoiseCtrlMode(See3camCU27.DenoiseDisable)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu27.setDenoiseCtrlMode(See3camCU27.DenoiseDisable)
+                        }
+                    }
+                }
+
+                Text {
                     id: flickerctrlField
                     text: "-- Flicker Detection Control --"
                     font.pixelSize: 14
@@ -508,6 +549,7 @@ Item {
         see3camcu27.getFlickerMode()
         see3camcu27.getQFactor()
         see3camcu27.getBurstLength()
+        see3camcu27.getDenoiseCtrlMode()
     }
 
     function getSerialNumber() {
@@ -708,6 +750,14 @@ Item {
 
         onTitleTextChanged: {
             displayMessageBox(qsTr(_title), qsTr(_text))
+        }
+
+        onDenoiseModeChanged:{
+            if(denoiseMode == See3camCU27.DenoiseEnable){
+                denoiseEnable.checked = true
+            }else if(denoiseMode == See3camCU27.DenoiseDisable){
+                denoiseDisable.checked = true
+            }
         }
 
         onQFactorValue:{
