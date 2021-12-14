@@ -56,6 +56,8 @@ public:
     FrameRenderer();
     ~FrameRenderer();
 
+    int skipH264Frames;
+
     void setT(qreal t) { m_t = t; }
     void setViewportSize(const QSize &size) { m_viewportSize = size; }
     void setWindow(QQuickWindow *window) { m_window = window; }
@@ -80,6 +82,7 @@ public:
     void drawUYVYBUffer();
     void drawY8BUffer();
     void drawBufferFor360p();
+    void drawBufferForYUV420();
     void clearShader();
     void changeShader();
     void shaderRGB();
@@ -167,6 +170,7 @@ private:
     GLint samplerLocUYVY;
     GLint samplerLocRGB;
     GLint samplerLocGREY;
+    GLint samplerLocUV;
 
      static CommonEnums::ECameraNames currentlySelectedEnumValue;
 };

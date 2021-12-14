@@ -23,6 +23,11 @@
 
 using namespace std;
 
+static enum AVPixelFormat get_format(AVCodecContext *ctx,const enum AVPixelFormat *pi_fmt)
+{
+    H264Decoder* this_pointer = static_cast<H264Decoder*>(ctx->opaque);
+    return this_pointer->get_format_real(ctx, pi_fmt);
+}
 
 H264Decoder::H264Decoder()
 {
@@ -33,6 +38,13 @@ H264Decoder::H264Decoder()
 H264Decoder::~H264Decoder()
 {
     closeFile();
+}
+
+enum AVPixelFormat H264Decoder::get_format_real(AVCodecContext *ctx, const AVPixelFormat *pi_fmt)
+{
+    enum AVPixelFormat swfmt = avcodec_default_get_format(ctx, pi_fmt);
+    return swfmt;
+
 }
 
 bool H264Decoder::initH264Decoder(unsigned width, unsigned height)
@@ -70,7 +82,14 @@ bool H264Decoder::initH264Decoder(unsigned width, unsigned height)
 
     pH264CodecCtx->width = width;
     pH264CodecCtx->height = height;
+    pH264CodecCtx->thread_count = 10;
+    pH264CodecCtx->thread_safe_callbacks = true;
+    pH264CodecCtx->workaround_bugs = FF_BUG_AUTODETECT;
+    pH264CodecCtx->err_recognition = 1;
+    pH264CodecCtx->thread_type = 3;
+    pH264CodecCtx->opaque = this;
 
+    pH264CodecCtx->get_format = get_format;
 #if LIBAVCODEC_VER_AT_LEAST(53,6)
     if (avcodec_open2(pH264CodecCtx, pH264Codec, NULL) < 0)
 #else

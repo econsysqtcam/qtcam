@@ -308,6 +308,7 @@ FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
     m_shaderProgram = NULL;
     m_programYUYV = NULL;
     y16BayerFormat = false;
+    skipH264Frames = 10;
 }
 
 /**
@@ -357,6 +358,140 @@ void FrameRenderer::calculateViewport(int vidResolutionWidth, int vidResolutionH
 void FrameRenderer::selectedCameraEnum(CommonEnums::ECameraNames selectedDeviceEnum)
 {
     currentlySelectedEnumValue = selectedDeviceEnum;
+}
+
+void FrameRenderer::drawBufferForYUV420(){
+    if (!m_shaderProgram) {
+        initializeOpenGLFunctions();
+
+        m_shaderProgram = new QOpenGLShaderProgram();
+
+        m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Vertex,
+                                                 "attribute vec4 a_position;\n"
+                                                 "attribute vec2 a_texCoord;\n"
+                                                 "varying vec2 v_texCoord;\n"
+                                                 "void main()\n"
+                                                 "{\n"
+                                                 "gl_Position = a_position;\n"
+                                                 "v_texCoord = a_texCoord;\n"
+                                                 "}\n");
+        m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Fragment,
+                                                 "#ifdef GL_ES\n"
+                                                 "precision highp float;\n"
+                                                 "#endif\n"
+
+                                                 "varying vec2 v_texCoord;"
+                                                 "uniform sampler2D y_texture;"
+                                                 "uniform sampler2D u_texture;"
+                                                 "uniform sampler2D v_texture;"
+
+                                                 "void main (void) {"
+                                                 "float r, g, b, y, u, v;"
+                                                 "y = texture2D(y_texture, v_texCoord).r;"
+                                                 "u = texture2D(u_texture, v_texCoord).r;"
+                                                 "v = texture2D(v_texture, v_texCoord).r;"
+
+                                                 "y = 1.1643*(y-0.0625);"
+                                                 "u = u-0.5;"
+                                                 "v = v-0.5;"
+
+                                                 "r = y+1.5958*v;"
+                                                 "g = y-0.39173*u-0.81290*v;"
+                                                 "b = y+2.017*u;"
+                                                 "gl_FragColor = vec4(r, g, b, 1.0);"
+                                                 "}\n");
+
+        m_shaderProgram->bindAttributeLocation("a_position", 0);
+        m_shaderProgram->bindAttributeLocation("a_texCoord", 1);
+        m_shaderProgram->link();
+
+        mPositionLoc = m_shaderProgram->attributeLocation("a_position");
+        mTexCoordLoc = m_shaderProgram->attributeLocation("a_texCoord");
+
+        /*********** Y-Texture**************/
+        glEnable(GL_TEXTURE_2D);
+        samplerLocY = m_shaderProgram->uniformLocation("y_texture");
+        GLuint yTextureId;
+        glGenTextures (1, &yTextureId); // Generate a texture object
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture (GL_TEXTURE_2D, yTextureId);
+
+        /*********** U-Texture**************/
+        glEnable(GL_TEXTURE_2D);
+        samplerLocU = m_shaderProgram->uniformLocation("u_texture");
+        GLuint uTextureId;
+        glGenTextures (1, &uTextureId); // Generate a texture object
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture (GL_TEXTURE_2D, uTextureId);
+
+        /*********** V-Texture**************/
+        glEnable(GL_TEXTURE_2D);
+        samplerLocV = m_shaderProgram->uniformLocation("v_texture");
+        GLuint vTextureId;
+        glGenTextures (1, &vTextureId); // Generate a texture object
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture (GL_TEXTURE_2D, vTextureId);
+        updateStop = true;
+    }
+    renderyuyvMutex.lock();
+
+    int skipFrames =4;
+    m_shaderProgram->bind();
+
+    glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
+    glVertexAttribPointer(mTexCoordLoc, 2, GL_FLOAT, false, 8, mVerticesDataTextCord);
+
+    m_shaderProgram->enableAttributeArray(0);
+    m_shaderProgram->enableAttributeArray(1);
+
+    glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
+    if (yuvBuffer!= NULL){
+       if(h264DecodeRet<0 || skipH264Frames>=0)
+       {
+            goto skip;
+       }
+       if(gotFrame && !updateStop && skipFrames >3){
+
+           // set active texture and give input y buffer
+           glActiveTexture(GL_TEXTURE1);
+           glUniform1i(samplerLocY, 1);
+           glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth, videoResolutionHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, yuvBuffer);
+           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+           glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+           glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+           // set active texture and give input u buffer
+           glActiveTexture(GL_TEXTURE2);
+           glUniform1i(samplerLocU, 2);
+           glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth/2, videoResolutionHeight/2, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, yuvBuffer+(videoResolutionwidth*videoResolutionHeight));
+           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+           glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+           glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+           // set active texture and give input v buffer
+           glActiveTexture(GL_TEXTURE3);
+           glUniform1i(samplerLocV, 3);
+           glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth/2, videoResolutionHeight/2, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, yuvBuffer+((videoResolutionwidth*videoResolutionHeight)+(videoResolutionwidth*videoResolutionHeight/4)));
+           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+           glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+           glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+           glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+       }
+    }
+skip:
+    m_shaderProgram->disableAttributeArray(0);
+    m_shaderProgram->disableAttributeArray(1);
+
+    m_shaderProgram->removeAllShaders();
+    m_shaderProgram->release();
+
+    // Not strictly needed for this example, but generally useful for when
+    // mixing with raw OpenGL.
+    m_window->resetOpenGLState();
+    renderyuyvMutex.unlock();
 }
 
 /**
@@ -741,12 +876,14 @@ void FrameRenderer::changeShader(){
             break;
         case V4L2_PIX_FMT_YUYV:
         case V4L2_PIX_FMT_Y16:
-        case V4L2_PIX_FMT_H264:
         case V4L2_PIX_FMT_Y12:
         case V4L2_PIX_FMT_SGRBG8:
         case V4L2_PIX_FMT_SBGGR8: //Added by M Vishnu Murali: See3CAM_10CUG_CH uses respective pixel format 
             shaderYUYV();
             drawYUYVBUffer(); // To fix white color corruption drawing intially
+            break;
+        case V4L2_PIX_FMT_H264:
+            drawBufferForYUV420();
             break;
         }
     }
@@ -1068,6 +1205,8 @@ void FrameRenderer::paint()
             drawY8BUffer();
         }else if(renderBufferFormat == CommonEnums::BUFFER_RENDER_360P){ // Render 360p resoln
             drawBufferFor360p();
+        }else if(renderBufferFormat == CommonEnums::YUV420_BUFFER_RENDER){
+            drawBufferForYUV420();
         }
     }
 }
@@ -1427,9 +1566,14 @@ void Videostreaming::capFrame()
             else if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264 && !m_VideoRecord){ // capture and save image in h264 format[not for video recording]
                 v4l2_format tmpSrcFormat = m_capSrcFormat;
                 tmpSrcFormat.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
-                err = v4lconvert_convert(m_convertData, &tmpSrcFormat, &m_capDestFormat,
+                if(h264DecodeRet>=0 && m_renderer->skipH264Frames<0)
+                {
+                    err = v4lconvert_convert(m_convertData, &tmpSrcFormat, &m_capDestFormat,
                                          (unsigned char *)yuv420pdestBuffer, (width* height * 3)/2,
                                          m_capImage->bits(), m_capDestFormat.fmt.pix.sizeimage); // yuv420p to rgb conversion
+                }
+                else
+                    err=-1;
             }else{
                 err = v4lconvert_convert(m_convertData, &m_capSrcFormat, &m_capDestFormat,
                                          (unsigned char *)m_buffers[buf.index].start[0], buf.bytesused,
@@ -2345,14 +2489,18 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
             }
                 break;
             case V4L2_PIX_FMT_H264:{
-                if(width == 640 && height == 360){
-                    m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
-                }else
-                    m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
+                m_renderer->renderBufferFormat = CommonEnums::YUV420_BUFFER_RENDER;
                 // check - decode h264 to yuyv available
                 h264DecodeRet = h264Decode->decodeH264(yuv420pdestBuffer, (uint8_t *) inputbuffer, bytesUsed); /* decode h264 to yuv420p */
-                h264Decode->yu12_to_yuyv(yuyvBuffer, yuv420pdestBuffer, width, height); /*yuv420p to yuyv conversion */
-                memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+    //            h264Decode->yu12_to_yuyv(yuyvBuffer, yuv420pdestBuffer, width, height); /*yuv420p to yuyv conversion */
+                if(m_renderer->skipH264Frames>=0)
+                {
+                    m_renderer->skipH264Frames--;
+                }
+                if(h264DecodeRet>=0  && m_renderer->skipH264Frames<0)
+                {
+                    memcpy(m_renderer->yuvBuffer, yuv420pdestBuffer, width*height*1.5);
+                }
             }
                 break;
 
@@ -2389,7 +2537,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 break;
             }
         }
-        if(m_renderer->renderBufferFormat == CommonEnums::YUYV_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::UYVY_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::GREY_BUFFER_RENDER || m_renderer->renderBufferFormat== CommonEnums::BUFFER_RENDER_360P){
+        if(m_renderer->renderBufferFormat == CommonEnums::YUYV_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::UYVY_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::GREY_BUFFER_RENDER || m_renderer->renderBufferFormat== CommonEnums::BUFFER_RENDER_360P || m_renderer->renderBufferFormat==CommonEnums::YUV420_BUFFER_RENDER ||m_renderer->renderBufferFormat == CommonEnums::NV12_BUFFER_RENDER){
             if(m_VideoRecord){
                 if(videoEncoder!=NULL) {
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
@@ -3095,6 +3243,7 @@ void Videostreaming::startAgain() {
     }
     if(retrieveFrame)
         m_timer.start(2000);
+    m_renderer->skipH264Frames = 10;
 
 }
 
@@ -3182,7 +3331,10 @@ void Videostreaming::displayStillResolution() {
 void Videostreaming::displayEncoderList(){
     QStringList encoders;
     encoders.clear();
-    encoders<<"MJPG"<<"H264";
+    if(m_pixelformat == V4L2_PIX_FMT_H264)
+        encoders<<"H264";
+    else
+        encoders<<"MJPG"<<"H264";
     encoderList.setStringList(encoders);
 }
 
@@ -3517,6 +3669,8 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
     if(videoFormatType.isEmpty()) {
         videoFormatType = "avi";        //Application never enters in this condition
     }
+    if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264)
+        videoEncoderType = 1;
 #if !LIBAVCODEC_VER_AT_LEAST(54, 25)
     switch(videoEncoderType) {
     case 0:
@@ -3828,3 +3982,4 @@ void Videostreaming :: setFpsOnCheckingFormat(QString stillFmt){
     else
         changeFPSForHyperyon = FPS_DEFAULT;
 }
+

@@ -1330,6 +1330,9 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.ECAM82_USB) {
             see3cam = Qt.createComponent("../UVCSettings/ecam82_USB/ecam82_usb.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.ECAM83_USB) {
+            see3cam = Qt.createComponent("../UVCSettings/ecam83_USB/ecam83_usb.qml").createObject(root)
+        }
         else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }

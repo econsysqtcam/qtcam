@@ -60,6 +60,7 @@ public:
         ECAM51A_USB,
         ECAM51B_USB,
         ECAM82_USB,
+        ECAM83_USB,
         SEE3CAM_160,
         SEE3CAM_CU27,
         FSCAM_CU135, // STORECAM_1335
@@ -86,6 +87,8 @@ public:
         YUYV_BUFFER_RENDER,
         UYVY_BUFFER_RENDER,
         GREY_BUFFER_RENDER,
+        YUV420_BUFFER_RENDER,
+        NV12_BUFFER_RENDER,
         BUFFER_RENDER_360P  // render for 360p resoln alone
     }ERenderBuffer;
 	

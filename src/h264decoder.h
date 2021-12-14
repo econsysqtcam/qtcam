@@ -34,6 +34,7 @@ extern "C" {
 #include "libavutil/imgutils.h"
 }
 
+static enum AVPixelFormat get_format(AVCodecContext *ctx, const enum AVPixelFormat *pi_fmt);
 
 class H264Decoder
 {
@@ -46,6 +47,7 @@ public:
    int decodeH264(uint8_t *out_buf, uint8_t *in_buf, int buf_size);
    void yu12_to_yuyv(u_int8_t *out, u_int8_t *in, int width, int height);
     int libav_decode(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacket *pkt);
+   enum AVPixelFormat get_format_real(AVCodecContext *ctx, const enum AVPixelFormat *pi_fmt);
 protected:
       AVCodecContext *pH264CodecCtx;
       AVCodec *pH264Codec;
