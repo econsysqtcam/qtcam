@@ -36,6 +36,9 @@
 #define GET_DENOISE_MODE_CU27        0x1C
 #define SET_DENOISE_MODE_CU27        0x1D
 
+#define GET_ROLL_VALUE_CU27          0x1E
+#define SET_ROLL_VALUE_CU27          0x1F
+
 #define MAX_WINDOW_SIZE             8
 
 #define READ_FIRMWARE_VERSION_CU27   0x19
@@ -111,6 +114,7 @@ public:
 signals:
     void titleTextChanged(QString _title,QString _text);
     void qFactorValue(uint qFactor);
+    void rollValue(uint roll);
     void flickerModeChanged(uint flickerMode);
     void awbPresetModeChanged(uint awbMode);
     void awbLockStatusChanged(uint lockStatus);
@@ -148,6 +152,9 @@ public slots:
 
     bool setDenoiseCtrlMode(denoiseModes deNoiseMode);
     bool getDenoiseCtrlMode();
+
+    bool getRollValue();
+    bool setRollValue(uint rollValue);
 };
 
 #endif // SEE3CAM_CU27_H

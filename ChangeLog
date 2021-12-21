@@ -1,3 +1,8 @@
+Qtcam Application - 24.0.23
+---------------------------
+*Added support for See3CAM_CU1330M.
+*Added rollControl for See3CAM_CU27.
+
 Qtcam Application - 24.0.22
 ---------------------------
 *Added support for e-cam83USB.

@@ -635,3 +635,71 @@ bool See3CAM_CU27::getDenoiseCtrlMode()
     }
     return false;
 }
+
+/**
+ * @brief See3CAM_CU27::getRollValue - get RollValue from camera
+ * return true - success /false - failure
+ */
+bool See3CAM_CU27::getRollValue()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU27; /* camera id */
+    g_out_packet_buf[2] = GET_ROLL_VALUE_CU27; /* get q factor command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU27 &&
+            g_in_packet_buf[1]==GET_ROLL_VALUE_CU27 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {
+            emit rollValue(g_in_packet_buf[2]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief See3CAM_CU27::setRollValue - set RollValue in camera
+ * @param rollValue.
+ * return true - success /false - failure
+ */
+bool See3CAM_CU27::setRollValue(uint rollValue){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU27; /* camera id */
+    g_out_packet_buf[2] = SET_ROLL_VALUE_CU27; /* set q factor command */
+    g_out_packet_buf[3] = rollValue; /* qfactor value to set */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU27 &&
+            g_in_packet_buf[1]==SET_ROLL_VALUE_CU27 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}

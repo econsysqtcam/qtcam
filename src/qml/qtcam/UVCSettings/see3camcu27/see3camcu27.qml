@@ -13,11 +13,14 @@ Item {
 
     property int qFactorMin: 0
     property int qFactorMax: 100
+    property int rollMin: 0
+    property int rollMax: 180
     property int flickerCtrl
     property int aeMeteringMode
     property int awbPresetAutoMode: 8
     // Flags to prevent setting values in camera when getting the values from camera
     property bool skipUpdateUIQFactor : false
+    property bool skipUpdateUIRoll : false
     property bool skipUpdateUIFlickerMode:false
     property bool skipUpdateUIAWbPreset: false
     property bool skipUpdateUIAEMeterMode: false
@@ -384,6 +387,54 @@ Item {
                     }
                 }
 
+                Text {
+                    id: rollValueText
+                    text: "--- Roll Value ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+
+                Row{
+                    spacing: 35
+                    Slider {
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        id: rollSlider
+                        width: 150
+                        stepSize: 180
+                        style:econSliderStyle
+                        minimumValue: rollMin
+                        maximumValue: rollMax
+                        onValueChanged:  {
+                            rollTextField.text = rollSlider.value
+                            if(skipUpdateUIRoll){
+                                see3camcu27.setRollValue(rollSlider.value)
+                            }
+                            skipUpdateUIRoll = true
+                        }
+                    }
+                    TextField {
+                        id: rollTextField
+                        text: rollSlider.value
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        validator: IntValidator {bottom: rollSlider.minimumValue; top: rollSlider.maximumValue}
+                        onTextChanged: {
+                            if(text.length > 0){
+                                rollSlider.value = rollTextField.text
+                            }
+                        }
+                    }
+                }
+
+
                 Row{
                     Layout.alignment: Qt.AlignCenter
                     Button {
@@ -548,6 +599,7 @@ Item {
         see3camcu27.getAElockstatus()
         see3camcu27.getFlickerMode()
         see3camcu27.getQFactor()
+        see3camcu27.getRollValue()
         see3camcu27.getBurstLength()
         see3camcu27.getDenoiseCtrlMode()
     }
@@ -764,6 +816,12 @@ Item {
             skipUpdateUIQFactor = false
             qFactorSlider.value = qFactor
             skipUpdateUIQFactor = true
+        }
+
+        onRollValue:{
+            skipUpdateUIRoll = false
+            rollSlider.value = roll
+            skipUpdateUIRoll = true
         }
 
         onFlickerModeChanged: {

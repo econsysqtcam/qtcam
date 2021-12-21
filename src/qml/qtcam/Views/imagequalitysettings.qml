@@ -1666,7 +1666,8 @@ Item {
         if(!exposureAutoAvailable){ // If a camera does not contain "exposure, auto" control, but having "exposure absolute" control, allow it change exposure value.
             exposure_Slider.opacity = 1
             exposure_Slider.enabled = true
-            exposure_value.opacity = 1            
+            exposure_value.opacity = 1
+            exposure_absolute.opacity = 1
         }
         exposurecontrolId = controlID
         if(root.selectedDeviceEnumValue === CommonEnums.CX3_UVC_CAM)
