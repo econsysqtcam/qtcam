@@ -1589,12 +1589,12 @@ Item {
         zoomControlId = controlID
         zoom_Slider.minimumValue = controlMinValue
         zoom_Slider.maximumValue = controlMaxValue
-	// Added by Sankari: Nov 23 2018
-	if(hardwareDef.enabled){ // if hardware default button is clicked, enable zoom changes
-	    zoomValueChangeProperty = false
-	}
+    // Added by Sankari: Nov 23 2018
+//	if(hardwareDef.enabled){ // if hardware default button is clicked, enable zoom changes
+//	    zoomValueChangeProperty = false
+//	}
         zoom_Slider.value = controlDefaultValue
-	zoomValueChangeProperty = true
+//	zoomValueChangeProperty = true
         zoom_Slider.stepSize = controlStepSize
     }
     function hueUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)

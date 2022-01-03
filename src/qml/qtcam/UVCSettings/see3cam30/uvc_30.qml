@@ -1606,8 +1606,8 @@ Item {
          onAfterRecordVideo:{
              if(rectEnable.checked){
                 see3cam30.enableDisableAFRectangle(true)
+                see3cam30.enableDisableOverlayRect(true)
              }
-             see3cam30.enableDisableOverlayRect(true)
          }
          onVideoResolutionChanged:{
              getexposureCompFrameRateCtrlTimer.start()

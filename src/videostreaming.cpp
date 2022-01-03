@@ -591,7 +591,7 @@ void FrameRenderer::drawBufferFor360p(){
 
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if (yBuffer != NULL && uBuffer != NULL && vBuffer != NULL){
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG)){
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M)){
             skipFrames = frame;
         }
         else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
@@ -710,7 +710,7 @@ void FrameRenderer::drawYUYVBUffer(){
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG)){
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M)){
             skipFrames = frame;
         }
         else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
@@ -766,7 +766,7 @@ void FrameRenderer::drawUYVYBUffer(){
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG)){
+        if((currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M)){
             skipFrames = frame;
         }else{
             skipFrames = 4;
@@ -3094,7 +3094,7 @@ void Videostreaming::displayFrame() {
         m_renderer->y16BayerFormat = true;
     }
 
-    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG) && (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)) {
+    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU1330M) && (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)) {
         y16FormatFor20CUG = true;
     }
     if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264){

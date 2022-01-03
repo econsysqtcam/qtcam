@@ -1902,8 +1902,8 @@ value in the text box and click the Set button"
          onAfterRecordVideo:{
              if(rectEnable.checked){
                 seecam130D.enableDisableAFRectangle(true)
+                seecam130D.enableDisableFaceRectangle(true)
              }
-             seecam130D.enableDisableFaceRectangle(true)
          }
          onVideoResolutionChanged:{
              getexposureCompFrameRateCtrlTimer.start()
