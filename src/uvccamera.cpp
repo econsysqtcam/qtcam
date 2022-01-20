@@ -108,6 +108,7 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c184"),CommonEnums::ECAM83_USB);
     cameraEnumMap.insert(econVid + (",c12c"),CommonEnums::SEE3CAM_CU27);
     cameraEnumMap.insert(econVid + (",c1d7"),CommonEnums::SEE3CAM_CU1330M);
+    cameraEnumMap.insert(econVid + (",c0d7"),CommonEnums::SEE3CAM_135M);
     cameraEnumMap.insert(econVid + (",c400"),CommonEnums::SEE3CAM_160);
 }
 

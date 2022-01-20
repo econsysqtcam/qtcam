@@ -308,7 +308,7 @@ FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
     m_shaderProgram = NULL;
     m_programYUYV = NULL;
     y16BayerFormat = false;
-    skipH264Frames = 10;
+    skipH264Frames = 20;
 }
 
 /**
@@ -591,7 +591,8 @@ void FrameRenderer::drawBufferFor360p(){
 
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if (yBuffer != NULL && uBuffer != NULL && vBuffer != NULL){
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M)){
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M
+        || currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M)){
             skipFrames = frame;
         }
         else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
@@ -710,7 +711,7 @@ void FrameRenderer::drawYUYVBUffer(){
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M)){
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M)){
             skipFrames = frame;
         }
         else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
@@ -766,7 +767,7 @@ void FrameRenderer::drawUYVYBUffer(){
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M)){
+        if((currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M)){
             skipFrames = frame;
         }else{
             skipFrames = 4;
@@ -3094,7 +3095,7 @@ void Videostreaming::displayFrame() {
         m_renderer->y16BayerFormat = true;
     }
 
-    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU1330M) && (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)) {
+    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU1330M|| currentlySelectedCameraEnum == CommonEnums::SEE3CAM_135M) && (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)) {
         y16FormatFor20CUG = true;
     }
     if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264){
@@ -3243,7 +3244,7 @@ void Videostreaming::startAgain() {
     }
     if(retrieveFrame)
         m_timer.start(2000);
-    m_renderer->skipH264Frames = 10;
+    m_renderer->skipH264Frames = 20;
 
 }
 

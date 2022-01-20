@@ -68,6 +68,7 @@ public:
         SEE3CAM_CU22,
         SEE3CAM_1332,
         SEE3CAM_CU1330M,
+        SEE3CAM_135M,
         SEE3CAM_20CUG
     }ECameraNames;
     //Enum for capture shot type

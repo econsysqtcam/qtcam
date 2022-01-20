@@ -70,6 +70,7 @@
 #include "ecam82_usb.h"
 #include "ecam83_usb.h"
 #include "see3cam_cu1330m.h"
+#include "see3cam_135m.h"
 //*! \mainpage Qtcam - A econ's camera product
 // *
 // * \section See3CAM_10CUG
@@ -152,6 +153,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_CU27>("econ.camera.see3camcu27",1,0,"See3camCU27");
     qmlRegisterType<ecam82_USB>("econ.camera.ecam82_usb",1,0,"Ecam82USB");
     qmlRegisterType<See3CAM_CU1330M>("econ.camera.see3cam_cu1330m",1,0,"See3camCU1300M");
+    qmlRegisterType<See3CAM_135M>("econ.camera.see3cam_135m",1,0,"See3cam135M");
     qmlRegisterType<ecam83_USB>("econ.camera.ecam83_usb",1,0,"Ecam83USB");//while exposing to qml it is must that first letter should be in caps.
     //Added by Dhurka - 13th Oct 2016
     /**

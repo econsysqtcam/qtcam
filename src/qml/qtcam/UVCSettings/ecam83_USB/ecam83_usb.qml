@@ -7,7 +7,6 @@ import cameraenum 1.0
 import econ.camera.ecam83_usb 1.0
 
 Item {
-
     Connections
     {
         target: root

@@ -1,29 +1,32 @@
-#ifndef SEE3CAM_CU1330M_H
-#define SEE3CAM_CU1330M_H
+#ifndef SEE3CAM_135M_H
+#define SEE3CAM_135M_H
 
 #include "uvccamera.h"
 #include <QObject>
 
-#define CAMERA_CONTROL_CU1330M                  0xB0
+#define CAMERA_CONTROL_135M                  0xB1
 
-#define GET_STREAM_MODE_CU1330M                 0x01
-#define SET_STREAM_MODE_CU1330M                 0x02
+#define GET_STREAM_MODE_135M                 0x01
+#define SET_STREAM_MODE_135M                 0x02
 
-#define GET_FLASH_MODE_CU1330M                  0x03
-#define SET_FLASH_MODE_CU1330M                  0x04
+#define GET_FLASH_MODE_135M                  0x03
+#define SET_FLASH_MODE_135M                  0x04
 
-#define GET_ORIENTATION_CU1330M                 0x05
-#define SET_ORIENTATION_CU1330M                 0x06
+#define GET_ORIENTATION_135M                 0x05
+#define SET_ORIENTATION_135M                 0x06
 
-#define GET_EXP_ROI_MODE_CU1330M                0x07
-#define SET_EXP_ROI_MODE_CU1330M                0x08
+#define GET_EXP_ROI_MODE_135M                0x07
+#define SET_EXP_ROI_MODE_135M                0x08
 
-#define SET_TO_DEFAULT_CU1330M                  0xFF
+#define GET_FOCUS_ROI_MODE_135M              0x09
+#define SET_FOCUS_ROI_MODE_135M              0x0A
+
+#define SET_TO_DEFAULT_135M                  0xFF
 
 #define GET_SUCCESS                           0x01
 #define GET_FAILURE                           0x00
 
-class See3CAM_CU1330M : public QObject
+class See3CAM_135M : public QObject
 {
     Q_OBJECT
 
@@ -35,8 +38,8 @@ private:
     void initializeBuffers();
 
 public:
-    See3CAM_CU1330M();
-    ~See3CAM_CU1330M();
+    See3CAM_135M();
+    ~See3CAM_135M();
 
     enum flashStateValues{
          FLASHMODE_OFF = 0x00,
@@ -65,6 +68,12 @@ public:
     };
     Q_ENUMS(camROIAutoExpMode)
 
+    enum camROIAutoFocusMode {
+        AutoFocusFull = 0x01,
+        AutoFocusManual = 0x02,
+    };
+    Q_ENUMS(camROIAutoFocusMode)
+
 signals:
     void flashModeValue(uint flashMode);
 
@@ -73,6 +82,8 @@ signals:
     void flipCtrlValue(uint flipValue);
 
     void roiAutoExpMode(uint roiMode, uint winSize);
+
+    void roiAutoFocusMode(uint roiMode, uint winSize);
 
 
 public slots:
@@ -89,9 +100,12 @@ public slots:
     bool setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
     bool getAutoExpROIModeAndWindowSize();
 
+    bool setROIAutoFocus(camROIAutoFocusMode see3camAutofocusROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
+    bool getAutoFocusROIModeAndWindowSize();
+
     bool setToDefault();
 
 
 };
 
-#endif // SEE3CAM_CU1330M_H
+#endif // SEE3CAM_135M_H

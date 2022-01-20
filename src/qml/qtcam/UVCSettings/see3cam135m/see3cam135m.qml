@@ -3,15 +3,17 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.0
 import QtQuick.Dialogs 1.1
 import econ.camera.uvcsettings 1.0
-import econ.camera.see3cam_cu1330m 1.0
+import econ.camera.see3cam_135m 1.0
 import QtQuick.Layouts 1.1
 import cameraenum 1.0
 
 Item {
     width:240
-    height:720
+    height:1400
 
     property bool skipUpdateUIOnExpWindowSize: false
+    property bool skipUpdateUIOnFocusWindowSize: false
+
     Action {
         id: setDefault
         onTriggered:
@@ -25,7 +27,16 @@ Item {
         id: getAutoExpsoureControlValues
         interval: 1000
         onTriggered: {
-            see3camcu1330m.getAutoExpROIModeAndWindowSize()
+            see3cam135m.getAutoExpROIModeAndWindowSize()
+            stop()
+        }
+    }
+    // Used when selecting auto focus in image Quality settings menu
+    Timer {
+        id: getAutoFocusControlValues
+        interval: 1000
+        onTriggered: {
+            see3cam135m.getAutoFocusROIModeAndWindowSize()
             stop()
         }
     }
@@ -52,8 +63,14 @@ Item {
         }
         onMouseRightClicked:{
             if(autoexpManual.enabled && autoexpManual.checked){
-               see3camcu1330m.setROIAutoExposure(See3camCU1300M.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
+               see3cam135m.setROIAutoExposure(See3cam135M.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
             }
+            if(autofocusManual.enabled && autofocusManual.checked){
+               see3cam135m.setROIAutoFocus(See3cam135M.AutoFocusManual, width, height, x, y, autoFocusWinSizeCombo.currentText)
+            }
+        }
+        onAutoFocusSelected:{
+            enableDisableAutoFocusUIControls(autoFocusSelect)
         }
         onAutoExposureSelected:{
             enableDisableAutoExposureControls(autoExposureSelect)
@@ -142,10 +159,10 @@ Item {
                     exclusiveGroup: flashModeGroup
                     activeFocusOnPress: true
                     onClicked: {
-                        see3camcu1330m.setFlashState(See3camCU1300M.FLASHMODE_OFF)
+                        see3cam135m.setFlashState(See3cam135M.FLASHMODE_OFF)
                     }
                     Keys.onReturnPressed:  {
-                        see3camcu1330m.setFlashState(See3camCU1300M.FLASHMODE_OFF)
+                        see3cam135m.setFlashState(See3cam135M.FLASHMODE_OFF)
                     }
                 }
                 RadioButton {
@@ -155,10 +172,10 @@ Item {
                     exclusiveGroup: flashModeGroup
                     activeFocusOnPress: true
                     onClicked: {
-                        see3camcu1330m.setFlashState(See3camCU1300M.FLASHMODE_STROBE)
+                        see3cam135m.setFlashState(See3cam135M.FLASHMODE_STROBE)
                     }
                     Keys.onReturnPressed: {
-                        see3camcu1330m.setFlashState(See3camCU1300M.FLASHMODE_STROBE)
+                        see3cam135m.setFlashState(See3cam135M.FLASHMODE_STROBE)
                     }
                 }
                 RadioButton {
@@ -168,10 +185,10 @@ Item {
                     exclusiveGroup: flashModeGroup
                     activeFocusOnPress: true
                     onClicked: {
-                        see3camcu1330m.setFlashState(See3camCU1300M.FLASHMODE_TORCH)
+                        see3cam135m.setFlashState(See3cam135M.FLASHMODE_TORCH)
                     }
                     Keys.onReturnPressed: {
-                        see3camcu1330m.setFlashState(See3camCU1300M.FLASHMODE_TORCH)
+                        see3cam135m.setFlashState(See3cam135M.FLASHMODE_TORCH)
                     }
                 }
             }
@@ -195,10 +212,10 @@ Item {
                     text: "Horizontal"
                     style: econCheckBoxStyle
                     onClicked:{
-                        see3camcu1330m.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
+                        see3cam135m.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
                     }
                     Keys.onReturnPressed: {
-                        see3camcu1330m.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
+                        see3cam135m.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
                     }
                 }
                 CheckBox {
@@ -207,10 +224,10 @@ Item {
                     text: "Vertical"
                     style: econCheckBoxStyle
                     onClicked:{
-                        see3camcu1330m.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
+                        see3cam135m.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
                     }
                     Keys.onReturnPressed: {
-                        see3camcu1330m.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
+                        see3cam135m.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
                     }
                 }
 
@@ -240,11 +257,11 @@ Item {
                     // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
                     // winSize is required only for manual mode
                     onClicked: {
-                        see3camcu1330m.setROIAutoExposure(See3camCU1300M.AutoExpFull, 0, 0, 0, 0, 0);
+                        see3cam135m.setROIAutoExposure(See3cam135M.AutoExpFull, 0, 0, 0, 0, 0);
                         autoExpoWinSizeCombo.enabled = false
                     }
                     Keys.onReturnPressed: {
-                        see3camcu1330m.setROIAutoExposure(See3camCU1300M.AutoExpFull, 0, 0, 0, 0, 0);
+                        see3cam135m.setROIAutoExposure(See3cam135M.AutoExpFull, 0, 0, 0, 0, 0);
                         autoExpoWinSizeCombo.enabled = false
                     }
                 }
@@ -256,11 +273,11 @@ Item {
                     style: econRadioButtonStyle
                     opacity: enabled ? 1 : 0.1
                     onClicked: {
-                        see3camcu1330m.setROIAutoExposure(See3camCU1300M.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
+                        see3cam135m.setROIAutoExposure(See3cam135M.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = true
                     }
                     Keys.onReturnPressed: {
-                        see3camcu1330m.setROIAutoExposure(See3camCU1300M.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
+                        see3cam135m.setROIAutoExposure(See3cam135M.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = true
                     }
                 }
@@ -284,9 +301,83 @@ Item {
                 style: econComboBoxStyle
                 onCurrentIndexChanged: {
                     if(skipUpdateUIOnExpWindowSize){
-                        see3camcu1330m.setROIAutoExposure(See3camCU1300M.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
+                        see3cam135m.setROIAutoExposure(See3cam135M.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
                     }
                     skipUpdateUIOnExpWindowSize = true
+                }
+            }
+            Text {
+                id: roiAutoFocusMode
+                text: "--- ROI - Auto Focus ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+
+            Row{
+                spacing:38
+                ExclusiveGroup { id: roiFocusgroup }
+                RadioButton {
+                    exclusiveGroup: roiFocusgroup
+                    id: autofocusFull
+                    text: "Full"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    opacity: enabled ? 1 : 0.1
+                    // setROIAutoFocus() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
+                    // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
+                    // winSize is required only for manual mode
+                    onClicked: {
+                        see3cam135m.setROIAutoFocus(See3cam135M.AutoFocusFull, 0, 0, 0, 0, 0);
+                        autoFocusWinSizeCombo.enabled = false
+                    }
+                    Keys.onReturnPressed: {
+                        see3cam135m.setROIAutoFocus(See3cam135M.AutoFocusFull, 0, 0, 0, 0, 0);
+                        autoFocusWinSizeCombo.enabled = false
+                    }
+                }
+                RadioButton {
+                    exclusiveGroup: roiFocusgroup
+                    id: autofocusManual
+                    text: "Manual"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    opacity: enabled ? 1 : 0.1
+                    onClicked: {
+                        see3cam135m.setROIAutoFocus(See3cam135M.AutoFocusManual, 0, 0, 0, 0, autoFocusWinSizeCombo.currentText);
+                        autoFocusWinSizeCombo.enabled = true
+                    }
+                    Keys.onReturnPressed: {
+                        see3cam135m.setROIAutoFocus(See3cam135M.AutoFocusManual, 0, 0, 0, 0, autoFocusWinSizeCombo.currentText);
+                        autoFocusWinSizeCombo.enabled = true
+                    }
+                }
+            }
+            ComboBox
+            {
+                id: autoFocusWinSizeCombo
+                enabled: (autofocusManual.enabled && autofocusManual.checked) ? true : false
+                opacity: (autofocusManual.enabled && autofocusManual.checked) ? 1 : 0.1
+                model: ListModel {
+                    ListElement { text: "1" }
+                    ListElement { text: "2" }
+                    ListElement { text: "3" }
+                    ListElement { text: "4" }
+                    ListElement { text: "5" }
+                    ListElement { text: "6" }
+                    ListElement { text: "7" }
+                    ListElement { text: "8" }
+                }
+                activeFocusOnPress: true
+                style: econComboBoxStyle
+                onCurrentIndexChanged: {
+                    if(skipUpdateUIOnFocusWindowSize){
+                        see3cam135m.setROIAutoFocus(See3cam135M.AutoFocusManual, 0, 0, 0, 0, autoFocusWinSizeCombo.currentText)
+                    }
+                    skipUpdateUIOnFocusWindowSize = true
                 }
             }
             Row{
@@ -306,32 +397,32 @@ Item {
             }
         }
     }
-    See3camCU1300M{
-        id:see3camcu1330m
+    See3cam135M{
+        id:see3cam135m
         onStreamModeValue:{
-            if(streamMode == See3camCU1300M.MODE_MASTER){
+            if(streamMode == See3cam135M.MODE_MASTER){
                 rdoModeMaster.checked = true
-            }else if(streamMode == See3camCU1300M.MODE_TRIGGER){
+            }else if(streamMode == See3cam135M.MODE_TRIGGER){
                 rdoModeTrigger.checked = true
             }
         }
 
         onFlashModeValue:{
-            if(flashMode == See3camCU1300M.FLASHMODE_OFF){
+            if(flashMode == See3cam135M.FLASHMODE_OFF){
                 rdoModeOff.checked = true
-            }else if(flashMode == See3camCU1300M.FLASHMODE_STROBE){
+            }else if(flashMode == See3cam135M.FLASHMODE_STROBE){
                 rdoModeStrobe.checked = true
-            }else if(flashMode == See3camCU1300M.FLASHMODE_TORCH){
+            }else if(flashMode == See3cam135M.FLASHMODE_TORCH){
                 rdoModeTorch.checked = true
             }
         }
 
         onFlipCtrlValue:{
-            if(flipValue == See3camCU1300M.FLIP_HORIZONTAL){
+            if(flipValue == See3cam135M.FLIP_HORIZONTAL){
                  flipHorizontal.checked = true
-            }else if(flipValue == See3camCU1300M.FLIP_VERTICAL){
+            }else if(flipValue == See3cam135M.FLIP_VERTICAL){
                 flipVertical.checked = true
-            }else if(flipValue ==See3camCU1300M.FLIP_BOTH){
+            }else if(flipValue ==See3cam135M.FLIP_BOTH){
                flipHorizontal.checked = true
                flipVertical.checked = true
             }else{
@@ -340,8 +431,14 @@ Item {
             }
         }
 
+
         onRoiAutoExpMode:{
             currentROIAutoExposureMode(roiMode, winSize)
+        }
+
+
+        onRoiAutoFocusMode:{
+            currentROIAutoFocusMode(roiMode, winSize)
         }
     }
     Uvccamera {
@@ -479,11 +576,11 @@ Item {
     // current ROI auto exposure mode
     function currentROIAutoExposureMode(roiMode, winSize){
         switch(roiMode){
-        case See3camCU1300M.AutoExpFull:
+        case See3cam135M.AutoExpFull:
             autoexpFull.checked = true
             autoExpoWinSizeCombo.enabled = false
             break
-        case See3camCU1300M.AutoExpManual:
+        case See3cam135M.AutoExpManual:
             skipUpdateUIOnExpWindowSize = false
             autoexpManual.checked = true
             // If window size is got from camera is 0 then set window size to 1 in UI
@@ -495,30 +592,70 @@ Item {
         }
     }
 
+    // current ROI auto focus mode
+    function currentROIAutoFocusMode(roiMode, winSize){
+        switch(roiMode){
+        case See3cam135M.AutoFocusFull:
+            autofocusFull.checked = true
+            autoFocusWinSizeCombo.enabled = false
+            break
+        case See3cam135M.AutoFocusManual:
+            skipUpdateUIOnFocusWindowSize = false
+            autofocusManual.checked = true
+            break
+        }
+        if(winSize == 0){
+            autoFocusWinSizeCombo.currentIndex = 0
+        }else
+            autoFocusWinSizeCombo.currentIndex = winSize-1
+    }
+
     function getValuesFromCamera(){
-        see3camcu1330m.getFlashState()
-        see3camcu1330m.getStreamMode()
-        see3camcu1330m.getFlipCtrlValue()
-        see3camcu1330m.getAutoExpROIModeAndWindowSize()
+        see3cam135m.getFlashState()
+        see3cam135m.getStreamMode()
+        see3cam135m.getFlipCtrlValue()
+        see3cam135m.getAutoExpROIModeAndWindowSize()
+        see3cam135m.getAutoFocusROIModeAndWindowSize()
     }
     function setToDefaultValues(){
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
-        see3camcu1330m.setToDefault()
+        see3cam135m.setToDefault()
         getValuesFromCamera()
     }
     function setTriggerMode(){
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
-        see3camcu1330m.setStreamMode(See3camCU1300M.MODE_TRIGGER)
+        see3cam135m.setStreamMode(See3cam135M.MODE_TRIGGER)
     }
     function setMasterMode(){
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
-        see3camcu1330m.setStreamMode(See3camCU1300M.MODE_MASTER)
+        see3cam135m.setStreamMode(See3cam135M.MODE_MASTER)
     }
+
+    function enableDisableAutoFocusUIControls(autoFocusSelect){
+        if(autoFocusSelect){
+            autofocusFull.enabled = true
+            autofocusManual.enabled = true
+            if(autofocusFull.checked)
+                autoFocusWinSizeCombo.enabled = false
+            if(autofocusFull.checked)
+                autoFocusWinSizeCombo.enabled = true
+            autofocusFull.opacity = 1
+            autofocusManual.opacity = 1
+        }else{
+            autofocusFull.enabled = false
+            autofocusManual.enabled = false
+            autoFocusWinSizeCombo.enabled = false
+            autofocusFull.opacity = 0.1
+            autofocusManual.opacity = 0.1
+        }
+        getAutoFocusControlValues.start()
+    }
+
     function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
             autoexpManual.enabled = true
