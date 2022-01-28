@@ -1,3 +1,8 @@
+Qtcam Application - 24.0.26
+---------------------------
+*Disabled still capture in H264 pin for e-cam83USB.
+*Added pop up of warning message when trying to change resolution in H264 pin during dual stream for e-cam83USB.
+
 Qtcam Application - 24.0.25
 ---------------------------
 *Added support for See3CAM_135M.

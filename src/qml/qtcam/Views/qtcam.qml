@@ -357,6 +357,12 @@ Rectangle {
             pciBusCamDetails = businfo
         }
 
+        onDisableStillCapCombo: {
+            if(disableState)
+                disableStillProp(false)
+            else
+                disableStillProp(true)
+        }
 
         onTitleTextChanged:{
             vidstreamproperty.enabled = true

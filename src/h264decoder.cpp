@@ -20,6 +20,7 @@
 
 #include <QPainter>
 #include "h264decoder.h"
+#include <QDebug>
 
 using namespace std;
 
@@ -193,11 +194,19 @@ int H264Decoder::libav_decode(AVCodecContext *avctx, AVFrame *frame, int *got_fr
 
     *got_frame = 0;
 
+    int frameHeight,frameWidth;
+
     if (pkt)
     {
+            frameHeight = avctx->height;
+            frameWidth = avctx->width;
             ret = avcodec_send_packet(avctx, pkt);
             // In particular, we don't expect AVERROR(EAGAIN), because we read all
             // decoded frames with avcodec_receive_frame() until done.
+            if(frameHeight != avctx->height || frameWidth != avctx->width)
+            {
+                emit openDialogBox();
+            }
             if (ret < 0)
                     return ret == AVERROR_EOF ? 0 : ret;
     }

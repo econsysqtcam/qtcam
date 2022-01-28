@@ -423,6 +423,7 @@ private slots:
     void handleWindowChanged(QQuickWindow *win); 
 
 public slots:
+    void openMessageDialogBox();
      void switchToStillPreviewSettings(bool stillSettings);
      void retrieveFrameFromStoreCam();
     void sync();
@@ -692,6 +693,7 @@ signals:
     void sendFPSlist(QString fpsList);
      void signalTograbPreviewFrame(bool retrieveframe,bool InFailureCase);
      void signalToSwitchResoln(bool switchResoln);
+     void disableStillCapCombo(bool disableState);
 };
 
 #endif // VIDEOSTREAMING_H

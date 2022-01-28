@@ -20,6 +20,7 @@
 #ifndef H264DECODER_H
 #define H264DECODER_H
 #include "common.h"
+#include <QObject>
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -36,9 +37,9 @@ extern "C" {
 
 static enum AVPixelFormat get_format(AVCodecContext *ctx, const enum AVPixelFormat *pi_fmt);
 
-class H264Decoder
+class H264Decoder : public QObject
 {
-
+    Q_OBJECT
 public:
    H264Decoder();
    ~H264Decoder();
@@ -48,6 +49,8 @@ public:
    void yu12_to_yuyv(u_int8_t *out, u_int8_t *in, int width, int height);
     int libav_decode(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacket *pkt);
    enum AVPixelFormat get_format_real(AVCodecContext *ctx, const enum AVPixelFormat *pi_fmt);
+signals:
+    void openDialogBox();
 protected:
       AVCodecContext *pH264CodecCtx;
       AVCodec *pH264Codec;
