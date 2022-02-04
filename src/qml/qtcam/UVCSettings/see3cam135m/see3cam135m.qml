@@ -8,11 +8,26 @@ import QtQuick.Layouts 1.1
 import cameraenum 1.0
 
 Item {
-    width:240
-    height:1400
+    width:268
+    height:750
 
     property bool skipUpdateUIOnExpWindowSize: false
     property bool skipUpdateUIOnFocusWindowSize: false
+
+    Action {
+        id: firmwareVersion
+        onTriggered:
+        {
+            getFirmwareVersion()
+        }
+    }
+
+    Action {
+        id: serialNumber
+        onTriggered: {
+            getSerialNumber()
+        }
+    }
 
     Action {
         id: setDefault
@@ -395,6 +410,57 @@ Item {
                     }
                 }
             }
+            Row{
+               // Layout.alignment: Qt.AlignCenter
+                Button {
+                    id: f_wversion_selected130
+                    opacity: 1
+                    action: firmwareVersion
+                    activeFocusOnPress : true
+                    tooltip: "Click to view the firmware version of the camera"
+                    style: ButtonStyle {
+                        background: Rectangle {
+                        border.width: control.activeFocus ? 3 :0
+                        color: "#222021"
+                        border.color: control.activeFocus ? "#ffffff" : "#222021"
+                        radius: 5
+                        }
+                        label: Image {
+                        source: "images/f_wversion_selected.png"
+                        }
+                    }
+                    Keys.onReturnPressed: {
+                    getFirmwareVersion()
+                    }
+                }
+                Button {
+                    id: serial_no_selected
+                    opacity: 1
+                    action: serialNumber
+                    activeFocusOnPress : true
+                    tooltip: "Click to view the Serial Number"
+                    style: ButtonStyle {
+                        background: Rectangle {
+                        border.width: control.activeFocus ? 3 :0
+                        color: "#222021"
+                        border.color: control.activeFocus ? "#ffffff" : "#222021"
+                        radius: 5
+                        }
+                        label: Image {
+                        source: "images/serial_no_selected.png"
+                        }
+                    }
+                    Keys.onReturnPressed: {
+                    getSerialNumber()
+                    }
+                }
+            }
+            Row{
+                Button {
+                    id: dummy
+                    opacity: 0
+                }
+            }
         }
     }
     See3cam135M{
@@ -444,12 +510,14 @@ Item {
     Uvccamera {
         id: uvccamera
         onTitleTextChanged: {
-            displayMessageBox(qsTr(_title), qsTr(_text))
+            messageDialog.title = _title.toString()
+            messageDialog.text = _text.toString()
+            messageDialog.open()
         }
         onSerialNumber:{
-            displayMessageBox(qsTr("Serial Number"), serialNumber)
+            messageDialog.title = qsTr("Serial Number")
+            messageDialog.text = serialNumber;
         }
-
     }
     Component {
         id: econTextFieldStyle
@@ -571,6 +639,16 @@ Item {
                 font.pixelSize: 14
             }
         }
+    }
+
+    function getSerialNumber() {
+        uvccamera.getSerialNumber()
+        messageDialog.open()
+    }
+
+    function getFirmwareVersion() {
+        uvccamera.getFirmWareVersion()
+        messageDialog.open()
     }
 
     // current ROI auto exposure mode
