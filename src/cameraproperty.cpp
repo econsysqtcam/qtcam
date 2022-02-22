@@ -152,6 +152,9 @@ void Cameraproperty::checkforDevice() {
     bool metaCapture = false;
     availableCam.clear();
 
+    QStringList deviceNames,devicePaths;
+    uvccam.enumerateDevices(&deviceNames,&devicePaths);
+
     QCollator collator;             //Added by M.Vishnu Murali: for sorting alphanumeric values.
     collator.setNumericMode(true);
 
@@ -175,9 +178,21 @@ void Cameraproperty::checkforDevice() {
                     // Added by Navya: 12-Dec-2019
                     // For Kernal Version >= 4.15 ,single device is detecting as two Nodes ,one as VideoCapture and other as MetaData Capture.Enumerating the Node which is VideoCapture.
                     if(!(m_querycap.device_caps & V4L2_CAP_META_CAPTURE)){
+                        for(int i=0;i<devicePaths.size();i++)
+                        {
+                            QString path = devicePaths.at(i);
+                            if(!(path.compare(path,"video" + QString::number(qDevCount),Qt::CaseInsensitive)))
+                            {
+                                cameraName = deviceNames.at(i);
+                                if(cameraName.length()>22){
+                                    cameraName.insert(22,"\n");
+                                }
+                                availableCam.append(cameraName);
+                            }
+                        }
                         cameraMap.insert(qDevCount,QString::number(deviceIndex,10));
                         deviceNodeMap.insert(deviceIndex,(char*)m_querycap.bus_info);
-                        availableCam.append(cameraName);
+                        //availableCam.append(cameraName);
                         metaCapture = false;
                     }
                     // Added by Navya : 24th Jan 2020

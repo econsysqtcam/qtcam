@@ -33,6 +33,8 @@ Item {
     property bool colorSpace
     property bool outputSizeBox
     property int videoPinFrameInterval
+    property int previousIndex : 0
+    property bool updateResolution: true
     property string videoStoragePath : SystemVideoFolder
     property int imageFormatY
     property int stillPropertyY
@@ -294,13 +296,30 @@ Item {
                         }
                         onCurrentIndexChanged: {
                             if(output_size_box_Video.count > 0){
-                                JS.videoCaptureResolution = output_size_box_Video.currentText.toString();
-                                if(outputSizeBox) {
-                                    root.updateFPS(color_comp_box_VideoPin.currentText.toString(), currentText.toString())
-                                    root.updateScenePreview(output_size_box_Video.currentText.toString(), color_comp_box_VideoPin.currentIndex.toString(),frame_rate_box.currentIndex)      
+                                if(root.is83USBFormatH264)
+                                {
+                                    root.read83USBstreamingState()
+                                    if(root.ecam83USBstate == 3)   //In case of Dual Streaming, we must not be able to change resolution in PIN1
+                                    {
+                                        messageDialog.title = qsTr("Warning")
+                                        messageDialog.text = qsTr("Please close the secondary stream first before changing primary stream resolution.")
+                                        messageDialog.open()
+                                        output_size_box_Video.currentIndex = previousIndex
+                                        updateResolution = false
+                                    }
                                 }
-                                // Added by Sankari: 23 Dec 2016 - To inform video resolution is changed in video capture settings
-                                root.informVideoResoutionChanged()
+                                if(updateResolution)
+                                {
+                                    JS.videoCaptureResolution = output_size_box_Video.currentText.toString();
+                                    if(outputSizeBox) {
+                                        root.updateFPS(color_comp_box_VideoPin.currentText.toString(), currentText.toString())
+                                        root.updateScenePreview(output_size_box_Video.currentText.toString(), color_comp_box_VideoPin.currentIndex.toString(),frame_rate_box.currentIndex)
+                                    }
+                                    // Added by Sankari: 23 Dec 2016 - To inform video resolution is changed in video capture settings
+                                    root.informVideoResoutionChanged()
+                                }
+                                previousIndex = output_size_box_Video.currentIndex
+                                updateResolution = true
                             }
                         }
                         Component.onCompleted: {

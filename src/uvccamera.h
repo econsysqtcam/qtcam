@@ -171,6 +171,7 @@ public:
      * int uvccamera::findEconDevice(QStringList, QString)
      */
     int findEconDevice(QString);
+    int enumerateDevices(QStringList*,QStringList*);
     void getDeviceNodeName(QString);
     bool closeAscellaDevice();
 

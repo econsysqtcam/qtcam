@@ -1,3 +1,9 @@
+Qtcam Application - 24.0.27
+---------------------------
+*In case of dual stream, disabled resolution switch and cross still capture for PIN1 .
+*Added pop up of warning message when trying to open PIN1 stream while PIN2 is already streaming.
+*Fixed for rendering issue while changing from trigger to master for See3CAM_135M and See3CAM_CU135M_H01R1.
+
 Qtcam Application - 24.0.26
 ---------------------------
 *Disabled still capture in H264 pin for e-cam83USB.

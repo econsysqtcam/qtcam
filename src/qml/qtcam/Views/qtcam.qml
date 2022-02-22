@@ -164,6 +164,9 @@ Rectangle {
     property var fpsList;
 
     property variant vidstreamObj: vidstreamproperty
+    property variant ecam83usbObj
+    property int ecam83USBstate: -1
+    property bool is83USBFormatH264: false
 
     //Video frame interval
     signal videoFrameInterval(int frameInterval)
@@ -357,11 +360,8 @@ Rectangle {
             pciBusCamDetails = businfo
         }
 
-        onDisableStillCapCombo: {
-            if(disableState)
-                disableStillProp(false)
-            else
-                disableStillProp(true)
+        onEcam83USBformatChanged: {
+            is83USBFormatH264 = isH264
         }
 
         onTitleTextChanged:{
@@ -571,6 +571,11 @@ Rectangle {
                     captureBtnEnable(false)
                 }
             }
+        }
+
+        onUpdate83USBstreamingState: {
+            read83USBstreamingState()
+            vidstreamproperty.getecam83USBStreamingState(ecam83USBstate)
         }
 
         Rectangle
@@ -980,6 +985,32 @@ Rectangle {
             m_Snap = false
             if(!disableCaptureImage){ // disable capture by smile trigger key or external key is pressed when recording video
                 takeScreenShot(true)
+            }
+        }
+    }
+
+    function stopStreamingH264(deviceState){
+        if(deviceState == 2 )       //For ecam83USB in case if PIN2(2) is already streaming, PIN1 should not be able to stream
+        {
+            vidstreamproperty.openMessageDialogBox()
+        }
+    }
+
+    function read83USBstreamingState(){
+        ecam83USBstate = ecam83usbObj.readStreamingState()
+        disableStillCapCombo(ecam83USBstate)
+    }
+
+    function disableStillCapCombo(deviceState){
+        if(is83USBFormatH264)
+        {
+            if(deviceState == 2 || deviceState == 3)        //2 - PIN2 Streaming, 3 - Dual Streaming
+            {
+                root.disableStillProp(false)
+            }
+            else
+            {
+                root.disableStillProp(true)
             }
         }
     }

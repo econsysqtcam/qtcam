@@ -2741,10 +2741,10 @@ bool Videostreaming::startCapture()
     previewFrameSkipCount = 1;
     if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB && m_capSrcFormat.fmt.pix.pixelformat==V4L2_PIX_FMT_H264)
     {
-        disableStillCapCombo(true);
+        ecam83USBformatChanged(true);
     }
     else
-        disableStillCapCombo(false);
+        ecam83USBformatChanged(false);
 
     return true;
 }
@@ -3122,28 +3122,28 @@ void Videostreaming::displayFrame() {
 
 void Videostreaming::openMessageDialogBox()
 {
-    if(!retrieveFrame)
-        m_timer.stop();
-    closeDevice();
-    // Added by Sankari:19 Dec 2017.
-    //Bug Fix: 1. Streaming is not available for higher resolution when unplug and plug cu130 camera without closing application
-    v4l2_requestbuffers reqbufs;
-    if (m_buffers == NULL){
-        return;}
+//    if(!retrieveFrame)
+//        m_timer.stop();
+//    closeDevice();
+//    // Added by Sankari:19 Dec 2017.
+//    //Bug Fix: 1. Streaming is not available for higher resolution when unplug and plug cu130 camera without closing application
+//    v4l2_requestbuffers reqbufs;
+//    if (m_buffers == NULL){
+//        return;}
 
-    for (uint i = 0; i < m_nbuffers; ++i)
-        for (unsigned p = 0; p < m_buffers[i].planes; p++)
-            if (-1 == munmap(m_buffers[i].start[p], m_buffers[i].length[p]))
-                perror("munmap");
+//    for (uint i = 0; i < m_nbuffers; ++i)
+//        for (unsigned p = 0; p < m_buffers[i].planes; p++)
+//            if (-1 == munmap(m_buffers[i].start[p], m_buffers[i].length[p]))
+//                perror("munmap");
 
     // Free all buffers.
-    reqbufs_mmap(reqbufs, V4L2_BUF_TYPE_VIDEO_CAPTURE, 1);  // videobuf workaround
-    reqbufs_mmap(reqbufs, V4L2_BUF_TYPE_VIDEO_CAPTURE, 0);
+//    reqbufs_mmap(reqbufs, V4L2_BUF_TYPE_VIDEO_CAPTURE, 1);  // videobuf workaround
+//    reqbufs_mmap(reqbufs, V4L2_BUF_TYPE_VIDEO_CAPTURE, 0);
 
     // When device is unplugged, Stop rendering.
     m_renderer->updateStop = true;
 
-    emit deviceUnplugged("Warning","Invalid Resolution Switch. Please close the secondary stream first before changing primary stream resolution.");
+    emit deviceUnplugged("Warning","Please close the secondary stream first before Starting primary stream.");
 }
 
 void Videostreaming::stopCapture() {
@@ -3672,11 +3672,19 @@ void Videostreaming::setStillVideoSize(QString stillValue, QString stillFormat) 
     stillOutFormat = stillFormat;
     if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB && m_capSrcFormat.fmt.pix.pixelformat==V4L2_PIX_FMT_H264)
     {
-        stillSize = lastPreviewSize;
-        stillOutFormat = lastFormat;
+        emit update83USBstreamingState();
+        if(ecam83USBStreamingState==2 || ecam83USBStreamingState==3)     //2 - PIN2 Streaming, 3 - Dual Streaming. In case of Dual Streaming, Cross still is not allowed.
+        {
+            stillSize = lastPreviewSize;
+            stillOutFormat = lastFormat;
+        }
     }
 }
 
+void Videostreaming::getecam83USBStreamingState(int streamingState)
+{
+    ecam83USBStreamingState = streamingState;
+}
 
 void Videostreaming::enumerateAudioProperties(){
     audioinput.audio_init();

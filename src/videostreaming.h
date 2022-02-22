@@ -240,6 +240,7 @@ public:
 
     // Things need to do after change FPS and take shot
     void doAfterChangeFPSAndShot();
+    int ecam83USBStreamingState;
 
     v4l2_format fmt;
     QString _title;
@@ -646,6 +647,7 @@ public slots:
     void doEncodeAudio();
     void triggerModeSkipframes();
     void updatepreview();
+    void getecam83USBStreamingState(int streamingState);
 
 signals:
     void   triggerShotCap();
@@ -693,7 +695,8 @@ signals:
     void sendFPSlist(QString fpsList);
      void signalTograbPreviewFrame(bool retrieveframe,bool InFailureCase);
      void signalToSwitchResoln(bool switchResoln);
-     void disableStillCapCombo(bool disableState);
+     void ecam83USBformatChanged(bool isH264);
+     void update83USBstreamingState();
 };
 
 #endif // VIDEOSTREAMING_H

@@ -205,7 +205,7 @@ int H264Decoder::libav_decode(AVCodecContext *avctx, AVFrame *frame, int *got_fr
             // decoded frames with avcodec_receive_frame() until done.
             if(frameHeight != avctx->height || frameWidth != avctx->width)
             {
-                emit openDialogBox();
+              //  emit openDialogBox();
             }
             if (ret < 0)
                     return ret == AVERROR_EOF ? 0 : ret;

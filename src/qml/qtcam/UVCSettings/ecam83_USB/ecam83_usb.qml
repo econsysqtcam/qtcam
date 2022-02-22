@@ -7,6 +7,7 @@ import cameraenum 1.0
 import econ.camera.ecam83_usb 1.0
 
 Item {
+    property int deviceState: -1
     Connections
     {
         target: root
@@ -75,6 +76,10 @@ Item {
         messageDialog.open()
     }
 
+    function readStreamingState(){
+        ecam83USBId.readStreamingState()
+    }
+
     Ecam83USB{
         id:ecam83USBId
         onTitleTextChanged:
@@ -131,6 +136,10 @@ Item {
     Component.onCompleted:
     {
         ecam83USBId.initUVCExtensionUnit(root.vidstreamObj)
+        root.ecam83usbObj = ecam83USBId
+        deviceState = ecam83USBId.readStreamingState()
+        root.disableStillCapCombo(deviceState)
+        root.stopStreamingH264(deviceState)
     }
     Component.onDestruction:{
         ecam83USBId.deInitUVCExtensionUnit()

@@ -205,6 +205,10 @@ Item {
                         root.informStillResolutionIndexChanged(output_value.currentText.toString(),output_value.currentIndex, color_comp_box.currentIndex.toString(),color_comp_box.currentIndex)
 
                 }
+                onActiveFocusChanged: {
+                    if(focus)
+                        root.read83USBstreamingState()
+                }
             }
 
             Text {
@@ -332,6 +336,12 @@ Item {
         }
         onFocusChanged: {
             stillchildProperty.visible = false
+        }
+        onHoveredChanged: {
+            if(hovered && root.is83USBFormatH264)
+            {
+                root.read83USBstreamingState()
+            }
         }
     }
     Connections

@@ -703,6 +703,7 @@ Item {
         getValuesFromCamera()
     }
     function setTriggerMode(){
+        root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
         see3cam135m.setStreamMode(See3cam135M.MODE_TRIGGER)
@@ -711,6 +712,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.masterEnableForMonochrome()
         see3cam135m.setStreamMode(See3cam135M.MODE_MASTER)
     }
 

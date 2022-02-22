@@ -588,6 +588,7 @@ Item {
         getValuesFromCamera()
     }
     function setTriggerMode(){
+        root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
         see3camcu1330m.setStreamMode(See3camCU1300M.MODE_TRIGGER)
@@ -596,6 +597,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.masterEnableForMonochrome()
         see3camcu1330m.setStreamMode(See3camCU1300M.MODE_MASTER)
     }
     function enableDisableAutoExposureControls(autoExposureSelect){

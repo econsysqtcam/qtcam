@@ -91,6 +91,17 @@ bool ecam83_USB::readFirmwareVersion()
     return true;
 }
 
+int ecam83_USB::readStreamingState()
+{
+    __u8 outputValue;
+
+    if(!getControlValue(READ_STREAMING_STATE, UVC_GET_CUR, 1, &outputValue))
+    {
+        return -1;
+    }
+    return outputValue;
+}
+
 bool ecam83_USB::resetDevice()
 {
     unsigned char data[]={RESET_DEVICE,0x00,0x00,0x00};

@@ -14,12 +14,18 @@
 #define UVC_GET_INFO                        0x86
 
 #define READFIRMWAREVERSION                 0x13
+#define READ_STREAMING_STATE                0x15
 #define RESET_DEVICE_CONTROL_REGISTER       0x03
 #define UVC_XU_HW_CONTROL_REGISTER          0x04
 #define UVC_XU_HW_CONTROL_I2C_DEVICE        0x05
 #define UVC_XU_HW_CONTROL_SENSOR            0x10
 
 #define RESET_DEVICE                        0x01
+
+#define NO_STREAMING_83USB                  0x00
+#define PIN1_STREAMING_83USB                0x01
+#define PIN2_STREAMING_83USB                0x02
+#define DUAL_STREAMING_83USB                0x03
 
 class ecam83_USB : public QObject , public v4l2
 {
@@ -44,6 +50,7 @@ public slots:
     void deInitUVCExtensionUnit();
 
     bool readFirmwareVersion();
+    int readStreamingState();
     bool resetDevice();
 };
 
