@@ -768,12 +768,20 @@ Rectangle {
                         vidstreamproperty.masterModeEnabled()
                         // Moved by Sankari: Mar 20, 2019. For storage camera, before start preview, we need to set ondemand mode.
                         createExtensionUnitQml(selectedDeviceEnumValue) //setting ondemand mode in fscamcu135 qml oncompleted.
+                        if(ecam83USBstate !=2)     //If PIN2 is streaming, PIN1(H264) should not stream.
+                        {
                         vidstreamproperty.startAgain() // Then start preview
                         getStillImageFormats();
                         vidstreamproperty.updatepreview()
                         // Added by Sankari: 12 Feb 2018 - initialize a socket notifier to get key from camera.
                         keyEvent.initializeToGetKey();
-
+                        }
+                        else
+                        {
+                            createExtensionUnitQml(0);    //For ecam83USB, if PIN2 is streaming, PIN1(H264) should not stream and we must close the extension tab after getting the device state
+                            keyEventFiltering = true;     //images should not be captured when KEY_I is pressed
+                            ecam83USBstate = -1;
+                        }
                         // Initially enable capture image when external keyevent is occured.
                         disableCaptureImage =  false
 
@@ -990,6 +998,7 @@ Rectangle {
     }
 
     function stopStreamingH264(deviceState){
+        ecam83USBstate = deviceState
         if(deviceState == 2 )       //For ecam83USB in case if PIN2(2) is already streaming, PIN1 should not be able to stream
         {
             vidstreamproperty.openMessageDialogBox()
@@ -1373,6 +1382,9 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU1330M) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu1330m/see3cam_cu1330m.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU136M) {
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu136m/see3cam_cu136m.qml").createObject(root)
+        }
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_135M) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam135m/see3cam135m.qml").createObject(root)
         }
@@ -1431,6 +1443,7 @@ Rectangle {
         case CommonEnums.SEE3CAM_CU27:
         case CommonEnums.SEE3CAM_1332:
         case CommonEnums.SEE3CAM_CU1330M:
+        case CommonEnums.SEE3CAM_CU136M:
         case CommonEnums.SEE3CAM_135M:
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);

@@ -1,3 +1,8 @@
+Qtcam Application - 24.0.28
+---------------------------
+*Integrated See3CAM_CU135M_H03R1.
+*Bug fix for e-cam83USB.
+
 Qtcam Application - 24.0.27
 ---------------------------
 *In case of dual stream, disabled resolution switch and cross still capture for PIN1 .

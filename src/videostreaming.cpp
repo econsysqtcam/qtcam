@@ -592,7 +592,7 @@ void FrameRenderer::drawBufferFor360p(){
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if (yBuffer != NULL && uBuffer != NULL && vBuffer != NULL){
         if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M
-        || currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M)){
+        || currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
             skipFrames = frame;
         }
         else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
@@ -711,7 +711,7 @@ void FrameRenderer::drawYUYVBUffer(){
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M)){
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
             skipFrames = frame;
         }
         else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
@@ -767,7 +767,7 @@ void FrameRenderer::drawUYVYBUffer(){
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M)){
+        if((currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
             skipFrames = frame;
         }else{
             skipFrames = 4;
@@ -3102,7 +3102,7 @@ void Videostreaming::displayFrame() {
         m_renderer->y16BayerFormat = true;
     }
 
-    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU1330M|| currentlySelectedCameraEnum == CommonEnums::SEE3CAM_135M) && (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)) {
+    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU1330M|| currentlySelectedCameraEnum == CommonEnums::SEE3CAM_135M || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU136M) && (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)) {
         y16FormatFor20CUG = true;
     }
 
@@ -3122,9 +3122,9 @@ void Videostreaming::displayFrame() {
 
 void Videostreaming::openMessageDialogBox()
 {
-//    if(!retrieveFrame)
-//        m_timer.stop();
-//    closeDevice();
+    if(!retrieveFrame)
+        m_timer.stop();
+    closeDevice();
 //    // Added by Sankari:19 Dec 2017.
 //    //Bug Fix: 1. Streaming is not available for higher resolution when unplug and plug cu130 camera without closing application
 //    v4l2_requestbuffers reqbufs;
@@ -3140,10 +3140,14 @@ void Videostreaming::openMessageDialogBox()
 //    reqbufs_mmap(reqbufs, V4L2_BUF_TYPE_VIDEO_CAPTURE, 1);  // videobuf workaround
 //    reqbufs_mmap(reqbufs, V4L2_BUF_TYPE_VIDEO_CAPTURE, 0);
 
+//    stopCapture();
+
     // When device is unplugged, Stop rendering.
     m_renderer->updateStop = true;
-
-    emit deviceUnplugged("Warning","Please close the secondary stream first before Starting primary stream.");
+    if(m_pixelformat == V4L2_PIX_FMT_H264)
+        emit deviceUnplugged("Warning","Please close the secondary stream first before Starting primary stream.");
+    else
+        emit deviceUnplugged("Error", "Device or Resource is busy");
 }
 
 void Videostreaming::stopCapture() {
