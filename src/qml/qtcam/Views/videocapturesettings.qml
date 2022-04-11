@@ -33,8 +33,10 @@ Item {
     property bool colorSpace
     property bool outputSizeBox
     property int videoPinFrameInterval
-    property int previousIndex : 0
+    property int resPreviousIndex : 0
+    property int fpsPreviousIndex : 0
     property bool updateResolution: true
+    property bool updateFrameRate: true
     property string videoStoragePath : SystemVideoFolder
     property int imageFormatY
     property int stillPropertyY
@@ -167,11 +169,27 @@ Item {
                         }
                         onCurrentIndexChanged: {
                             if(frameRateBox) {
-                                root.informPreviewFPSChanged()
-                                videoPinFrameInterval = currentIndex
-                                JS.videocaptureFps = currentText
-                                root.updateScenePreview(output_size_box_Video.currentText.toString(), color_comp_box_VideoPin.currentIndex.toString(),currentIndex)
+                                if(root.is83USBFormatH264)
+                                {
+                                    root.read83USBstreamingState()
+                                    if(root.ecam83USBstate == 3)   //In case of Dual Streaming, we must not be able to change resolution in PIN1
+                                    {
+                                        messageDialog.title = qsTr("Warning")
+                                        messageDialog.text = qsTr("Please close the secondary stream first before changing primary stream resolution.")
+                                        messageDialog.open()
+                                        output_size_box_Video.currentIndex = fpsPreviousIndex
+                                        updateFrameRate = false
+                                    }
+                                }
+                                if(updateFrameRate){
+                                    root.informPreviewFPSChanged()
+                                    videoPinFrameInterval = currentIndex
+                                    JS.videocaptureFps = currentText
+                                    root.updateScenePreview(output_size_box_Video.currentText.toString(), color_comp_box_VideoPin.currentIndex.toString(),currentIndex)
+                                }
                             }
+                            fpsPreviousIndex = frame_rate_box.currentIndex
+                            updateResolution = true
                         }
                         Component.onCompleted: {
                             frameRateBox = true
@@ -304,7 +322,7 @@ Item {
                                         messageDialog.title = qsTr("Warning")
                                         messageDialog.text = qsTr("Please close the secondary stream first before changing primary stream resolution.")
                                         messageDialog.open()
-                                        output_size_box_Video.currentIndex = previousIndex
+                                        output_size_box_Video.currentIndex = resPreviousIndex
                                         updateResolution = false
                                     }
                                 }
@@ -318,7 +336,7 @@ Item {
                                     // Added by Sankari: 23 Dec 2016 - To inform video resolution is changed in video capture settings
                                     root.informVideoResoutionChanged()
                                 }
-                                previousIndex = output_size_box_Video.currentIndex
+                                resPreviousIndex = output_size_box_Video.currentIndex
                                 updateResolution = true
                             }
                         }

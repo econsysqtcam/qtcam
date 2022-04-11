@@ -1,3 +1,7 @@
+Qtcam Application - 24.0.29
+---------------------------
+*Added pop up of warning message when trying to change fps in H264 pin during dual stream for e-cam83USB.
+
 Qtcam Application - 24.0.28
 ---------------------------
 *Integrated See3CAM_CU135M_H03R1.
