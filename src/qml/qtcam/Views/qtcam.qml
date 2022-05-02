@@ -714,7 +714,7 @@ Rectangle {
 
                         // Added by Sankari: 12 Feb 2018 : stop Getting key from camera.
                         keyEvent.stopGetKeyFromCamera()
-			 if(!is20_04detcted)
+//			 if(!is20_04detcted)
                         	enumerateAudioSettings();
 
                         cameraSelected()
@@ -1385,6 +1385,9 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU136M) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu136m/see3cam_cu136m.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.BARCODE_CAMERA) {
+            see3cam = Qt.createComponent("../UVCSettings/barcode/barcode_camera.qml").createObject(root)
+        }
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_135M) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam135m/see3cam135m.qml").createObject(root)
         }
@@ -1444,6 +1447,7 @@ Rectangle {
         case CommonEnums.SEE3CAM_1332:
         case CommonEnums.SEE3CAM_CU1330M:
         case CommonEnums.SEE3CAM_CU136M:
+        case CommonEnums.BARCODE_CAMERA:
         case CommonEnums.SEE3CAM_135M:
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
@@ -1492,7 +1496,7 @@ Rectangle {
         {
             videoSettingsRootObject = videoViewComponent.createObject(root,{"imageFormatY" : imageFormatYValue,"stillPropertyY" : stillPropertyYValue});
         }
-        if(!is20_04detcted)
+//        if(!is20_04detcted)
         {
             var AudioViewComponent = Qt.createComponent("audiocapturesettings.qml")
             if (AudioViewComponent.status === Component.Ready)

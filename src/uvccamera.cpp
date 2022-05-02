@@ -110,6 +110,7 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c1d7"),CommonEnums::SEE3CAM_CU1330M);
     cameraEnumMap.insert(econVid + (",c0d7"),CommonEnums::SEE3CAM_135M);
     cameraEnumMap.insert(econVid + (",c1d8"),CommonEnums::SEE3CAM_CU136M);
+    cameraEnumMap.insert(econVid + (",c116"),CommonEnums::BARCODE_CAMERA);
     cameraEnumMap.insert(econVid + (",c400"),CommonEnums::SEE3CAM_160);
 }
 
@@ -518,6 +519,7 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
     //Commented by Nithyesh
     //uint i;
     int ret, desc_size = 0,hid_imu=-1,fd;
+    bool barcodeFlag = false;
     char buf[256];
     struct hidraw_devinfo info;
     struct hidraw_report_descriptor rpt_desc;
@@ -539,11 +541,85 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
             emit hidWarningReceived(_title,_text);
             return false;
         }
+if(selectedDeviceEnum == CommonEnums::BARCODE_CAMERA)
+{
+        /* Get Report Descriptor Size */
+        ret = ioctl(hid_fd, HIDIOCGRDESCSIZE, &desc_size);
+        if (ret < 0) {
+            perror("HIDIOCGRDESCSIZE");
+            return false;
+        }
+
+        int retVal, r,endpoints_no = 0;
+        libusb_device **list = NULL;
+        libusb_context *context = NULL;
+        libusb_device_handle *h_handle = NULL;
+        struct libusb_config_descriptor *conf_desc = NULL;
+        const libusb_interface *inter;
+        const libusb_interface_descriptor *interdesc;
+
+        r = libusb_init(&context);
+        if (r < 0 ) {
+            printf("Error in initializing libusb library...\n");
+            return -1;
+        }
+
+        size_t count = libusb_get_device_list(context, &list);
+
+        for (size_t idx = 0; idx < count; idx++) {
+            libusb_device *device = list[idx];
+            struct libusb_device_descriptor devDesc = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+            retVal = libusb_get_device_descriptor (device, &devDesc);
+
+            if (retVal != LIBUSB_SUCCESS) {
+                printf("libusb_get_device_descriptor return %d\n", retVal);
+                return -1;
+            }
+            retVal = libusb_open(device, &h_handle);
+
+            if(retVal < 0) {
+                printf("Problem acquiring device handle in %s \n", __func__);
+            }
+
+            if(devDesc.idVendor == 0x2560) {
+                unsigned char data[100];
+                memset(data,0,sizeof(data));
+                libusb_get_string_descriptor_ascii(h_handle,devDesc.iSerialNumber,data,sizeof(data));
+                libusb_get_config_descriptor(device, 0, &conf_desc);
+                for(int i=0;i<conf_desc->bNumInterfaces;i++)
+                {
+                    inter = &conf_desc->interface[i];
+                    interdesc = &inter->altsetting[0];
+                    if(interdesc->extra[7] == desc_size)			//wDescriptorLength will be in 7th byte of extra
+                    {
+                        if(interdesc->bInterfaceClass == 3)			//HID interface class value is 3
+                            endpoints_no=(int)interdesc->bNumEndpoints;
+                        if(endpoints_no == 2)					//Both IN and OUT endpoint
+                        {
+                            barcodeFlag = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if(h_handle) {
+                libusb_close(h_handle);
+                h_handle = NULL;
+            }
+        }
+
+        libusb_free_device_list(list, 1);
+        libusb_exit(context);
+
+}
         QString tempBuf = buf;
         if(tempBuf.contains(hidNode)) {
             openNode = ii.value();
             close(hid_fd);
- //          break;
+            if(barcodeFlag && selectedDeviceEnum == CommonEnums::BARCODE_CAMERA)
+                break;
         }
         close(hid_fd);
         ++ii;

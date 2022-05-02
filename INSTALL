@@ -86,10 +86,6 @@ To configure Qt, If permission is not given for user set it by using chmod comma
 Then double click the downloaded binary and install it to your local system.
 
 3.2.2. Run following command to install following list of dependency packages
- In ubuntu 12,
- $ sudo apt-get install libv4l-dev qt55base qt55declarative libgl1-mesa-dev libglu1-mesa-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libresample1-dev libudev-dev libavcodec-extra-53 libjpeg-turbo8-dev libusb-1.0-0-dev libusb-dev libevdev-dev libpulse-dev qt55multimedia libasound2-dev
- $ sudo apt-add-repository ppa:qtcam/precise
- $ sudo apt-get install qt55-meta-full
 
  In ubuntu 14,
  $ sudo apt-get install libv4l-dev qt55base qt55declarative libavcodec-dev libgl1-mesa-dev libglu1-mesa-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra-54 libjpeg-turbo8-dev libusb-1.0-0-dev libusb-dev libevdev-dev  libpulse-dev qt55multimedia qtdeclarative5-window-plugin qtdeclarative5-dialogs-plugin qtdeclarative5-controls-plugin  qtdeclarative5-qtquick2-plugin qt55-meta-full libasound2-dev
@@ -99,6 +95,9 @@ Then double click the downloaded binary and install it to your local system.
 
  In ubuntu 18.04,
  $sudo apt-get install libv4l-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra qt5-default qtdeclarative5-dev freeglut3 freeglut3-dev libjpeg-turbo8-dev libusb-1.0-0-dev libusb-dev libevdev-dev libpulse-dev qtmultimedia5-dev qtdeclarative5-window-plugin qml-module-qtquick-controls qml-module-qtquick-dialogs qml-module-qtquick-extras qml-module-qtquick-privatewidgets qtdeclarative5-qtquick2-plugin libasound2-dev libturbojpeg0-dev qtquickcontrols5-doc g++-5 lsb-release
+ 
+  In ubuntu 20.04,
+ $sudo apt-get install libv4l-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra qt5-default qtdeclarative5-dev freeglut3 freeglut3-dev libjpeg-turbo8-dev libusb-1.0-0-dev libusb-dev libevdev-dev libpulse-dev qtmultimedia5-dev qml-module-qtquick-controls qml-module-qtquick-dialogs qml-module-qtquick-extras qml-module-qtquick-privatewidgets libasound2-dev libturbojpeg0-dev qtquickcontrols5-doc g++ g++-10 lsb-release
 
 
 3.3 Build the application
@@ -151,6 +150,10 @@ $ sudo apt-add-repository ppa:qtcam/bionic
 $ sudo apt-get update
 $ sudo apt-get install qtcam
 
+4.1.4 Ubuntu 20.04
+$ sudo apt-add-repository ppa:qtcam/focal
+$ sudo apt-get update
+$ sudo apt-get install qtcam
 
 5. How to run the application
    * By clicking Qtcam icon from Dash home

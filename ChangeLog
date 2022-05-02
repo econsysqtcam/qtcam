@@ -1,3 +1,7 @@
+Qtcam Application - 25.0.0
+---------------------------
+*Added support for SmarteCAM_Barcode.
+
 Qtcam Application - 24.0.29
 ---------------------------
 *Added pop up of warning message when trying to change fps in H264 pin during dual stream for e-cam83USB.

@@ -84,6 +84,8 @@ uint AudioInput::devIndex;
 static pthread_t my_read_thread;
 static pa_stream *recordstream = NULL;
 
+bool AudioInput::is20_04 = false;
+
 
 AudioInfo::AudioInfo(const QAudioFormat &format, QObject *parent)
     :   QIODevice(parent)
@@ -374,6 +376,18 @@ void AudioInput::pa_sourcelist_cb(pa_context *c, const pa_source_info *l, int eo
     /* We'll need these state variables to keep track of our requests */
     int state = 0;
     int pa_ready = 0;
+
+    if(is20_04)
+    {
+        process.start("bash", QStringList() << "-c" << "sudo pulseaudio -D");
+        process.waitForFinished();
+        if(process.exitStatus() <0)
+        {
+            qDebug() << Q_FUNC_INFO << "process exit status 0";
+            qDebug() << "AUDIO: PULSE - unable to connect to server: pa_context_connect failed\n";
+            return -1;
+        }
+    }
 
     /* Create a mainloop API and connection to the default server */
     pa_ml = pa_mainloop_new();
@@ -709,6 +723,18 @@ void AudioInput::recordAudio(){
     int r;
     int pa_ready = 0;
 
+    if(audioInput->is20_04)
+    {
+        audioInput->process.start("bash", QStringList() << "-c" << "sudo pulseaudio -D");
+        audioInput->process.waitForFinished();
+        if(audioInput->process.exitStatus() <0)
+        {
+            qDebug() << Q_FUNC_INFO << "process exit status 0";
+            qDebug() << "AUDIO: PULSE - unable to connect to server: pa_context_connect failed\n";
+            return ((void *) -1);
+        }
+    }
+
     /* Create a mainloop API and connection to the default server */
     pa_ml = pa_mainloop_new();
     pa_mlapi = pa_mainloop_get_api(pa_ml);
@@ -955,10 +981,15 @@ bool AudioInput::updateSupportedInfo(uint currentIndex)
 
     audiosupportedFmtListModel.setStringList(samplerateStringList);
     audioChannelCountModel.setStringList(channelCountStringList);
+
+    return true;
 }
 
 bool AudioInput::setVolume(int micVolume){
-    alsa.setAlsaVolume(micVolume); // mic volume [ While setting mic volume, In slider (Range: 1-100), In camera (Range 1-7) ]
+    if(alsa.setAlsaVolume(micVolume)<0) // mic volume [ While setting mic volume, In slider (Range: 1-100), In camera (Range 1-7) ]
+        return false;
+    else
+        return true;
 }
 
 bool AudioInput::setMuteState(bool mute){
@@ -970,6 +1001,7 @@ bool AudioInput::setMuteState(bool mute){
     {
          alsa.setAlsaMute(false);
     }
+    return true;
 }
 void AudioInput::setSampleRate(int sampleRate){
     assert(audio_context != NULL);    
@@ -1134,8 +1166,9 @@ int AudioInput::audio_free_buffers()
         }
     }
     if(audio_buffers)
-    free(audio_buffers);
+        free(audio_buffers);
     audio_buffers = NULL;
+    return 1;
 }
 
 
