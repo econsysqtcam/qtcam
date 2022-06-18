@@ -2739,13 +2739,16 @@ bool Videostreaming::startCapture()
     // Added by Navya : 11 Feb 2020 -- Enabling capturing images once after streamon
     emit signalToSwitchResoln(true);
     previewFrameSkipCount = 1;
-    if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB && m_capSrcFormat.fmt.pix.pixelformat==V4L2_PIX_FMT_H264)
+    if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB )
     {
-        ecam83USBformatChanged(true);
+        emit update83USBstreamingState();
+        if(ecam83USBStreamingState==1 || ecam83USBStreamingState ==3) //PIN1 streaming
+        {
+            ecam83USBformatChanged(true);
+        }
+        else
+            ecam83USBformatChanged(false);
     }
-    else
-        ecam83USBformatChanged(false);
-
     return true;
 }
 
@@ -2791,6 +2794,15 @@ void Videostreaming::updatePreviewFrameSkip(uint previewSkip){
 
 
 void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
+    if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB && (ecam83USBStreamingState==1 || ecam83USBStreamingState ==3))  //PIN1 Streaming
+    {
+        emit update83USBstreamingState();
+        if(ecam83USBStreamingState==2 || ecam83USBStreamingState==3)     //2 - PIN2 Streaming, 3 - Dual Streaming. In case of Dual Streaming, Cross still is not allowed.
+        {
+            stillSize = lastPreviewSize;
+            stillOutFormat = lastFormat;
+        }
+    }
     captureTime.start();
     // Added by Sankari : to set still skip
     emit stillSkipCount(stillSize, lastPreviewSize, stillOutFormat);
@@ -3674,7 +3686,7 @@ int Videostreaming::getMenuIndex(unsigned int id,int value) {
 void Videostreaming::setStillVideoSize(QString stillValue, QString stillFormat) {
     stillSize = stillValue;
     stillOutFormat = stillFormat;
-    if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB && m_capSrcFormat.fmt.pix.pixelformat==V4L2_PIX_FMT_H264)
+    if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB && ecam83USBStreamingState==1)  //PIN1 Streaming
     {
         emit update83USBstreamingState();
         if(ecam83USBStreamingState==2 || ecam83USBStreamingState==3)     //2 - PIN2 Streaming, 3 - Dual Streaming. In case of Dual Streaming, Cross still is not allowed.

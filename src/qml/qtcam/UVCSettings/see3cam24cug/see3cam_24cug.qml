@@ -689,63 +689,6 @@ value in the text box and click the Set button"
                     }
                 }
             }
-            Text {
-                id: smileDetectionText
-                text: "--- Smile Detection ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-            Row{
-                spacing: 62
-                ExclusiveGroup { id: smileDetectGroup }
-                RadioButton {
-                    exclusiveGroup: smileDetectGroup
-                    id: smileDetectEnable
-                    text: "Enable"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    onClicked:{
-                        see3cam24cug.setSmileDetection(true, smileDetectEmbedData.checked)
-                    }
-                    Keys.onReturnPressed: {
-                        see3cam24cug.setSmileDetection(true, smileDetectEmbedData.checked)
-                    }
-                }
-                RadioButton {
-                    exclusiveGroup: smileDetectGroup
-                    id:smileDetectDisable
-                    text: "Disable"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    onClicked: {
-                        see3cam24cug.setSmileDetection(false, smileDetectEmbedData.checked)
-                    }
-                    Keys.onReturnPressed: {
-                        see3cam24cug.setSmileDetection(false, smileDetectEmbedData.checked)
-                    }
-                }
-            }
-            Row{
-                spacing: 5
-                CheckBox {
-                    id: smileDetectEmbedData
-                    activeFocusOnPress : true
-                    text: "Embed Data"
-                    style: econCheckBoxStyle
-                    enabled: smileDetectEnable.checked ? true : false
-                    opacity: enabled ? 1 : 0.1
-                    onClicked:{
-                        enableSmileDetectEmbedData()
-                    }
-                    Keys.onReturnPressed: {
-                        enableSmileDetectEmbedData()
-                    }
-                }
-            }
             Text{
                 id: flashCtrlText
                 x: 85
@@ -1120,9 +1063,6 @@ value in the text box and click the Set button"
         onFaceDetectModeValue:{
             updateFaceDetectModeUI(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect)
         }
-        onSmileDetectModeValue:{
-            updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue)
-        }
 
         onFlipMirrorModeChanged:{
             currentFlipMirrorMode(flipMirrorMode)
@@ -1237,26 +1177,6 @@ value in the text box and click the Set button"
         }
     }
 
-    function updateSmileDetectModeUI(smileDetectMode, smileDetectEmbedDataValue){
-        if(smileDetectMode == See3Cam24CUG.SmileDetectEnable){
-            smileDetectEnable.checked = true
-            if(smileDetectEmbedDataValue == See3Cam24CUG.SmileDetectEmbedDataEnable){
-                smileDetectEmbedData.checked = true
-            }else{
-                smileDetectEmbedData.checked = false
-            }
-        }else if(smileDetectMode == See3Cam24CUG.SmileDetectDisable){
-            smileDetectDisable.checked = true
-            if(smileDetectEmbedDataValue == See3Cam24CUG.SmileDetectEmbedDataEnable){
-                smileDetectEmbedData.checked = true
-            }else{
-                smileDetectEmbedData.checked = false
-            }
-
-        }
-
-    }
-
     function updateFaceDetectModeUI(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect){
         if(faceDetectMode == See3Cam24CUG.FaceRectEnable){
             faceRectEnable.checked = true
@@ -1284,7 +1204,7 @@ value in the text box and click the Set button"
     function enableFaceDetectEmbedData(){
         if(see3cam24cug.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){
             if(faceDetectEmbedData.checked){
-                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_24CUG_Face_and_Smile_Detection for more details"))
+                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_24CUG_Face_Detection for more details"))
             }
         }
     }
@@ -1294,18 +1214,6 @@ value in the text box and click the Set button"
         setButtonClicked = true
         see3cam24cug.setExposureCompensation(exposureCompValue.text)
         exposureCompSet.enabled = true
-    }
-
-
-    function enableSmileDetectEmbedData(){
-        setButtonClicked = false
-        if(see3cam24cug.setSmileDetection(true, smileDetectEmbedData.checked)){
-            if(smileDetectEmbedData.checked){
-                messageDialog.title = qsTr("Status")
-                messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_24CUG_Face_and_Smile_Detection for more details")
-                messageDialog.open()
-            }
-        }
     }
 
     function enableDisableAutoExposureControls(autoExposureSelect){
@@ -1385,7 +1293,6 @@ value in the text box and click the Set button"
         see3cam24cug.getFlickerDetection()
         getexposureCompFrameRateCtrlTimer.start()
         see3cam24cug.getFaceDetectMode()
-        see3cam24cug.getSmileDetectMode()
         see3cam24cug.getFlashState()
         see3cam24cug.getStreamMode()
     }

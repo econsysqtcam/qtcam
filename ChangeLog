@@ -1,3 +1,7 @@
+Qtcam Application - 25.0.1
+---------------------------
+*Added limitations by checking if it's PIN1 instead of checking for H264 format for e-cam83USB.
+
 Qtcam Application - 25.0.0
 ---------------------------
 *Added support for SmarteCAM_Barcode.

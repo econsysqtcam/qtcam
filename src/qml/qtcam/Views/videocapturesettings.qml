@@ -35,8 +35,10 @@ Item {
     property int videoPinFrameInterval
     property int resPreviousIndex : 0
     property int fpsPreviousIndex : 0
+    property int colorSpacePreviousIndex: 0
     property bool updateResolution: true
     property bool updateFrameRate: true
+    property bool updateColorSpace: true
     property string videoStoragePath : SystemVideoFolder
     property int imageFormatY
     property int stillPropertyY
@@ -177,7 +179,7 @@ Item {
                                         messageDialog.title = qsTr("Warning")
                                         messageDialog.text = qsTr("Please close the secondary stream first before changing primary stream resolution.")
                                         messageDialog.open()
-                                        output_size_box_Video.currentIndex = fpsPreviousIndex
+                                        frame_rate_box.currentIndex = fpsPreviousIndex
                                         updateFrameRate = false
                                     }
                                 }
@@ -189,7 +191,7 @@ Item {
                                 }
                             }
                             fpsPreviousIndex = frame_rate_box.currentIndex
-                            updateResolution = true
+                            updateFrameRate = true
                         }
                         Component.onCompleted: {
                             frameRateBox = true
@@ -248,14 +250,31 @@ Item {
                         }
                         onCurrentIndexChanged: {
                             if(output_size_box_Video.count > 0){
-                                if(colorSpace) {
-                                    root.informVideoColorSpaceChanged()
-                                    root.vidFormatChanged = true
-                                    JS.videoCaptureFormat = color_comp_box_VideoPin.currentIndex.toString()
-                                    root.updateVideoResolution(color_comp_box_VideoPin.currentIndex.toString(),frame_rate_box.currentIndex);
-                                    root.updateFPS(currentText.toString(), output_size_box_Video.currentText.toString())
-                                    root.vidFormatChanged = false
+                                if(root.is83USBFormatH264)
+                                {
+                                    root.read83USBstreamingState()
+                                    if(root.ecam83USBstate == 3)   //In case of Dual Streaming, we must not be able to change resolution in PIN1
+                                    {
+                                        messageDialog.title = qsTr("Warning")
+                                        messageDialog.text = qsTr("Please close the secondary stream first before changing primary stream resolution.")
+                                        messageDialog.open()
+                                        color_comp_box_VideoPin.currentIndex = colorSpacePreviousIndex
+                                        updateColorSpace = false
+                                    }
                                 }
+                                if(updateColorSpace)
+                                {
+                                    if(colorSpace) {
+                                        root.informVideoColorSpaceChanged()
+                                        root.vidFormatChanged = true
+                                        JS.videoCaptureFormat = color_comp_box_VideoPin.currentIndex.toString()
+                                        root.updateVideoResolution(color_comp_box_VideoPin.currentIndex.toString(),frame_rate_box.currentIndex);
+                                        root.updateFPS(currentText.toString(), output_size_box_Video.currentText.toString())
+                                        root.vidFormatChanged = false
+                                    }
+                                }
+                                colorSpacePreviousIndex = color_comp_box_VideoPin.currentIndex
+                                updateColorSpace = true
                             }
                         }
                         Component.onCompleted: {
