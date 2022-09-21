@@ -1388,6 +1388,9 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.BARCODE_CAMERA) {
             see3cam = Qt.createComponent("../UVCSettings/barcode/barcode_camera.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.NILECAM20_USB) {
+            see3cam = Qt.createComponent("../UVCSettings/nilecam20usb/nilecam20_usb.qml").createObject(root)
+        }
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_135M) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam135m/see3cam135m.qml").createObject(root)
         }
@@ -1431,6 +1434,7 @@ Rectangle {
             // Added by Sankari : 22 Feb 2017
         case CommonEnums.SEE3CAM_CU135:
         case CommonEnums.NILECAM30_USB:
+        case CommonEnums.NILECAM20_USB:
         case CommonEnums.SEE3CAM_CU55:
         case CommonEnums.FSCAM_CU135:
         case CommonEnums.SEE3CAM_CU38:

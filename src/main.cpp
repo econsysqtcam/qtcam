@@ -73,6 +73,7 @@
 #include "see3cam_cu136m.h"
 #include "barcode_camera.h"
 #include "see3cam_135m.h"
+#include "nilecam20_usb.h"
 //*! \mainpage Qtcam - A econ's camera product
 // *
 // * \section See3CAM_10CUG
@@ -157,6 +158,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_CU1330M>("econ.camera.see3cam_cu1330m",1,0,"See3camCU1300M");
     qmlRegisterType<See3CAM_135M>("econ.camera.see3cam_135m",1,0,"See3cam135M");
     qmlRegisterType<See3CAM_CU136M>("econ.camera.see3cam_cu136m",1,0,"See3camCU136M");
+    qmlRegisterType<NILECAM20_USB>("econ.camera.nilecam20_usb",1,0,"NileCam20_USB");
     qmlRegisterType<BarcodeCamera>("econ.camera.barcode_camera",1,0,"BarcodeCamera");
     qmlRegisterType<ecam83_USB>("econ.camera.ecam83_usb",1,0,"Ecam83USB");//while exposing to qml it is must that first letter should be in caps.
     //Added by Dhurka - 13th Oct 2016
