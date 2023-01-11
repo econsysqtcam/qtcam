@@ -74,6 +74,10 @@
 #include "barcode_camera.h"
 #include "see3cam_135m.h"
 #include "nilecam20_usb.h"
+#include "see3cam_27cug.h"
+#include "renderer.h"
+
+
 //*! \mainpage Qtcam - A econ's camera product
 // *
 // * \section See3CAM_10CUG
@@ -81,7 +85,6 @@
 // * \ref See3CAM_10CUG
 // * \section See3CAM_10CUG
 // * Bayer Camera
-
 int main(int argc, char *argv[])
 {
     /*Indentifying OS version*/
@@ -95,13 +98,15 @@ int main(int argc, char *argv[])
          is20_04detected = true;
 
     QApplication app(argc, argv);
+
+
     qmlRegisterType<Cameraproperty>("econ.camera.property",1,0,"Camproperty");
     qmlRegisterType<Videostreaming>("econ.camera.stream", 1, 0, "Videostreaming");
     qmlRegisterType<CamKeyEventReceive>("econ.camera.keyEvent", 1, 0, "KeyEventRecv");
     qmlRegisterType<uvccamera>("econ.camera.uvcsettings", 1, 0, "Uvccamera");
     qmlRegisterType<UVCExtCx3SNI>("econ.camera.uvcExtsettings", 1, 0, "UvcExtcamera");
-    qmlRegisterType<See3CAM_11CUG>("econ.camera.see3cam11", 1, 0, "See3Cam11");    
-    qmlRegisterType<See3CAM_AR130>("econ.camera.see3camar0130", 1, 0, "See3Camar0130");    
+    qmlRegisterType<See3CAM_11CUG>("econ.camera.see3cam11", 1, 0, "See3Cam11");
+    qmlRegisterType<See3CAM_AR130>("econ.camera.see3camar0130", 1, 0, "See3Camar0130");
     qmlRegisterType<See3CAM_10CUG_Bayer>("econ.camera.see3cam10Bayer", 1, 0, "See3Cam10Bayer");
     qmlRegisterType<See3CAM_10CUG_Mono>("econ.camera.see3cam10Mono", 1, 0, "See3Cam10Mono");
     qmlRegisterType<See3CAM_80>("econ.camera.see3cam80", 1, 0, "See3Cam80");
@@ -110,19 +115,19 @@ int main(int argc, char *argv[])
     //Added by Navya - 26 Aug 2019
     qmlRegisterType<See3CAM_20CUG>("econ.camera.see3cam20cug", 1, 0, "See3cam20cug");
 
-  // Added by Sankari : 07 Feb 2017
+    // Added by Sankari : 07 Feb 2017
     qmlRegisterType<See3CAM_30>("econ.camera.see3cam30", 1, 0, "See3Cam30");
 
- // Added by Sankari: 17 Dec 2016
+    // Added by Sankari: 17 Dec 2016
     qmlRegisterType<See3CAM_81>("econ.camera.see3cam81", 1, 0, "See3Cam81");
 
-    qmlRegisterType<See3CAM_CU50>("econ.camera.see3cam50", 1, 0, "See3Cam50");    
+    qmlRegisterType<See3CAM_CU50>("econ.camera.see3cam50", 1, 0, "See3Cam50");
     qmlRegisterType<See3CAM_CU130>("econ.camera.see3camcu130", 1, 0, "See3CamCu130");
 
     // Added by Sankari : 22 Feb 2017
     qmlRegisterType<See3CAM_CU135>("econ.camera.see3camcu135", 1, 0, "See3CamCu135");
 
-// Added by Sankari: 21 Apr 2017
+    // Added by Sankari: 21 Apr 2017
     qmlRegisterType<See3CAM_CU40>("econ.camera.see3camcu40", 1, 0, "See3Camcu40");
 
     qmlRegisterType<See3CAM_130>("econ.camera.see3cam130", 1, 0, "See3Cam130");
@@ -138,7 +143,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_CU22>("econ.camera.see3camcu22", 1, 0, "See3Camcu22");
     qmlRegisterType<See3CAM_CU51>("econ.camera.see3cam51", 1, 0, "See3Cam51");
     // Added by Sankari - 5 Oct 2018
-    qmlRegisterType<H264Camera>("econ.camera.h264cam", 1, 0, "H264camera"); //ecam22_usb 
+    qmlRegisterType<H264Camera>("econ.camera.h264cam", 1, 0, "H264camera"); //ecam22_usb
     qmlRegisterType<ASCELLA>("econ.camera.ascella", 1, 0, "Ascella");
     qmlRegisterType<See3CAM_Control>("econ.camera.see3camControl", 1, 0, "See3CamCtrl");
     qmlRegisterType<See3CAM_GPIOControl>("econ.camera.see3camGpioControl", 1, 0, "See3CamGpio");
@@ -159,8 +164,14 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_135M>("econ.camera.see3cam_135m",1,0,"See3cam135M");
     qmlRegisterType<See3CAM_CU136M>("econ.camera.see3cam_cu136m",1,0,"See3camCU136M");
     qmlRegisterType<NILECAM20_USB>("econ.camera.nilecam20_usb",1,0,"NileCam20_USB");
+
+    qmlRegisterType<SEE3CAM_27CUG>("econ.camera.see3cam_27cug",1,0,"See3CAM_27CUG");
     qmlRegisterType<BarcodeCamera>("econ.camera.barcode_camera",1,0,"BarcodeCamera");
     qmlRegisterType<ecam83_USB>("econ.camera.ecam83_usb",1,0,"Ecam83USB");//while exposing to qml it is must that first letter should be in caps.
+
+    //For IR Window
+    qmlRegisterType<ImageItem>("econ.camera.qimagerenderer", 1, 0, "ImageItem");
+
     //Added by Dhurka - 13th Oct 2016
     /**
      * @brief qmlRegisterType<CommonEnums> - Access the ENUM list to QML
@@ -170,7 +181,7 @@ int main(int argc, char *argv[])
     QtQuick2ApplicationViewer viewer;
 
     //Create a object for Camera property
-    Cameraproperty camProperty;    
+    Cameraproperty camProperty;
 
     if(argc > 1){
         if(strcmp(argv[1],"-l") == 0 || strcmp(argv[1],"--log") == 0){
@@ -185,9 +196,9 @@ int main(int argc, char *argv[])
 
     viewer.rootContext()->setContextProperty("camModels", &camProperty.modelCam);
 
-    Videostreaming vs;   
+    Videostreaming vs;
     AudioInput audio;
-    
+
     if(is20_04detected)
     {
         viewer.rootContext()->setContextProperty("is20_04detcted", QVariant(true));
@@ -197,6 +208,7 @@ int main(int argc, char *argv[])
          viewer.rootContext()->setContextProperty("is20_04detcted", QVariant(false));
          audio.is20_04 = false;
     }
+
     viewer.rootContext()->setContextProperty("resolutionModel", &vs.resolution);
     viewer.rootContext()->setContextProperty("stillOutputFormatModel", &vs.stillOutputFormat);
     viewer.rootContext()->setContextProperty("videoOutputFormatModel", &vs.videoOutputFormat);
@@ -212,9 +224,13 @@ int main(int argc, char *argv[])
 #else
     viewer.setMainQmlFile(QStringLiteral("qml/qtcam/Views/qtcam.qml"));
 #endif
+
+    viewer.rootContext()->setContextProperty("helperQml", &vs.helperObj);
+
     QObject *rootObject = dynamic_cast<QObject*>(viewer.rootObject());
 
     QObject::connect(rootObject,SIGNAL(stopCamPreview()),rootObject,SLOT(triggerModeCapture()));
+
 
     //Setting the Window ICON
 #if LAUNCHPAD

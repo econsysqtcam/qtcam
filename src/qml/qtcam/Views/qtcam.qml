@@ -18,10 +18,10 @@
  * along with Qtcam. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 2.0
+import QtQuick 2.6
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
-import QtQuick.Window 2.0
+import QtQuick.Window 2.2
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.1
 import econ.camera.property 1.0
@@ -30,12 +30,15 @@ import econ.camera.keyEvent 1.0
 import econ.camera.fscamcu135 1.0
 import econ.camera.see3cam50 1.0
 import econ.camera.see3camcu55mh 1.0
+import econ.camera.see3cam_27cug 1.0
 import "../JavaScriptFiles/tempValue.js" as JS
 import cameraenum 1.0
 import econ.camera.uvcsettings 1.0
+import econ.camera.qimagerenderer 1.0
 
 Rectangle {
     id: root
+    visible: true
     //Removed unused signals and property  - By Dhurka - 21st Oct 2016
     signal stopCamPreview()
     signal mouseRightClicked(var x, var y, var width, var height)
@@ -61,8 +64,12 @@ Rectangle {
     //To grab preview Frames
     signal queryFrame(bool retriveframe,bool InFailureCase);
 
+    //signal to send cameraMode to renderer.qml
+    signal sendCameraModeToQml(int cameraMode)
+
 
     property int burstLength;
+    property int cameraMode;
     property bool vidFormatChanged: false
     property bool keyEventFiltering :true
 
@@ -167,6 +174,8 @@ Rectangle {
     property variant ecam83usbObj
     property int ecam83USBstate: -1
     property bool is83USBFormatH264: false
+
+    property var irPreview: undefined
 
     //Video frame interval
     signal videoFrameInterval(int frameInterval)
@@ -324,7 +333,6 @@ Rectangle {
         }
     }
 
-
     Image {
         id: layer_0
         source: "images/layer_0.png"
@@ -344,6 +352,7 @@ Rectangle {
         width: sideBarItems.visible ? parent.width * 0.85 : parent.width
         height: layer_0.height
     }
+
     Videostreaming {
         id: vidstreamproperty
         focus: true
@@ -578,6 +587,15 @@ Rectangle {
             vidstreamproperty.getecam83USBStreamingState(ecam83USBstate)
         }
 
+        /*
+            Added By Sushanth.S
+            Signal emitted from Videostreaming.cpp to pass cameraMode to renderer.qml
+        */
+        onSendCameraMode:{
+            //signal emitted to renderer.qml
+            sendCameraModeToQml(cameraMode)
+        }
+
         Rectangle
         {
             id:previewwindow
@@ -714,7 +732,7 @@ Rectangle {
 
                         // Added by Sankari: 12 Feb 2018 : stop Getting key from camera.
                         keyEvent.stopGetKeyFromCamera()
-//			 if(!is20_04detcted)
+                        //			 if(!is20_04detcted)
                         	enumerateAudioSettings();
 
                         cameraSelected()
@@ -1006,7 +1024,10 @@ Rectangle {
     }
 
     function read83USBstreamingState(){
-        ecam83USBstate = ecam83usbObj.readStreamingState()
+        if(is83USBFormatH264)
+        {
+            ecam83USBstate = ecam83usbObj.readStreamingState()
+        }
         disableStillCapCombo(ecam83USBstate)
     }
 
@@ -1391,6 +1412,10 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.NILECAM20_USB) {
             see3cam = Qt.createComponent("../UVCSettings/nilecam20usb/nilecam20_usb.qml").createObject(root)
         }
+        //Added By Sushanth
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_27CUG) {
+            see3cam = Qt.createComponent("../UVCSettings/see3cam27cug/see3cam27cug.qml").createObject(root)
+        }
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_135M) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam135m/see3cam135m.qml").createObject(root)
         }
@@ -1433,6 +1458,9 @@ Rectangle {
         case CommonEnums.SEE3CAM_81:
             // Added by Sankari : 22 Feb 2017
         case CommonEnums.SEE3CAM_CU135:
+        case CommonEnums.SEE3CAM_CU81:
+        //ADDED
+        case CommonEnums.SEE3CAM_27CUG:
         case CommonEnums.NILECAM30_USB:
         case CommonEnums.NILECAM20_USB:
         case CommonEnums.SEE3CAM_CU55:
@@ -1610,7 +1638,7 @@ Rectangle {
     }
 
     function informStillResolutionIndexChanged(resoln, resolutionIndex,format,stillFormatIndex){
-        stillResolutionChanged(resoln, resolutionIndex, format, stillFormatIndex)
+       stillResolutionChanged(resoln, resolutionIndex, format, stillFormatIndex)
     }
 
     // Added by Sankari - 9 Dec 2016
@@ -1630,6 +1658,42 @@ Rectangle {
     {
         burstLength = burstLen
     }
+
+    //for sending cameraMode value to Videostreaming.cpp
+    function cameraMode_Enabled(Mode)
+    {
+        cameraMode = Mode
+        vidstreamproperty.cameraModeEnabled(cameraMode)
+    }
+
+
+    //Added by Sushanth.S - Creating component for IR preview
+    function irPreviewWindow()
+    {
+        //To avoid creating mutiple windows, when the radiobutton is clicked mutiple times
+        if(irPreview == undefined)
+        {
+            var component = Qt.createComponent("../Views/renderer.qml")
+
+            if (component.status === Component.Ready)
+            {
+                irPreview = component.createObject(root)
+            }
+
+            //if the window is closed, assign irPreview is undefined
+            irPreview.closing.connect(function() { irPreview = undefined;})
+            irPreview.show()
+        }
+        else
+        {
+            /*
+                If window closed, then clicks the button again
+                the window will opened again using requestActivate()
+            */
+            irPreview.requestActivate()
+        }
+    }
+
     //for taking snap shot
     function imageCapture(shotType)
     {
@@ -1684,9 +1748,13 @@ Rectangle {
     function selectMenuIndex(controlId,index)
     {
         if(enableUVCSettings)
+        {
             vidstreamproperty.selectMenuIndex(controlId,index)
+        }
         else
+        {
             enableUVCSettings = true;
+        }
     }
     function cameraFilterControls(value)
     {
@@ -1763,3 +1831,4 @@ Rectangle {
         }
     }
 }
+

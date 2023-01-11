@@ -38,6 +38,7 @@ SOURCES += main.cpp \
     see3cam_cu20.cpp\
     uvcExtCx3sni.cpp \
     keyEventReceive.cpp \
+    see3cam_27cug.cpp\
     nilecam20_usb.cpp \
     nilecam30_usb.cpp \
     h264camera.cpp \
@@ -63,7 +64,8 @@ SOURCES += main.cpp \
     see3cam_cu1330m.cpp \
     see3cam_135m.cpp \
     see3cam_cu136m.cpp \
-    barcode_camera.cpp
+    barcode_camera.cpp \
+    renderer.cpp
 
 # Installation path
 # target.path =
@@ -103,6 +105,7 @@ HEADERS += \
     see3cam_cu20.h\
     uvcExtCx3sni.h \
     keyEventReceive.h \
+    see3cam_27cug.h\
     nilecam30_usb.h \
     nilecam20_usb.h \
     h264camera.h \
@@ -127,7 +130,8 @@ HEADERS += \
     see3cam_cu1330m.h \
     see3cam_135m.h \
     see3cam_cu136m.h \
-    barcode_camera.h
+    barcode_camera.h \
+    renderer.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
@@ -206,5 +210,6 @@ DISTFILES += \
     qml/qtcam/UVCSettings/see3camcu1330m/see3cam_cu1330m.qml \
     qml/qtcam/UVCSettings/see3cam135m/see3cam135m.qml \
     qml/qtcam/UVCSettings/see3cam136m/see3cam_cu136m.qml \
+    qml/qtcam/UVCSettings/see3cam27cug/see3cam27cug.qml\
     qml/qtcam/UVCSettings/nilecam20usb/nilecam20_usb.qml \
     qml/qtcam/UVCSettings/barcode/barcode_camera.qml

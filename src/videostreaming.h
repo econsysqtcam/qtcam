@@ -21,6 +21,10 @@
 
 #ifndef VIDEOSTREAMING_H
 #define VIDEOSTREAMING_H
+
+#define RGB_FRAME 0X00
+#define IR_FRAME 0x01
+
 #include <QTimer>
 #include <QDateTime>
 #include <QSocketNotifier>
@@ -41,6 +45,7 @@
 #include "common_enums.h"
 #include"fscam_cu135.h"
 #include <linux/uvcvideo.h>
+#include "renderer.h"
 
 #include <QtQuick/QQuickItem>
 #include <QtGui/QOpenGLFunctions>
@@ -48,6 +53,9 @@
 #include <QMutex>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include "qtquick2applicationviewer.h"
+#include <QtQuick/QQuickView>
+#include <QQmlContext>
 
 class FrameRenderer : public QObject, protected QOpenGLFunctions
 {
@@ -57,6 +65,7 @@ public:
     ~FrameRenderer();
 
     int skipH264Frames;
+    int Hello = 1;
 
     void setT(qreal t) { m_t = t; }
     void setViewportSize(const QSize &size) { m_viewportSize = size; }
@@ -100,6 +109,8 @@ public:
     uint8_t *uBuffer;
     uint8_t *vBuffer;
     uint8_t *yuvBuffer,*greyBuffer;
+    uint8_t *irBuffer,*rgbBuffer;
+
       __u32 xcord,ycord;
     unsigned frame;
 
@@ -118,7 +129,9 @@ public:
     unsigned fps;
 
     QMutex renderMutex; // mutex to use in rendering - rgba
-    QMutex renderyuyvMutex; // mutex to use in rendering yuyv   
+    QMutex renderyuyvMutex; // mutex to use in rendering yuyv
+    QMutex render27CugMutex; //Mutex to use for See3CAM_27CUG (UYVY Rendering)
+    QMutex still27CugMutex; //Muted to use for See3CAM_27CUG (Still Capture IR-RGB)
 
     bool  m_formatChange;
     bool  m_videoResolnChange;
@@ -154,7 +167,7 @@ public:
     QOpenGLShaderProgram *m_shaderProgram;
     QOpenGLShaderProgram *m_programYUYV;
 
-private:    
+private:
     qreal m_t;
 
     QQuickWindow *m_window;
@@ -179,6 +192,7 @@ class Videostreaming :  public QQuickItem, public v4l2
 {
     Q_OBJECT
     Q_PROPERTY(qreal t READ t WRITE setT NOTIFY tChanged)
+//    Q_PROPERTY(QImage image READ image WRITE setImage NOTIFY imageChanged)
 
 public:
     struct buffer {
@@ -187,8 +201,8 @@ public:
         size_t  length[VIDEO_MAX_PLANES];
     };
     Videostreaming();
-    ~Videostreaming();   
-    
+    ~Videostreaming();
+
     qreal t() const { return m_t; }
     void setT(qreal t);
     void updateBuffer();
@@ -198,20 +212,31 @@ public:
     static QStringListModel resolution;
     static QStringListModel stillOutputFormat;
     static QStringListModel videoOutputFormat;
-    static QStringListModel fpsList;    
+    static QStringListModel fpsList;
     static QStringListModel encoderList;
+    static Helper helperObj;
      QTimer m_timer;
 
     void displayFrame();
 
-   unsigned char *tempSrcBuffer;
+    unsigned char *tempSrcBuffer;
 
+    //Buffer to stillCapture for See3CAM_27CUG => Added By Sushanth.S
+    unsigned char *still_Buffer;
 
     // prepare target buffer for rendering from input buffer.
     bool prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 bytesUsed);
 
+    //Preparing RGB & IR buffer for Rendering
+    bool prepare27cugBuffer(uint8_t* inputBuffer);
+
+    bool bufferToQImage(uint8_t* irBuffer);
+
+    //Preparing RGB & IR buffer for Still capture
+    bool stillBuffer(uint8_t* inputBuffer);
+
     // save captured image files
-    bool saveRawFile(void *inputBuffer, int buffersize);    
+    bool saveRawFile(void *inputBuffer, int buffersize);
     bool saveIRImage();
 
 
@@ -262,7 +287,6 @@ public:
 
    FSCAM_CU135 Fscamcu135;
 
-
     /* Jpeg decode */
     int doyuv;
     int dotile;
@@ -285,6 +309,8 @@ public:
     };
     Q_ENUMS(fpsChange)
 
+
+
 private:
     QFuture <int >threadMonitor;        //Added by M.Vishnu Murali:In order to moitor functions running in seperate thread.
     qreal m_t;
@@ -292,6 +318,7 @@ private:
     FrameRenderer *m_renderer;
 
     uint8_t *yuyvBuffer ,*yuyvBuffer_Y12;
+    uint8_t *IRBuffer;
     uint8_t *yuv420pdestBuffer;
     unsigned short int *bayerIRBuffer;
 
@@ -341,6 +368,11 @@ private:
     int triggermode_skipframes;
     int skipImageCapture;
 
+    int skipFrame           = 0;
+    int skipPreviewChange   = 0;
+    bool skipReturn       = false;
+    bool flagReset      = true;
+
     QSocketNotifier *m_capNotifier;
 
     struct v4l2_fract m_interval;
@@ -352,11 +384,13 @@ private:
     struct v4lconvert_data *m_convertData;
     struct buffer *m_buffers;
 
-    QImage *m_capImage;   
-  
+    QImage *m_capImage;
+    QImage *s_capRender;
+
 
     QString ctrlName, ctrlType, ctrlID, ctrlStepSize, ctrlMaxValue, ctrlMinValue,ctrlDefaultValue;
     QString stillSize;
+    QString storeSize;
     QString stillOutFormat;
     QString formatType;
     QString filename;
@@ -373,7 +407,7 @@ private:
     unsigned char *m_buf;
     unsigned m_size;
 
-    uint m_nbuffers;    
+    uint m_nbuffers;
     static int deviceNumber;
     static QString camDeviceName;
 
@@ -421,14 +455,14 @@ private:
     bool check_jpeg_header(void *inputbuffer, __u32 bytesUsed);
 
 private slots:
-    void handleWindowChanged(QQuickWindow *win); 
+    void handleWindowChanged(QQuickWindow *win);
 
 public slots:
     void openMessageDialogBox();
      void switchToStillPreviewSettings(bool stillSettings);
      void retrieveFrameFromStoreCam();
     void sync();
-    void cleanup();   
+    void cleanup();
     void setPreviewBgrndArea(int width, int height, bool sidebarAvailable);
     // Added by Sankari: 21 May 2019, Called this when sidebar opened/closed
     void sidebarStateChanged();
@@ -600,7 +634,7 @@ public slots:
      * @param videoEncoderType - Encoder types are video codecs, Currently four codecs are used as follows
      * 1. RAW VIDEO
      * 2. MJPEG
-     * 3. H264     
+     * 3. H264
      * @param videoFormatType - Format type is the container used to record the video.  Currently two containers are used as follows
      * 1. avi
      *
@@ -613,6 +647,12 @@ public slots:
      * @brief This function should be called to stop the video recording
      */
     void recordStop();
+
+    /**
+     * @brief To get the camera mode
+     */
+    void cameraModeEnabled(int cameraModeValue);
+
 
     /**
      * @brief To stop updating the preview in the trigger Mode
@@ -650,13 +690,15 @@ public slots:
     void getecam83USBStreamingState(int streamingState);
 
 signals:
-    void   triggerShotCap();
+    void triggerShotCap();
 
-
+    void sendResolutionChange(bool frame);
     // from qml file , rendering animation duration t changed
     void tChanged();
 
     void captureVideo();
+
+    void sendCameraMode(int cameraMode);
 
     // Added by Sankari: 12 Feb 2018
     // Get the bus info details and send to qml for selected camera
@@ -667,7 +709,7 @@ signals:
     void titleTextChanged(QString _title,QString _text);
     void enableCaptureAndRecord();
     void newControlAdded(QString ctrlName,QString ctrlType,QString ctrlID,QString ctrlStepSize = "0",QString ctrlMinValue= "0", QString ctrlMaxValue = "0",QString ctrlDefaultValue="0", QString ctrlHardwareDefault="0");
-    void deviceUnplugged(QString _title,QString _text);    
+    void deviceUnplugged(QString _title,QString _text);
     void averageFPS(unsigned fps);
     void defaultStillFrameSize(unsigned int outputIndexValue);
     void defaultFrameSize(unsigned int outputIndexValue, unsigned int  defaultWidth, unsigned int defaultHeight);
@@ -697,6 +739,7 @@ signals:
      void signalToSwitchResoln(bool switchResoln);
      void ecam83USBformatChanged(bool isH264);
      void update83USBstreamingState();
+
 };
 
 #endif // VIDEOSTREAMING_H

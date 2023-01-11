@@ -50,8 +50,7 @@ public:
         // Added by Sankari - 13 June 2017
         CX3_SNI_CAM,
         NILECAM30_USB,
-        NILECAM20_USB,
-	// Added by Sankari - 11 Dec 2018
+        // Added by Sankari - 11 Dec 2018
         ECAM22_USB,
         SEE3CAM_CU55,  // SEE3CAM_AR0521
         // Added by Navya
@@ -72,6 +71,8 @@ public:
         SEE3CAM_135M,
         SEE3CAM_CU136M,
         BARCODE_CAMERA,
+        NILECAM20_USB,
+        SEE3CAM_27CUG,
         SEE3CAM_20CUG
     }ECameraNames;
     //Enum for capture shot type
