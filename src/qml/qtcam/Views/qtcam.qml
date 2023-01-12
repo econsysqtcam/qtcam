@@ -18,10 +18,10 @@
  * along with Qtcam. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 2.6
+import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
-import QtQuick.Window 2.2
+import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.1
 import econ.camera.property 1.0

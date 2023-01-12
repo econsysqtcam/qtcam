@@ -9,7 +9,7 @@ class ImageItem : public QQuickPaintedItem
     Q_OBJECT
     Q_PROPERTY(QImage image READ image WRITE setImage NOTIFY imageChanged)
 public:
-    ImageItem(QQuickItem *parent = nullptr);
+    ImageItem(QQuickItem *parent = NULL);
     QImage image() const;
     void setImage(const QImage &image);
 
