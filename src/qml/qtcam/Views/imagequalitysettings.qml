@@ -834,7 +834,7 @@ Item {
                         spacing : 4
                         Text {
                             id: exposureAutoPriority
-                            text: "Esure,\nAuto\nPriority"
+                            text: "Exposure,\nAuto\nPriority"
                             font.pixelSize: 12
                             font.family: "Ubuntu"
                             color: "#ffffff"
