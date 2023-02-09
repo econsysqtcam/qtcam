@@ -24,6 +24,10 @@ Window {
                 irPreview.close()
             }
         }
+        onWindowCloseAfterUnplug:
+        {
+            irPreview.close()
+        }
     }
 
     Connections{
@@ -38,6 +42,12 @@ Window {
         id: liveImageItem
          height: parent.height
          width: parent.width
+    }
+
+    Component.onCompleted:
+    {
+            x = Screen.width / 2 - width / 2
+            y = Screen.height / 2 - height / 2
     }
 
 }

@@ -22,8 +22,9 @@
 #ifndef VIDEOSTREAMING_H
 #define VIDEOSTREAMING_H
 
-#define RGB_FRAME 0X00
-#define IR_FRAME 0x01
+#define RGB_FRAME           0X00
+#define IR_FRAME            0x01
+#define BYTES_PER_PIXEL_RGB 3
 
 #include <QTimer>
 #include <QDateTime>
@@ -65,7 +66,6 @@ public:
     ~FrameRenderer();
 
     int skipH264Frames;
-    int Hello = 1;
 
     void setT(qreal t) { m_t = t; }
     void setViewportSize(const QSize &size) { m_viewportSize = size; }
@@ -109,7 +109,7 @@ public:
     uint8_t *uBuffer;
     uint8_t *vBuffer;
     uint8_t *yuvBuffer,*greyBuffer;
-    uint8_t *irBuffer,*rgbBuffer;
+    uint8_t *rgbBuffer;
 
       __u32 xcord,ycord;
     unsigned frame;
@@ -215,14 +215,15 @@ public:
     static QStringListModel fpsList;
     static QStringListModel encoderList;
     static Helper helperObj;
-     QTimer m_timer;
+    QTimer m_timer;
+    QTimer stillTimeOutTimer;
 
     void displayFrame();
 
     unsigned char *tempSrcBuffer;
 
     //Buffer to stillCapture for See3CAM_27CUG => Added By Sushanth.S
-    unsigned char *still_Buffer;
+    unsigned char *stillBuffer;
 
     // prepare target buffer for rendering from input buffer.
     bool prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 bytesUsed);
@@ -233,7 +234,7 @@ public:
     bool bufferToQImage(uint8_t* irBuffer);
 
     //Preparing RGB & IR buffer for Still capture
-    bool stillBuffer(uint8_t* inputBuffer);
+    bool prepareStillBuffer(uint8_t* inputBuffer);
 
     // save captured image files
     bool saveRawFile(void *inputBuffer, int buffersize);
@@ -385,7 +386,7 @@ private:
     struct buffer *m_buffers;
 
     QImage *m_capImage;
-    QImage *s_capRender;
+    QImage *irRenderer;
 
 
     QString ctrlName, ctrlType, ctrlID, ctrlStepSize, ctrlMaxValue, ctrlMinValue,ctrlDefaultValue;
@@ -480,6 +481,15 @@ public slots:
      // Added by Sankari : 10 Dec 2016
     // To Disable image capture dialog when taking trigger shot in trigger mode for 12cunir camera
     void disableImageCaptureDialog();
+
+    //Added By Sushanth S  09 Feb 2023 - To start preview after timeout in Socket Notifier
+    void doStartFrameTimeOut();
+
+    //Added By Sushanth S 09 Feb 2023 - To Enable the frameTimer
+    void enableStillTimeOutTimer();
+
+    //Added By Sushanth S 09 Feb 2023 - To Stop the timer when app is closed or when camera is connected other than See3CAM_27CUG
+    void stopStillTimeOutTimer();
 
     // Added by Sankari : 10 Dec 2016
     // Disable saving image when focus is changed from trigger mode to master mode
@@ -698,7 +708,17 @@ signals:
 
     void captureVideo();
 
+    /*
+     * Added by Sushanth S
+     * To emit cameraMode to qml
+     */
     void sendCameraMode(int cameraMode);
+\
+    /*
+     * Added by Sushanth S
+     * To close IR window after the device is unplugged
+     */
+    void deviceUnPlug();
 
     // Added by Sankari: 12 Feb 2018
     // Get the bus info details and send to qml for selected camera

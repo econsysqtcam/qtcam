@@ -204,12 +204,12 @@ OTHER_FILES += \
 DISTFILES += \
     qml/qtcam/UVCSettings/see3cam_cu81/see3cam_cu81.qml \
     qml/qtcam/UVCSettings/see3cam160/see3cam_160.qml \
-    qml/qtcam/UVCSettings/ecam51A_USB/ecam51_usb.qml \
+    qml/qtcam/UVCSettings/ecam51_USB/ecam51_usb.qml \
     qml/qtcam/UVCSettings/ecam82_USB/ecam82_usb.qml \
     qml/qtcam/UVCSettings/see3camcu27/see3camcu27.qml \
     qml/qtcam/UVCSettings/see3camcu1330m/see3cam_cu1330m.qml \
     qml/qtcam/UVCSettings/see3cam135m/see3cam135m.qml \
-    qml/qtcam/UVCSettings/see3cam136m/see3cam_cu136m.qml \
+    qml/qtcam/UVCSettings/see3camcu136m/see3cam_cu136m.qml \
     qml/qtcam/UVCSettings/see3cam27cug/see3cam27cug.qml\
     qml/qtcam/UVCSettings/nilecam20usb/nilecam20_usb.qml \
     qml/qtcam/UVCSettings/barcode/barcode_camera.qml

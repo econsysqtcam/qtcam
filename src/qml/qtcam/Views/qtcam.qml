@@ -67,6 +67,9 @@ Rectangle {
     //signal to send cameraMode to renderer.qml
     signal sendCameraModeToQml(int cameraMode)
 
+    //signal close IR window after unplugging the device
+    signal windowCloseAfterUnplug()
+
 
     property int burstLength;
     property int cameraMode;
@@ -596,6 +599,14 @@ Rectangle {
             sendCameraModeToQml(cameraMode)
         }
 
+        /*
+            Added By Sushanth.S
+            Signal emitted from Videostreaming.cpp to close IR window after unplugging the device
+        */
+        onDeviceUnPlug:{
+            windowCloseAfterUnplug()
+        }
+
         Rectangle
         {
             id:previewwindow
@@ -614,7 +625,9 @@ Rectangle {
                             if(captureVideoRecordRootObject.captureBtnVisible && !getTriggerMode ){//Restricts in case of Trigger Modes for FSCAM_CU135 camera.
                                 keyEventFiltering = false
                                 mouseClickCapture()
-                            } else if(captureVideoRecordRootObject.recordBtnVisible && !getTriggerMode ){
+                            } else if(captureVideoRecordRootObject.recordBtnVisible && !getTriggerMode && (cameraMode != 1)){
+                                //Modified by Sushanth S 3rd Feb 2023
+                                //To disable video recording in IR-RGB mode for See3CAM_27CUG
                                 videoRecordBegin()
                                 keyEventFiltering = true         // Added by Navya : To avoid capturing image when video record mode is selected.
                             } else if(captureVideoRecordRootObject.recordStopBtnVisible){
@@ -1546,6 +1559,8 @@ Rectangle {
     Component.onDestruction: {
         // Stop the timer when quitting application
         vidstreamproperty.stopFrameTimeoutTimer();
+        // Stopping stillTimeOutTimer
+        vidstreamproperty.stopStillTimeOutTimer();
         if(captureVideoRecordRootObject.recordStopBtnVisible) {
             vidstreamproperty.recordStop()
             captureVideoRecordRootObject.videoTimerUpdate(false)
@@ -1665,7 +1680,6 @@ Rectangle {
         cameraMode = Mode
         vidstreamproperty.cameraModeEnabled(cameraMode)
     }
-
 
     //Added by Sushanth.S - Creating component for IR preview
     function irPreviewWindow()
@@ -1787,6 +1801,11 @@ Rectangle {
     function enableTimerforGrabPreviewFrame(timerstatus)
     {
         vidstreamproperty.enableTimer(timerstatus);
+    }
+
+    function enableTimerToRetrieveFrame()
+    {
+        vidstreamproperty.enableStillTimeOutTimer()
     }
 
     // Added by Navya -To avoid crash in case of Hyperyon by setting correct resoln

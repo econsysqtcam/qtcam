@@ -47,13 +47,12 @@ Item {
     property variant secondWindow
     property bool setButtonClicked: false
 
-    // Used when selecting auto exposure in image Quality settings menu
     Timer {
-        id: getAutoExpsoureControlValues
+        id: getexposureCompTimer
         interval: 500
         onTriggered: {
-            see3cam27cug.getMaximumExposureCompensation()
             see3cam27cug.getMinimumExposureCompensation()
+            see3cam27cug.getMaximumExposureCompensation()
             stop()
         }
     }
@@ -82,6 +81,15 @@ Item {
             stillImageFormat.push("raw")
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
+        }
+        onVideoResolutionChanged:{
+            getexposureCompTimer.start()
+        }
+        onPreviewFPSChanged:{
+            getexposureCompTimer.start()
+        }
+        onVideoColorSpaceChanged:{
+            getexposureCompTimer.start()
         }
     }
 
@@ -206,6 +214,7 @@ Item {
                        Keys.onReturnPressed: {
                            root.cameraMode_Enabled(See3CAM_27CUG.RGB_IR_ENABLE)
                            setIrRgbMode()
+
                            root.irPreviewWindow()
                            videoRecordBtnEnable(false)
                        }
@@ -845,6 +854,8 @@ Item {
             if(setButtonClicked){
                 displayMessageBox(title, text)
                 setButtonClicked = false
+                see3cam27cug.getMinimumExposureCompensation()
+                see3cam27cug.getMaximumExposureCompensation()
             }
         }
     }
@@ -919,9 +930,10 @@ Item {
     function setMasterMode(){
         defaultValue.enabled = true
         see3cam27cug.setStreamMode(See3CAM_27CUG.MASTER)
-
+        root.startUpdatePreviewInMasterMode()
         root.checkForTriggerMode(false)
-        if(!(see3cam27cug.setCameraMode(See3CAM_27CUG.RGB_IR_ENABLE)))
+
+        if(irrgbMode.checked == false)
         {
             root.videoRecordBtnEnable(true)
         }
@@ -932,7 +944,7 @@ Item {
     function setTriggerMode(){
         defaultValue.enabled = true
         see3cam27cug.setStreamMode(See3CAM_27CUG.TRIGGER)
-
+        root.stopUpdatePreviewInTriggerMode()
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
@@ -974,6 +986,7 @@ Item {
             getCurrentValuesFromCamera()
         }
         defaultValue.enabled = true
+        root.startUpdatePreviewInMasterMode()
     }
 
     function getCurrentValuesFromCamera(){
@@ -1031,10 +1044,14 @@ Item {
             minExpTextField.opacity = 0.1
             minExpSetButton.opacity = 0.1
         }
-        getAutoExpsoureControlValues.start()
     }
 
     Component.onCompleted: {
         getCurrentValuesFromCamera()
+        root.enableTimerToRetrieveFrame()
+    }
+    Component.onDestruction: {
+        // Stopping stillTimeOutTimer when this Component is destroyed
+        vidstreamproperty.stopStillTimeOutTimer();
     }
 }

@@ -740,7 +740,6 @@ Item {
                                     if(currentText.toString() != "Auto Mode" && currentText.toString() != "Aperture Priority Mode") {
                                         root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())
 
-
                                         root.autoExposureSelected(false)
                                         JS.autoExposureSelected = false
                                         exposure_absolute.opacity = 1
@@ -788,6 +787,7 @@ Item {
                                 exposureValueAscella = exposureOrigAscella[value]
                                 exposure_value.text = exposureOrigAscella[value]
                                 root.changeCameraSettings(exposurecontrolId, exposureValueAscella)
+
                             }else if(!exposureAutoAvailable){ // If a camera does not contain "exposure, auto" control, but having "exposure absolute" control, allow it change exposure value.
                                 root.changeCameraSettings(exposurecontrolId,value.toString())
                             }else{
@@ -834,7 +834,7 @@ Item {
                         spacing : 4
                         Text {
                             id: exposureAutoPriority
-                            text: "Exposure,\nAuto\nPriority"
+                            text: "Esure,\nAuto\nPriority"
                             font.pixelSize: 12
                             font.family: "Ubuntu"
                             color: "#ffffff"
@@ -1840,6 +1840,7 @@ Item {
             exposureCombo.currentIndex = controlDefaultValue
             if(exposureCombo.currentText.toString()=="Manual Mode" || exposureCombo.currentText.toString()=="Shutter Priority Mode")
             {
+                disable()
                 JS.autoExposureSelected = false
                 exposure_absolute.opacity = 1
                 exposure_Slider.enabled = true
@@ -1988,6 +1989,11 @@ Item {
         disableVideoProcessCheck.enabled = false
         autoSelect_wb.opacity = 0.1
         autoSelect_wb.enabled = false
+    }
+
+    function disable()
+    {
+        disableExposureCompensation();
     }
 
     function videoControlFilter() {
