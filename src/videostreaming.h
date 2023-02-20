@@ -22,9 +22,38 @@
 #ifndef VIDEOSTREAMING_H
 #define VIDEOSTREAMING_H
 
-#define RGB_FRAME           0X00
-#define IR_FRAME            0x01
-#define BYTES_PER_PIXEL_RGB 3
+#define RGB_FRAME               0X00
+#define IR_FRAME                0x01
+#define BYTES_PER_PIXEL_RGB     3
+
+#define IR_RGB_MODE 1
+#define RGB_MODE    2
+#define IR_MODE     3
+
+#define BYTES_PER_PIXEL_UYVY      2
+
+#define RGB_SIZE_CU83          16588800
+#define IR_SIZE_CU83           2073600
+
+#define IR_RESOLUTION          1920*1080
+#define RGB_RESOLUTION         3840*2160
+
+#define Y16_2160p_WIDTH            4440
+#define Y16_2160p_HEIGHT           2160
+
+#define Y16_2160p_RGB_WIDTH        3840
+#define Y16_2160p_RGB_HEIGHT       1350
+
+#define Y16_2160p_Y8_WIDTH        1920
+#define Y16_2160p_Y8_HEIGHT       1080
+
+#define Y16_1350p_WIDTH            3840
+#define Y16_1350p_HEIGHT           1350
+#define Y16_1350p_HEIGHT_MODIFIED  2160
+
+#define Y16_675p_WIDTH             1920
+#define Y16_675p_HEIGHT            675
+#define Y16_675p_HEIGHT_MODIFIED   1080
 
 #include <QTimer>
 #include <QDateTime>
@@ -111,6 +140,11 @@ public:
     uint8_t *yuvBuffer,*greyBuffer;
     uint8_t *rgbBuffer;
 
+    //Buffers for See3CAM_CU83
+    uint8_t *uyvyBuffer;
+    uint8_t *ir1350pBuffer;
+    uint8_t *ir675pBuffer;
+
       __u32 xcord,ycord;
     unsigned frame;
 
@@ -192,7 +226,6 @@ class Videostreaming :  public QQuickItem, public v4l2
 {
     Q_OBJECT
     Q_PROPERTY(qreal t READ t WRITE setT NOTIFY tChanged)
-//    Q_PROPERTY(QImage image READ image WRITE setImage NOTIFY imageChanged)
 
 public:
     struct buffer {
@@ -221,6 +254,7 @@ public:
     void displayFrame();
 
     unsigned char *tempSrcBuffer;
+    unsigned char *outputIrBuffer,*inputIrBuffer;
 
     //Buffer to stillCapture for See3CAM_27CUG => Added By Sushanth.S
     unsigned char *stillBuffer;
@@ -235,6 +269,9 @@ public:
 
     //Preparing RGB & IR buffer for Still capture
     bool prepareStillBuffer(uint8_t* inputBuffer);
+
+    //Preparing UYVY & Y8 buffer for See3CAM_CU83
+    bool prepareCu83Buffer(uint8_t *inputbuffer);
 
     // save captured image files
     bool saveRawFile(void *inputBuffer, int buffersize);
@@ -354,6 +391,7 @@ private:
     bool updateOnce;
     bool m_snapShot;
     bool startFrame;
+    bool createWindow = true;//To stop creating window when capturing still
 
     bool updateStop;
     bool makeSnapShot;
@@ -373,6 +411,8 @@ private:
     int skipPreviewChange   = 0;
     bool skipReturn       = false;
     bool flagReset      = true;
+
+    bool onY16Format = false;
 
     QSocketNotifier *m_capNotifier;
 
@@ -713,12 +753,30 @@ signals:
      * To emit cameraMode to qml
      */
     void sendCameraMode(int cameraMode);
-\
+
+    //signal to create IR window for See3CAM_CU83
+    void signalToCreateWindow();
+
+    //signal to destroy IR window for See3CAM_CU83
+    void signalToDestroyWindow();
+
     /*
      * Added by Sushanth S
      * To close IR window after the device is unplugged
      */
     void deviceUnPlug();
+
+    /*
+     * Added by Sushanth S
+     * To emit current resolution
+     */
+    void emitResolution(int width, int height);
+
+    /*
+     * Added by Sushanth S
+     * To disable videoRecording..which enables after capturing still
+     */
+    void disableVideoRecord();
 
     // Added by Sankari: 12 Feb 2018
     // Get the bus info details and send to qml for selected camera

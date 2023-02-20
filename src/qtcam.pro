@@ -39,6 +39,7 @@ SOURCES += main.cpp \
     uvcExtCx3sni.cpp \
     keyEventReceive.cpp \
     see3cam_27cug.cpp\
+    see3cam_cu83.cpp \
     nilecam20_usb.cpp \
     nilecam30_usb.cpp \
     h264camera.cpp \
@@ -106,6 +107,7 @@ HEADERS += \
     uvcExtCx3sni.h \
     keyEventReceive.h \
     see3cam_27cug.h\
+    see3cam_cu83.h\
     nilecam30_usb.h \
     nilecam20_usb.h \
     h264camera.h \
@@ -211,5 +213,6 @@ DISTFILES += \
     qml/qtcam/UVCSettings/see3cam135m/see3cam135m.qml \
     qml/qtcam/UVCSettings/see3camcu136m/see3cam_cu136m.qml \
     qml/qtcam/UVCSettings/see3cam27cug/see3cam27cug.qml\
+    qml/qtcam/UVCSettings/see3camcu83/see3camcu83.qml\
     qml/qtcam/UVCSettings/nilecam20usb/nilecam20_usb.qml \
     qml/qtcam/UVCSettings/barcode/barcode_camera.qml

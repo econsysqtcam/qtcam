@@ -43,7 +43,7 @@ VideoEncoder::VideoEncoder()
     initCodec();
     frameCount = 0;
     pAudioFrame = 0;
-    samples = 0;  
+    samples = 0;
 
     // Added by Sankari: Mar 4 2019.  Initialize AVpacket to NULL
     pkt.data = NULL;
@@ -159,6 +159,7 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
         pCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         pCodecCtx->width = getWidth();
         pCodecCtx->height = getHeight();
+
 
         if(fpsDenominator >= 5){
             pCodecCtx->time_base = (AVRational){fpsNumerator, fpsDenominator};
@@ -286,7 +287,7 @@ bool VideoEncoder::closeFile()
         av_freep(&pFormatCtx->streams[i]);
     }
 
-    sws_freeContext(img_convert_ctx);    
+    sws_freeContext(img_convert_ctx);
 
     // Close file
     avio_close(pFormatCtx->pb);
@@ -339,12 +340,12 @@ int VideoEncoder::encodePacket(uint8_t *buffer, uint8_t bufferType){
     }
 
     if(!isOk())
-        return -1;    
+        return -1;
 
     convertImage_sws(buffer,bufferType);
 
     int got_packet = 0;
-    int out_size = 0;     
+    int out_size = 0;
 
     if(pkt.data != NULL && pkt.size != 0){
        av_free_packet(&pkt);
@@ -358,11 +359,11 @@ int VideoEncoder::encodePacket(uint8_t *buffer, uint8_t bufferType){
     pkt.pts = pkt.dts = ppicture->pts;
 
     /* encode the image */
-    int ret = avcodec_encode_video2(pCodecCtx, &pkt, ppicture, &got_packet);    
+    int ret = avcodec_encode_video2(pCodecCtx, &pkt, ppicture, &got_packet);
     if (ret < 0) {
         char errText[999]="";
         av_strerror(ret, errText, 999);
-        fprintf(stderr, "Error encoding a video frame\n");        
+        fprintf(stderr, "Error encoding a video frame\n");
         av_free_packet(&pkt);
         pkt.data = NULL;
         pkt.size = 0;
@@ -373,7 +374,7 @@ int VideoEncoder::encodePacket(uint8_t *buffer, uint8_t bufferType){
     if (got_packet) {
 
         // increment frame count
-          frameCount++;     
+          frameCount++;
 
         // https://stackoverflow.com/questions/48440670/how-to-set-pts-and-dts-of-avpacket-from-rtp-timestamps-while-muxing-vp8-rtp-stre
             //frameDuration = video_st->time_base.den / video_fps; // i.e. 25
@@ -455,14 +456,14 @@ int VideoEncoder::encodeImage(uint8_t *buffer,uint8_t bufferType)
             pkt.flags |= AV_PKT_FLAG_KEY;
        pkt.stream_index = pVideoStream->index;
        pkt.data = outbuf;
-       pkt.size = out_size;       
+       pkt.size = out_size;
        /* write the compressed frame in the media file */
        ret = av_write_frame(pFormatCtx, &pkt);
 
        if(ret == 0){
         videoPacketReceived = true;
        }
-       
+
     } else {
        ret = 0;
     }
@@ -657,8 +658,8 @@ bool VideoEncoder::convertImage_sws(uint8_t *buffer,uint8_t bufferType)
    @param : buffer - raw h264 buffer
    @param : bytesused - bytes in buffer
 **/
-int VideoEncoder::writeH264Image(void *buffer, int bytesused){    
-    int ret = -1;    
+int VideoEncoder::writeH264Image(void *buffer, int bytesused){
+    int ret = -1;
     ret = encodeH264Packet(buffer, bytesused);
     return ret;
 }
@@ -682,7 +683,7 @@ int VideoEncoder::encodeH264Packet(void *buffer, int bytesused){
 
     if(!isOk())
         return -1;
-   
+
     int out_size = 0;
     pkt.data = (u_int8_t *) buffer;
     pkt.size = bytesused;
@@ -885,7 +886,7 @@ int VideoEncoder::encodeAudio(void *data){
 
     if (got_packet) {
         audioPkt.stream_index = pAudioStream->index;
-#if LIBAVCODEC_VER_AT_LEAST(56,1)        
+#if LIBAVCODEC_VER_AT_LEAST(56,1)
         av_packet_rescale_ts(&audioPkt,
                                   pAudioCodecCtx->time_base,
                                   pAudioStream->time_base);
@@ -898,7 +899,7 @@ int VideoEncoder::encodeAudio(void *data){
         if(pAudioCodecCtx->coded_frame->key_frame)
             audioPkt.flags |= AV_PKT_FLAG_KEY;
 
-        out_size = audioPkt.size;        
+        out_size = audioPkt.size;
 
         if(!m_recStop){
             /* Write the compressed frame to the media file. */

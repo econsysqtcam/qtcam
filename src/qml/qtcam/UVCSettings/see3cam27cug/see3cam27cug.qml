@@ -174,11 +174,11 @@ Item {
                        exclusiveGroup: cameraModeGroup
                        activeFocusOnPress: true
                        onClicked: {
-                           root.cameraMode_Enabled(See3CAM_27CUG.IR)
+                           root.camModeEnabled(See3CAM_27CUG.IR)
                            setIrMode()
                        }
                        Keys.onReturnPressed: {
-                           root.cameraMode_Enabled(See3CAM_27CUG.IR)
+                           root.camModeEnabled(See3CAM_27CUG.IR)
                            setIrMode()
                        }
                    }
@@ -189,11 +189,11 @@ Item {
                        exclusiveGroup: cameraModeGroup
                        activeFocusOnPress: true
                        onClicked: {
-                          root.cameraMode_Enabled(See3CAM_27CUG.RGB)
+                          root.camModeEnabled(See3CAM_27CUG.RGB)
                           setRgbMode()
                        }
                        Keys.onReturnPressed: {
-                          root.cameraMode_Enabled(See3CAM_27CUG.RGB)
+                          root.camModeEnabled(See3CAM_27CUG.RGB)
                           setRgbMode()
                        }
                    }
@@ -204,7 +204,7 @@ Item {
                        exclusiveGroup: cameraModeGroup
                        activeFocusOnPress: true
                        onClicked: {
-                           root.cameraMode_Enabled(See3CAM_27CUG.RGB_IR_ENABLE)
+                           root.camModeEnabled(See3CAM_27CUG.RGB_IR_ENABLE)
                            setIrRgbMode()
 
                            //function to create IR window
@@ -212,7 +212,7 @@ Item {
                            videoRecordBtnEnable(false)
                        }
                        Keys.onReturnPressed: {
-                           root.cameraMode_Enabled(See3CAM_27CUG.RGB_IR_ENABLE)
+                           root.camModeEnabled(See3CAM_27CUG.RGB_IR_ENABLE)
                            setIrRgbMode()
 
                            root.irPreviewWindow()
@@ -981,6 +981,7 @@ Item {
         root.videoRecordBtnEnable(false)
         root.irPreviewWindow()
 
+        root.camModeEnabled(See3CAM_27CUG.RGB_IR_ENABLE)
         if(see3cam27cug.setToDefaultValues())
         {
             getCurrentValuesFromCamera()

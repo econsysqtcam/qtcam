@@ -1840,7 +1840,8 @@ Item {
             exposureCombo.currentIndex = controlDefaultValue
             if(exposureCombo.currentText.toString()=="Manual Mode" || exposureCombo.currentText.toString()=="Shutter Priority Mode")
             {
-                disable()
+                //To disable Exposure compensation when application opens (Manual Mode)
+                root.autoExposureSelected(false)
                 JS.autoExposureSelected = false
                 exposure_absolute.opacity = 1
                 exposure_Slider.enabled = true
@@ -1849,6 +1850,8 @@ Item {
             }
             else
             {
+                //To disable Exposure compensation when application opens (Auto Mode)
+                root.autoExposureSelected(true)
                 JS.autoExposureSelected = true
                 exposure_Slider.enabled = false
                 exposure_Slider.opacity = 0.1
@@ -1989,11 +1992,6 @@ Item {
         disableVideoProcessCheck.enabled = false
         autoSelect_wb.opacity = 0.1
         autoSelect_wb.enabled = false
-    }
-
-    function disable()
-    {
-        disableExposureCompensation();
     }
 
     function videoControlFilter() {

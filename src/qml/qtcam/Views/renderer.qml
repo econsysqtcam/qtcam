@@ -28,6 +28,9 @@ Window {
         {
             irPreview.close()
         }
+        onDestroyIrWindow:{
+            irPreview.close()
+        }
     }
 
     Connections{

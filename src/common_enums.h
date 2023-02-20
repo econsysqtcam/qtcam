@@ -73,6 +73,7 @@ public:
         BARCODE_CAMERA,
         NILECAM20_USB,
         SEE3CAM_27CUG,
+        SEE3CAM_CU83, //Added By Sushanth.S
         SEE3CAM_20CUG
     }ECameraNames;
     //Enum for capture shot type

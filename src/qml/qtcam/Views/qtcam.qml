@@ -70,6 +70,14 @@ Rectangle {
     //signal close IR window after unplugging the device
     signal windowCloseAfterUnplug()
 
+    //signal to see3camcu83.qml -> to create IR window
+    signal createIrWindow()
+
+    //signal to see3camcu83.qml -> to create IR window
+    signal destroyIrWindow()
+
+    signal sendResolution(int width, int height)
+
 
     property int burstLength;
     property int cameraMode;
@@ -84,6 +92,7 @@ Rectangle {
     // Added by Sankari : 25 May 2017, the flag to indicate side bar items are opened/closed
     property bool closeSideBarClicked: false
     property bool getTriggerMode :false
+    property bool stopRecording: false
 
     // Added by Sankari : 25 May 2017, store the status of capture/record button visiblity[used when closing side bar items]
     property bool captureButtonVisibleStatus: false
@@ -376,6 +385,14 @@ Rectangle {
             is83USBFormatH264 = isH264
         }
 
+        /*
+         * Added by Sushanth S
+         * To disable videoRecording....which enables after capturing still
+         */
+        onDisableVideoRecord:{
+            videoRecordBtnEnable(false)
+        }
+
         onTitleTextChanged:{
             vidstreamproperty.enabled = true
             if(!getTriggerMode)                 //Added by Nivedha: 09 Mar 2021 -- To enable capture and video record button only for master mode
@@ -601,6 +618,40 @@ Rectangle {
 
         /*
             Added By Sushanth.S
+            Signal emitted to destroy IR window
+        */
+        onSignalToDestroyWindow:
+        {
+            destroyIrWindow();
+        }
+
+        /*
+            Added By Sushanth.S
+            Signal emitted to create IR window
+        */
+        onSignalToCreateWindow: {
+            createIrWindow()
+        }
+
+        /*
+            Added By Sushanth.S
+            Signal emitted to send resolution
+        */
+        onEmitResolution:{
+            sendResolution(width,height)
+            //To enable flag to disable videoRecord when right click on screen
+            if((width == 4440)&&(height == 2160))
+            {
+                stopRecording = true
+            }
+            else
+            {
+                stopRecording = false
+            }
+        }
+
+        /*
+            Added By Sushanth.S
             Signal emitted from Videostreaming.cpp to close IR window after unplugging the device
         */
         onDeviceUnPlug:{
@@ -625,9 +676,10 @@ Rectangle {
                             if(captureVideoRecordRootObject.captureBtnVisible && !getTriggerMode ){//Restricts in case of Trigger Modes for FSCAM_CU135 camera.
                                 keyEventFiltering = false
                                 mouseClickCapture()
-                            } else if(captureVideoRecordRootObject.recordBtnVisible && !getTriggerMode && (cameraMode != 1)){
+                            } else if(captureVideoRecordRootObject.recordBtnVisible && !getTriggerMode && (cameraMode != 1) && (!stopRecording)){
                                 //Modified by Sushanth S 3rd Feb 2023
                                 //To disable video recording in IR-RGB mode for See3CAM_27CUG
+                                //stopRecording - To disable videoRecording in See3CAM_CU83 for default resolution
                                 videoRecordBegin()
                                 keyEventFiltering = true         // Added by Navya : To avoid capturing image when video record mode is selected.
                             } else if(captureVideoRecordRootObject.recordStopBtnVisible){
@@ -1429,6 +1481,9 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_27CUG) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam27cug/see3cam27cug.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU83) {
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu83/see3camcu83.qml").createObject(root)
+        }
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_135M) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam135m/see3cam135m.qml").createObject(root)
         }
@@ -1472,8 +1527,6 @@ Rectangle {
             // Added by Sankari : 22 Feb 2017
         case CommonEnums.SEE3CAM_CU135:
         case CommonEnums.SEE3CAM_CU81:
-        //ADDED
-        case CommonEnums.SEE3CAM_27CUG:
         case CommonEnums.NILECAM30_USB:
         case CommonEnums.NILECAM20_USB:
         case CommonEnums.SEE3CAM_CU55:
@@ -1494,6 +1547,8 @@ Rectangle {
         case CommonEnums.SEE3CAM_CU136M:
         case CommonEnums.BARCODE_CAMERA:
         case CommonEnums.SEE3CAM_135M:
+        case CommonEnums.SEE3CAM_27CUG:  //Added by Sushanth.S
+        case CommonEnums.SEE3CAM_CU83:   //Added by Sushanth.S
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
             break;
@@ -1675,7 +1730,7 @@ Rectangle {
     }
 
     //for sending cameraMode value to Videostreaming.cpp
-    function cameraMode_Enabled(Mode)
+    function camModeEnabled(Mode)
     {
         cameraMode = Mode
         vidstreamproperty.cameraModeEnabled(cameraMode)
