@@ -1,3 +1,7 @@
+Qtcam Application - 25.0.6
+---------------------------
+*Disable videoRecord & still capture in trigger mode(IR, RGB, IR-RGB) for See3Cam_27CUG.
+
 Qtcam Application - 25.0.5
 ---------------------------
 *Added support for See3CAM_CU83

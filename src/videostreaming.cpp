@@ -1614,7 +1614,7 @@ void Videostreaming::capFrame()
                     _text = "Image not saved in the selected location";
                     emit logCriticalHandle("Still image not saved successfully");
                     emit titleTextChanged(_title,_text);
-                    if(cameraMode == 1)
+                    if(cameraMode == 1)// cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
                     {
                         emit disableVideoRecord();
                     }
@@ -2010,6 +2010,7 @@ void Videostreaming::capFrame()
             }
 
             //Resetting the flags to capture second frame for See3CAM_27CUG => Added By Sushanth.S (08 Dec 2022)
+            // cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
             if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG) && (flagReset) && (cameraMode == 1))
             {
                 makeSnapShot  = true;
@@ -3141,6 +3142,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                     m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
 
                     //For rendering in 640x482 resolution for See3CAM_27CUG
+                    // cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
                     if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG) && (cameraMode == 1))
                     {
                         uint8_t *ptmp = (uint8_t *)m_renderer->rgbBuffer; //rgb buffer contains UYVY data for See3Cam_27CUG
@@ -3766,7 +3768,7 @@ void Videostreaming::formatSaveSuccess(bool burstFlag) {
         }
         emit logDebugHandle("Captured image(s) is(are) saved successfully");
         emit titleTextChanged(_title,_text);
-        if(cameraMode == 1)
+        if(cameraMode == 1)// cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
         {
             emit disableVideoRecord();
         }
@@ -3776,7 +3778,7 @@ void Videostreaming::formatSaveSuccess(bool burstFlag) {
         _text = "Image not saved in the selected location";
         emit logCriticalHandle("Still image not saved successfully");
         emit titleTextChanged(_title,_text);
-        if(cameraMode == 1)
+        if(cameraMode == 1)// cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
         {
             emit disableVideoRecord();
         }
@@ -3837,7 +3839,7 @@ void Videostreaming::displayFrame() {
     m_capDestFormat.fmt.pix.sizeimage = width*height*3;
 
     m_capImage = new QImage(width, height, QImage::Format_RGB888);
-    if(cameraMode == 1)
+    if(cameraMode == 1)// cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
     {
         irRenderer = new QImage(width, height, QImage::Format_RGB888);
     }
@@ -3884,7 +3886,7 @@ void Videostreaming::doStartFrameTimeOut()
     _title = "Failure";
     _text = "Image not saved in the selected location";
     emit titleTextChanged(_title,_text);
-    if(cameraMode == 1)
+    if(cameraMode == 1)// cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
     {
         emit disableVideoRecord();
     }
@@ -4680,7 +4682,7 @@ void Videostreaming::updatepreview() {
 void Videostreaming::cameraModeEnabled(int cameraModeValue)
 {
     cameraMode = cameraModeValue;
-    if(cameraMode == 1)
+    if(cameraMode == 1)// cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
     {
         irRenderer = new QImage(width, height, QImage::Format_RGB888);
     }

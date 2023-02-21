@@ -176,10 +176,34 @@ Item {
                        onClicked: {
                            root.camModeEnabled(See3CAM_27CUG.IR)
                            setIrMode()
+                           if(triggerMode.checked == true)
+                           {
+                               root.captureBtnEnable(false)
+                               root.videoRecordBtnEnable(false)
+                               root.checkForTriggerMode(true)
+                           }
+                           else
+                           {
+                               root.captureBtnEnable(true)
+                               root.videoRecordBtnEnable(true)
+                               root.checkForTriggerMode(false)
+                           }
                        }
                        Keys.onReturnPressed: {
                            root.camModeEnabled(See3CAM_27CUG.IR)
                            setIrMode()
+                           if(triggerMode.checked == true)
+                           {
+                               root.captureBtnEnable(false)
+                               root.videoRecordBtnEnable(false)
+                               root.checkForTriggerMode(true)
+                           }
+                           else
+                           {
+                               root.captureBtnEnable(true)
+                               root.videoRecordBtnEnable(true)
+                               root.checkForTriggerMode(false)
+                           }
                        }
                    }
                    RadioButton {
@@ -191,10 +215,34 @@ Item {
                        onClicked: {
                           root.camModeEnabled(See3CAM_27CUG.RGB)
                           setRgbMode()
+                           if(triggerMode.checked == true)
+                           {
+                               root.captureBtnEnable(false)
+                               root.videoRecordBtnEnable(false)
+                               root.checkForTriggerMode(true)
+                           }
+                           else
+                           {
+                               root.captureBtnEnable(true)
+                               root.videoRecordBtnEnable(true)
+                               root.checkForTriggerMode(false)
+                           }
                        }
                        Keys.onReturnPressed: {
                           root.camModeEnabled(See3CAM_27CUG.RGB)
                           setRgbMode()
+                           if(triggerMode.checked == true)
+                           {
+                               root.captureBtnEnable(false)
+                               root.videoRecordBtnEnable(false)
+                               root.checkForTriggerMode(true)
+                           }
+                           else
+                           {
+                               root.captureBtnEnable(true)
+                               root.videoRecordBtnEnable(true)
+                               root.checkForTriggerMode(false)
+                           }
                        }
                    }
                    RadioButton {
@@ -206,6 +254,18 @@ Item {
                        onClicked: {
                            root.camModeEnabled(See3CAM_27CUG.RGB_IR_ENABLE)
                            setIrRgbMode()
+                           if(triggerMode.checked == true)
+                           {
+                               root.captureBtnEnable(false)
+                               root.videoRecordBtnEnable(false)
+                               root.checkForTriggerMode(true)
+                           }
+                           else
+                           {
+                               root.captureBtnEnable(true)
+                               root.videoRecordBtnEnable(true)
+                               root.checkForTriggerMode(false)
+                           }
 
                            //function to create IR window
                            root.irPreviewWindow()
@@ -214,6 +274,18 @@ Item {
                        Keys.onReturnPressed: {
                            root.camModeEnabled(See3CAM_27CUG.RGB_IR_ENABLE)
                            setIrRgbMode()
+                           if(triggerMode.checked == true)
+                           {
+                               root.captureBtnEnable(false)
+                               root.videoRecordBtnEnable(false)
+                               root.checkForTriggerMode(true)
+                           }
+                           else
+                           {
+                               root.captureBtnEnable(true)
+                               root.videoRecordBtnEnable(true)
+                               root.checkForTriggerMode(false)
+                           }
 
                            root.irPreviewWindow()
                            videoRecordBtnEnable(false)
