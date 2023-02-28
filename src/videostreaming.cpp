@@ -1479,7 +1479,7 @@ void Videostreaming::capFrame()
     memset(planes, 0, sizeof(planes));
     buf.length = VIDEO_MAX_PLANES;
     buf.m.planes = planes;
-    stillTimeOutTimer.stop();
+    
     if (!dqbuf_mmap(buf, buftype, again)) {
         // stop the timer when device is unplugged
         if(!retrieveFrame)
@@ -1665,7 +1665,6 @@ void Videostreaming::capFrame()
                 {
                     if((width == Y16_2160p_WIDTH) && (height == Y16_2160p_HEIGHT))//4440x2160
                     {//For default resolutions - Converting UYVY to RGB & saving Y8 directly
-//                        stillTimeOutTimer.stop();
                         prepareStillBuffer((uint8_t*)m_buffers[buf.index].start[0]);
 
                         //Converting sourceformat as UYVY for RGB conversion
@@ -1678,7 +1677,6 @@ void Videostreaming::capFrame()
                     }
                     else //for 3840x1350 & 1920x675 resolutions
                     {
-                        stillTimeOutTimer.stop();
                         prepareStillBuffer((uint8_t*)m_buffers[buf.index].start[0]);
 
                         //To avoid v4l2convert failure for this case
@@ -3001,10 +2999,11 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputbuffer){
         return false;
     }
 
+    //CameraMode 3 - IR mode
     if((inputbuffer[7] == IR_FRAME) && (cameraMode == 3)){
         memcpy(m_renderer->yuvBuffer, inputbuffer, (width*height*2));
         m_renderer->gotFrame = true;
-    }
+    }//CameraMode 2 - RGB mode
     else if((inputbuffer[7] == RGB_FRAME) && (cameraMode == 2)){
         memcpy(m_renderer->yuvBuffer, inputbuffer, (width*height*2));
         m_renderer->gotFrame = true;
@@ -3870,12 +3869,11 @@ void Videostreaming::displayFrame() {
         sprintf(header,"P6\n%d %d 255\n",width,height);
         if(((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)) && (m_snapShot || m_burstShot))
         {
-            stillTimeOutTimer.start(3000);
+            stillTimeOutTimer.start(4000);
         }
 
         m_capNotifier = new QSocketNotifier(fd(), QSocketNotifier::Read);
         connect(m_capNotifier, SIGNAL(activated(int)), this, SLOT(capFrame()));
-//        stillTimeOutTimer.stop();
     }
 }
 
@@ -3884,7 +3882,7 @@ void Videostreaming::doStartFrameTimeOut()
 {
     resolnSwitch();
     _title = "Failure";
-    _text = "Image not saved in the selected location";
+    _text = "Image failed to capture. Retry";
     emit titleTextChanged(_title,_text);
     if(cameraMode == 1)// cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
     {
@@ -4686,6 +4684,7 @@ void Videostreaming::cameraModeEnabled(int cameraModeValue)
     {
         irRenderer = new QImage(width, height, QImage::Format_RGB888);
     }
+    //To send cameraMode to qml
     emit sendCameraMode(cameraMode);
 }
 
@@ -4768,12 +4767,15 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
             vidCapFormatChanged(stillOutFormat);
 
             setResoultion(stillSize);
+            
             m_renderer->renderBufferFormat = CommonEnums::NO_RENDER;
         }
         else{
             retrieveShot = false;
             vidCapFormatChanged(lastFormat);
             setResoultion(lastPreviewSize);
+            //Added by Sushanth - To stop the stillTimeOut timer once the still is captured
+            stopStillTimeOutTimer();
             m_renderer->renderBufferFormat = CommonEnums::NO_RENDER;
         }
         if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB)

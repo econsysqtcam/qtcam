@@ -1,10 +1,5 @@
 #include "see3cam_cu27.h"
 
-//See3CAM_CU27::See3CAM_CU27(QObject *parent):QObject(parent)
-//{
-//    qDebug() << Q_FUNC_INFO;
-//}
-
 See3CAM_CU27::See3CAM_CU27()
 {
 }

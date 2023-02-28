@@ -1,0 +1,794 @@
+/*
+ * see3cam_50cug_m.qml -- extension settings for other cameras
+ * Copyright © 2015  e-con Systems India Pvt. Limited
+ *
+ * This file is part of Qtcam.
+ *
+ * Qtcam is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * Qtcam is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Qtcam. If not, see <http://www.gnu.org/licenses/>.
+ */
+import QtQuick 2.0
+import QtQuick.Controls 1.1
+import QtQuick.Controls.Styles 1.0
+import QtQuick.Dialogs 1.1
+import econ.camera.uvcsettings 1.0
+import econ.camera.see3cam_50cug_m 1.0
+import QtQuick.Layouts 1.1
+import cameraenum 1.0
+
+Item{
+
+    width:240
+    height:720
+
+    property int imageBurstMin: 0
+    property int imageBurstMax: 5
+
+    property bool skipUpdateUIOnBurstLength: false
+    property bool skipUpdateUIFlickerCtrl:false
+    property int  triggerCtrl
+
+    Action {
+        id: setDefault
+        onTriggered:
+        {
+            setToDefaultValues()
+        }
+    }
+
+    Action {
+        id: firmwareVersion
+        onTriggered:
+        {
+            getFirmwareVersion()
+        }
+    }
+
+    Action {
+        id: serialNumber
+        onTriggered: {
+            getSerialNumber()
+        }
+    }
+    Connections{
+        target: root
+
+        onTakeScreenShot:
+        {
+            root.imageCapture(CommonEnums.SNAP_SHOT);
+        }
+        onGetVideoPinStatus:
+        {
+            root.enableVideoPin(true);
+        }
+        onGetStillImageFormats:
+        {
+            var stillImageFormat = []
+            stillImageFormat.push("jpg")
+            stillImageFormat.push("bmp")
+            stillImageFormat.push("raw")
+            stillImageFormat.push("png")
+            root.insertStillImageFormat(stillImageFormat);
+        }
+
+    }
+
+    ScrollView
+    {
+        id: scrollview
+        x: 10
+        y: 189.5
+        width: 257
+        height: 500
+        style: econscrollViewStyle
+
+        Item{
+           height: 900
+            ColumnLayout{
+                x:2
+                y:5
+                spacing:20
+
+                Text {
+                    id: cameraMode
+                    text: "--- Camera Mode ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                ColumnLayout{
+                   ExclusiveGroup { id: cameraModeGroup }
+                   spacing: 25
+                   RadioButton {
+                       id: masterMode
+                       style:  econRadioButtonStyle
+                       text: qsTr("Master")
+                       exclusiveGroup: cameraModeGroup
+                       activeFocusOnPress: true
+                       onClicked: {
+                           setMasterMode()
+                       }
+                       Keys.onReturnPressed: {
+                           setMasterMode()
+                       }
+                   }
+                   RadioButton {
+                       id: triggerMode
+                       style:  econRadioButtonStyle
+                       text: qsTr("Trigger")
+                       exclusiveGroup: cameraModeGroup
+                       activeFocusOnPress: true
+                       onClicked: {
+                           //enable trigger combobox
+                           triggerCombo.enabled = true
+                           triggerCombo.opacity = 1
+
+                           setTriggerMode()
+                       }
+                       Keys.onReturnPressed: {
+                           triggerCombo.enabled = true
+                           triggerCombo.opacity = 1
+
+                           setTriggerMode()
+                       }
+                   }
+                   ComboBox
+                   {
+                       id: triggerCombo
+                       opacity: 1
+                       enabled: true
+                       model: ListModel {
+                           ListElement { text: "Exposure control" }
+                           ListElement { text: "Acquisition control" }
+                       }
+                       activeFocusOnPress: true
+                       style: econComboBoxStyle
+                       onCurrentIndexChanged: {
+                               setTriggerMode()
+                       }
+                   }
+               }
+
+                Text {
+                    id: flipMode
+                    text: "--- Flip Mode ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                Row{
+                    spacing: 40
+                    CheckBox {
+                        id: flipCtrlHorizotal
+                        activeFocusOnPress : true
+                        text: "Horizontal"
+                        style: econCheckBoxStyle
+                        onClicked:{
+                            defaultValue.enabled = true
+                            see3cam50cugm.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                        }
+                        Keys.onReturnPressed: {
+                            defaultValue.enabled = true
+                            see3cam50cugm.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                        }
+                    }
+                    CheckBox {
+                        id: flipCtrlVertical
+                        activeFocusOnPress : true
+                        text: "Vertical"
+                        style: econCheckBoxStyle
+                        onClicked:{
+                            defaultValue.enabled = true
+                            see3cam50cugm.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                        }
+                        Keys.onReturnPressed: {
+                            defaultValue.enabled = true
+                            see3cam50cugm.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                        }
+                    }
+                }
+
+                Text {
+                    id: blackLevelAdj
+                    text: "--- black Level Adjustment ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                ColumnLayout{
+                   ExclusiveGroup { id: blackLeverAdjGroup }
+                   spacing: 25
+                   RadioButton {
+                       id: enableBlackLevel
+                       style:  econRadioButtonStyle
+                       text: qsTr("Enable")
+                       exclusiveGroup: blackLeverAdjGroup
+                       activeFocusOnPress: true
+                       onClicked: {
+                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.AUTO)
+                       }
+                       Keys.onReturnPressed: {
+                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.AUTO)
+                       }
+                   }
+                   RadioButton {
+                       id: disableBlackLevel
+                       style:  econRadioButtonStyle
+                       text: qsTr("Disable")
+                       exclusiveGroup: blackLeverAdjGroup
+                       activeFocusOnPress: true
+                       onClicked: {
+                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.DISABLE)
+                       }
+                       Keys.onReturnPressed: {
+                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.DISABLE)
+                       }
+                   }
+               }
+
+
+                Text {
+                    id: strobe
+                    text: "--- Strobe Mode---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                ColumnLayout{
+                    spacing: 10
+                    ExclusiveGroup { id: strobesGrp }
+                    RadioButton {
+                        exclusiveGroup: strobesGrp
+                        checked: false
+                        id: strobeFlash
+                        text: "Flash"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        onClicked: {
+                            see3cam50cugm.setStrobeMode(SEE3CAM_50CUGM.FLASH)
+                        }
+                        Keys.onReturnPressed: {
+                            see3cam50cugm.setStrobeMode(SEE3CAM_50CUGM.FLASH)
+                        }
+                    }
+
+                    RadioButton {
+                        exclusiveGroup: strobesGrp
+                        checked: false
+                        id: strobeTorch
+                        text: "Torch"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        onClicked: {
+                            see3cam50cugm.setStrobeMode(SEE3CAM_50CUGM.TORCH)
+                        }
+                        Keys.onReturnPressed: {
+                            see3cam50cugm.setStrobeMode(SEE3CAM_50CUGM.TORCH)
+                        }
+                    }
+
+                    RadioButton {
+                        exclusiveGroup: strobesGrp
+                        checked: false
+                        id: strobeOff
+                        text: "Off"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        onClicked: {
+                            see3cam50cugm.setStrobeMode(SEE3CAM_50CUGM.OFF)
+                        }
+                        Keys.onReturnPressed: {
+                            see3cam50cugm.setStrobeMode(SEE3CAM_50CUGM.OFF)
+                        }
+                    }
+
+                    Row{
+                        Layout.alignment: Qt.AlignCenter
+                        Text {
+                            id: imgCapText
+                            text: "--- Image Capture ---"
+                            font.pixelSize: 14
+                            font.family: "Ubuntu"
+                            color: "#ffffff"
+                            smooth: true
+                            Layout.alignment: Qt.AlignCenter
+                            opacity: 0.50196078431373
+                        }
+                    }
+                    Text {
+                        id: burstLength
+                        text: "Burst Length :"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 1
+                    }
+                    ComboBox
+                    {
+                        id: burstLengthCombo
+                        opacity: 1
+                        enabled: true
+                        model: ListModel {
+                            ListElement { text: "0" }
+                            ListElement { text: "1" }
+                            ListElement { text: "2" }
+                            ListElement { text: "3" }
+                            ListElement { text: "4" }
+                            ListElement { text: "5" }
+                        }
+
+                        activeFocusOnPress: true
+                        style: econComboBoxStyle
+                        onCurrentIndexChanged: {
+                            root.stillBurstLength(burstLengthCombo.currentIndex)
+                            if(skipUpdateUIOnBurstLength){
+                                see3cam50cugm.setBurstLength(burstLengthCombo.currentText)
+                            }
+                            skipUpdateUIOnBurstLength = true
+                        }
+                    }
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Button {
+                        id: defaultValue
+                        opacity: 1
+                        activeFocusOnPress : true
+                        text: "Default"
+                        tooltip: "Click to set default values in extension controls"
+                        style: econButtonStyle
+                        action: setDefault
+                        onClicked:{
+                            setToDefaultValues()
+                        }
+                        Keys.onReturnPressed: {
+                            setToDefaultValues()
+                        }
+                    }
+                }
+
+
+                Row{
+                    Button {
+                        id: f_wversion_selected130
+                        opacity: 1
+                        activeFocusOnPress : true
+                        action: firmwareVersion
+                        tooltip: "Click to view the firmware version of the camera"
+                        style: ButtonStyle {
+                            background: Rectangle {
+                                border.width: control.activeFocus ? 3 :0
+                                color: "#222021"
+                                border.color: control.activeFocus ? "#ffffff" : "#222021"
+                                radius: 5
+                            }
+                            label: Image {
+                                source: "images/f_wversion_selected.png"
+                            }
+                        }
+                        onClicked: {
+                            getFirmwareVersion()
+                        }
+                        Keys.onReturnPressed: {
+                            getFirmwareVersion()
+                        }
+                    }
+                    Button {
+                        id: serial_no_selected
+                        opacity: 1
+                        activeFocusOnPress : true
+                        tooltip: "Click to view the Serial Number"
+                        action: serialNumber
+                        style: ButtonStyle {
+                            background: Rectangle {
+                                border.width: control.activeFocus ? 3 :0
+                                color: "#222021"
+                                border.color: control.activeFocus ? "#ffffff" : "#222021"
+                                radius: 5
+                            }
+                            label: Image {
+                                source: "images/serial_no_selected.png"
+                            }
+                        }
+                        onClicked: {
+                            getSerialNumber()
+                        }
+                        Keys.onReturnPressed: {
+                            getSerialNumber()
+                        }
+                    }
+                }
+
+           }
+         }
+       }
+
+}
+
+    Component {
+        id: econRadioButtonStyle
+        RadioButtonStyle {
+            label: Text {
+                text: control.text
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                opacity: 1
+            }
+            background: Rectangle {
+                color: "#222021"
+                border.color: control.activeFocus ? "#ffffff" : "#222021"
+            }
+        }
+    }
+
+    Component {
+        id: econscrollViewStyle
+        ScrollViewStyle {
+            scrollToClickedPosition: true
+            handle: Image {
+                id: scrollhandle
+                source: "images/scroller.png"
+            }
+            scrollBarBackground: Image {
+                id: scrollStyle
+                source: "images/Scroller_bg.png"
+            }
+            incrementControl: Image {
+                id: increment
+                source: "images/down_arrow.png"
+            }
+            decrementControl: Image {
+                id: decrement
+                source: "images/up_arrow.png"
+            }
+        }
+    }
+
+    Component {
+        id: econComboBoxStyle
+        ComboBoxStyle {
+            background: Image {
+                id: combo_bkgrnd
+                source: "../../Views/images/device_box.png"
+                Rectangle {
+                    width: combo_bkgrnd.sourceSize.width  - 28
+                    height: combo_bkgrnd.sourceSize.height
+                    color: "#222021"
+                    border.color: "white"
+                    border.width: control.activeFocus ? 3 : 1
+                    radius: control.activeFocus ? 5 : 0
+                }
+            }
+            label:  Text{
+                anchors.fill: parent
+                color: "#ffffff"
+                elide: Text.ElideRight
+                text: control.currentText
+                verticalAlignment: Text.AlignVCenter
+                maximumLineCount: 1
+                font.family: "Ubuntu"
+                font.pixelSize: 14
+            }
+        }
+    }
+
+    Component {
+        id: econCheckBoxStyle
+        CheckBoxStyle {
+            label: Text {
+                text: control.text
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                opacity: 1
+            }
+            background: Rectangle {
+                color: "#222021"
+                border.color: control.activeFocus ? "#ffffff" : "#222021"
+            }
+        }
+    }
+
+    Component {
+        id: econTextFieldStyle
+        TextFieldStyle {
+            textColor: "black"
+            background: Rectangle {
+                radius: 2
+                implicitWidth: 50
+                implicitHeight: 20
+                border.color: "#333"
+                border.width: 2
+                y: 1
+            }
+        }
+    }
+
+    Component {
+        id: econButtonStyle
+        ButtonStyle {
+            background: Rectangle {
+                implicitHeight: 38
+                implicitWidth: 104
+                border.width: control.activeFocus ? 3 :0
+                color: "#e76943"
+                border.color: control.activeFocus ? "#ffffff" : "#222021"
+                radius: control.activeFocus ? 5 : 0
+            }
+            label: Text {
+                color: "#ffffff"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.family: "Ubuntu"
+                font.pointSize: 10
+                text: control.text
+            }
+        }
+    }
+
+    Uvccamera {
+        id: uvccamera
+        onTitleTextChanged: {
+            messageDialog.title = _title.toString()
+            messageDialog.text = _text.toString()
+            messageDialog.open()
+        }
+        onSerialNumber:{
+            messageDialog.title = qsTr("Serial Number")
+            messageDialog.text = serialNumber;
+        }
+    }
+
+    SEE3CAM_50CUGM{
+        id:see3cam50cugm
+
+        onCameraModeChanged:
+        {
+            if(cameraMode == SEE3CAM_50CUGM.MASTER)
+            {
+                masterMode.checked = true
+                triggerCombo.enabled = false
+                triggerCombo.opacity = 0.1
+            }
+            else
+            {
+                triggerCombo.enabled = true
+                triggerCombo.opacity = 1
+                triggerMode.checked = true
+
+                root.checkForTriggerMode(true)
+                root.videoRecordBtnEnable(false)
+                root.captureBtnEnable(false)
+
+                if(cameraMode == SEE3CAM_50CUGM.TRIGGER_EXP_CONTROL)
+                {
+                    triggerCombo.currentIndex = 0
+                }
+                else if(cameraMode == SEE3CAM_50CUGM.TRIGGER_ACQ_CONTROL)
+                {
+                    triggerCombo.currentIndex = 1
+                }
+            }
+        }
+
+        onFlipMirrorModeChanged:
+        {
+            currentFlipMirrorMode(flipMode)
+        }
+
+        onStrobeModeChanged:
+        {
+            currentStrobeMode(strobe)
+            if(masterMode.checked == true)
+            {
+                strobeFlash.enabled = false
+                strobeFlash.opacity = 0.1
+                strobeTorch.enabled = false
+                strobeTorch.opacity = 0.1
+                strobeOff.enabled = false
+                strobeOff.opacity = 0.1
+            }
+            else
+            {
+                strobeFlash.enabled = true
+                strobeFlash.opacity = 1
+                strobeTorch.enabled = true
+                strobeTorch.opacity = 1
+                strobeOff.enabled = true
+                strobeOff.opacity = 1
+            }
+        }
+
+        onBlackLevelAdjustmentChanged:
+        {
+            if(blacklevel == SEE3CAM_50CUGM.ENABLE)
+            {
+                enableBlackLevel.checked = true
+                disableBlackLevel.checked = false
+            }
+            else if(blacklevel == SEE3CAM_50CUGM.DISABLE)
+            {
+                enableBlackLevel.checked = false
+                disableBlackLevel.checked = true
+            }
+        }
+        onImageBurstChanged:{
+            skipUpdateUIOnBurstLength = false
+            burstLengthCombo.currentIndex = burstLength
+        }
+    }
+
+    function getSerialNumber() {
+        uvccamera.getSerialNumber()
+        messageDialog.open()
+    }
+
+    function getFirmwareVersion() {
+        uvccamera.getFirmWareVersion()
+        messageDialog.open()
+    }
+
+    function setMasterMode()
+    {
+        //disable strobe mode when the camera is in Master mode
+        strobeFlash.enabled = false
+        strobeFlash.opacity = 0.1
+        strobeTorch.enabled = false
+        strobeTorch.opacity = 0.1
+        strobeOff.enabled = false
+        strobeOff.opacity = 0.1
+
+        //disable trigger combobox
+        triggerCombo.enabled = false
+        triggerCombo.opacity = 0.1
+
+        see3cam50cugm.setCameraMode(SEE3CAM_50CUGM.MASTER)
+
+        root.checkForTriggerMode(false)
+        root.videoRecordBtnEnable(true)
+        root.captureBtnEnable(true)
+    }
+
+    function setTriggerMode()
+    {
+        if(triggerCombo.currentText.toString() == "Exposure control")
+        {
+           setTriggerExpControl()
+        }
+        else if(triggerCombo.currentText.toString() == "Acquisition control")
+        {
+           setTriggerAcqControl()
+        }
+    }
+
+    function setTriggerExpControl()
+    {
+        root.checkForTriggerMode(true)
+        root.videoRecordBtnEnable(false)
+        root.captureBtnEnable(false)
+
+        //enable strobe mode when the camera is in trigger mode
+        strobeFlash.enabled = true
+        strobeFlash.opacity = 1
+        strobeTorch.enabled = true
+        strobeTorch.opacity = 1
+        strobeOff.enabled = true
+        strobeOff.opacity = 1
+
+        see3cam50cugm.setCameraMode(SEE3CAM_50CUGM.TRIGGER_EXP_CONTROL)
+    }
+
+    function setTriggerAcqControl()
+    {
+        root.checkForTriggerMode(true)
+        root.videoRecordBtnEnable(false)
+        root.captureBtnEnable(false)
+
+        //enable strobe mode when the camera is in trigger mode
+        strobeFlash.enabled = true
+        strobeFlash.opacity = 1
+        strobeTorch.enabled = true
+        strobeTorch.opacity = 1
+        strobeOff.enabled = true
+        strobeOff.opacity = 1
+
+        see3cam50cugm.setCameraMode(SEE3CAM_50CUGM.TRIGGER_ACQ_CONTROL)
+    }
+
+
+    function currentFlipMirrorMode(mode)
+    {
+        switch(mode)
+        {
+        case SEE3CAM_50CUGM.NORMAL:
+            flipCtrlVertical.checked = false
+            flipCtrlHorizotal.checked = false
+            break;
+        case SEE3CAM_50CUGM.VERTICAL:
+            flipCtrlVertical.checked = true
+            flipCtrlHorizotal.checked = false
+            break;
+        case SEE3CAM_50CUGM.HORIZONTAL:
+            flipCtrlVertical.checked = false
+            flipCtrlHorizotal.checked = true
+            break;
+        case SEE3CAM_50CUGM.ROTATE_180:
+            flipCtrlVertical.checked = true
+            flipCtrlHorizotal.checked = true
+            break;
+        }
+    }
+
+    function currentStrobeMode(mode){
+        switch(mode){
+            case SEE3CAM_50CUGM.OFF:
+                strobeOff.checked   = true
+                strobeFlash.checked = false
+                strobeTorch.checked = false
+                break;
+            case SEE3CAM_50CUGM.FLASH:
+                strobeOff.checked   = false
+                strobeFlash.checked = true
+                strobeTorch.checked = false
+                break;
+            case SEE3CAM_50CUGM.TORCH:
+                strobeOff.checked   = false
+                strobeFlash.checked = false
+                strobeTorch.checked = true
+                break;
+        }
+    }
+
+    function setToDefaultValues(){
+        defaultValue.enabled = false //To avoid multiple clicks over Default button
+        root.checkForTriggerMode(false)
+        root.captureBtnEnable(true)
+        root.videoRecordBtnEnable(false)
+
+        if(see3cam50cugm.setToDefaultValues())
+        {
+            getCurrentValuesFromCamera()
+        }
+        defaultValue.enabled = true
+    }
+
+    function getCurrentValuesFromCamera(){
+        see3cam50cugm.getCameraMode()
+        see3cam50cugm.getOrientation()
+        see3cam50cugm.getBlackLevelAdjustment()
+        see3cam50cugm.getStrobeMode()
+        see3cam50cugm.getBurstLength()
+    }
+    Component.onCompleted: {
+        getCurrentValuesFromCamera()
+    }
+}
+
+
+

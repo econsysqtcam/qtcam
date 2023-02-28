@@ -778,92 +778,12 @@ bool See3CAM_130A::setToDefault(){
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130A &&
             g_in_packet_buf[1]==SET_TO_DEFAULT &&
-            g_in_packet_buf[6]==SET_SUCCESS) {\
+            g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
         }
     }
     return false;
 }
-///**
-// * @brief See3CAM_130A::setFlipHorzMode - Setting horizontal flip mode
-// * @param horizModeSel - mode selected / unselected in UI
-// * @return true/false
-// */
-//bool See3CAM_130A::setFlipHorzMode(bool horizModeSel){
-//    // hid validation
-//    if(uvccamera::hid_fd < 0)
-//    {
-//        return false;
-//    }
-
-//    //Initialize buffers
-//    initializeBuffers();
-
-//    // fill buffer values
-//    g_out_packet_buf[1] = CAMERA_CONTROL_130A; /* camera id */
-//    g_out_packet_buf[2] = SET_FLIP_MODE_130A; /* set flip mode command */
-//    g_out_packet_buf[3] = SET_HORZ_FLIP_MODE_130A; /* set horizontal flip mode */
-//    if(horizModeSel){
-//        g_out_packet_buf[4] = FlipEnable; /* value to enable flip */
-//    }else{
-//        g_out_packet_buf[4] = FlipDisable; /* value to disable flip */
-//    }
-
-//    // send request and get reply from camera
-//    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-//        if (g_in_packet_buf[6]==SET_FAIL) {
-//            return false;
-//        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130A &&
-//            g_in_packet_buf[1]==SET_FLIP_MODE_130A &&
-//            g_in_packet_buf[2]==SET_HORZ_FLIP_MODE_130A &&
-//            g_in_packet_buf[6]==SET_SUCCESS) {
-//            return true;
-//        }
-//    }
-//    return false;
-//}
-
-///**
-// * @brief See3CAM_130A::setFlipVertMode - Setting vertical flip mode
-// * @param vertiModeSel - mode selected / unselected in UI
-// * @return true/false
-// */
-//bool See3CAM_130A::setFlipVertiMode(bool vertModeSel){
-
-//    // hid validation
-//    if(uvccamera::hid_fd < 0)
-//    {
-//        return false;
-//    }
-
-//    //Initialize buffers
-//    initializeBuffers();
-
-//    // fill buffer values
-//    g_out_packet_buf[1] = CAMERA_CONTROL_130A; /* camera id */
-//    g_out_packet_buf[2] = SET_FLIP_MODE_130A; /* set flip mode command */
-//    g_out_packet_buf[3] = SET_VERT_FLIP_MODE_130A; /* set vertical flip mode */
-//    if(vertModeSel){
-//        g_out_packet_buf[4] = FlipEnable; /* value to enable flip */
-//    }else{
-//        g_out_packet_buf[4] = FlipDisable; /* value to disable flip */
-//    }
-
-//    // send request and get reply from camera
-//    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-//        if (g_in_packet_buf[6]==SET_FAIL) {
-//            qDebug()<<"Flip enable fail";
-//            return false;
-//        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130A &&
-//            g_in_packet_buf[1]==SET_FLIP_MODE_130A &&
-//            g_in_packet_buf[2]==SET_VERT_FLIP_MODE_130A &&
-//            g_in_packet_buf[6]==SET_SUCCESS) {
-//            qDebug()<<"Flip enable success";
-//            return true;
-//        }
-//    }
-//    return false;
-//}
 
 /**
  * @brief NILECAM30_USB::setFlipMode - Setting orientation

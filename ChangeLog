@@ -1,6 +1,10 @@
+Qtcam Application - 25.0.7
+---------------------------
+*Bug fix for See3Cam_27CUG - Added stillTimeOutTimer.
+
 Qtcam Application - 25.0.6
 ---------------------------
-*Disable videoRecord & still capture in trigger mode(IR, RGB, IR-RGB) for See3Cam_27CUG.
+*Bug fix for See3Cam_27CUG - Disabled still capture for trigger mode in IR & RGB modes.
 
 Qtcam Application - 25.0.5
 ---------------------------
