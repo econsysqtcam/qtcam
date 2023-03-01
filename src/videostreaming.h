@@ -585,6 +585,10 @@ public slots:
     void triggerModeShot(QString filePath,QString imgFormatType);
 
     /**
+     * @brief To clear buffer when trigger mode is enabled
+     */
+    void clearBufInTrigger(bool isTrigger);
+    /**
      * @brief To stop the camera preview
      */
     void stopCapture();
@@ -771,6 +775,12 @@ signals:
      * To emit current resolution
      */
     void emitResolution(int width, int height);
+
+    /*
+     * Added by Sushanth S
+     * To set exposure compensation while switching resolution during cross resolution still capture
+     */
+    void setExposureCompensation();
 
     /*
      * Added by Sushanth S

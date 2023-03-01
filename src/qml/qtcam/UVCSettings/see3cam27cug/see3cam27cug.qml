@@ -91,6 +91,10 @@ Item {
         onVideoColorSpaceChanged:{
             getexposureCompTimer.start()
         }
+        onSetExpCompensation:{
+            see3cam27cug.setMaximumExposureCompensation(maxExpTextField.text)
+            see3cam27cug.setMinimumExposureCompensation(minExpTextField.text)
+        }
     }
 
     ScrollView
@@ -176,10 +180,22 @@ Item {
                        onClicked: {
                            root.camModeEnabled(See3CAM_27CUG.IR)
                            setIrMode()
+                           if(triggerMode.checked == true)
+                           {
+                               root.checkForTriggerMode(true)
+                               root.captureBtnEnable(false)
+                               root.videoRecordBtnEnable(false)
+                           }
                        }
                        Keys.onReturnPressed: {
                            root.camModeEnabled(See3CAM_27CUG.IR)
                            setIrMode()
+                           if(triggerMode.checked == true)
+                           {
+                               root.checkForTriggerMode(true)
+                               root.captureBtnEnable(false)
+                               root.videoRecordBtnEnable(false)
+                           }
                        }
                    }
                    RadioButton {
@@ -191,10 +207,22 @@ Item {
                        onClicked: {
                           root.camModeEnabled(See3CAM_27CUG.RGB)
                           setRgbMode()
+                           if(triggerMode.checked == true)
+                           {
+                               root.checkForTriggerMode(true)
+                               root.captureBtnEnable(false)
+                               root.videoRecordBtnEnable(false)
+                           }
                        }
                        Keys.onReturnPressed: {
                           root.camModeEnabled(See3CAM_27CUG.RGB)
                           setRgbMode()
+                           if(triggerMode.checked == true)
+                           {
+                               root.checkForTriggerMode(true)
+                               root.captureBtnEnable(false)
+                               root.videoRecordBtnEnable(false)
+                           }
                        }
                    }
                    RadioButton {
@@ -210,6 +238,12 @@ Item {
                            //function to create IR window
                            root.irPreviewWindow()
                            videoRecordBtnEnable(false)
+                           if(triggerMode.checked == true)
+                           {
+                               root.checkForTriggerMode(true)
+                               root.captureBtnEnable(false)
+                               root.videoRecordBtnEnable(false)
+                           }
                        }
                        Keys.onReturnPressed: {
                            root.camModeEnabled(See3CAM_27CUG.RGB_IR_ENABLE)
@@ -217,6 +251,12 @@ Item {
 
                            root.irPreviewWindow()
                            videoRecordBtnEnable(false)
+                           if(triggerMode.checked == true)
+                           {
+                               root.checkForTriggerMode(true)
+                               root.captureBtnEnable(false)
+                               root.videoRecordBtnEnable(false)
+                           }
                        }
                    }
                }
@@ -937,8 +977,10 @@ Item {
         {
             root.videoRecordBtnEnable(true)
         }
-
         root.captureBtnEnable(true)
+
+        //To enable preview in master mode
+        root.clearBufferInTriggerMode(false)
     }
 
     function setTriggerMode(){
@@ -948,6 +990,9 @@ Item {
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+
+        //To clear buffer in trigger mode
+        root.clearBufferInTriggerMode(true)
     }
 
     function setRgbMode(){
@@ -982,10 +1027,12 @@ Item {
         root.irPreviewWindow()
 
         root.camModeEnabled(See3CAM_27CUG.RGB_IR_ENABLE)
+
         if(see3cam27cug.setToDefaultValues())
         {
             getCurrentValuesFromCamera()
         }
+
         defaultValue.enabled = true
         root.startUpdatePreviewInMasterMode()
     }
@@ -1000,6 +1047,12 @@ Item {
         see3cam27cug.getGainForIR()
         see3cam27cug.getMinimumExposureCompensation()
         see3cam27cug.getMaximumExposureCompensation()
+        if(triggerMode.checked == true)
+        {
+            root.checkForTriggerMode(true)
+            root.captureBtnEnable(false)
+            root.videoRecordBtnEnable(false)
+        }
     }
 
     function enableDisableAutoExposureControls(autoExposureSelect){

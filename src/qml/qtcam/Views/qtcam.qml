@@ -67,6 +67,9 @@ Rectangle {
     //signal to send cameraMode to renderer.qml
     signal sendCameraModeToQml(int cameraMode)
 
+    //signal to set exposure compensation while still capture
+    signal setExpCompensation();
+
     //signal close IR window after unplugging the device
     signal windowCloseAfterUnplug()
 
@@ -614,6 +617,14 @@ Rectangle {
         onSendCameraMode:{
             //signal emitted to renderer.qml
             sendCameraModeToQml(cameraMode)
+        }
+
+        /*
+            Added By Sushanth.S
+            To Set exposure compensation when cross resolution still capture
+        */
+        onSetExposureCompensation:{
+            setExpCompensation();
         }
 
         /*
@@ -1738,6 +1749,12 @@ Rectangle {
     {
         cameraMode = Mode
         vidstreamproperty.cameraModeEnabled(cameraMode)
+    }
+
+    //Added by Sushanth - To clear buffer when device is in trigger mode
+    function clearBufferInTriggerMode(isTrigger)
+    {
+        vidstreamproperty.clearBufInTrigger(isTrigger)
     }
 
     //Added by Sushanth.S - Creating component for IR preview

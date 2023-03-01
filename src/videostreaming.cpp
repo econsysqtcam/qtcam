@@ -42,6 +42,7 @@ int cameraMode = 0;
 int shaderType = 0;
 bool isBothIrRgbCaptured = false;
 bool isOneFrameCaptured  = false;
+bool clearBuffer = false;
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define SEE3CAM160_MJPEG_MAXBYTESUSED       4193280
 
@@ -783,6 +784,14 @@ void FrameRenderer::drawUYVYBUffer(){
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
+
+    //Added by Sushanth - To clear the buffer when device is in trigger mode
+    if(clearBuffer)
+    {
+        memset(rgbBuffer,0,videoResolutionwidth*videoResolutionHeight*BYTES_PER_PIXEL_UYVY);
+        memset(yuvBuffer,0,videoResolutionwidth*videoResolutionHeight*BYTES_PER_PIXEL_UYVY);
+    }
+
     if(renderyuyvMutex.tryLock()){
 
         // Added by Navya -- 18 Sep 2019
@@ -3014,6 +3023,11 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputbuffer){
         m_renderer->gotFrame = true;
     }
     else if((cameraMode == 1) && (inputbuffer[7] == IR_FRAME)){
+        //Added by Sushanth - To clear buffer when trigger mode is enabled
+        if(clearBuffer)
+        {
+            memset(inputbuffer,0,width*height*BYTES_PER_PIXEL_UYVY);
+        }
         //converting IR frame into QImage, inorder to render in another window
         int err = -1;
         err = v4lconvert_convert(m_convertData, &m_capSrcFormat, &m_capDestFormat,
@@ -3569,13 +3583,16 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
         m_renderer->updateStop = true;
         stopCapture();
         vidCapFormatChanged(stillOutFormat);
-
         setResoultion(stillSize);
+
         if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB)
         {
             frameIntervalChanged(lastFPSValue.toUInt(),changeFPSForHyperyon);
         }
         startAgain();
+
+        //to set Exposure compensation after setting still resolution
+        emit setExposureCompensation();
     }
 }
 
@@ -3616,6 +3633,23 @@ void  Videostreaming::changeFPSandTakeShot(QString filePath,QString imgFormatTyp
     }else{
         emit stillSkipCountWhenFPSChange(false);
     }
+}
+
+/**
+ * Added by Sushanth
+ * @brief Videostreaming::clearBufInTrigger - To clear buffer when trigger mode is enabled
+ * @param isTrigger - bool variable need to enable or disable clearBuffer
+ */
+void Videostreaming::clearBufInTrigger(bool isTrigger)
+{
+  if(isTrigger)
+  {
+      clearBuffer = true;
+  }
+  else
+  {
+      clearBuffer = false;
+  }
 }
 
 void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
@@ -4774,6 +4808,7 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
             retrieveShot = false;
             vidCapFormatChanged(lastFormat);
             setResoultion(lastPreviewSize);
+
             //Added by Sushanth - To stop the stillTimeOut timer once the still is captured
             stopStillTimeOutTimer();
             m_renderer->renderBufferFormat = CommonEnums::NO_RENDER;
@@ -4783,6 +4818,9 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
             frameIntervalChanged(lastFPSValue.toUInt(),FPS_DEFAULT);
         }
         startAgain();
+
+        //to set ExpComp after setting preview resolution
+        emit setExposureCompensation();
     }
 }
 

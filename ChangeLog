@@ -1,6 +1,8 @@
 Qtcam Application - 25.0.7
 ---------------------------
 *Bug fix for See3Cam_27CUG - Added stillTimeOutTimer.
+*Clear buffer when device is in trigger mode.
+*set exposure compensation while resolution switching during cross resolution still capture.
 
 Qtcam Application - 25.0.6
 ---------------------------
