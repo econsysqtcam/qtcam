@@ -325,6 +325,7 @@ public:
 
    FSCAM_CU135 Fscamcu135;
 
+    bool autoExposureMode = true;
     /* Jpeg decode */
     int doyuv;
     int dotile;
@@ -588,6 +589,12 @@ public slots:
      * @brief To clear buffer when trigger mode is enabled
      */
     void clearBufInTrigger(bool isTrigger);
+
+    /**
+     * @brief To enable/disable exposure compensation when auto/manual exposure in UVC
+     */
+    void enableDisableExpCompensation(bool isEnable);
+
     /**
      * @brief To stop the camera preview
      */
@@ -780,13 +787,15 @@ signals:
      * Added by Sushanth S
      * To set exposure compensation while switching resolution during cross resolution still capture
      */
-    void setExposureCompensation();
+    void setExpAfterCrossStill();
 
     /*
      * Added by Sushanth S
      * To disable videoRecording..which enables after capturing still
      */
     void disableVideoRecord();
+
+    void setToTriggerMode();
 
     // Added by Sankari: 12 Feb 2018
     // Get the bus info details and send to qml for selected camera

@@ -410,6 +410,43 @@ bool SEE3CAM_50CUGM::setToDefaultValues()
     return false;
 }
 
+
+/**
+ * @brief SEE3CAM_50CUGM::saveConfiguration
+ * @return true/false
+ */
+bool SEE3CAM_50CUGM::saveConfiguration()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = SAVE_CONFIGURATION_SEE3CAM_50CUG_M; /* camera id */
+    g_out_packet_buf[2] = SAVE_SEE3CAM_50CUG_M; /* set to default command */
+
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH))
+    {
+        if (g_in_packet_buf[6] == SET_FAIL)
+        {
+            return false;
+        }
+        else if(g_in_packet_buf[0] == SAVE_CONFIGURATION_SEE3CAM_50CUG_M  &&
+            g_in_packet_buf[1]==SAVE_SEE3CAM_50CUG_M &&
+            g_in_packet_buf[6]==SET_SUCCESS){
+            return true;
+        }
+    }
+    return false;
+}
+
 /*
  * @brief SEE3CAM_50CUGM::initializeBuffers - Initialize input and output buffers
  */

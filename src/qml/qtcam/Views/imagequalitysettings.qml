@@ -737,6 +737,7 @@ Item {
                                 }
                                 else{
                                     root.selectMenuIndex(exposureAutoControlId,currentIndex)
+                                    //To set Auto/Manual exposure mode
                                     if(currentText.toString() != "Auto Mode" && currentText.toString() != "Aperture Priority Mode") {
                                         root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())
 
@@ -1521,7 +1522,6 @@ Item {
                 if(root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM)
                 {
                     exposureAutoPriorityUIUpdate(controlID,controlDefaultValue)
-
                 }
                 break;
             case "Disable video processing":
@@ -1838,10 +1838,13 @@ Item {
             while(menuitems.pop()){}
             exposureAutoControlId = controlID
             exposureCombo.currentIndex = controlDefaultValue
+            //getting auto or manual exposure mode
             if(exposureCombo.currentText.toString()=="Manual Mode" || exposureCombo.currentText.toString()=="Shutter Priority Mode")
             {
+                //Added By Sushanth
                 //To disable Exposure compensation when application opens (Manual Mode)
                 root.autoExposureSelected(false)
+
                 JS.autoExposureSelected = false
                 exposure_absolute.opacity = 1
                 exposure_Slider.enabled = true
@@ -1850,8 +1853,10 @@ Item {
             }
             else
             {
-                //To disable Exposure compensation when application opens (Auto Mode)
+                //Added By Sushanth
+                //To Enable Exposure compensation when application opens (Auto Mode)
                 root.autoExposureSelected(true)
+
                 JS.autoExposureSelected = true
                 exposure_Slider.enabled = false
                 exposure_Slider.opacity = 0.1

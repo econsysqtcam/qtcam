@@ -27,6 +27,10 @@
 
 #define SET_DEFAULT_SEE3CAM_50CUGM                        0xFF
 
+#define SAVE_CONFIGURATION_SEE3CAM_50CUG_M                0x42
+#define SAVE_SEE3CAM_50CUG_M                              0x01
+
+
 
 #define SET_FAIL	 0x00
 #define SET_SUCCESS  0x01
@@ -104,6 +108,7 @@ public:
         bool getBurstLength();
 
         bool setToDefaultValues();
+        bool saveConfiguration();
 
 };
 #endif // SEE3CAM_50CUG_M_H

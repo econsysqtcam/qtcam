@@ -991,7 +991,7 @@ Item {
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
 
-        //To clear buffer in trigger mode
+        //Clear last frame when device is in trigger mode
         root.clearBufferInTriggerMode(true)
     }
 
@@ -1000,7 +1000,10 @@ Item {
         see3cam27cug.setCameraMode(See3CAM_27CUG.RGB)
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
-        root.videoRecordBtnEnable(true)
+        root.videoRecordBtnEnable(true)  
+
+        //To disable IR controls in RGB mode
+        disableIrControls()
     }
 
     function setIrMode(){
@@ -1009,6 +1012,9 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+
+        //To enable IR controls in IR mode
+        enableIrControls()
     }
 
     function setIrRgbMode(){
@@ -1017,6 +1023,45 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(false)
+
+        //To enable IR controls in IR-RGB mode
+        enableIrControls()
+    }
+
+    function enableIrControls()
+    {
+        brightnessSlider.enabled = true
+        brightnessSlider.opacity = 1
+        brightnessTextField.enabled = true
+        brightnessTextField.opacity = 1
+
+        contrastSlider.enabled = true
+        contrastSlider.opacity = 1
+        contrastTextField.enabled = true
+        contrastTextField.opacity = 1
+
+        gainSlider.enabled = true
+        gainSlider.opacity = 1
+        gainTextField.enabled = true
+        gainTextField.opacity = 1
+    }
+
+    function disableIrControls()
+    {
+        brightnessSlider.enabled = false
+        brightnessSlider.opacity = 0.1
+        brightnessTextField.enabled = false
+        brightnessTextField.opacity = 0.1
+
+        contrastSlider.enabled = false
+        contrastSlider.opacity = 0.1
+        contrastTextField.enabled = false
+        contrastTextField.opacity = 0.1
+
+        gainSlider.enabled = false
+        gainSlider.opacity = 0.1
+        gainTextField.enabled = false
+        gainTextField.opacity = 0.1
     }
 
     function setToDefaultValues(){
@@ -1053,10 +1098,24 @@ Item {
             root.captureBtnEnable(false)
             root.videoRecordBtnEnable(false)
         }
+
+        if(rgbMode.checked == true)
+        {
+            //To disable IR controls in RGB mode
+            disableIrControls()
+        }
+        else
+        {
+            //To enable IR controls in IR mode
+            enableIrControls()
+        }
     }
 
     function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
+            //To enable exposure compensation when device is in manual exposure mode in UVC
+            root.enableDisableExposureCompensation(autoExposureSelect)
+
             maxExposureCompTextTitle.enabled = true
             maxExposureCompText.enabled = true
             maxExpTextField.enabled = true
@@ -1078,6 +1137,9 @@ Item {
             minExpSetButton.opacity = 1
 
         }else{
+            //To disable exposure compensation when device is in manual exposure mode in UVC
+            root.enableDisableExposureCompensation(autoExposureSelect)
+
             maxExposureCompTextTitle.enabled = false
             maxExposureCompText.enabled = false
             maxExpTextField.enabled = false

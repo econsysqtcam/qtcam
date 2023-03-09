@@ -401,7 +401,11 @@ Rectangle {
             if(!getTriggerMode)                 //Added by Nivedha: 09 Mar 2021 -- To enable capture and video record button only for master mode
             {
                 captureBtnEnable(true)
-                videoRecordBtnEnable(true)
+                //Modified by Sushanth - to disable videoRecording for See3CAM_CU83 default resolution
+                if(!stopRecording)
+                {
+                    videoRecordBtnEnable(true)
+                }
             }
             webcamKeyAccept = true
             if(getTriggerMode)
@@ -623,7 +627,7 @@ Rectangle {
             Added By Sushanth.S
             To Set exposure compensation when cross resolution still capture
         */
-        onSetExposureCompensation:{
+        onSetExpAfterCrossStill:{
             setExpCompensation();
         }
 
@@ -1631,6 +1635,7 @@ Rectangle {
         vidstreamproperty.stopFrameTimeoutTimer();
         // Stopping stillTimeOutTimer
         vidstreamproperty.stopStillTimeOutTimer();
+
         if(captureVideoRecordRootObject.recordStopBtnVisible) {
             vidstreamproperty.recordStop()
             captureVideoRecordRootObject.videoTimerUpdate(false)
@@ -1755,6 +1760,21 @@ Rectangle {
     function clearBufferInTriggerMode(isTrigger)
     {
         vidstreamproperty.clearBufInTrigger(isTrigger)
+    }
+
+    //Added by Sushanth - To enable autoMode flag when auto exposure is enabled in UVC
+    //autoMode - To set Min & Max exposure compensation when capturing still in cross resolution
+    function enableDisableExposureCompensation(isEnable)
+    {
+        if(isEnable)
+        {
+            vidstreamproperty.enableDisableExpCompensation(true)
+        }
+        else
+        {
+            vidstreamproperty.enableDisableExpCompensation(false)
+        }
+
     }
 
     //Added by Sushanth.S - Creating component for IR preview

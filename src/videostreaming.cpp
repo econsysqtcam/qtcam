@@ -43,6 +43,8 @@ int shaderType = 0;
 bool isBothIrRgbCaptured = false;
 bool isOneFrameCaptured  = false;
 bool clearBuffer = false;
+bool triggerMode = false;
+int skipFrameForTrigger = 0;
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define SEE3CAM160_MJPEG_MAXBYTESUSED       4193280
 
@@ -194,6 +196,12 @@ void Videostreaming::updateBuffer(){
 void FrameRenderer::updateBuffer(){
     //Added by Navya : 16 March 2020 -- Split yuyv data only for 640x480/640x360 resolution.
     if((renderBufferFormat == CommonEnums::BUFFER_RENDER_360P) | (renderBufferFormat == CommonEnums::UYVY_BUFFER_RENDER)){
+
+        if(clearBuffer)
+        {
+            gotFrame = false;
+        }
+
         if(renderMutex.tryLock()){
             if(yuvBuffer != NULL){
                 if(gotFrame){
@@ -201,6 +209,7 @@ void FrameRenderer::updateBuffer(){
                 }else{
                     updateStop = true;
                 }
+
                 u_int8_t *pyuv = yuvBuffer;
                 const u_int8_t *pyuv_end = pyuv + (videoResolutionwidth*videoResolutionHeight*2);
                 int j = 0, k = 0; // destination
@@ -278,7 +287,10 @@ void Videostreaming::sync()
         m_renderer = new FrameRenderer();
         m_renderer->videoResolutionwidth = 640; // need to check this assignment is needed.
         m_renderer->videoResolutionHeight = 480;
+
+        //sender,signal,reciever,slot,connectionType
         connect(window(), &QQuickWindow::afterRendering, m_renderer, &FrameRenderer::paint, Qt::DirectConnection);
+
     }
     m_renderer->setViewportSize(QSize(window()->width(),window()->height()));
     m_renderer->setT(m_t);
@@ -785,13 +797,6 @@ void FrameRenderer::drawUYVYBUffer(){
 
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
 
-    //Added by Sushanth - To clear the buffer when device is in trigger mode
-    if(clearBuffer)
-    {
-        memset(rgbBuffer,0,videoResolutionwidth*videoResolutionHeight*BYTES_PER_PIXEL_UYVY);
-        memset(yuvBuffer,0,videoResolutionwidth*videoResolutionHeight*BYTES_PER_PIXEL_UYVY);
-    }
-
     if(renderyuyvMutex.tryLock()){
 
         // Added by Navya -- 18 Sep 2019
@@ -1266,6 +1271,7 @@ void FrameRenderer::shaderUYVY(){
 */
 void FrameRenderer::paint()
 {
+
     if(gotFrame && !triggermodeFlag){               //Added by Nivedha : 12 Mar 2021 -- To avoid getting preview in trigger mode.
         if(m_formatChange | m_videoResolnChange){  // Call to change Shader on format and Resolution change
             m_formatChange = false;
@@ -1479,6 +1485,17 @@ void Videostreaming::sidebarStateChanged(){
 
 void Videostreaming::capFrame()
 {
+    //To get frame in trigger mode when external trigger is given
+    //Skipping 3 frames as capframe is called thrice when trigger mode is switched from master mode
+    if(triggerMode)
+    {
+      if(skipFrameForTrigger >= 3)//to skip the 3 frames which is called when trigger mode is on
+      {
+          clearBuffer = false;
+      }
+      else
+          skipFrameForTrigger++;
+    }
     unsigned char *temp_Buffer=NULL;
     __u32 buftype = m_buftype;
     v4l2_plane planes[VIDEO_MAX_PLANES];
@@ -2023,6 +2040,7 @@ void Videostreaming::capFrame()
                 makeSnapShot  = true;
                 m_snapShot    = true;
                 flagReset = false;
+                usleep(250000);
             }
             else
             {
@@ -2153,7 +2171,6 @@ void Videostreaming::capFrame()
     if(windowResized){
         emit setWindowSize(resizedWidth,resizedHeight);
     }
-
     m_timer.start(2000);
 }
 
@@ -3000,38 +3017,33 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 }
 
 //Added By Sushanth.S - Preparing Buffer for rendering IR & RGB for See3CAM_27CUG
-bool Videostreaming::prepare27cugBuffer(uint8_t* inputbuffer){
+bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
     m_renderer->render27CugMutex.lock();
     m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
-    if(!inputbuffer){
+    if(!inputBuffer){
         m_renderer->render27CugMutex.unlock();
         return false;
     }
 
     //CameraMode 3 - IR mode
-    if((inputbuffer[7] == IR_FRAME) && (cameraMode == 3)){
-        memcpy(m_renderer->yuvBuffer, inputbuffer, (width*height*2));
+    if((inputBuffer[7] == IR_FRAME) && (cameraMode == 3)){
+        memcpy(m_renderer->yuvBuffer, inputBuffer, (width*height*BYTES_PER_PIXEL_UYVY));
         m_renderer->gotFrame = true;
     }//CameraMode 2 - RGB mode
-    else if((inputbuffer[7] == RGB_FRAME) && (cameraMode == 2)){
-        memcpy(m_renderer->yuvBuffer, inputbuffer, (width*height*2));
+    else if((inputBuffer[7] == RGB_FRAME) && (cameraMode == 2)){
+        memcpy(m_renderer->yuvBuffer, inputBuffer, (width*height*BYTES_PER_PIXEL_UYVY));
         m_renderer->gotFrame = true;
     }
     //IR-RGB Mode -> Buffer for RGB(MainWindow)
-    else if((cameraMode == 1) && (inputbuffer[7]==RGB_FRAME)){
-        memcpy(m_renderer->rgbBuffer, inputbuffer, (width*height*2));
+    else if((cameraMode == 1) && (inputBuffer[7]==RGB_FRAME)){
+        memcpy(m_renderer->rgbBuffer, inputBuffer, (width*height*BYTES_PER_PIXEL_UYVY));
         m_renderer->gotFrame = true;
     }
-    else if((cameraMode == 1) && (inputbuffer[7] == IR_FRAME)){
-        //Added by Sushanth - To clear buffer when trigger mode is enabled
-        if(clearBuffer)
-        {
-            memset(inputbuffer,0,width*height*BYTES_PER_PIXEL_UYVY);
-        }
+    else if((cameraMode == 1) && (inputBuffer[7] == IR_FRAME)){
         //converting IR frame into QImage, inorder to render in another window
         int err = -1;
         err = v4lconvert_convert(m_convertData, &m_capSrcFormat, &m_capDestFormat,
-                                    inputbuffer, width*height*2, irRenderer->bits(),
+                                    inputBuffer, width*height*2, irRenderer->bits(),
                                             m_capDestFormat.fmt.pix.sizeimage);
         if(err == -1){
             return false;
@@ -3040,6 +3052,12 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputbuffer){
        QImage qImageRenderer(width, height, QImage::Format_RGB888);
 
        memcpy(qImageRenderer.bits(),irRenderer->bits(),(height*width*BYTES_PER_PIXEL_RGB));
+
+       //set black color in the preview window, when device is in trigger mode
+       if(clearBuffer)
+       {
+           qImageRenderer.fill(Qt::black);
+       }
 
        //passing QImage to the setImage() defined in renderer class
        helperObj.setImage(qImageRenderer);
@@ -3485,6 +3503,7 @@ bool Videostreaming::startCapture()
     createWindow = true;
     // Added by Navya : 11 Feb 2020 -- Enabling capturing images once after streamon
     emit signalToSwitchResoln(true);
+
     //Here
     previewFrameSkipCount = 1;
     if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB )
@@ -3591,8 +3610,12 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
         }
         startAgain();
 
-        //to set Exposure compensation after setting still resolution
-        emit setExposureCompensation();
+        //Added by Sushanth - autoExposureMode in UVC settings
+        if(autoExposureMode)
+        {
+             //to set exposure compensation after capturing still in cross resolution.
+             emit setExpAfterCrossStill();
+        }
     }
 }
 
@@ -3645,10 +3668,13 @@ void Videostreaming::clearBufInTrigger(bool isTrigger)
   if(isTrigger)
   {
       clearBuffer = true;
+      triggerMode = true;
+      skipFrameForTrigger = 0;
   }
   else
   {
       clearBuffer = false;
+      triggerMode = false;
   }
 }
 
@@ -3685,6 +3711,22 @@ void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
 void Videostreaming::getFileName(QString filePath,QString imgFormatType){
     QDateTime dateTime = QDateTime::currentDateTime();
     QDir tmpDir;
+
+    bool validFilePath = true;
+    //Added By Sushanth - Validating the filePath
+    struct stat validateFilePath;
+    // Calls the function with path as argument
+    // If the file/directory exists at the path returns 0
+    QByteArray byteArray = filePath.toLocal8Bit(); // converting QString to Bytearray & stores it into char array
+    const char *charFilePath = byteArray.data();
+    if (stat(charFilePath, &validateFilePath) != 0)
+    {
+        _title = "Failure";
+        _text = "Location doesn't exist";
+        validFilePath = false;
+        emit titleTextChanged(_title,_text);
+    }
+
     if(tmpDir.cd(filePath)) {
         QStringList filters,list;
         filters << "Qtcam_" + dateTime.toString("yy_MM_dd:hh_mm_ss")+"-*"+imgFormatType;
@@ -3721,8 +3763,12 @@ void Videostreaming::getFileName(QString filePath,QString imgFormatType){
         }
     }
 
-    setFilePath(filePath);
-    setImageFormatType(imgFormatType);
+    //if the filePath is valid
+    if(validFilePath)
+    {
+        setFilePath(filePath);
+        setImageFormatType(imgFormatType);
+    }
 }
 
 void Videostreaming::setFilePath(QString filePath){
@@ -4063,7 +4109,6 @@ void Videostreaming::stopCapture() {
         m_renderer->ir1350pBuffer = NULL;
     }
 
-
     if(inputIrBuffer != NULL){
         free(inputIrBuffer);
         inputIrBuffer = NULL;
@@ -4144,7 +4189,6 @@ void Videostreaming::setResoultion(QString resolution)
     m_height = height;
     try_fmt(fmt);
     s_fmt(fmt);
-
 
     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode)
     {
@@ -4718,6 +4762,10 @@ void Videostreaming::cameraModeEnabled(int cameraModeValue)
     {
         irRenderer = new QImage(width, height, QImage::Format_RGB888);
     }
+    if((triggerMode)&&(!clearBuffer))
+    {
+      clearBuffer = true;
+    }
     //To send cameraMode to qml
     emit sendCameraMode(cameraMode);
 }
@@ -4819,8 +4867,12 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
         }
         startAgain();
 
-        //to set ExpComp after setting preview resolution
-        emit setExposureCompensation();
+        //Added by Sushanth - autoExposureMode in UVC settings
+        if(autoExposureMode)
+        {
+             //to set exposure compensation after capturing still in cross resolution.
+             emit setExpAfterCrossStill();
+        }
     }
 }
 
@@ -4828,6 +4880,20 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
 void Videostreaming::doCaptureFrameTimeout()
 {
     emit capFrameTimeout();
+}
+
+//To enable/disable exposure compensation when auto/manual exposure in UVC
+void Videostreaming::enableDisableExpCompensation(bool isEnable)
+{
+  if(isEnable)
+  {
+    autoExposureMode = true;
+    //To set Min & Max exposure after cross resolution still capture in manual mode (when switched to auto mode)
+    emit setExpAfterCrossStill();
+  }
+  else{
+    autoExposureMode = false;
+  }
 }
 
 /**

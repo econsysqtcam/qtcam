@@ -1346,6 +1346,7 @@ bool uvccamera::sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len)
 
     // Read data from camera
     int retval = read(hid_fd, inBuf, len);
+
     if (retval < 0) {
         return false;
     }

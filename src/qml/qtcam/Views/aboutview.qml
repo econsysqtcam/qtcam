@@ -62,6 +62,7 @@ Item {
                 source: "images/about.png"
             }
         }
+
         Keys.onReturnPressed:  {
             aboutWindow.show();
         }

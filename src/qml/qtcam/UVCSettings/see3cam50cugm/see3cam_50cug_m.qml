@@ -45,6 +45,13 @@ Item{
             setToDefaultValues()
         }
     }
+    Action {
+        id: saveConfiguration
+        onTriggered:
+        {
+            see3cam50cugm.saveConfiguration()
+        }
+    }
 
     Action {
         id: firmwareVersion
@@ -65,7 +72,7 @@ Item{
 
         onTakeScreenShot:
         {
-            root.imageCapture(CommonEnums.SNAP_SHOT);
+            root.imageCapture(CommonEnums.BURST_SHOT);
         }
         onGetVideoPinStatus:
         {
@@ -422,6 +429,24 @@ Item{
                     }
                 }
 
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Button {
+                        id: saveConfig
+                        opacity: 1
+                        activeFocusOnPress : true
+                        text: "Save Configuration"
+                        style: econButtonStyle
+                        action: saveConfiguration
+                        onClicked:{
+                            saveConfigurations()
+                        }
+                        Keys.onReturnPressed: {
+                            saveConfigurations()
+                        }
+                    }
+                }
+
            }
          }
        }
@@ -649,6 +674,11 @@ Item{
         messageDialog.open()
     }
 
+    function saveConfigurations()
+    {
+        see3cam50cugm.saveConfiguration()
+    }
+
     function getFirmwareVersion() {
         uvccamera.getFirmWareVersion()
         messageDialog.open()
@@ -769,7 +799,7 @@ Item{
         defaultValue.enabled = false //To avoid multiple clicks over Default button
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
-        root.videoRecordBtnEnable(false)
+        root.videoRecordBtnEnable(true)
 
         if(see3cam50cugm.setToDefaultValues())
         {

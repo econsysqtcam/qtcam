@@ -25,13 +25,11 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.0
 import econ.camera.about 1.0
 Window {
-    //Item {
+    id: aboutRoot
     width:800
     height:480
     modality: Qt.WindowModal
     flags: Qt.FramelessWindowHint
-    id: aboutRoot
-    //    anchors.centerIn: parent
     Action {
         id: windowClose
         onTriggered: {

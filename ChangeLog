@@ -1,8 +1,14 @@
+Qtcam Application - 25.0.8
+---------------------------
+*Added save configuration HID setting for See3CAM_50CUG_M
+*Set black preview when trigger mode is enabled in See3CAM_27CUG.
+*Fixed fps drop issue when capturing still in cross resolution for See3CAM_27CUG.
+
 Qtcam Application - 25.0.7
 ---------------------------
 *Bug fix for See3Cam_27CUG - Added stillTimeOutTimer.
 *Clear buffer when device is in trigger mode.
-*set exposure compensation while resolution switching during cross resolution still capture.
+*Set exposure compensation while resolution switching during cross resolution still capture.
 
 Qtcam Application - 25.0.6
 ---------------------------

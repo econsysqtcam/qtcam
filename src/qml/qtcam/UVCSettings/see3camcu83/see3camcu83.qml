@@ -33,7 +33,7 @@ Item{
     property int denoiseMax: 15
     property int frameRateMin: 0
     property int frameRateMax: 60
-    property int expoCompMin: 8000
+    property int expoCompMin: 50
     property int expoCompMax: 1000000
 
     property bool skipUpdateUIDenoise: false
@@ -76,7 +76,7 @@ Item{
         target: root
         onTakeScreenShot:
         {
-            root.imageCapture(CommonEnums.SNAP_SHOT);
+            root.imageCapture(CommonEnums.BURST_SHOT);
         }
         onGetVideoPinStatus:
         {
@@ -418,10 +418,10 @@ Item{
                 text: "Horizontal"
                 style: econCheckBoxStyle
                 onClicked:{
-                    see3camcu83.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.Unchecked)
+                    see3camcu83.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                 }
                 Keys.onReturnPressed: {
-                    see3camcu83.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.Unchecked)
+                    see3camcu83.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                 }
             }
             CheckBox
@@ -431,10 +431,10 @@ Item{
                 text: "Vertical"
                 style: econCheckBoxStyle
                 onClicked:{
-                    see3camcu83.setOrientation(flipCtrlHorizotal.Unchecked, flipCtrlVertical.checked)
+                    see3camcu83.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                 }
                 Keys.onReturnPressed: {
-                    see3camcu83.setOrientation(flipCtrlHorizotal.Unchecked, flipCtrlVertical.checked)
+                    see3camcu83.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                 }
             }
         }
@@ -456,7 +456,7 @@ Item{
                 Text
                 {
                     id: exposureCompText
-                    text: "value(µs)[8000 - 1000000]"
+                    text: "value(µs)[50 - 1000000]"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -549,9 +549,9 @@ Item{
                     validator: IntValidator {bottom: frameRateSlider.minimumValue; top: frameRateSlider.maximumValue}
                     onTextChanged: {
                         frameRateSlider.value = frameRateTextField.text
-//                        if(text.length > 0){
-//                            frameRateSlider.value = frameRateTextField.text
-//                        }
+                        if(text.length > 0){
+                            frameRateSlider.value = frameRateTextField.text
+                        }
                     }
                 }
             }
