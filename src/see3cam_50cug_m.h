@@ -78,7 +78,6 @@ public:
 
     enum strobeMode {
         FLASH = 0x00,
-        TORCH = 0x01,
         OFF   = 0x02
     };
     Q_ENUMS(strobeMode)
@@ -90,6 +89,7 @@ public:
         void strobeModeChanged(uint strobe);
         void blackLevelAdjustmentChanged(uint blacklevel);
         void imageBurstChanged(uint burstLength);
+        void indicateCommandStatus(QString title, QString text);
 
     public slots:
         bool setCameraMode(cameraModes cameraMode);

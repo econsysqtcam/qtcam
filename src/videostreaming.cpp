@@ -3501,6 +3501,8 @@ bool Videostreaming::startCapture()
         }
     }
     createWindow = true;
+    //To disable clearBuffer after crossResolution still capture to start the paint - Added by Sushanth
+    clearBuffer = false;
     // Added by Navya : 11 Feb 2020 -- Enabling capturing images once after streamon
     emit signalToSwitchResoln(true);
 
@@ -3609,6 +3611,12 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
             frameIntervalChanged(lastFPSValue.toUInt(),changeFPSForHyperyon);
         }
         startAgain();
+
+        //Added by Sushanth
+        if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG)
+        {
+            clearBuffer = true; // to clear buffer in IR preview while cross resolution stillCapture
+        }
 
         //Added by Sushanth - autoExposureMode in UVC settings
         if(autoExposureMode)
@@ -3815,6 +3823,12 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
     emit stillSkipCount(stillSize, lastPreviewSize, stillOutFormat);
 
     getFileName(filePath, imgFormatType);
+//    if(!(burstLength == 0))
+//    {
+//        m_burstLength = burstLength; // no of shots to take
+//        m_burstNumber = 1;
+//        formatType = imgFormatType;
+//    }
     m_burstLength = burstLength; // no of shots to take
     m_burstNumber = 1;
     formatType = imgFormatType;

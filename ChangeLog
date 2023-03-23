@@ -1,3 +1,12 @@
+Qtcam Application - 25.0.9
+---------------------------
+See3CAM_50CUG
+*Torch in strobe mode removed, 
+*Fixed black level enable issue
+*Burst length O Removed
+*Added dialogue box for save configuration
+*Bug fixing for See3CAM_27CUG & See3CAM_CU83
+
 Qtcam Application - 25.0.8
 ---------------------------
 *Added save configuration HID setting for See3CAM_50CUG_M

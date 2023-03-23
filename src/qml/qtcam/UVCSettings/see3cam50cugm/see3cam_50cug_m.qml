@@ -231,10 +231,10 @@ Item{
                        exclusiveGroup: blackLeverAdjGroup
                        activeFocusOnPress: true
                        onClicked: {
-                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.AUTO)
+                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.ENABLE)
                        }
                        Keys.onReturnPressed: {
-                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.AUTO)
+                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.ENABLE)
                        }
                    }
                    RadioButton {
@@ -251,7 +251,6 @@ Item{
                        }
                    }
                }
-
 
                 Text {
                     id: strobe
@@ -278,21 +277,6 @@ Item{
                         }
                         Keys.onReturnPressed: {
                             see3cam50cugm.setStrobeMode(SEE3CAM_50CUGM.FLASH)
-                        }
-                    }
-
-                    RadioButton {
-                        exclusiveGroup: strobesGrp
-                        checked: false
-                        id: strobeTorch
-                        text: "Torch"
-                        activeFocusOnPress: true
-                        style: econRadioButtonStyle
-                        onClicked: {
-                            see3cam50cugm.setStrobeMode(SEE3CAM_50CUGM.TORCH)
-                        }
-                        Keys.onReturnPressed: {
-                            see3cam50cugm.setStrobeMode(SEE3CAM_50CUGM.TORCH)
                         }
                     }
 
@@ -339,7 +323,6 @@ Item{
                         opacity: 1
                         enabled: true
                         model: ListModel {
-                            ListElement { text: "0" }
                             ListElement { text: "1" }
                             ListElement { text: "2" }
                             ListElement { text: "3" }
@@ -350,7 +333,7 @@ Item{
                         activeFocusOnPress: true
                         style: econComboBoxStyle
                         onCurrentIndexChanged: {
-                            root.stillBurstLength(burstLengthCombo.currentIndex)
+                            root.stillBurstLength(burstLengthCombo.currentIndex + 1)
                             if(skipUpdateUIOnBurstLength){
                                 see3cam50cugm.setBurstLength(burstLengthCombo.currentText)
                             }
@@ -634,8 +617,6 @@ Item{
             {
                 strobeFlash.enabled = false
                 strobeFlash.opacity = 0.1
-                strobeTorch.enabled = false
-                strobeTorch.opacity = 0.1
                 strobeOff.enabled = false
                 strobeOff.opacity = 0.1
             }
@@ -643,8 +624,6 @@ Item{
             {
                 strobeFlash.enabled = true
                 strobeFlash.opacity = 1
-                strobeTorch.enabled = true
-                strobeTorch.opacity = 1
                 strobeOff.enabled = true
                 strobeOff.opacity = 1
             }
@@ -665,7 +644,10 @@ Item{
         }
         onImageBurstChanged:{
             skipUpdateUIOnBurstLength = false
-            burstLengthCombo.currentIndex = burstLength
+            burstLengthCombo.currentIndex = burstLength - 1
+        }
+        onIndicateCommandStatus:{
+            displayMessageBox(title, text)
         }
     }
 
@@ -679,6 +661,13 @@ Item{
         see3cam50cugm.saveConfiguration()
     }
 
+    function displayMessageBox(title, text){
+        messageDialog.title = qsTr(title)
+        messageDialog.text = qsTr(text)
+        messageDialog.open()
+
+    }
+
     function getFirmwareVersion() {
         uvccamera.getFirmWareVersion()
         messageDialog.open()
@@ -689,8 +678,6 @@ Item{
         //disable strobe mode when the camera is in Master mode
         strobeFlash.enabled = false
         strobeFlash.opacity = 0.1
-        strobeTorch.enabled = false
-        strobeTorch.opacity = 0.1
         strobeOff.enabled = false
         strobeOff.opacity = 0.1
 
@@ -726,8 +713,6 @@ Item{
         //enable strobe mode when the camera is in trigger mode
         strobeFlash.enabled = true
         strobeFlash.opacity = 1
-        strobeTorch.enabled = true
-        strobeTorch.opacity = 1
         strobeOff.enabled = true
         strobeOff.opacity = 1
 
@@ -743,8 +728,6 @@ Item{
         //enable strobe mode when the camera is in trigger mode
         strobeFlash.enabled = true
         strobeFlash.opacity = 1
-        strobeTorch.enabled = true
-        strobeTorch.opacity = 1
         strobeOff.enabled = true
         strobeOff.opacity = 1
 
@@ -780,17 +763,10 @@ Item{
             case SEE3CAM_50CUGM.OFF:
                 strobeOff.checked   = true
                 strobeFlash.checked = false
-                strobeTorch.checked = false
                 break;
             case SEE3CAM_50CUGM.FLASH:
                 strobeOff.checked   = false
                 strobeFlash.checked = true
-                strobeTorch.checked = false
-                break;
-            case SEE3CAM_50CUGM.TORCH:
-                strobeOff.checked   = false
-                strobeFlash.checked = false
-                strobeTorch.checked = true
                 break;
         }
     }

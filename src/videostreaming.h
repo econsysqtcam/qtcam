@@ -42,7 +42,7 @@
 #define Y16_2160p_HEIGHT           2160
 
 #define Y16_2160p_RGB_WIDTH        3840
-#define Y16_2160p_RGB_HEIGHT       1350
+#define Y16_2160p_RGB_HEIGHT       2160
 
 #define Y16_2160p_Y8_WIDTH        1920
 #define Y16_2160p_Y8_HEIGHT       1080
