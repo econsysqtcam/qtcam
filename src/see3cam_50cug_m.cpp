@@ -366,7 +366,6 @@ bool SEE3CAM_50CUGM::getBurstLength()
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_50CUG_M &&
             g_in_packet_buf[1]==GET_IMAGE_BURST_SEE3CAM_50CUG_M &&
             g_in_packet_buf[6]==GET_SUCCESS) {
-            qDebug()<<Q_FUNC_INFO<<g_in_packet_buf[2];
             emit imageBurstChanged(g_in_packet_buf[2]);
             return true;
         }

@@ -1505,7 +1505,7 @@ void Videostreaming::capFrame()
     memset(planes, 0, sizeof(planes));
     buf.length = VIDEO_MAX_PLANES;
     buf.m.planes = planes;
-    
+
     if (!dqbuf_mmap(buf, buftype, again)) {
         // stop the timer when device is unplugged
         if(!retrieveFrame)
@@ -3823,12 +3823,6 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
     emit stillSkipCount(stillSize, lastPreviewSize, stillOutFormat);
 
     getFileName(filePath, imgFormatType);
-//    if(!(burstLength == 0))
-//    {
-//        m_burstLength = burstLength; // no of shots to take
-//        m_burstNumber = 1;
-//        formatType = imgFormatType;
-//    }
     m_burstLength = burstLength; // no of shots to take
     m_burstNumber = 1;
     formatType = imgFormatType;
@@ -4863,7 +4857,7 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
             vidCapFormatChanged(stillOutFormat);
 
             setResoultion(stillSize);
-            
+
             m_renderer->renderBufferFormat = CommonEnums::NO_RENDER;
         }
         else{
