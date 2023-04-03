@@ -85,7 +85,6 @@ public:
     signals:
         void cameraModeChanged(uint cameraMode);
         void flipMirrorModeChanged(uint flipMode);
-        void gainModeChanged(uint gain);
         void strobeModeChanged(uint strobe);
         void blackLevelAdjustmentChanged(uint blacklevel);
         void imageBurstChanged(uint burstLength);

@@ -464,6 +464,9 @@ private:
     uint m_burstLength;
     uint m_burstNumber;
 
+    //Added by Sushanth - Flag for validating filePath for image capture
+    bool validFilePath = true;
+
     // Added by Sankari  - 10 Nov 2016 - To decide whether display pop up dialog will appear in while capturing image
     bool m_displayCaptureDialog;
 
@@ -776,6 +779,12 @@ signals:
      * To close IR window after the device is unplugged
      */
     void deviceUnPlug();
+
+    /*
+     * Added by Sushanth S
+     * To enable/disable WakeOn Motion HID setting when the colorspace is UYVY for See3CAM_CU83
+     */
+    void wakeOnMotion(bool isEnable);
 
     /*
      * Added by Sushanth S

@@ -319,39 +319,41 @@ bool SEE3CAM_CU83::getOrientation()
     return false;
 }
 
-bool SEE3CAM_CU83::setExposureCompensation(uint exposureCompValue)
+
+/**
+ * @brief ::setExposureCompensation - setting minimum exposure compensation
+ * @return true/false
+ */
+bool SEE3CAM_CU83::setExposureCompensation(unsigned int exposureCompValue)
 {
-   // hid validation
-   if(uvccamera::hid_fd < 0)
-   {
-       return false;
-   }
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+    //Initialize buffers
+    initializeBuffers();
 
-   //Initialize buffers
-   initializeBuffers();
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_SEE3CAM_CU83;
+    g_out_packet_buf[2] = SET_EXPOSURE_COMPENSATION_SEE3CAM_CU83;
+    g_out_packet_buf[3] = (u_int8_t)((exposureCompValue & 0xFF000000) >> 24);
+    g_out_packet_buf[4] = (u_int8_t)((exposureCompValue & 0x00FF0000) >> 16);
+    g_out_packet_buf[5] = (u_int8_t)((exposureCompValue & 0x0000FF00) >> 8);
+    g_out_packet_buf[6] = (u_int8_t)((exposureCompValue & 0x000000FF) >> 0);
 
-   // fill buffer values
-   g_out_packet_buf[1] = CAMERA_CONTROL_SEE3CAM_CU83; /* camera id */
-   g_out_packet_buf[2] = SET_EXPOSURE_COMPENSATION_SEE3CAM_CU83; /* set exposure compensation command */
-   g_out_packet_buf[3] = (u_int8_t)((exposureCompValue & 0xFF000000) >> 24);
-   g_out_packet_buf[4] = (u_int8_t)((exposureCompValue & 0x00FF0000) >> 16);
-   g_out_packet_buf[5] = (u_int8_t)((exposureCompValue & 0x0000FF00) >> 8);
-   g_out_packet_buf[6] = (u_int8_t)((exposureCompValue & 0x000000FF) >> 0);
-
-   // send request and get reply from camera
-   if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-       if (g_in_packet_buf[6]==SET_FAIL) {
-           return false;
-       } else if(/*g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU83 &&*/
-           g_in_packet_buf[1]==SET_EXPOSURE_COMPENSATION_SEE3CAM_CU83 &&
-           g_in_packet_buf[6]==SET_SUCCESS) {
-           emit indicateCommandStatus("Success", "Exposure compensation value is set successfully");
-           return true;
-       }
-   }
-  else{
-    emit indicateCommandStatus("Failure", "Failed to set exposure compensation value");
-   }
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==SET_FAIL) {
+            emit indicateCommandStatus("Failure", "Failed to set Exposure Compensation Value");
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU83 &&
+            g_in_packet_buf[1]==SET_EXPOSURE_COMPENSATION_SEE3CAM_CU83 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {
+            emit indicateCommandStatus("Success", "Exposure compensation value is set successfully");
+            return true;
+        }
+    }
     return false;
 }
 
@@ -376,15 +378,14 @@ bool SEE3CAM_CU83::getExposureCompensation()
    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
        if (g_in_packet_buf[6]==GET_FAIL) {
            return false;
-       } else if(/*g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU83 &&*/
+       } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU83 &&
            g_in_packet_buf[1]==GET_EXPOSURE_COMPENSATION_SEE3CAM_CU83 &&
            g_in_packet_buf[6]==GET_SUCCESS) {
            expComp = (((u_int8_t)g_in_packet_buf[2]) << 24)
                                | (((u_int8_t)g_in_packet_buf[3]) << 16)
                                | (((u_int8_t)g_in_packet_buf[4]) << 8)
                    | (((u_int8_t)g_in_packet_buf[5]) << 0);
-
-         emit exposureCompValueRecieved(expComp);
+           emit exposureCompValueRecieved(expComp);
            return true;
        }
    }
@@ -392,7 +393,7 @@ bool SEE3CAM_CU83::getExposureCompensation()
 
 }
 
-bool SEE3CAM_CU83::setFrameRateCtrlValue(uint frameRateCtrl)
+bool SEE3CAM_CU83::setFrameRateCtrlValue(uint frameRate)
 {
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -406,7 +407,7 @@ bool SEE3CAM_CU83::setFrameRateCtrlValue(uint frameRateCtrl)
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_SEE3CAM_CU83; /* set camera control code */
     g_out_packet_buf[2] = SET_FRAMERATE_CONTROL_SEE3CAM_CU83; /* set framerate control code */
-    g_out_packet_buf[3] = frameRateCtrl; /* set framerate value */
+    g_out_packet_buf[3] = frameRate; /* set framerate value */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -440,10 +441,13 @@ bool SEE3CAM_CU83::getFrameRateCtrlValue()
    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
        if (g_in_packet_buf[6]==GET_FAIL) {
            return false;
-       } else if(/*g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU83 &&*/
+       } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU83 &&
            g_in_packet_buf[1]==GET_FRAMERATE_CONTROL_SEE3CAM_CU83 &&
            g_in_packet_buf[6]==GET_SUCCESS) {
+           emit minimumFramesReceived(g_in_packet_buf[3]);
+           emit maximumFramesReceived(g_in_packet_buf[4]);
            emit frameRateCtrlValueRecieved(g_in_packet_buf[2]);
+
            return true;
        }
    }
@@ -600,7 +604,7 @@ bool SEE3CAM_CU83::setWakeOnMotion(wakeOnMode  wakeOn)
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
-        } else if(/*g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU83 &&*/
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU83 &&
             g_in_packet_buf[1] == SET_WAKEON_MOTION_SEE3CAM_CU83 &&
             g_in_packet_buf[6] == SET_SUCCESS) {
             return true;
@@ -626,7 +630,7 @@ bool SEE3CAM_CU83::getWakeOnMotion()
 
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_SEE3CAM_CU83; /* camera id */
-    g_out_packet_buf[2] = GET_WAKEON_MOTION_SEE3CAM_CU83; /* get special mode command  */
+    g_out_packet_buf[2] = GET_WAKEON_MOTION_SEE3CAM_CU83;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -634,11 +638,11 @@ bool SEE3CAM_CU83::getWakeOnMotion()
         {
             return false;
         }
-        else if(/*(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU83) &&*/
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_CU83) &&
                 (g_in_packet_buf[1]==GET_WAKEON_MOTION_SEE3CAM_CU83) &&
                 (g_in_packet_buf[6]==GET_SUCCESS))
         {
-            emit wakeonModeRecieved(g_in_packet_buf[2]);
+            emit wakeonModeReceived(g_in_packet_buf[2]);
             return true;
         }
     }

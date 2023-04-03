@@ -42,10 +42,10 @@ Item{
     property bool skipUpdateUIOnBurstLength: false
     property bool skipUpdateUIOnAntiFlickerMode:false
 
-     property bool setButtonClicked: false
+    property bool setButtonClicked: false
 
     Timer {
-        id: getexposureCompFrameRateCtrlTimer
+        id: getCamValuesTimer
         interval: 500
         onTriggered: {
             see3camcu83.getExposureCompensation()
@@ -110,12 +110,21 @@ Item{
         }
         onVideoResolutionChanged:{
             getexposureCompTimer.start()
+            getCamValuesTimer.start()
         }
         onPreviewFPSChanged:{
             getexposureCompTimer.start()
+            getCamValuesTimer.start()
         }
         onVideoColorSpaceChanged:{
             getexposureCompTimer.start()
+            getCamValuesTimer.start()
+        }
+        onWakeOnMotionSettings:{
+            wakeOnMotion(isEnable)
+        }
+        onSetExpCompensation:{
+            see3camcu83.setExposureCompensation(exposureCompValue.text)
         }
     }
 
@@ -492,12 +501,14 @@ Item{
                     onClicked:
                     {
                         exposureCompSet.enabled = false
+                        setButtonClicked = true
                         see3camcu83.setExposureCompensation(exposureCompValue.text)
                         exposureCompSet.enabled = true
                     }
                     Keys.onReturnPressed:
                     {
                         exposureCompSet.enabled = false
+                        setButtonClicked = true
                         see3camcu83.setExposureCompensation(exposureCompValue.text)
                         exposureCompSet.enabled = true
                     }
@@ -515,20 +526,17 @@ Item{
                 Layout.alignment: Qt.AlignCenter
                 opacity: 0.50196078431373
             }
-
-            Row
-            {
+            Row{
                 spacing: 35
-                Slider
-                {
+                Slider {
                     activeFocusOnPress: true
                     updateValueWhileDragging: false
                     id: frameRateSlider
                     width: 150
                     stepSize: 1
                     style:econSliderStyle
-                    minimumValue: frameRateMin
-                    maximumValue: frameRateMax
+                    minimumValue: frameRateSlider.minimumValue
+                    maximumValue: frameRateSlider.maximumValue
                     onValueChanged:  {
                         frameRateTextField.text = frameRateSlider.value
                         if(skipUpdateUIFrameRate){
@@ -537,8 +545,7 @@ Item{
                         skipUpdateUIFrameRate = true
                     }
                 }
-                TextField
-                {
+                TextField {
                     id: frameRateTextField
                     text: frameRateSlider.value
                     font.pixelSize: 10
@@ -548,7 +555,6 @@ Item{
                     style: econTextFieldStyle
                     validator: IntValidator {bottom: frameRateSlider.minimumValue; top: frameRateSlider.maximumValue}
                     onTextChanged: {
-                        frameRateSlider.value = frameRateTextField.text
                         if(text.length > 0){
                             frameRateSlider.value = frameRateTextField.text
                         }
@@ -978,6 +984,12 @@ Item{
             frameRateSlider.value = frameRateVal
             skipUpdateUIFrameRate = true
         }
+        onMinimumFramesReceived: {
+            frameRateSlider.minimumValue = minimumFps
+        }
+        onMaximumFramesReceived: {
+            frameRateSlider.maximumValue = maximumFps
+        }
 
         onBurstLengthValueRecieved:
         {
@@ -1014,12 +1026,16 @@ Item{
              }
         }
 
-        onWakeonModeRecieved: {
+        onWakeonModeReceived: {
             setWakeOnMode(wakeOn)
         }
 
+        //Signal for command Prompt
         onIndicateCommandStatus:{
-            displayMessageBox(title, text)
+            if(setButtonClicked){
+                displayMessageBox(title, text)
+                setButtonClicked = false
+            }
         }
         onIndicateExposureValueRangeFailure:{
             if(setButtonClicked){
@@ -1077,13 +1093,31 @@ Item{
         switch(mode)
         {
         case See3Cam_CU83.ENABLE:
-            wakeOnEnable.enabled  = true
-            wakeOnDisable.enabled = false
+            wakeOnEnable.checked  = true
+            wakeOnDisable.checked = false
             break;
         case See3Cam_CU83.DISABLE:
-            wakeOnEnable.enabled  = false
-            wakeOnDisable.enabled = true
+            wakeOnEnable.checked  = false
+            wakeOnDisable.checked = true
             break;
+        }
+    }
+
+    function wakeOnMotion(isEnable)
+    {
+        if(isEnable)
+        {
+            wakeOnEnable.enabled  = true
+            wakeOnEnable.opacity  = 1
+            wakeOnDisable.enabled = true
+            wakeOnDisable.opacity = 1
+        }
+        else
+        {
+            wakeOnEnable.enabled  = false
+            wakeOnEnable.opacity  = 0.1
+            wakeOnDisable.enabled = false
+            wakeOnDisable.opacity  = 0.1
         }
     }
 
@@ -1101,6 +1135,9 @@ Item{
 
     function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
+            //To enable exposure compensation when device is in manual exposure mode in UVC
+            root.enableDisableExposureCompensation(autoExposureSelect)
+
             autoexpManual.enabled = true
             autoexpFull.enabled = true
             if(autoexpManual.checked)
@@ -1115,6 +1152,9 @@ Item{
             exposureCompSet.opacity = 1
             exposureCompText.opacity = 1
         }else{
+            //To disable exposure compensation when device is in manual exposure mode in UVC
+            root.enableDisableExposureCompensation(autoExposureSelect)
+
             autoexpManual.enabled = false
             autoexpFull.enabled = false
             autoExpoWinSizeCombo.enabled = false
@@ -1159,16 +1199,14 @@ Item{
     }
 
     function getCurrentValuesFromCamera(){
+        getCamValuesTimer.start()
         see3camcu83.getSpecialMode()
         see3camcu83.getDenoiseValue()
         see3camcu83.getAutoExpROIModeAndWindowSize()
         see3camcu83.getOrientation()
-        see3camcu83.getExposureCompensation()
-        see3camcu83.getFrameRateCtrlValue()
         see3camcu83.getBurstLength()
         see3camcu83.getAntiFlickerMode()
         see3camcu83.getWakeOnMotion()
-        getexposureCompFrameRateCtrlTimer.start()
     }
 
     Component.onCompleted: {

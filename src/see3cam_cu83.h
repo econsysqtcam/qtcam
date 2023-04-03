@@ -100,9 +100,11 @@ signals:
     void flipMirrorModeReceived(uint flipMode);
     void exposureCompValueRecieved(uint exposureCompVal);
     void frameRateCtrlValueRecieved(uint frameRateVal);
+    void minimumFramesReceived(uint minimumFps);
+    void maximumFramesReceived(uint maximumFps);
     void burstLengthValueRecieved(uint burstLenVal);
     void antiFlickerModeRecieved(uint antiFlickerVal);
-    void wakeonModeRecieved(uint wakeOn);
+    void wakeonModeReceived(uint wakeOn);
 
     void indicateExposureValueRangeFailure(QString title, QString text);
     void indicateCommandStatus(QString title, QString text);

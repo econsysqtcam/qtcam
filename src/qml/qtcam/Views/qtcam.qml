@@ -35,6 +35,7 @@ import "../JavaScriptFiles/tempValue.js" as JS
 import cameraenum 1.0
 import econ.camera.uvcsettings 1.0
 import econ.camera.qimagerenderer 1.0
+import econ.camera.see3camcu83 1.0
 
 Rectangle {
     id: root
@@ -66,6 +67,9 @@ Rectangle {
 
     //signal to send cameraMode to renderer.qml
     signal sendCameraModeToQml(int cameraMode)
+
+    //signal to enable/disable wakeonMotion
+    signal wakeOnMotionSettings(bool isEnable)
 
     //signal to set exposure compensation while still capture
     signal setExpCompensation();
@@ -621,6 +625,14 @@ Rectangle {
         onSendCameraMode:{
             //signal emitted to renderer.qml
             sendCameraModeToQml(cameraMode)
+        }
+
+        /*
+            Added By Sushanth.S
+            Signal emitted from Videostreaming.cpp to enable/disable wakeonMotion
+        */
+        onWakeOnMotion:{
+            wakeOnMotionSettings(isEnable)
         }
 
         /*
@@ -1756,6 +1768,7 @@ Rectangle {
         vidstreamproperty.cameraModeEnabled(cameraMode)
     }
 
+
     //Added by Sushanth - To clear buffer when device is in trigger mode
     function clearBufferInTriggerMode(isTrigger)
     {
@@ -1774,7 +1787,6 @@ Rectangle {
         {
             vidstreamproperty.enableDisableExpCompensation(false)
         }
-
     }
 
     //Added by Sushanth.S - Creating component for IR preview

@@ -1,3 +1,13 @@
+Qtcam Application - 25.0.10
+---------------------------
+See3CAM_CU83
+*Fixed Wake on motion issue.
+*Preview crop issue in Y16 format.
+*Set exposure compensation while capturing still in cross resolution as did in See3CAM_27CUG.
+See3CAM_50CUG
+*Save configuration bug fixed.
+
+
 Qtcam Application - 25.0.9
 ---------------------------
 See3CAM_50CUG

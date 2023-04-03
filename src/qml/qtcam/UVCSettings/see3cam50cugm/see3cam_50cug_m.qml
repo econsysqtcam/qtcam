@@ -45,13 +45,6 @@ Item{
             setToDefaultValues()
         }
     }
-    Action {
-        id: saveConfiguration
-        onTriggered:
-        {
-            see3cam50cugm.saveConfiguration()
-        }
-    }
 
     Action {
         id: firmwareVersion
@@ -420,7 +413,6 @@ Item{
                         activeFocusOnPress : true
                         text: "Save Configuration"
                         style: econButtonStyle
-                        action: saveConfiguration
                         onClicked:{
                             saveConfigurations()
                         }
