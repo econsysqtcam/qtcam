@@ -882,12 +882,12 @@ void FrameRenderer::drawY8BUffer(){
         if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83){
             if((videoResolutionwidth == Y16_1350p_WIDTH)&&(videoResolutionHeight == Y16_1350p_HEIGHT)){
                 if(ir1350pBuffer != NULL){
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth ,videoResolutionHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, ir1350pBuffer);
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth ,Y16_1350p_HEIGHT_MODIFIED, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, ir1350pBuffer);
                 }
             }
             else if((videoResolutionwidth == Y16_675p_WIDTH)&&(videoResolutionHeight == Y16_675p_HEIGHT)){
                 if(ir675pBuffer != NULL){
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth ,videoResolutionHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, ir675pBuffer);
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth ,Y16_675p_HEIGHT_MODIFIED, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, ir675pBuffer);
                 }
             }
             else{
@@ -2980,7 +2980,6 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         {
             qImage3.fill(Qt::black);
         }
-
 
        //passing QImage to the setImage() defined in renderer class
        helperObj.setImage(qImage3);

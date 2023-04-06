@@ -1050,11 +1050,17 @@ Item{
         switch(roiMode){
             case See3Cam_CU83.FULL_ROI:
                 autoexpFull.checked = true
+                //To disable comboBox in full roi mode
                 autoExpoWinSizeCombo.enabled = false
+                autoExpoWinSizeCombo.opacity = 0.1
                 break
             case See3Cam_CU83.MANUAL_ROI:
                 skipUpdateUIOnExpWindowSize = false
+                autoexpManual.enabled = true
                 autoexpManual.checked = true
+                //To enable comboBox in manual mode
+                autoExpoWinSizeCombo.enabled = true
+                autoExpoWinSizeCombo.opacity = 1
                 // If window size is got from camera is 0 then set window size to 1 in UI
                 if(winSize == 0){
                     autoExpoWinSizeCombo.currentIndex = 0
@@ -1064,7 +1070,9 @@ Item{
             case See3Cam_CU83.AE_DISABLED:
                 autoexpFull.enabled = false
                 autoexpManual.enabled = false
+                //To disable comboBox in Disable mode
                 autoExpoWinSizeCombo.enabled = false
+                autoExpoWinSizeCombo.opacity = 0.1
                 break
         }
     }
