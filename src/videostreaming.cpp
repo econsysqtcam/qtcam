@@ -196,12 +196,6 @@ void Videostreaming::updateBuffer(){
 void FrameRenderer::updateBuffer(){
     //Added by Navya : 16 March 2020 -- Split yuyv data only for 640x480/640x360 resolution.
     if((renderBufferFormat == CommonEnums::BUFFER_RENDER_360P) | (renderBufferFormat == CommonEnums::UYVY_BUFFER_RENDER)){
-
-        if(clearBuffer)
-        {
-            gotFrame = false;
-        }
-
         if(renderMutex.tryLock()){
             if(yuvBuffer != NULL){
                 if(gotFrame){
@@ -624,7 +618,7 @@ void FrameRenderer::drawBufferFor360p(){
 
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if (yBuffer != NULL && uBuffer != NULL && vBuffer != NULL){
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1
         || currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
             skipFrames = frame;
         }
@@ -744,7 +738,7 @@ void FrameRenderer::drawYUYVBUffer(){
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
             skipFrames = frame;
         }
         else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
@@ -801,7 +795,7 @@ void FrameRenderer::drawUYVYBUffer(){
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG) | (currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU1330M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M))
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG) | (currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M))
         {
             skipFrames = frame;
         }
@@ -1271,7 +1265,11 @@ void FrameRenderer::shaderUYVY(){
 */
 void FrameRenderer::paint()
 {
-
+    //Added by sushanth - To stop the paint when capturing still in cross resolution
+    if(clearBuffer)
+    {
+        gotFrame = false;
+    }
     if(gotFrame && !triggermodeFlag){               //Added by Nivedha : 12 Mar 2021 -- To avoid getting preview in trigger mode.
         if(m_formatChange | m_videoResolnChange){  // Call to change Shader on format and Resolution change
             m_formatChange = false;
@@ -1684,6 +1682,7 @@ void Videostreaming::capFrame()
         //  Ex: cu40 camera
         if(!m_renderer->y16BayerFormat)
         {
+//            clearBuffer = true;
             if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)
             { // y16
                 onY16Format = true;
@@ -2975,12 +2974,6 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         //Convert buffer into QImage to render in another window
         QImage qImage3(outputIrBuffer, Y16_2160p_Y8_WIDTH, Y16_2160p_Y8_HEIGHT, QImage::Format_Grayscale8);
 
-        //set black color in the preview window, when device is in trigger mode
-        if(clearBuffer)
-        {
-            qImage3.fill(Qt::black);
-        }
-
        //passing QImage to the setImage() defined in renderer class
        helperObj.setImage(qImage3);
     }
@@ -3173,7 +3166,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 //Added By Sushanth - To enable wakeonMotion in GREY format
                 if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
                 {
-                    emit wakeOnMotion(true);
+                    emit wakeOnMotion(false);
                 }
 
                 memcpy(m_renderer->greyBuffer, (uint8_t*)inputbuffer, width*height);
@@ -3185,7 +3178,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 //Added By Sushanth - To disable wakeonMotion in UVVY format
                 if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
                 {
-                    emit wakeOnMotion(false);
+                    emit wakeOnMotion(true);
                 }
 
                 if(width == 640 && (height == 480 | height == 360 | height == 482))
@@ -3272,7 +3265,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
                 {
                     //Added By Sushanth - To enable wakeonMotion in Y16 format
-                    emit wakeOnMotion(true);
+                    emit wakeOnMotion(false);
 
                     if(!prepareCu83Buffer((uint8_t*)inputbuffer))
                     {
@@ -3524,12 +3517,9 @@ bool Videostreaming::startCapture()
         }
     }
     createWindow = true;
-    //To disable clearBuffer after crossResolution still capture to start the paint - Added by Sushanth
-    clearBuffer = false;
     // Added by Navya : 11 Feb 2020 -- Enabling capturing images once after streamon
     emit signalToSwitchResoln(true);
 
-    //Here
     previewFrameSkipCount = 1;
     if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB )
     {
@@ -3995,7 +3985,7 @@ void Videostreaming::displayFrame() {
         m_renderer->y16BayerFormat = true;
     }
 
-    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU1330M|| currentlySelectedCameraEnum == CommonEnums::SEE3CAM_135M || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU136M) && (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)) {
+    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG || currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedCameraEnum == CommonEnums::SEE3CAM_135M || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU136M) && (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)) {
         y16FormatFor20CUG = true;
     }
     if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264){
@@ -4908,15 +4898,16 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
             retrieveShot =true;
             m_renderer->updateStop = true;
             vidCapFormatChanged(stillOutFormat);
-
             setResoultion(stillSize);
-
             m_renderer->renderBufferFormat = CommonEnums::NO_RENDER;
         }
         else{
             retrieveShot = false;
             vidCapFormatChanged(lastFormat);
             setResoultion(lastPreviewSize);
+
+            //To disable clearBuffer after crossResolution still capture to start the paint - Added by Sushanth
+            clearBuffer = false;
 
             //Added by Sushanth - To stop the stillTimeOut timer once the still is captured
             stopStillTimeOutTimer();

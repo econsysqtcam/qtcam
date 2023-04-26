@@ -69,7 +69,7 @@
 #include "see3cam_cu27.h"
 #include "ecam82_usb.h"
 #include "ecam83_usb.h"
-#include "see3cam_cu1330m.h"
+#include "see3cam_cu135m_h01r1.h"
 #include "see3cam_cu136m.h"
 #include "barcode_camera.h"
 #include "see3cam_135m.h"
@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<See3CAM_160>("econ.camera.see3cam160",1,0,"See3cam160");
     qmlRegisterType<See3CAM_CU27>("econ.camera.see3camcu27",1,0,"See3camCU27");
     qmlRegisterType<ecam82_USB>("econ.camera.ecam82_usb",1,0,"Ecam82USB");
-    qmlRegisterType<See3CAM_CU1330M>("econ.camera.see3cam_cu1330m",1,0,"See3camCU1300M");
+    qmlRegisterType<See3CAM_CU135M_H01R1>("econ.camera.see3CamCu135mH01r1",1,0,"See3CAM_CU135M_H01R1");
     qmlRegisterType<See3CAM_135M>("econ.camera.see3cam_135m",1,0,"See3cam135M");
     qmlRegisterType<See3CAM_CU136M>("econ.camera.see3cam_cu136m",1,0,"See3camCU136M");
     qmlRegisterType<NILECAM20_USB>("econ.camera.nilecam20_usb",1,0,"NileCam20_USB");

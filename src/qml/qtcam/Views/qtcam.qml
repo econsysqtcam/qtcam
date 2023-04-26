@@ -632,6 +632,7 @@ Rectangle {
             Signal emitted from Videostreaming.cpp to enable/disable wakeonMotion
         */
         onWakeOnMotion:{
+            console.log("\n Signal captured in qtcam.qml")
             wakeOnMotionSettings(isEnable)
         }
 
@@ -1492,8 +1493,8 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.ECAM83_USB) {
             see3cam = Qt.createComponent("../UVCSettings/ecam83_USB/ecam83_usb.qml").createObject(root)
         }
-        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU1330M) {
-            see3cam = Qt.createComponent("../UVCSettings/see3camcu1330m/see3cam_cu1330m.qml").createObject(root)
+        else if(selectedDeviceEnumValue == CommonEnums.See3CAM_CU135M_H01R1) {
+            see3cam = Qt.createComponent("../UVCSettings/see3CamCu135mH01r1/see3CamCu135m_H01r1.qml").createObject(root)
         }
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU136M) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu136m/see3cam_cu136m.qml").createObject(root)
@@ -1573,7 +1574,7 @@ Rectangle {
 
         case CommonEnums.SEE3CAM_CU27:
         case CommonEnums.SEE3CAM_1332:
-        case CommonEnums.SEE3CAM_CU1330M:
+        case CommonEnums.See3CAM_CU135M_H01R1: //Modified by Sushanth
         case CommonEnums.SEE3CAM_CU136M:
         case CommonEnums.BARCODE_CAMERA:
         case CommonEnums.SEE3CAM_135M:

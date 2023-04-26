@@ -34,7 +34,7 @@ Item{
     property int frameRateMin: 0
     property int frameRateMax: 60
     property int expoCompMin: 50
-    property int expoCompMax: 1000000
+    property int expoCompMax: 100000
 
     property bool skipUpdateUIDenoise: false
     property bool skipUpdateUIOnExpWindowSize: false
@@ -465,7 +465,7 @@ Item{
                 Text
                 {
                     id: exposureCompText
-                    text: "value(µs)[50 - 1000000]"
+                    text: "value(µs)[50 - 100000]"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -1125,7 +1125,7 @@ Item{
             wakeOnEnable.enabled  = false
             wakeOnEnable.opacity  = 0.1
             wakeOnDisable.enabled = false
-            wakeOnDisable.opacity  = 0.1
+            wakeOnDisable.opacity = 0.1
         }
     }
 

@@ -62,10 +62,10 @@ SOURCES += main.cpp \
     see3cam_cu27.cpp \
     see3cam_1332.cpp \
     ecam83_usb.cpp \
-    see3cam_cu1330m.cpp \
     see3cam_135m.cpp \
     see3cam_cu136m.cpp \
     see3cam_50cug_m.cpp \
+    see3cam_cu135m_h01r1.cpp \
     barcode_camera.cpp \
     renderer.cpp
 
@@ -130,9 +130,9 @@ HEADERS += \
     see3cam_cu27.h \
     see3cam_1332.h \
     ecam83_usb.h \
-    see3cam_cu1330m.h \
     see3cam_135m.h \
     see3cam_cu136m.h \
+    see3cam_cu135m_h01r1.h \
     see3cam_50cug_m.h \
     barcode_camera.h \
     renderer.h
@@ -211,7 +211,7 @@ DISTFILES += \
     qml/qtcam/UVCSettings/ecam51_USB/ecam51_usb.qml \
     qml/qtcam/UVCSettings/ecam82_USB/ecam82_usb.qml \
     qml/qtcam/UVCSettings/see3camcu27/see3camcu27.qml \
-    qml/qtcam/UVCSettings/see3camcu1330m/see3cam_cu1330m.qml \
+    qml/qtcam/UVCSettings/see3CamCu135mH01r1/see3CamCu135m_H01r1.qml \
     qml/qtcam/UVCSettings/see3cam135m/see3cam135m.qml \
     qml/qtcam/UVCSettings/see3camcu136m/see3cam_cu136m.qml \
     qml/qtcam/UVCSettings/see3cam27cug/see3cam27cug.qml\

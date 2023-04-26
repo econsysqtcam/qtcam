@@ -331,6 +331,11 @@ bool SEE3CAM_CU83::getOrientation()
  */
 bool SEE3CAM_CU83::setExposureCompensation(unsigned int exposureCompValue)
 {
+    if(EXPOSURECOMP_MIN > exposureCompValue || EXPOSURECOMP_MAX < exposureCompValue){
+        emit indicateExposureValueRangeFailure("Failure", "Given exposure compensation value is invalid");
+        return false;
+    }
+
     // hid validation
     if(uvccamera::hid_fd < 0)
     {

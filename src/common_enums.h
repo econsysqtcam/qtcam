@@ -67,7 +67,7 @@ public:
         SEE3CAM_CU55_MH, // cu55 monochrome
         SEE3CAM_CU22,
         SEE3CAM_1332,
-        SEE3CAM_CU1330M,
+        See3CAM_CU135M_H01R1, //Modified By Sushanth
         SEE3CAM_135M,
         SEE3CAM_CU136M,
         BARCODE_CAMERA,
