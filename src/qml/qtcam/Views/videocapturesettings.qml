@@ -265,12 +265,12 @@ Item {
                                 if(updateColorSpace)
                                 {
                                     if(colorSpace) {
-                                        root.informVideoColorSpaceChanged()
                                         root.vidFormatChanged = true
                                         JS.videoCaptureFormat = color_comp_box_VideoPin.currentIndex.toString()
                                         root.updateVideoResolution(color_comp_box_VideoPin.currentIndex.toString(),frame_rate_box.currentIndex);
                                         root.updateFPS(currentText.toString(), output_size_box_Video.currentText.toString())
                                         root.vidFormatChanged = false
+                                        root.informVideoColorSpaceChanged()
                                     }
                                 }
                                 colorSpacePreviousIndex = color_comp_box_VideoPin.currentIndex
@@ -388,7 +388,7 @@ Item {
                         opacity: 1
                         model: ListModel {
                             id: extensionModel
-                            ListElement { text: "avi"  }                           
+                            ListElement { text: "avi"  }
                         }
 
                         activeFocusOnPress: true
@@ -460,7 +460,7 @@ Item {
                             }
                         }
                         onCurrentIndexChanged: {
-                            JS.videoEncoder = fileEncoder.currentIndex                                              
+                            JS.videoEncoder = fileEncoder.currentIndex
                         }
                     }
 
@@ -663,7 +663,6 @@ Item {
     }
 
     Component.onCompleted: {
-        root.videoPropHeight = video_Capture_property_Child.height        
+        root.videoPropHeight = video_Capture_property_Child.height
     }
 }
-

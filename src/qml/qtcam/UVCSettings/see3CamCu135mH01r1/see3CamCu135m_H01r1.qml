@@ -9,7 +9,7 @@ import cameraenum 1.0
 
 Item {
     width:268
-    height:750
+    height:800
 
     property bool skipUpdateUIOnExpWindowSize   : false
     property bool skipUpdateLowerLimitSlider    : false
