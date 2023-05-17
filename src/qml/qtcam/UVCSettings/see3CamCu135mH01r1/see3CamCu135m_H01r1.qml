@@ -142,6 +142,9 @@ Item {
             see3camcu135mH01r1.setAutoExposureUpperLimit(upperLimitTextField.text)
             see3camcu135mH01r1.setGainLimit(gainLowerLimitSlider.value, gainUpperLimitSlider.value)
         }
+        onSendGainValueToHID:{
+           gainSlider.value = gainHid
+        }
     }
     ScrollView{
         id: scrollview
@@ -579,6 +582,7 @@ Item {
                     maximumValue: gainMax
                     onValueChanged:  {
                         gainTextField.text = gainSlider.value
+                        root.getGainValueFromHID(gainSlider.value)
                         if(skipUpdateGainMode){
                             see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.MANUAL_GAIN,0,gainSlider.value)
                         }
@@ -718,11 +722,25 @@ Item {
                     opacity: enabled ? 1 : 0.1
                     onClicked: {
                         see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.CONTINIOUS_EXPOSURE)
+
+                        //Enable flicker mode when auto exposure continious mode
+                        antiFlickerCombo.enabled = true
+                        antiFlickerCombo.opacity = 1
+                        frequency.enabled        = true
+                        frequency.opacity        = 1
+
                         triggerExposureBtn.enabled = false
                         triggerExposureBtn.opacity = 0.1
                       }
                       Keys.onReturnPressed: {
                         see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.CONTINIOUS_EXPOSURE)
+
+                        //Enable flicker mode when auto exposure continious mode
+                        antiFlickerCombo.enabled = true
+                        antiFlickerCombo.opacity = 1
+                        frequency.enabled        = true
+                        frequency.opacity        = 1
+
                         triggerExposureBtn.enabled = false
                         triggerExposureBtn.opacity = 0.1
                       }
@@ -739,11 +757,25 @@ Item {
                     opacity: enabled ? 1 : 0.1
                     onClicked: {
                         see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
+
+                        //Disable flicker mode when auto exposure continious mode
+                        antiFlickerCombo.enabled = false
+                        antiFlickerCombo.opacity = 0.1
+                        frequency.enabled        = false
+                        frequency.opacity        = 0.1
+
                         triggerExposureBtn.enabled = true
                         triggerExposureBtn.opacity = 1
                     }
                     Keys.onReturnPressed: {
                         see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
+
+                        //Disable flicker mode when auto exposure continious mode
+                        antiFlickerCombo.enabled = false
+                        antiFlickerCombo.opacity = 0.1
+                        frequency.enabled        = false
+                        frequency.opacity        = 0.1
+
                         triggerExposureBtn.enabled = true
                         triggerExposureBtn.opacity = 1
                     }
@@ -759,6 +791,13 @@ Item {
                     implicitWidth: 120
                     action: (singleShotExposure.enabled && singleShotExposure.checked) ? triggerExposure : null
                     Keys.onReturnPressed: {
+
+                        //Disable flicker mode when auto exposure continious mode
+                        antiFlickerCombo.enabled = false
+                        antiFlickerCombo.opacity = 0.1
+                        frequency.enabled        = false
+                        frequency.opacity        = 0.1
+
                         see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
                     }
                 }
@@ -1164,6 +1203,22 @@ Item {
         }
 
         onAntiFlickerModeRecieved: {
+
+            if(continousExposure.checked == true)
+            {
+                antiFlickerCombo.enabled = true
+                antiFlickerCombo.opacity = 1
+
+                frequency.enabled        = true
+                frequency.opacity        = 1
+            }
+            else{
+                antiFlickerCombo.enabled = false
+                antiFlickerCombo.opacity = 0.1
+
+                frequency.enabled        = false
+                frequency.opacity        = 0.1
+            }
             getAntiFlickerModes(antiFlicker)
         }
 
@@ -1620,14 +1675,35 @@ Item {
             continousExposure.opacity  = 1
             singleShotExposure.enabled = true
             singleShotExposure.opacity = 1
-            triggerExposureBtn.enabled = true
-            triggerExposureBtn.opacity = 1
+
+            //To enable trigger button when UVC auto exposure is enabled
+            if(singleShotExposure.checked)
+            {
+                triggerExposureBtn.enabled = true
+                triggerExposureBtn.opacity = 1
+            }
 
             //Enable readStatistics in auto exposure mode
             exposureLabel.enabled         = true
             exposureStatTextField.enabled = true
             exposureLabel.opacity         = 1
             exposureStatTextField.opacity = 1
+
+            //Enable exposure limit
+            lowerLimitModetext.enabled    = true
+            lowerLimitModetext.opacity    = 1
+            lowerLimitTextField.enabled   = true
+            lowerLimitTextField.opacity   = 1
+            lowerLimtSetBtn.enabled       = true
+            lowerLimtSetBtn.opacity       = 1
+
+            upperLimitModetext.enabled    = true
+            upperLimitModetext.opacity    = 1
+            upperLimitTextField.enabled   = true
+            upperLimitTextField.opacity   = 1
+            upperLimitSetBtn.enabled      = true
+            upperLimitSetBtn.opacity      = 1
+
 
             autoexpManual.enabled = true
             autoexpFull.enabled = true
@@ -1638,6 +1714,7 @@ Item {
             autoexpManual.opacity = 1
             autoexpFull.opacity = 1
         }else{
+
             //Disable Auto exposure modes
             continousExposure.enabled = false
             continousExposure.opacity = 0.1
@@ -1645,6 +1722,23 @@ Item {
             singleShotExposure.opacity = 0.1
             triggerExposureBtn.enabled = false
             triggerExposureBtn.opacity = 0.1
+
+            //Disable exposure limit
+            lowerLimitModetext.enabled    = false
+            lowerLimitModetext.opacity    = 0.1
+            lowerLimitTextField.enabled   = false
+            lowerLimitTextField.opacity   = 0.1
+            lowerLimtSetBtn.enabled       = false
+            lowerLimtSetBtn.opacity       = 0.1
+
+            upperLimitModetext.enabled    = false
+            upperLimitModetext.opacity    = 0.1
+            upperLimitTextField.enabled   = false
+            upperLimitTextField.opacity   = 0.1
+            upperLimitSetBtn.enabled      = false
+            upperLimitSetBtn.opacity      = 0.1
+
+
 
             //Disable readStatistics in manual exposure mode
             exposureLabel.enabled         = false

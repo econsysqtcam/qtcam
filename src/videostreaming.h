@@ -26,17 +26,22 @@
 #define IR_FRAME                0x01
 #define BYTES_PER_PIXEL_RGB     3
 
-#define IR_RGB_MODE 1
-#define RGB_MODE    2
-#define IR_MODE     3
+#define IR_RGB_MODE    1
+#define RGB_MODE       2
+#define IR_MODE        3
 
 #define BYTES_PER_PIXEL_UYVY      2
+#define BYTES_PER_PIXEL_Y16       2
 
 #define RGB_SIZE_CU83          16588800
 #define IR_SIZE_CU83           2073600
 
+#define IR_Y10_SIZE            2592000
 #define IR_RESOLUTION          1920*1080
 #define RGB_RESOLUTION         3840*2160
+
+#define NUMBER_OF_RGB_LINES    2160
+#define NUMBER_OF_IR_LINES     1080
 
 #define Y16_2160p_WIDTH            4440
 #define Y16_2160p_HEIGHT           2160

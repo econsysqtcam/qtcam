@@ -34,7 +34,7 @@ Item{
     property int frameRateMin: 0
     property int frameRateMax: 60
     property int expoCompMin: 50
-    property int expoCompMax: 100000
+    property int expoCompMax: 1000000
 
     property bool skipUpdateUIDenoise: false
     property bool skipUpdateUIOnExpWindowSize: false
@@ -465,7 +465,7 @@ Item{
                 Text
                 {
                     id: exposureCompText
-                    text: "value(µs)[50 - 100000]"
+                    text: "value(µs)[50 - 1000000]"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -1041,6 +1041,7 @@ Item{
             if(setButtonClicked){
                 displayMessageBox(title, text)
                 setButtonClicked = false
+                see3camcu83.getExposureCompensation()
             }
         }
     }

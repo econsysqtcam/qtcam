@@ -43,7 +43,7 @@
 #define GET_SUCCESS		0x01
 
 #define EXPOSURECOMP_MIN 50
-#define EXPOSURECOMP_MAX 100000
+#define EXPOSURECOMP_MAX 1000000
 
 class SEE3CAM_CU83 : public QObject
 {

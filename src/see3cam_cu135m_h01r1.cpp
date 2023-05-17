@@ -351,7 +351,7 @@ bool See3CAM_CU135M_H01R1::getGainMode()
 
             emit gainModeReceived(g_in_packet_buf[2]);
             emit autoGainModeRecieved(g_in_packet_buf[3]);
-            manualGain = (g_in_packet_buf[3] << 8) | (g_in_packet_buf[4] << 0);
+            manualGain = (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
             emit manualGainModeRecieved(manualGain);
 
             return true;
@@ -382,25 +382,23 @@ bool See3CAM_CU135M_H01R1::setGainMode(gainMode gainType,autoGain autoModes,uint
     g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[2] = SET_AUTO_GAIN_MODE_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[3] = gainType;
-    if(gainType == 0x00)
+    if(g_out_packet_buf[3] == 0x00)
     {
         g_out_packet_buf[4] = autoModes;
     }
-    else if(gainType == 0x01)
+    else if(g_out_packet_buf[3] == 0x01)
     {
-        g_out_packet_buf[4] = ((manualGain & 0xFF00) >> 8);
-        g_out_packet_buf[5] = ((manualGain & 0x00FF) >> 0);
+        g_out_packet_buf[5] = ((manualGain & 0xFF00) >> 8);
+        g_out_packet_buf[6] = ((manualGain & 0x00FF) >> 0);
     }
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == SET_FAIL) {
-
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == SET_AUTO_GAIN_MODE_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6] == SET_SUCCESS) {
-
             return true;
         }
     }

@@ -266,6 +266,11 @@ Rectangle {
     signal disableAwb(bool isAwbSelected);
 
     signal disableStillProp(bool status);
+
+    //Added by Sushanth 15th May 2023
+    signal sendGainValueToUVC(int gain);
+    signal sendGainValueToHID(int gainHid);
+
     width:Screen.width
     height:Screen.height
     focus: true
@@ -632,7 +637,6 @@ Rectangle {
             Signal emitted from Videostreaming.cpp to enable/disable wakeonMotion
         */
         onWakeOnMotion:{
-            console.log("\n Signal captured in qtcam.qml")
             wakeOnMotionSettings(isEnable)
         }
 
@@ -1767,6 +1771,18 @@ Rectangle {
     {
         cameraMode = Mode
         vidstreamproperty.cameraModeEnabled(cameraMode)
+    }
+
+    //To get gain value from HID settings & set it to UVC
+    function getGainValueFromHID(gainValue)
+    {
+        sendGainValueToUVC(gainValue)
+    }
+
+    //To get gain value from UVC and set it to HID
+    function getGainValueFromUVC(gainValue)
+    {
+        sendGainValueToHID(gainValue)
     }
 
 

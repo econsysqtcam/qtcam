@@ -86,7 +86,8 @@ public:
         void cameraModeChanged(uint cameraMode);
         void flipMirrorModeChanged(uint flipMode);
         void strobeModeChanged(uint strobe);
-        void blackLevelAdjustmentChanged(uint blacklevel);
+        void blackLevelModeChanged(uint blacklevelMode);
+        void blackLevelValueChanged(uint blackLevelValue);
         void imageBurstChanged(uint burstLength);
         void indicateCommandStatus(QString title, QString text);
 
@@ -100,7 +101,7 @@ public:
         bool setStrobeMode(strobeMode strobe);
         bool getStrobeMode();
 
-        bool setBlackLevelAdjustment(blackLevelAdjustment blacklevel);
+        bool setBlackLevelAdjustment(blackLevelAdjustment blackLevelMode, uint blackLevelValue);
         bool getBlackLevelAdjustment();
 
         bool setBurstLength(uint burstlength);

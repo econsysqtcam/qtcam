@@ -586,6 +586,8 @@ Item {
                         style:econSliderStyle
                         onValueChanged: {
                             if(gainValueChangeProperty) {
+                                //Signal to send UVC gain value to HID
+                                root.getGainValueFromUVC(gain_Slider.value)
                                 root.logInfo("Gain settings changed to: "+ value.toString())
                                 root.changeCameraSettings(gainControlId,value.toString())
                             }
@@ -1242,6 +1244,9 @@ Item {
         onSidebarVisibleStatus:
         {
             videoFilter.visible = status;
+        }
+        onSendGainValueToUVC:{
+            gain_Slider.value = gain
         }
     }
     Connections
