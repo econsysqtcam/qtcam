@@ -36,12 +36,8 @@
 #define RGB_SIZE_CU83          16588800
 #define IR_SIZE_CU83           2073600
 
-#define IR_Y10_SIZE            2592000
-#define IR_RESOLUTION          1920*1080
-#define RGB_RESOLUTION         3840*2160
-
-#define NUMBER_OF_RGB_LINES    2160
-#define NUMBER_OF_IR_LINES     1080
+#define Y16_IR_RESOLUTION          1920*1080
+#define Y16_RGB_RESOLUTION         3840*2160
 
 #define Y16_2160p_WIDTH            4440
 #define Y16_2160p_HEIGHT           2160

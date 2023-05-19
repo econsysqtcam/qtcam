@@ -229,10 +229,22 @@ Item{
                        exclusiveGroup: blackLeverAdjGroup
                        activeFocusOnPress: true
                        onClicked: {
+
                            see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.ENABLE,blackLevelSlider.value)
+
+                           blackLevelSlider.enabled    = true
+                           blackLevelSlider.opacity    = 1
+                           blackLevelTextField.enabled = true
+                           blackLevelTextField.opacity = 1
                        }
                        Keys.onReturnPressed: {
+
                            see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.ENABLE,blackLevelSlider.value)
+
+                           blackLevelSlider.enabled    = true
+                           blackLevelSlider.opacity    = 1
+                           blackLevelTextField.enabled = true
+                           blackLevelTextField.opacity = 1
                        }
                    }
                    RadioButton {
@@ -242,10 +254,22 @@ Item{
                        exclusiveGroup: blackLeverAdjGroup
                        activeFocusOnPress: true
                        onClicked: {
+
                            see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.DISABLE,blackLevelSlider.value)
+
+                           blackLevelSlider.enabled    = false
+                           blackLevelSlider.opacity    = 0.1
+                           blackLevelTextField.enabled = false
+                           blackLevelTextField.opacity = 0.1
                        }
+
                        Keys.onReturnPressed: {
                            see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.DISABLE,blackLevelSlider.value)
+
+                           blackLevelSlider.enabled    = false
+                           blackLevelSlider.opacity    = 0.1
+                           blackLevelTextField.enabled = false
+                           blackLevelTextField.opacity = 0.1
                        }
                    }
                }
@@ -266,7 +290,7 @@ Item{
                         onValueChanged:  {
                             blackLevelTextField.text = blackLevelSlider.value
                             if(skipUpdateBlackLevelMode){
-                                see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.DISABLE,blackLevelSlider.value)
+                                see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.ENABLE,blackLevelSlider.value)
                             }
                             skipUpdateBlackLevelMode = true
                         }
@@ -289,39 +313,6 @@ Item{
                     }
                 }
 
-
-
-
-//                ColumnLayout{
-//                   ExclusiveGroup { id: blackLeverAdjGroup }
-//                   spacing: 25
-//                   RadioButton {
-//                       id: enableBlackLevel
-//                       style:  econRadioButtonStyle
-//                       text: qsTr("Enable")
-//                       exclusiveGroup: blackLeverAdjGroup
-//                       activeFocusOnPress: true
-//                       onClicked: {
-//                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.ENABLE)
-//                       }
-//                       Keys.onReturnPressed: {
-//                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.ENABLE)
-//                       }
-//                   }
-//                   RadioButton {
-//                       id: disableBlackLevel
-//                       style:  econRadioButtonStyle
-//                       text: qsTr("Disable")
-//                       exclusiveGroup: blackLeverAdjGroup
-//                       activeFocusOnPress: true
-//                       onClicked: {
-//                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.DISABLE)
-//                       }
-//                       Keys.onReturnPressed: {
-//                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.DISABLE)
-//                       }
-//                   }
-//               }
                 Text {
                     id: strobe
                     text: "--- Strobe ---"
@@ -705,16 +696,20 @@ Item{
                 enableBlackLevel.checked = true
                 disableBlackLevel.checked = false
 
-                blackLevelSlider.enabled = true
-                blackLevelSlider.opacity = 1
+                blackLevelSlider.enabled    = true
+                blackLevelSlider.opacity    = 1
+                blackLevelTextField.enabled = true
+                blackLevelTextField.opacity = 1
             }
             else if(blacklevelMode == SEE3CAM_50CUGM.DISABLE)
             {
                 enableBlackLevel.checked = false
                 disableBlackLevel.checked = true
 
-                blackLevelSlider.enabled = false
-                blackLevelSlider.opacity = 0.1
+                blackLevelSlider.enabled    = false
+                blackLevelSlider.opacity    = 0.1
+                blackLevelTextField.enabled = false
+                blackLevelTextField.opacity = 0.1
             }
         }
 
