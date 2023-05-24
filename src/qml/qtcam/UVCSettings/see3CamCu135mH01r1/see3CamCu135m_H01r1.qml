@@ -327,11 +327,11 @@ Item {
                     // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
                     // winSize is required only for manual mode
                     onClicked: {
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, 0, 0, 0);
+                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = false
                     }
                     Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, 0, 0, 0);
+                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = false
                     }
                 }
@@ -758,7 +758,7 @@ Item {
                     onClicked: {
                         see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
 
-                        //Disable flicker mode when auto exposure continious mode
+                        //Disable flicker mode when auto singleShotExposure
                         antiFlickerCombo.enabled = false
                         antiFlickerCombo.opacity = 0.1
                         frequency.enabled        = false
@@ -770,7 +770,7 @@ Item {
                     Keys.onReturnPressed: {
                         see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
 
-                        //Disable flicker mode when auto exposure continious mode
+                        //Disable flicker mode when auto singleShotExposure
                         antiFlickerCombo.enabled = false
                         antiFlickerCombo.opacity = 0.1
                         frequency.enabled        = false
@@ -792,7 +792,7 @@ Item {
                     action: (singleShotExposure.enabled && singleShotExposure.checked) ? triggerExposure : null
                     Keys.onReturnPressed: {
 
-                        //Disable flicker mode when auto exposure continious mode
+                        //Disable flicker mode when auto singleShotExposure
                         antiFlickerCombo.enabled = false
                         antiFlickerCombo.opacity = 0.1
                         frequency.enabled        = false
@@ -1670,6 +1670,7 @@ Item {
 
     function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
+
             //Enable Auto exposure modes
             continousExposure.enabled  = true
             continousExposure.opacity  = 1
@@ -1681,6 +1682,20 @@ Item {
             {
                 triggerExposureBtn.enabled = true
                 triggerExposureBtn.opacity = 1
+
+                //Disable flicker mode when auto singleShotExposure
+                antiFlickerCombo.enabled = false
+                antiFlickerCombo.opacity = 0.1
+                frequency.enabled        = false
+                frequency.opacity        = 0.1
+            }
+            else if(continousExposure.checked)
+            {
+                //Enable flicker mode when auto exposure continious mode
+                antiFlickerCombo.enabled = true
+                antiFlickerCombo.opacity = 1
+                frequency.enabled        = true
+                frequency.opacity        = 1
             }
 
             //Enable readStatistics in auto exposure mode
@@ -1715,13 +1730,19 @@ Item {
             autoexpFull.opacity = 1
         }else{
 
-            //Disable Auto exposure modes
+            //Disable Auto exposure modes in manual mode
             continousExposure.enabled = false
             continousExposure.opacity = 0.1
             singleShotExposure.enabled = false
             singleShotExposure.opacity = 0.1
             triggerExposureBtn.enabled = false
             triggerExposureBtn.opacity = 0.1
+
+            //Disable flicker mode exposure is in manual mode
+            antiFlickerCombo.enabled = false
+            antiFlickerCombo.opacity = 0.1
+            frequency.enabled        = false
+            frequency.opacity        = 0.1
 
             //Disable exposure limit
             lowerLimitModetext.enabled    = false
@@ -1738,19 +1759,17 @@ Item {
             upperLimitSetBtn.enabled      = false
             upperLimitSetBtn.opacity      = 0.1
 
-
-
             //Disable readStatistics in manual exposure mode
             exposureLabel.enabled         = false
             exposureStatTextField.enabled = false
             exposureLabel.opacity         = 0.1
             exposureStatTextField.opacity = 0.1
 
-            autoexpManual.enabled = false
-            autoexpFull.enabled = false
-            autoExpoWinSizeCombo.enabled = false
-            autoexpManual.opacity = 0.1
-            autoexpFull.opacity = 0.1
+            autoexpManual.enabled          = false
+            autoexpFull.enabled            = false
+            autoExpoWinSizeCombo.enabled   = false
+            autoexpManual.opacity          = 0.1
+            autoexpFull.opacity            = 0.1
         }
         getAutoExpsoureControlValues.start()
     }

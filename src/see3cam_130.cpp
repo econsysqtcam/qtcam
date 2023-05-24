@@ -318,16 +318,15 @@ bool See3CAM_130::setiHDRMode(camiHDRMode iHDRMode, uint iHDRValue){
     g_out_packet_buf[1] = CAMERA_CONTROL_130; /* set camera control code */
     g_out_packet_buf[2] = SET_HDR_MODE_130; /* set ihdr mode command code */
     g_out_packet_buf[3] = iHDRMode; /* iHdr value */
-    if(iHDRMode == HdrManual){
-        g_out_packet_buf[4] = iHDRValue;
-    }
+    g_out_packet_buf[4] = iHDRValue;
+
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130 &&
             g_in_packet_buf[1]==SET_HDR_MODE_130 &&
-            g_in_packet_buf[6]==SET_SUCCESS) {\
+            g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
         }
     }

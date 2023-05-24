@@ -71,8 +71,8 @@ public:
     Q_ENUMS(orientation)
 
     enum blackLevelAdjustment {
-        ENABLE  = 0x01,
-        DISABLE = 0x02,
+        AUTO  = 0x01,
+        MANUAL = 0x02,
     };
     Q_ENUMS(blackLevelAdjustment)
 

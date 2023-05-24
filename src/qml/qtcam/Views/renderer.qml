@@ -13,6 +13,8 @@ Window {
 
     property int camMode
 
+    signal closeWindow()
+
     Connections{
         target:root
         onSendCameraModeToQml:{
@@ -47,10 +49,10 @@ Window {
          width: parent.width
     }
 
+
     Component.onCompleted:
     {
-            x = Screen.width / 2 - width / 2
-            y = Screen.height / 2 - height / 2
+        x = Screen.width / 2 - width / 2
+        y = Screen.height / 2 - height / 2
     }
-
 }

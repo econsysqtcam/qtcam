@@ -1,3 +1,10 @@
+Qtcam Application - 25.0.13
+---------------------------
+*CheckBox for IR preview in See3CAM_CU83.
+*Replacing slider with comboBox and also values for iHDR manual mode (See3CAM_130 & See3CAM_CU135).
+*GreyOut AntiFlicker mode when exposure is in manual mode for See3CAM_CU135M.
+*UI Change in See3CAM_50CUG
+
 Qtcam Application - 25.0.12
 ---------------------------
 *See3CAM_50CUG, See3CAM_CU135M Modification.

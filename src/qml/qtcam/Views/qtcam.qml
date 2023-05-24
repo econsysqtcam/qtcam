@@ -83,7 +83,10 @@ Rectangle {
     //signal to see3camcu83.qml -> to create IR window
     signal destroyIrWindow()
 
+    //signal to send resolution from videostreaming.cpp to respective qml
     signal sendResolution(int width, int height)
+
+    signal irWindowCloseBtnSignal()
 
 
     property int burstLength;
@@ -1773,6 +1776,12 @@ Rectangle {
         vidstreamproperty.cameraModeEnabled(cameraMode)
     }
 
+    //function to create & destroy IR window via CheckBox
+    function closeIrWindow()
+    {
+        destroyIrWindow();
+    }
+
     //To get gain value from HID settings & set it to UVC
     function getGainValueFromHID(gainValue)
     {
@@ -1820,7 +1829,10 @@ Rectangle {
             }
 
             //if the window is closed, assign irPreview is undefined
-            irPreview.closing.connect(function() { irPreview = undefined;})
+            irPreview.closing.connect(function() {
+                irPreview = undefined;
+                irWindowCloseBtn()
+            })
             irPreview.show()
         }
         else
@@ -1831,6 +1843,12 @@ Rectangle {
             */
             irPreview.requestActivate()
         }
+    }
+
+    //Added By Sushanth - To uncheck the IR_Window CheckBox when close button is clicked in the window
+    function irWindowCloseBtn()
+    {
+        irWindowCloseBtnSignal()
     }
 
     //for taking snap shot

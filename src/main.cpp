@@ -220,6 +220,8 @@ int main(int argc, char *argv[])
     viewer.rootContext()->setContextProperty("audioinputDevModel", &audio.audioinputDeviceList);
     viewer.rootContext()->setContextProperty("audioSupportedFormatList", &audio.audiosupportedFmtListModel);
     viewer.rootContext()->setContextProperty("audioChannelCountModel", &audio.audioChannelCountModel);
+
+
     viewer.rootContext()->setContextProperty("SystemPictureFolder",QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).first());
     viewer.rootContext()->setContextProperty("SystemVideoFolder",QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first());
 #if LAUNCHPAD

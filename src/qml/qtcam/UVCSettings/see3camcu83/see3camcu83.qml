@@ -25,6 +25,7 @@ import econ.camera.uvcsettings 1.0
 import QtQuick.Layouts 1.1
 import cameraenum 1.0
 import econ.camera.see3camcu83 1.0
+
 Item{
     width:240
     height:720
@@ -43,6 +44,8 @@ Item{
     property bool skipUpdateUIOnAntiFlickerMode:false
 
     property bool setButtonClicked: false
+
+    signal destroyWindow()
 
     Timer {
         id: getCamValuesTimer
@@ -96,16 +99,33 @@ Item{
             enableDisableAutoExposureControls(autoExposureSelect)
         }
         onCreateIrWindow:{
+            //To enable CheckBox when IR window is created by resolution switch
+            irWindowCheckBox.checked = true
+
+            //Enabling IR window CheckBox when switched to default resolution
+            irWindowCheckBox.enabled = true
+            irWindowCheckBox.opacity = 1
+
             root.irPreviewWindow()
         }
+
+        //signal for getting resolution from videostreaming.cpp
         onSendResolution:{
             if((width == 4440)&&(height == 2160))
             {
                 root.videoRecordBtnEnable(false)
+
+                //Enable checkBox for IR window
+                irWindowCheckBox.enabled = true
+                irWindowCheckBox.opacity = 1
             }
             else
             {
                 root.videoRecordBtnEnable(true)
+
+                //Disable CheckBox for IR window
+                irWindowCheckBox.enabled = false
+                irWindowCheckBox.opacity = 0.1
             }
         }
         onVideoResolutionChanged:{
@@ -126,6 +146,12 @@ Item{
         onSetExpCompensation:{
             see3camcu83.setExposureCompensation(exposureCompValue.text)
         }
+
+        //signal to uncheck irWindowCheckBox
+        onIrWindowCloseBtnSignal:
+        {
+            irWindowCheckBox.checked = false
+        }
     }
 
     ScrollView
@@ -145,6 +171,21 @@ Item{
             y:5
             spacing:20
 
+        CheckBox
+        {
+            id: irWindowCheckBox
+            activeFocusOnPress : true
+            text: "IR Window"
+            style: econCheckBoxStyle
+            tooltip: "Enable this checkBox to create IR window"
+            Layout.alignment: Qt.AlignCenter
+            onClicked:{
+                irWindowEnable()
+            }
+            Keys.onReturnPressed: {
+                irWindowEnable()
+            }
+        }
         Text
         {
              id: special_effects
@@ -1216,6 +1257,19 @@ Item{
         see3camcu83.getBurstLength()
         see3camcu83.getAntiFlickerMode()
         see3camcu83.getWakeOnMotion()
+    }
+
+    //function to create and destroy IR window via CheckBox
+    function irWindowEnable()
+    {
+       if(irWindowCheckBox.checked)
+       {
+           root.irPreviewWindow()
+       }
+       else
+       {
+           root.closeIrWindow()
+       }
     }
 
     Component.onCompleted: {

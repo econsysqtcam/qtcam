@@ -225,51 +225,51 @@ Item{
                    RadioButton {
                        id: enableBlackLevel
                        style:  econRadioButtonStyle
-                       text: qsTr("Enable")
+                       text: qsTr("Auto")
                        exclusiveGroup: blackLeverAdjGroup
                        activeFocusOnPress: true
                        onClicked: {
 
-                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.ENABLE,blackLevelSlider.value)
+                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.AUTO,blackLevelSlider.value)
 
-                           blackLevelSlider.enabled    = true
-                           blackLevelSlider.opacity    = 1
-                           blackLevelTextField.enabled = true
-                           blackLevelTextField.opacity = 1
+                           blackLevelSlider.enabled    = false
+                           blackLevelSlider.opacity    = 0.1
+                           blackLevelTextField.enabled = false
+                           blackLevelTextField.opacity = 0.1
                        }
                        Keys.onReturnPressed: {
 
-                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.ENABLE,blackLevelSlider.value)
+                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.AUTO,blackLevelSlider.value)
 
-                           blackLevelSlider.enabled    = true
-                           blackLevelSlider.opacity    = 1
-                           blackLevelTextField.enabled = true
-                           blackLevelTextField.opacity = 1
+                           blackLevelSlider.enabled    = false
+                           blackLevelSlider.opacity    = 0.1
+                           blackLevelTextField.enabled = false
+                           blackLevelTextField.opacity = 0.1
                        }
                    }
                    RadioButton {
                        id: disableBlackLevel
                        style:  econRadioButtonStyle
-                       text: qsTr("Disable")
+                       text: qsTr("Manual")
                        exclusiveGroup: blackLeverAdjGroup
                        activeFocusOnPress: true
                        onClicked: {
 
-                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.DISABLE,blackLevelSlider.value)
+                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.MANUAL,blackLevelSlider.value)
 
-                           blackLevelSlider.enabled    = false
-                           blackLevelSlider.opacity    = 0.1
-                           blackLevelTextField.enabled = false
-                           blackLevelTextField.opacity = 0.1
+                           blackLevelSlider.enabled    = true
+                           blackLevelSlider.opacity    = 1
+                           blackLevelTextField.enabled = true
+                           blackLevelTextField.opacity = 1
                        }
 
                        Keys.onReturnPressed: {
-                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.DISABLE,blackLevelSlider.value)
+                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.MANUAL,blackLevelSlider.value)
 
-                           blackLevelSlider.enabled    = false
-                           blackLevelSlider.opacity    = 0.1
-                           blackLevelTextField.enabled = false
-                           blackLevelTextField.opacity = 0.1
+                           blackLevelSlider.enabled    = true
+                           blackLevelSlider.opacity    = 1
+                           blackLevelTextField.enabled = true
+                           blackLevelTextField.opacity = 1
                        }
                    }
                }
@@ -290,7 +290,7 @@ Item{
                         onValueChanged:  {
                             blackLevelTextField.text = blackLevelSlider.value
                             if(skipUpdateBlackLevelMode){
-                                see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.ENABLE,blackLevelSlider.value)
+                                see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.MANUAL,blackLevelSlider.value)
                             }
                             skipUpdateBlackLevelMode = true
                         }
@@ -691,25 +691,25 @@ Item{
 
         onBlackLevelModeChanged:
         {
-            if(blacklevelMode == SEE3CAM_50CUGM.ENABLE)
+            if(blacklevelMode == SEE3CAM_50CUGM.AUTO)
             {
                 enableBlackLevel.checked = true
                 disableBlackLevel.checked = false
-
-                blackLevelSlider.enabled    = true
-                blackLevelSlider.opacity    = 1
-                blackLevelTextField.enabled = true
-                blackLevelTextField.opacity = 1
-            }
-            else if(blacklevelMode == SEE3CAM_50CUGM.DISABLE)
-            {
-                enableBlackLevel.checked = false
-                disableBlackLevel.checked = true
 
                 blackLevelSlider.enabled    = false
                 blackLevelSlider.opacity    = 0.1
                 blackLevelTextField.enabled = false
                 blackLevelTextField.opacity = 0.1
+            }
+            else if(blacklevelMode == SEE3CAM_50CUGM.MANUAL)
+            {
+                enableBlackLevel.checked = false
+                disableBlackLevel.checked = true
+
+                blackLevelSlider.enabled    = true
+                blackLevelSlider.opacity    = 1
+                blackLevelTextField.enabled = true
+                blackLevelTextField.opacity = 1
             }
         }
 

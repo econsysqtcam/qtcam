@@ -395,11 +395,15 @@ Item {
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked:{
-                            seecamcu135.setiHDRMode(See3CamCu135.HdrOff, 0)
+                            seecamcu135.setiHDRMode(See3CamCu135.HdrOff, iHDRCombo.currentText)
+                            iHDRCombo.enabled = false
+                            iHDRCombo.opacity = 0.1
                         }
 
                         Keys.onReturnPressed: {
-                            seecamcu135.setiHDRMode(See3CamCu135.HdrOff, 0)
+                            seecamcu135.setiHDRMode(See3CamCu135.HdrOff, iHDRCombo.currentText)
+                            iHDRCombo.enabled = false
+                            iHDRCombo.opacity = 0.1
                         }
                     }
                     RadioButton {
@@ -409,11 +413,15 @@ Item {
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked: {
-                            seecamcu135.setiHDRMode(See3CamCu135.HdrAuto, 0)
+                            seecamcu135.setiHDRMode(See3CamCu135.HdrAuto, iHDRCombo.currentText)
+                            iHDRCombo.enabled = false
+                            iHDRCombo.opacity = 0.1
                         }
 
                         Keys.onReturnPressed: {
-                            seecamcu135.setiHDRMode(See3CamCu135.HdrAuto, 0)
+                            seecamcu135.setiHDRMode(See3CamCu135.HdrAuto, iHDRCombo.currentText)
+                            iHDRCombo.enabled = false
+                            iHDRCombo.opacity = 0.1
                         }
                     }
                     RadioButton {
@@ -423,49 +431,41 @@ Item {
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
                         onClicked:{
-                            seecamcu135.setiHDRMode(See3CamCu135.HdrManual, iHDRSlider.value)
+                            seecamcu135.setiHDRMode(See3CamCu135.HdrManual, iHDRCombo.currentText)
+                            iHDRCombo.enabled = true
+                            iHDRCombo.opacity = 1
                         }
                         Keys.onReturnPressed: {
-                            seecamcu135.setiHDRMode(See3CamCu135.HdrManual, iHDRSlider.value)
+                            seecamcu135.setiHDRMode(See3CamCu135.HdrManual, iHDRCombo.currentText)
+                            iHDRCombo.enabled = true
+                            iHDRCombo.opacity = 1
                         }
                     }
                 }
                 Row{
                     spacing: 35
-                    Slider {
-                        activeFocusOnPress: true
-                        updateValueWhileDragging: false
-                        id: iHDRSlider
-                        width: 150
-                        stepSize: 1
-                        style:econSliderStyle
-                        minimumValue: iHDRMin
-                        maximumValue: iHDRMax
-                        enabled: (hdrManual.enabled && hdrManual.checked) ? true : false
-                        opacity: enabled ? 1 : 0.1
-                        onValueChanged:  {
-                            iHDRTextField.text = iHDRSlider.value
-                            if(skipUpdateUIiHDR){
-                                seecamcu135.setiHDRMode(See3CamCu135.HdrManual, iHDRSlider.value)
-                            }
-                            skipUpdateUIiHDR = true
 
-                        }
-                    }
-                    TextField {
-                        id: iHDRTextField
-                        text: iHDRSlider.value
-                        font.pixelSize: 10
-                        font.family: "Ubuntu"
-                        smooth: true
-                        horizontalAlignment: TextInput.AlignHCenter
-                        style: econTextFieldStyle
-                        enabled: (hdrManual.enabled && hdrManual.checked) ? true : false
-                        opacity: enabled ? 1 : 0.1
-                        validator: IntValidator {bottom: iHDRSlider.minimumValue; top: iHDRSlider.maximumValue}
-                        onTextChanged: {
-                            if(text.length > 0){
-                                iHDRSlider.value = iHDRTextField.text
+                    Row{
+                        spacing: 35
+                        ComboBox
+                        {
+                            id: iHDRCombo
+                            opacity: 1
+                            enabled: true
+                            model: ListModel
+                                   {
+                                        ListElement { text: "1" }
+                                        ListElement { text: "2" }
+                                        ListElement { text: "4" }
+                                        ListElement { text: "8" }
+                                    }
+                            activeFocusOnPress: true
+                            style: econComboBoxStyle
+                            onCurrentIndexChanged: {
+                                if(skipUpdateUIiHDR){
+                                    seecamcu135.setiHDRMode(See3CamCu135.HdrManual, iHDRCombo.currentText)
+                                }
+                                skipUpdateUIiHDR = true
                             }
                         }
                     }
@@ -1127,12 +1127,21 @@ Item {
         {
             case See3CamCu135.HdrOff:
                 hdrOff.checked = true
+
+                iHDRCombo.enabled = false
+                iHDRCombo.opacity = 0.1
                 break;
             case See3CamCu135.HdrAuto:
                 hdrAuto.checked = true
+
+                iHDRCombo.enabled = false
+                iHDRCombo.opacity = 0.1
                 break;
             case See3CamCu135.HdrManual:
                 hdrManual.checked = true
+
+                iHDRCombo.enabled = true
+                iHDRCombo.opacity = 1
                 break;
         }
     }
@@ -1270,7 +1279,21 @@ Item {
         onHdrModeValue:{
             currentHDRMode(hdrMode)
             if(hdrMode == See3CamCu135.HdrManual){
-                iHDRSlider.value = hdrValue
+                switch(hdrValue)
+                {
+                    case 1:
+                        iHDRCombo.currentIndex = 0
+                        break
+                    case 2:
+                        iHDRCombo.currentIndex = 1
+                        break
+                    case 4:
+                        iHDRCombo.currentIndex = 2
+                        break
+                    case 8:
+                        iHDRCombo.currentIndex = 3
+                        break
+                 }
             }
         }
         onStreamModeValue:{
