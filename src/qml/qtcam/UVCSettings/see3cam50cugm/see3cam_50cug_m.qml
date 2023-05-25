@@ -643,6 +643,11 @@ Item{
                 masterMode.checked = true
                 triggerCombo.enabled = false
                 triggerCombo.opacity = 0.1
+
+                strobeFlash.enabled = false
+                strobeFlash.opacity = 0.1
+                strobeOff.enabled   = false
+                strobeOff.opacity   = 0.1
             }
             else
             {
@@ -656,11 +661,21 @@ Item{
 
                 if(cameraMode == SEE3CAM_50CUGM.TRIGGER_EXP_CONTROL)
                 {
+                    strobeFlash.enabled = false
+                    strobeFlash.opacity = 0.1
+                    strobeOff.enabled   = false
+                    strobeOff.opacity   = 0.1
+
                     triggerCombo.currentIndex = 0
                 }
                 else if(cameraMode == SEE3CAM_50CUGM.TRIGGER_ACQ_CONTROL)
                 {
                     triggerCombo.currentIndex = 1
+
+                    strobeFlash.enabled = true
+                    strobeFlash.opacity = 1
+                    strobeOff.enabled   = true
+                    strobeOff.opacity   = 1
                 }
             }
         }
@@ -677,15 +692,22 @@ Item{
             {
                 strobeFlash.enabled = false
                 strobeFlash.opacity = 0.1
-                strobeOff.enabled = false
-                strobeOff.opacity = 0.1
+                strobeOff.enabled   = false
+                strobeOff.opacity   = 0.1
+            }
+            else if(triggerCombo.currentIndex == 0)
+            {
+                strobeFlash.enabled = false
+                strobeFlash.opacity = 0.1
+                strobeOff.enabled   = false
+                strobeOff.opacity   = 0.1
             }
             else
             {
                 strobeFlash.enabled = true
                 strobeFlash.opacity = 1
-                strobeOff.enabled = true
-                strobeOff.opacity = 1
+                strobeOff.enabled   = true
+                strobeOff.opacity   = 1
             }
         }
 
@@ -754,8 +776,8 @@ Item{
         //disable strobe mode when the camera is in Master mode
         strobeFlash.enabled = false
         strobeFlash.opacity = 0.1
-        strobeOff.enabled = false
-        strobeOff.opacity = 0.1
+        strobeOff.enabled   = false
+        strobeOff.opacity   = 0.1
 
         //disable trigger combobox
         triggerCombo.enabled = false
@@ -786,11 +808,11 @@ Item{
         root.videoRecordBtnEnable(false)
         root.captureBtnEnable(false)
 
-        //enable strobe mode when the camera is in trigger mode
-        strobeFlash.enabled = true
-        strobeFlash.opacity = 1
-        strobeOff.enabled = true
-        strobeOff.opacity = 1
+        //disable strobe mode when the camera is in Master mode
+        strobeFlash.enabled = false
+        strobeFlash.opacity = 0.1
+        strobeOff.enabled   = false
+        strobeOff.opacity   = 0.1
 
         see3cam50cugm.setCameraMode(SEE3CAM_50CUGM.TRIGGER_EXP_CONTROL)
     }
@@ -804,8 +826,8 @@ Item{
         //enable strobe mode when the camera is in trigger mode
         strobeFlash.enabled = true
         strobeFlash.opacity = 1
-        strobeOff.enabled = true
-        strobeOff.opacity = 1
+        strobeOff.enabled   = true
+        strobeOff.opacity   = 1
 
         see3cam50cugm.setCameraMode(SEE3CAM_50CUGM.TRIGGER_ACQ_CONTROL)
     }
