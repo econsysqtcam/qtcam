@@ -25,7 +25,8 @@ class Helper: public QObject{
     Q_OBJECT
     Q_PROPERTY(QImage image READ image WRITE setImage NOTIFY imageChanged)
 public:
-    QImage image() const{ return m_image; }
+    QImage image() const{
+        return m_image; }
     void setImage(const QImage &image){
         m_image = image;
         emit imageChanged();

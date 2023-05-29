@@ -3522,6 +3522,8 @@ bool Videostreaming::startCapture()
         }
         else
         {
+          //Added to disable irWindow checkbox when relaunch application after resolution switch
+          emit emitResolution(width,height);
           emit signalToDestroyWindow();
         }
     }
@@ -3530,7 +3532,7 @@ bool Videostreaming::startCapture()
     emit signalToSwitchResoln(true);
 
     previewFrameSkipCount = 1;
-    if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB )
+    if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB)
     {
         emit update83USBstreamingState();
         if(ecam83USBStreamingState==1 || ecam83USBStreamingState ==3) //PIN1 streaming

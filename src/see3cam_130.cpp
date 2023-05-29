@@ -510,7 +510,7 @@ bool See3CAM_130::getQFactor()
  * return true - success /false - failure
  */
 bool See3CAM_130::setROIAutoFoucs(camROIAfMode see3camAfROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize)
-{    
+{
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -756,7 +756,7 @@ bool See3CAM_130::getAFRectMode()
  * @brief See3CAM_130::setToDefault - set all the values to default in camera
  * @return true/false
  */
-bool See3CAM_130::setToDefault(){    
+bool See3CAM_130::setToDefault(){
 
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -1071,7 +1071,7 @@ bool See3CAM_130::setSmileDetection(bool enableSmileDetect, bool embedData){
     if(embedData)
         g_out_packet_buf[5] = ENABLE_EMBED_DATA; /* enable embed data */
     else
-        g_out_packet_buf[5] = DISABLE_EMBED_DATA; /* disable embed data */   
+        g_out_packet_buf[5] = DISABLE_EMBED_DATA; /* disable embed data */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){

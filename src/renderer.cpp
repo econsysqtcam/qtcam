@@ -35,7 +35,7 @@ void ImageItem::setImage(const QImage &image)
 {
     m_image = image;
     emit imageChanged();
-    update();
+   update();
 }
 
 void ImageItem::paint(QPainter *painter)
@@ -43,13 +43,19 @@ void ImageItem::paint(QPainter *painter)
     if(m_image.isNull())
         return;
 
+    //Defines the rectangle in the plane
     QRectF bounding_rect = boundingRect();
+
     QImage scaled = m_image.scaledToHeight(bounding_rect.height());
+
+    //Defines a point in the plane using floating point precision
     QPointF center = bounding_rect.center() - scaled.rect().center();
 
     if (center.x() < 0)
         center.setX(0);
     if (center.y() < 0)
         center.setY(0);
+
+    //drawImage(QPointF, QImage) -> Draws the given image at the given point.
     painter->drawImage(center, scaled);
 }

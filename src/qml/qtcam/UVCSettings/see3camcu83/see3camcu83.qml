@@ -152,6 +152,12 @@ Item{
         {
             irWindowCheckBox.checked = false
         }
+
+        onMouseRightClicked:{
+            if(autoexpManual.enabled && autoexpManual.checked){
+                see3camcu83.setROIAutoExposure(See3Cam_CU83.AE_DISABLED, 0, 0, 0, 0, 0);
+            }
+        }
     }
 
     ScrollView
@@ -1134,6 +1140,10 @@ Item{
         case See3Cam_CU83.BOTH:
             flipCtrlVertical.checked = true
             flipCtrlHorizotal.checked = true
+            break;
+        default:
+            flipCtrlVertical.checked = false
+            flipCtrlHorizotal.checked = false
             break;
         }
     }

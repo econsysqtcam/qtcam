@@ -1794,7 +1794,6 @@ Rectangle {
         sendGainValueToHID(gainValue)
     }
 
-
     //Added by Sushanth - To clear buffer when device is in trigger mode
     function clearBufferInTriggerMode(isTrigger)
     {
@@ -1831,6 +1830,8 @@ Rectangle {
             //if the window is closed, assign irPreview is undefined
             irPreview.closing.connect(function() {
                 irPreview = undefined;
+
+                //Function call to uncheck ir window when window is closed via close button
                 irWindowCloseBtn()
             })
             irPreview.show()
