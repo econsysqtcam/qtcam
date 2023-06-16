@@ -111,7 +111,7 @@ Item{
 
         //signal for getting resolution from videostreaming.cpp
         onSendResolution:{
-            if((width == 4440)&&(height == 2160))
+            if(((width == 4440)&&(height == 2160)) || ((width == 3120)&&(height == 1080)))
             {
                 root.videoRecordBtnEnable(false)
 
@@ -664,7 +664,7 @@ Item{
                     id: wakeOnEnable
                     style:  econRadioButtonStyle
                     text:   qsTr("Enable")
-                    exclusiveGroup: effectInputGroup
+                    exclusiveGroup: wakeOnGroup
                     activeFocusOnPress: true
                     onClicked: {
                         defaultValue.enabled = true
@@ -680,7 +680,7 @@ Item{
                     id: wakeOnDisable
                     style:  econRadioButtonStyle
                     text: qsTr("Disable")
-                    exclusiveGroup: effectInputGroup
+                    exclusiveGroup: wakeOnGroup
                     activeFocusOnPress: true
                     onClicked: {
                         see3camcu83.setWakeOnMotion(See3Cam_CU83.DISABLE)
@@ -987,19 +987,19 @@ Item{
             {
                 case See3Cam_CU83.EFFECT_NORMAL:
                     rdoEffectNormal.checked = true
-                    break;
+                    break
                 case See3Cam_CU83.EFFECT_BLACK_WHITE:
                     rdoEffectBW.checked = true
-                    break;
+                    break
                 case See3Cam_CU83.EFFECT_GREYSCALE:
                     rdoEffectGreyScale.checked = true
-                    break;
+                    break
                 case See3Cam_CU83.EFFECT_NEGATIVE:
                     rdoEffectNegative.checked = true
-                    break;
+                    break
                 case See3Cam_CU83.EFFECT_SKETCH:
                     rdoEffectSketch.checked = true
-                    break;
+                    break
             }
         }
 

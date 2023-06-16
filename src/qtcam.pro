@@ -66,6 +66,8 @@ SOURCES += main.cpp \
     see3cam_cu136m.cpp \
     see3cam_50cug_m.cpp \
     see3cam_cu135m_h01r1.cpp \
+    see3camcu512m.cpp \
+    see3cam16cugm.cpp \
     barcode_camera.cpp \
     renderer.cpp
 
@@ -134,6 +136,8 @@ HEADERS += \
     see3cam_cu136m.h \
     see3cam_cu135m_h01r1.h \
     see3cam_50cug_m.h \
+    see3camcu512m.h \
+    see3cam16cugm.h \
     barcode_camera.h \
     renderer.h
 
@@ -218,4 +222,6 @@ DISTFILES += \
     qml/qtcam/UVCSettings/see3camcu83/see3camcu83.qml\
     qml/qtcam/UVCSettings/nilecam20usb/nilecam20_usb.qml \
     qml/qtcam/UVCSettings/see3cam50cugm/see3cam_50cug_m.qml \
+    qml/qtcam/UVCSettings/see3cam_cu512M/see3camcu512m.qml \
+    qml/qtcam/UVCSettings/see3cam16cugm/see3cam16cugm.qml \
     qml/qtcam/UVCSettings/barcode/barcode_camera.qml

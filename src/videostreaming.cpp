@@ -305,6 +305,7 @@ FrameRenderer::~FrameRenderer()
 
 
     if(uyvyBuffer){free(uyvyBuffer); uyvyBuffer = NULL;}
+    if(rgbFromY16Buffer){free(rgbFromY16Buffer); rgbFromY16Buffer = NULL;}
     if(ir675pBuffer){free(ir675pBuffer); ir675pBuffer = NULL;}
     if(ir1350pBuffer){free(ir1350pBuffer); ir1350pBuffer = NULL;}
 
@@ -332,6 +333,7 @@ FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
     skipH264Frames = 20;
 
     uyvyBuffer    = NULL;
+    rgbFromY16Buffer = NULL;
     ir1350pBuffer = NULL;
     ir675pBuffer  = NULL;
 }
@@ -805,8 +807,13 @@ void FrameRenderer::drawUYVYBUffer(){
         }
         if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83){
               if((videoResolutionwidth == Y16_2160p_WIDTH) && (videoResolutionHeight == Y16_2160p_HEIGHT)) {//To render Y16 -> UYVY colorspace
-                  if(uyvyBuffer!= NULL){
+                    if(uyvyBuffer!= NULL){
                         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Y16_2160p_RGB_WIDTH/2, Y16_2160p_RGB_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, uyvyBuffer);
+                    }
+              }
+              else if((videoResolutionwidth == Y16_NEW_WIDTH) && (videoResolutionHeight == Y16_NEW_HEIGHT)) { //3120x1080
+                    if(rgbFromY16Buffer!= NULL){
+                        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Y16_NEW_RENDERING_WIDTH/2, Y16_NEW_RENDERING_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgbFromY16Buffer);
                     }
               }
               else{  //To render UYVY colorspace
@@ -1338,6 +1345,13 @@ void FrameRenderer::getDisplayRenderArea(int *displayX, int *displayY, int *dest
                 calculateViewport(videoResolutionwidth, Y16_1350p_HEIGHT_MODIFIED, previewBgrdAreaWidth-xMargin, previewBgrdAreaHeight, &x, &y, &destWindowWidth, &destWindowHeight);
             }
         }
+        else if((videoResolutionwidth == 3120)&&(videoResolutionHeight == 1080)){
+            if(previewBgrdAreaHeight == 0){
+                calculateViewport(Y16_NEW_RENDERING_WIDTH, Y16_NEW_RENDERING_HEIGHT, previewBgrdAreaWidth-xMargin, m_viewportSize.height(), &x, &y, &destWindowWidth, &destWindowHeight);
+            }else{
+                calculateViewport(Y16_NEW_RENDERING_WIDTH, Y16_NEW_RENDERING_HEIGHT, previewBgrdAreaWidth-xMargin, previewBgrdAreaHeight, &x, &y, &destWindowWidth, &destWindowHeight);
+            }
+        }
         else if((videoResolutionwidth == Y16_675p_WIDTH)&&(videoResolutionHeight == Y16_675p_HEIGHT)){
             if(previewBgrdAreaHeight == 0){
                 calculateViewport(videoResolutionwidth, Y16_675p_HEIGHT_MODIFIED, previewBgrdAreaWidth-xMargin, m_viewportSize.height(), &x, &y, &destWindowWidth, &destWindowHeight);
@@ -1688,8 +1702,22 @@ void Videostreaming::capFrame()
                 onY16Format = true;
                 if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
                 {
-                    if((width == Y16_2160p_WIDTH) && (height == Y16_2160p_HEIGHT))//4440x2160
-                    {//For default resolutions - Converting UYVY to RGB & saving Y8 directly
+                    if((width == Y16_2160p_WIDTH) && (height == Y16_2160p_HEIGHT))
+                    {
+                        //For default resolutions - Converting UYVY to RGB & saving Y8 directly
+                        prepareStillBuffer((uint8_t*)m_buffers[buf.index].start[0]);
+
+                        //Converting sourceformat as UYVY for RGB conversion
+                        copy = m_capSrcFormat;
+                        copy.fmt.pix.pixelformat = V4L2_PIX_FMT_UYVY;
+
+                        err = v4lconvert_convert(m_convertData, &copy, &m_capDestFormat,
+                        stillBuffer, buf.bytesused, m_capImage->bits(),
+                                m_capDestFormat.fmt.pix.sizeimage);
+                    }
+                    else if((width == Y16_NEW_WIDTH) && (height == Y16_NEW_HEIGHT))
+                    {
+                        //For default resolutions - Converting UYVY to RGB & saving Y8 directly
                         prepareStillBuffer((uint8_t*)m_buffers[buf.index].start[0]);
 
                         //Converting sourceformat as UYVY for RGB conversion
@@ -1901,6 +1929,42 @@ void Videostreaming::capFrame()
                     if((width == Y16_2160p_WIDTH) && (height == Y16_2160p_HEIGHT))//4440x2160
                     {
                         QImage qImage3(bufferToSave, Y16_1350p_WIDTH, Y16_1350p_HEIGHT_MODIFIED, QImage::Format_RGB888);
+                        QImageWriter writer(filename);
+
+                        if(m_saveImage){
+                            if((OnMouseClick || !SkipIfPreviewFrame)){   //Saving Image after Checking for Preview or Still
+                                if(!writer.write(qImage3))
+                                {
+                                    emit logCriticalHandle("Error while saving an image:"+writer.errorString());
+                                }
+                                else
+                                {
+                                    imgSaveSuccessCount++;
+                                }
+                            }
+                        }
+                        //To save Ir image in different filename
+                        getFileName(getFilePath(),getImageFormatType());
+
+                        QImage qImage4(outputIrBuffer, Y16_675p_WIDTH, Y16_675p_HEIGHT_MODIFIED, QImage::Format_Grayscale8);
+                        QImageWriter irWriter(filename);
+
+                        if(m_saveImage){
+                            if((OnMouseClick || !SkipIfPreviewFrame)){   //Saving Image after Checking for Preview or Still
+                                if(!irWriter.write(qImage4))
+                                {
+                                    emit logCriticalHandle("Error while saving an image:"+irWriter.errorString());
+                                }
+                                else
+                                {
+                                    imgSaveSuccessCount++;
+                                }
+                            }
+                        }
+                    }
+                    else if((width == 3120) && (height == 1080))//4440x2160
+                    {
+                        QImage qImage3(bufferToSave, 1920, 1080, QImage::Format_RGB888);
                         QImageWriter writer(filename);
 
                         if(m_saveImage){
@@ -2876,6 +2940,65 @@ bool Videostreaming::prepareStillBuffer(uint8_t *inputBuffer)
                  IRsize      -= 5;
              }
        }
+       else if((width == Y16_NEW_WIDTH)&&(height == Y16_NEW_HEIGHT))
+       {
+             long int frameSize  = 0; //Total Frame Size
+             int bufferCount     = 0; //To iterate through the buffer
+             int uyvySize        = 0; //To store the size of UYVY buffer
+             int irSize          = 0; //To store the size of IR buffer
+
+             int RgbLinesToRead  = 3840;
+             int IrLinesToRead   = 2400;
+             int RGBCounter = 0;
+             int IRCounter =  0;
+
+             shaderType = CommonEnums::UYVY_BUFFER_RENDER;
+             m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
+
+             frameSize  = width*height*BYTES_PER_PIXEL_Y16; // for the resolution 4440x1080=19180800
+
+             while (frameSize > 0)
+             {
+                 //if the first bit of the first byte of the input buffer is 0, its UYVY data
+                 if(((inputBuffer[bufferCount]) & (0x01))  == 0)
+                 {
+                     memcpy((m_renderer->rgbFromY16Buffer)+(uyvySize),(inputBuffer+bufferCount),RgbLinesToRead - 1);
+                     bufferCount += RgbLinesToRead;
+                     uyvySize    += RgbLinesToRead;
+                     frameSize   -= RgbLinesToRead;
+                     RGBCounter++;
+                 }
+                 else if(((inputBuffer[bufferCount]) & (0x01)) == 1)
+                 {//if the first bit of the first byte of the input buffer is 1, its Y8 data
+                     memcpy((inputIrBuffer)+(irSize),(inputBuffer+bufferCount),IrLinesToRead - 1);
+                     bufferCount += IrLinesToRead;
+                     irSize      += IrLinesToRead;
+                     frameSize   -= IrLinesToRead;
+                     IRCounter++;
+                 }
+             }
+
+             //allocating still buffer to rgb size
+             stillBuffer = (unsigned char*) realloc(stillBuffer,(Y16_NEW_RENDERING_WIDTH*Y16_NEW_RENDERING_HEIGHT*BYTES_PER_PIXEL_UYVY));
+             //copying converted buffer to stillbuffer
+             memcpy(stillBuffer, (m_renderer->rgbFromY16Buffer), (Y16_NEW_RENDERING_WIDTH*Y16_NEW_RENDERING_HEIGHT*BYTES_PER_PIXEL_UYVY));
+
+             //Removing 5th bit from each frame of IRBuffer
+             int IRsize = irSize;
+             bufferCount = 0;
+             irSize = 0;
+
+             if((RGBCounter == 1080) && (IRCounter == 1080))
+             {
+               while (IRsize > 0)
+               {
+                   memcpy((outputIrBuffer) + (irSize), (inputIrBuffer) + bufferCount, 4);
+                   irSize      += 4;
+                   bufferCount += 5;
+                   IRsize      -= 5;
+               }
+             }
+       }
        else if((width == Y16_1350p_WIDTH)&&(height == Y16_1350p_HEIGHT))
        {
              m_renderer->renderBufferFormat = CommonEnums::GREY_BUFFER_RENDER;
@@ -2934,6 +3057,58 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 
         int uyvyBytesToRead = 7680;
         int y8BytesToRead   = 2400;
+
+        shaderType = CommonEnums::UYVY_BUFFER_RENDER;
+        m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
+
+        frameSize  = width*height*BYTES_PER_PIXEL_UYVY; // for the resolution 4440x1080=19180800
+
+        while (frameSize > 0)
+        {
+            //if the first bit of the first byte of the input buffer is 0, its UYVY data
+            if(((inputbuffer[bufferCount]) & (0x01)) == 0)
+            {
+                memcpy((m_renderer->uyvyBuffer)+(uyvySize),(inputbuffer+bufferCount),uyvyBytesToRead - 1);
+                bufferCount += uyvyBytesToRead;
+                uyvySize    += uyvyBytesToRead;
+                frameSize   -= uyvyBytesToRead;
+            }
+            else if(((inputbuffer[bufferCount]) & (0x01)) == 1)
+            {//if the first bit of the first byte of the input buffer is 1, its Y8 data
+                memcpy((inputIrBuffer)+(irSize),(inputbuffer+bufferCount),y8BytesToRead - 1);
+                bufferCount += y8BytesToRead;
+                irSize      += y8BytesToRead;
+                frameSize   -= y8BytesToRead;
+            }
+        }
+
+        //Removing 5th bit from each frame of IRBuffer
+        int IRsize = irSize;
+        bufferCount = 0;
+        irSize = 0;
+        while (IRsize > 0)
+        {
+            memcpy((outputIrBuffer) + (irSize), (inputIrBuffer) + bufferCount, 4);
+            irSize      += 4;
+            bufferCount += 5;
+            IRsize      -= 5;
+        }
+
+        //Convert buffer into QImage to render in another window
+        QImage qImage3(outputIrBuffer, Y16_2160p_Y8_WIDTH, Y16_2160p_Y8_HEIGHT, QImage::Format_Grayscale8);
+
+       //passing QImage to the setImage() defined in renderer class
+       helperObj.setImage(qImage3);
+    }
+    else if((width == Y16_NEW_WIDTH)&&(height == Y16_NEW_HEIGHT))
+    {
+        long int frameSize  = 0; //Total Frame Size
+        int bufferCount     = 0; //To iterate through the buffer
+        int uyvySize        = 0; //To store the size of UYVY buffer
+        int irSize          = 0; //To store the size of IR buffer
+
+        int RgbLinesToRead  = 3840;
+        int IrLinesToRead   = 2400;
         int RGBCounter = 0;
         int IRCounter =  0;
 
@@ -2947,18 +3122,18 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
             //if the first bit of the first byte of the input buffer is 0, its UYVY data
             if(((inputbuffer[bufferCount]) & (0x01))  == 0)
             {
-                memcpy((m_renderer->uyvyBuffer)+(uyvySize),(inputbuffer+bufferCount),uyvyBytesToRead - 1);
-                bufferCount += uyvyBytesToRead;
-                uyvySize    += uyvyBytesToRead;
-                frameSize   -= uyvyBytesToRead;
+                memcpy((m_renderer->rgbFromY16Buffer)+(uyvySize),(inputbuffer+bufferCount),RgbLinesToRead - 1);
+                bufferCount += RgbLinesToRead;
+                uyvySize    += RgbLinesToRead;
+                frameSize   -= RgbLinesToRead;
                 RGBCounter++;
             }
             else if(((inputbuffer[bufferCount]) & (0x01)) == 1)
             {//if the first bit of the first byte of the input buffer is 1, its Y8 data
-                memcpy((inputIrBuffer)+(irSize),(inputbuffer+bufferCount),y8BytesToRead - 1);
-                bufferCount += y8BytesToRead;
-                irSize      += y8BytesToRead;
-                frameSize   -= y8BytesToRead;
+                memcpy((inputIrBuffer)+(irSize),(inputbuffer+bufferCount),IrLinesToRead - 1);
+                bufferCount += IrLinesToRead;
+                irSize      += IrLinesToRead;
+                frameSize   -= IrLinesToRead;
                 IRCounter++;
             }
         }
@@ -2968,7 +3143,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         bufferCount = 0;
         irSize = 0;
 
-        if((RGBCounter == 2160) && (IRCounter == 1080))
+        if((RGBCounter == 1080) && (IRCounter == 1080))
         {
           while (IRsize > 0)
           {
@@ -2979,8 +3154,8 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
           }
         }
 
-        QImage qImage3(Y16_2160p_Y8_WIDTH, Y16_2160p_Y8_HEIGHT, QImage::Format_Grayscale8);
-        memcpy(qImage3.bits(),outputIrBuffer,(Y16_2160p_Y8_WIDTH*Y16_2160p_Y8_HEIGHT));
+        QImage qImage3(Y16_NEW_RENDERING_WIDTH, Y16_NEW_RENDERING_HEIGHT, QImage::Format_Grayscale8);
+        memcpy(qImage3.bits(),outputIrBuffer,(Y16_NEW_RENDERING_WIDTH*Y16_NEW_RENDERING_HEIGHT));
 
         //passing QImage to the setImage() defined in renderer class
         helperObj.setImage(qImage3);
@@ -3413,8 +3588,9 @@ void Videostreaming::allocBuffers()
     //Splitted UYVY data from Y16 & used it to render
     m_renderer->uyvyBuffer = (uint8_t*)realloc(m_renderer->uyvyBuffer,Y16_RGB_RESOLUTION*BYTES_PER_PIXEL_UYVY);
 
+    m_renderer->rgbFromY16Buffer = (uint8_t*)realloc(m_renderer->rgbFromY16Buffer,Y16_NEW_RENDERING_WIDTH*Y16_NEW_RENDERING_HEIGHT*BYTES_PER_PIXEL_UYVY);
     //Splitted IR Data from Y16
-    inputIrBuffer = (uint8_t*)realloc(inputIrBuffer,Y16_IR_RESOLUTION*BYTES_PER_PIXEL_Y16);
+    inputIrBuffer = (uint8_t*)realloc(inputIrBuffer,Y16_IR_RESOLUTION*BYTES_PER_PIXEL_UYVY);
 
     //To Render IR data
     outputIrBuffer = (uint8_t*)realloc(outputIrBuffer,Y16_IR_RESOLUTION);
@@ -3515,8 +3691,9 @@ bool Videostreaming::startCapture()
     if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83) && (createWindow))
     {
         //condition to check default resolution for creating IR Window
-        if((width == Y16_2160p_WIDTH)&&(height == Y16_2160p_HEIGHT))
+        if(((width == Y16_2160p_WIDTH)&&(height == Y16_2160p_HEIGHT)) || ((width == 3120)&&(height == 1080)))
         {
+
           emit signalToCreateWindow();
           emit emitResolution(width,height);
         }
@@ -3532,7 +3709,7 @@ bool Videostreaming::startCapture()
     emit signalToSwitchResoln(true);
 
     previewFrameSkipCount = 1;
-    if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB)
+    if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB )
     {
         emit update83USBstreamingState();
         if(ecam83USBStreamingState==1 || ecam83USBStreamingState ==3) //PIN1 streaming
@@ -4159,6 +4336,11 @@ void Videostreaming::stopCapture() {
         m_renderer->uyvyBuffer = NULL;
     }
 
+    if(m_renderer->rgbFromY16Buffer != NULL){
+       free(m_renderer->rgbFromY16Buffer);
+       m_renderer->rgbFromY16Buffer = NULL;
+    }
+
     if(m_renderer->ir675pBuffer != NULL){
         free(m_renderer->ir675pBuffer);
         m_renderer->ir675pBuffer = NULL;
@@ -4561,7 +4743,7 @@ QString Videostreaming::getSettings(unsigned int id) {
     struct v4l2_control c;
     c.id = id;
     c.value = 0;
-	while((ioctl(VIDIOC_G_CTRL, &c)<0)&&tries--)
+    while((ioctl(VIDIOC_G_CTRL, &c)<0)&&tries--)
         emit logCriticalHandle("Unable to get the Value, Retrying...");
     QString value = QString::number(c.value,10);
     return value;

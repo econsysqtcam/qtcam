@@ -78,6 +78,8 @@
 #include "renderer.h"
 #include "see3cam_cu83.h"
 #include "see3cam_50cug_m.h"
+#include "see3camcu512m.h"
+#include "see3cam16cugm.h"
 
 
 //*! \mainpage Qtcam - A econ's camera product
@@ -171,6 +173,9 @@ int main(int argc, char *argv[])
     qmlRegisterType<BarcodeCamera>("econ.camera.barcode_camera",1,0,"BarcodeCamera");
     qmlRegisterType<ecam83_USB>("econ.camera.ecam83_usb",1,0,"Ecam83USB");//while exposing to qml it is must that first letter should be in caps.
     qmlRegisterType<SEE3CAM_50CUGM>("econ.camera.see3cam_50cug_m",1,0,"SEE3CAM_50CUGM");
+    qmlRegisterType<SEE3CAM_CU512M>("econ.camera.see3camcu512m", 1, 0, "See3CAM_CU512M");
+    qmlRegisterType<SEE3CAM_16CUGM>("econ.camera.see3cam16cugm", 1, 0, "See3CAM_16CUGM");
+
 
     //For IR Window
     qmlRegisterType<ImageItem>("econ.camera.qimagerenderer", 1, 0, "ImageItem");

@@ -120,6 +120,10 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c188"),CommonEnums::SEE3CAM_CU83);
     //Added By Sushanth 23rd Feb 2023
     cameraEnumMap.insert(econVid + (",c157"),CommonEnums::SEE3CAM_50CUGM);
+    //Added By Sushanth 7th June 2023
+    cameraEnumMap.insert(econVid + (",c158"),CommonEnums::SEE3CAM_CU512M);
+    //Added By Sushanth 9th June 2023
+    cameraEnumMap.insert(econVid + (",c117"),CommonEnums::SEE3CAM_16CUGM);
 }
 
 unsigned int uvccamera::getTickCount()

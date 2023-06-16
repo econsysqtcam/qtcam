@@ -962,6 +962,7 @@ Rectangle {
                     extensionTab()
             }
         }
+
         Component {
             id: econSliderStyle
             SliderStyle {
@@ -987,6 +988,7 @@ Rectangle {
                 }
             }
         }
+
         Component {
             id: econTextFieldStyle
             TextFieldStyle {
@@ -1525,6 +1527,12 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_135M) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam135m/see3cam135m.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU512M) {
+            see3cam = Qt.createComponent("../UVCSettings/see3cam_cu512M/see3camcu512m.qml").createObject(root)
+        }
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_16CUGM) {
+            see3cam = Qt.createComponent("../UVCSettings/see3cam16cugm/see3cam16cugm.qml").createObject(root)
+        }
         else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
@@ -1588,6 +1596,8 @@ Rectangle {
         case CommonEnums.SEE3CAM_27CUG:  //Added by Sushanth.S
         case CommonEnums.SEE3CAM_CU83:   //Added by Sushanth.S
         case CommonEnums.SEE3CAM_50CUGM:  //Added by Sushanth.S
+        case CommonEnums.SEE3CAM_CU512M:  //Added by Sushanth.S
+        case CommonEnums.SEE3CAM_16CUGM:  //Added by Sushanth.S
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
             break;

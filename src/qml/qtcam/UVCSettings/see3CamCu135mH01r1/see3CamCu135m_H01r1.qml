@@ -18,6 +18,9 @@ Item {
     property bool skipUpdateUIOnAntiFlickerMode : false
     property bool skipUpdateGainMode            : false
 
+    property bool skipUpdateGainFromUVC         : false
+
+
     property int brightnessMin: 0
     property int brightnessMax: 15
 
@@ -584,7 +587,22 @@ Item {
                         gainTextField.text = gainSlider.value
                         root.getGainValueFromHID(gainSlider.value)
                         if(skipUpdateGainMode){
-                            see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.MANUAL_GAIN,0,gainSlider.value)
+
+                            if(manualGain.checked == true)
+                            {
+                                see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.MANUAL_GAIN,0,gainSlider.value)
+                            }
+                            else if(autoGain.checked == true)
+                            {
+                                if(radioContin.checked == true)
+                                {
+                                    see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.CONTINUOUS, gainSlider.value)
+                                }
+                                else if(radioOneshot.checked == true)
+                                {
+                                    see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.SINGLE_SHOT, gainSlider.value)
+                                }
+                            }
                         }
                         skipUpdateGainMode = true
                     }

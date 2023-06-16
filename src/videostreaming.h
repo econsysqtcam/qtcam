@@ -56,6 +56,12 @@
 #define Y16_675p_HEIGHT            675
 #define Y16_675p_HEIGHT_MODIFIED   1080
 
+#define Y16_NEW_RENDERING_WIDTH        1920
+#define Y16_NEW_RENDERING_HEIGHT       1080
+
+#define Y16_NEW_WIDTH     3120
+#define Y16_NEW_HEIGHT    1080
+
 #include <QTimer>
 #include <QDateTime>
 #include <QSocketNotifier>
@@ -145,6 +151,7 @@ public:
     uint8_t *uyvyBuffer;
     uint8_t *ir1350pBuffer;
     uint8_t *ir675pBuffer;
+    uint8_t *rgbFromY16Buffer;
 
       __u32 xcord,ycord;
     unsigned frame;
@@ -850,3 +857,4 @@ signals:
 };
 
 #endif // VIDEOSTREAMING_H
+
