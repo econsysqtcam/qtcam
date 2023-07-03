@@ -109,13 +109,13 @@ public:
    bool createFile(QString filename, CodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitRate,  int audioDeviceIndex, int sampleRate, int channels);
 #endif
 
-   // audio
+    // Opens the audio stream for encoding.
     int open_audio(AVStream *st);
 
     unsigned int getTickCount();
 
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
-    AVStream* add_audio_stream(AVFormatContext *oc, enum AVCodecID codec_id, int sampleRate, int channels);
+    AVStream* add_audio_stream(AVFormatContext *oc, enum AVCodecID codec_id, int sampleRate, int channels); //Adds an audio stream to the output file.
 #else
     AVStream* add_audio_stream(AVFormatContext *oc, enum CodecID codec_id, int sampleRate, int channels);
 #endif    
@@ -123,8 +123,14 @@ public:
     int encodeAudio(void *);       
 
    bool closeFile();
+
+   //Encodes a video frame given a buffer and buffer type.
    int encodeImage(uint8_t *buffer, uint8_t bufferType);
+
+   //Encodes a video packet given a buffer and buffer type.
    int encodePacket(uint8_t *buffer, uint8_t bufferType);
+
+   //Checks if the video encoder is in a valid state.
    bool isOk();
 
 // Added by Sankari : 8 Oct 2018

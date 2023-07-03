@@ -24,14 +24,17 @@ Item {
     property int brightnessMin: 0
     property int brightnessMax: 15
 
+    property int xCoordinate: 0
+    property int yCoordinate: 0
+
     property int gainMin: 1
     property int gainMax: 83
 
     property int lowerLimitMin: 100
-    property int lowerLimitMax: 66666
+    property int lowerLimitMax: 1000000
 
     property int upperLimitMin: 100
-    property int upperLimitMax: 66666
+    property int upperLimitMax: 1000000
 
     property int flickerCtrl
     property bool setButtonClicked: false
@@ -346,11 +349,11 @@ Item {
                     style: econRadioButtonStyle
                     opacity: enabled ? 1 : 0.1
                     onClicked: {
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
+                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, xCoordinate, yCoordinate, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = true
                     }
                     Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
+                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, xCoordinate, yCoordinate, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = true
                     }
                 }
@@ -374,7 +377,7 @@ Item {
                 style: econComboBoxStyle
                 onCurrentIndexChanged: {
                     if(skipUpdateUIOnExpWindowSize){
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
+                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, xCoordinate, yCoordinate, autoExpoWinSizeCombo.currentText)
                     }
                     skipUpdateUIOnExpWindowSize = true
                 }
@@ -837,7 +840,7 @@ Item {
 
                     Text {
                         id: lowerLimitModetext
-                        text: "value(µs)[100 - 666666]"
+                        text: "value(µs)[100 - 1000000]"
                         font.pixelSize: 14
                         font.family: "Ubuntu"
                         color: "#ffffff"
@@ -899,7 +902,7 @@ Item {
 
                     Text {
                         id: upperLimitModetext
-                        text: "value(µs)[100 - 666666]"
+                        text: "value(µs)[100 - 1000000]"
                         font.pixelSize: 14
                         font.family: "Ubuntu"
                         color: "#ffffff"
@@ -1002,7 +1005,7 @@ Item {
                 spacing: 35
                 Text {
                     id: exposureLabel
-                    text: "Exposure"
+                    text: "Exposure value (us)"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -1024,7 +1027,7 @@ Item {
                 spacing: 35
                 Text {
                     id: gainLabel
-                    text: "Gain"
+                    text: "Gain value (10^-2x)"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -1155,7 +1158,7 @@ Item {
         }
 
         onRoiAutoExpMode:{
-            currentROIAutoExposureMode(roiMode, winSize)
+            currentROIAutoExposureMode(roiMode, x, y, winSize)
         }
 
         onGainModeReceived: {
@@ -1414,11 +1417,16 @@ Item {
         messageDialog.open()
     }
 
-    function currentROIAutoExposureMode(roiMode, winSize){
+    function currentROIAutoExposureMode(roiMode, xValue, yValue, winSize){
+
+        xCoordinate = xValue
+        yCoordinate = yValue
+
         switch(roiMode){
         case See3CAM_CU135M_H01R1.AutoExpFull:
             autoexpFull.checked = true
             autoExpoWinSizeCombo.enabled = false
+            autoExpoWinSizeCombo.currentIndex = winSize-1
             break
         case See3CAM_CU135M_H01R1.AutoExpManual:
             skipUpdateUIOnExpWindowSize = false

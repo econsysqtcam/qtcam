@@ -162,7 +162,7 @@ Item{
                        activeFocusOnPress: true
                        style: econComboBoxStyle
                        onCurrentIndexChanged: {
-                               setTriggerMode()
+                           setTriggerMode()
                        }
                    }
                }

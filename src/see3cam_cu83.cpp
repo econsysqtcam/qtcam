@@ -1,5 +1,5 @@
 /*
- * see3cam_cu83.cpp -- Handling special feature of nilecam30_usb camera
+ * see3cam_cu83.cpp -- Handling special feature of See3CAM_CU83 camera
  * Copyright © 2015  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.

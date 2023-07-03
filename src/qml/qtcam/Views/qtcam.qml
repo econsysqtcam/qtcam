@@ -675,7 +675,7 @@ Rectangle {
         onEmitResolution:{
             sendResolution(width,height)
             //To enable flag to disable videoRecord when right click on screen
-            if((width == 4440)&&(height == 2160))
+            if(((width == 4440)&&(height == 2160)) || ((width == 3120)&&(height == 1080)))
             {
                 stopRecording = true
             }
@@ -1533,6 +1533,12 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_16CUGM) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam16cugm/see3cam16cugm.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU210) {
+            see3cam = Qt.createComponent("../UVCSettings/See3CamCu210/see3camcu210.qml").createObject(root)
+        }
+        else if(selectedDeviceEnumValue == CommonEnums.ECAM_512USB) {
+            see3cam = Qt.createComponent("../UVCSettings/eCAM512USB/ecam512usb.qml").createObject(root)
+        }
         else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
@@ -1579,7 +1585,7 @@ Rectangle {
         case CommonEnums.FSCAM_CU135:
         case CommonEnums.SEE3CAM_CU38:
 
-            // Added by Navya
+        // Added by Navya
         case CommonEnums.SEE3CAM_CU55_MH:
         case CommonEnums.SEE3CAM_20CUG:
         case CommonEnums.SEE3CAM_CU22:
@@ -1598,6 +1604,8 @@ Rectangle {
         case CommonEnums.SEE3CAM_50CUGM:  //Added by Sushanth.S
         case CommonEnums.SEE3CAM_CU512M:  //Added by Sushanth.S
         case CommonEnums.SEE3CAM_16CUGM:  //Added by Sushanth.S
+        case CommonEnums.SEE3CAM_CU210:  //Added by Sushanth.S
+        case CommonEnums.ECAM_512USB:  //Added by Sushanth.S
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
             break;

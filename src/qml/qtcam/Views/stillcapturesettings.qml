@@ -251,6 +251,7 @@ Item {
                             border.width: control.activeFocus ? 3 : 1
                             color: "#222021"
                             border.color: "#ffffff"
+                            enabled: false
                         }
                     }
                 }
@@ -259,6 +260,7 @@ Item {
                 id: fileDialog
                 selectFolder: true
                 title: qsTr("Select a folder")
+                folder: storage_path.text
                 onAccepted: {
                     storage_path.text = folder.toString().replace("file://", "")
                 }
@@ -281,7 +283,6 @@ Item {
                 source: "images/open_folder.png"
                 x: 205
                 y: 182
-                opacity: 1
             }
             Text {
                 id: image_format

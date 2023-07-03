@@ -105,10 +105,6 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c05c"),CommonEnums::ECAM51B_USB);
     cameraEnumMap.insert(econVid + (",c181"),CommonEnums::ECAM82_USB);
     cameraEnumMap.insert(econVid + (",c0d8"),CommonEnums::SEE3CAM_1332);
-    //Added By Sushanth
-    cameraEnumMap.insert(econVid + (",c12f"),CommonEnums::NILECAM20_USB);
-    //Added By Sushanth
-    cameraEnumMap.insert(econVid + (",0121"),CommonEnums::SEE3CAM_27CUG);
     cameraEnumMap.insert(econVid + (",c184"),CommonEnums::ECAM83_USB);
     cameraEnumMap.insert(econVid + (",c12c"),CommonEnums::SEE3CAM_CU27);
     cameraEnumMap.insert(econVid + (",c1d7"),CommonEnums::See3CAM_CU135M_H01R1);
@@ -116,6 +112,10 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c1d8"),CommonEnums::SEE3CAM_CU136M);
     cameraEnumMap.insert(econVid + (",c116"),CommonEnums::BARCODE_CAMERA);
     cameraEnumMap.insert(econVid + (",c400"),CommonEnums::SEE3CAM_160);
+    //Added By Sushanth
+    cameraEnumMap.insert(econVid + (",c12f"),CommonEnums::NILECAM20_USB);
+    //Added By Sushanth
+    cameraEnumMap.insert(econVid + (",0121"),CommonEnums::SEE3CAM_27CUG);
     //Added By Sushanth 20th Dec 2022
     cameraEnumMap.insert(econVid + (",c188"),CommonEnums::SEE3CAM_CU83);
     //Added By Sushanth 23rd Feb 2023
@@ -124,6 +124,10 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c158"),CommonEnums::SEE3CAM_CU512M);
     //Added By Sushanth 9th June 2023
     cameraEnumMap.insert(econVid + (",c117"),CommonEnums::SEE3CAM_16CUGM);
+    //Added By Sushanth 26th June 2023
+    cameraEnumMap.insert(econVid + (",0126"),CommonEnums::SEE3CAM_CU210);
+    //Added By Sushanth 28th June 2023
+    cameraEnumMap.insert(econVid + (",c159"),CommonEnums::ECAM_512USB);
 }
 
 unsigned int uvccamera::getTickCount()
@@ -1341,7 +1345,6 @@ bool uvccamera::sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len)
     tv.tv_usec = 0;
 
     // Monitor read file descriptor for 5 secs
-
     if(0 > select(1, &rfds, NULL, NULL, &tv)){
 
       perror("select");
@@ -1350,12 +1353,10 @@ bool uvccamera::sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len)
 
     // Read data from camera
     int retval = read(hid_fd, inBuf, len);
-
     if (retval < 0) {
         return false;
     }
     else{
         return true;
     }
-
 }

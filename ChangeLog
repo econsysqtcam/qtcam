@@ -2,8 +2,7 @@ Qtcam Application - 25.0.14
 ---------------------------
 *Added Support for See3CAM_16CUGM.
 *Added Support for See3CAM_CU512M.
-*Added new resolution (3120x1080), Dual streaming & still capture support for See3CAM_CU83.
-*Added changes in gain mode for See3CAM_CU135M.
+*Added changes in gain mode & fixed ROI issue for See3CAM_CU135M.
 
 Qtcam Application - 25.0.13
 ---------------------------

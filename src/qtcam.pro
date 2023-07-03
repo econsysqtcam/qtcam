@@ -69,7 +69,9 @@ SOURCES += main.cpp \
     see3camcu512m.cpp \
     see3cam16cugm.cpp \
     barcode_camera.cpp \
-    renderer.cpp
+    renderer.cpp \
+    see3cam_cu210.cpp \
+    ecam_512usb.cpp
 
 # Installation path
 # target.path =
@@ -139,7 +141,9 @@ HEADERS += \
     see3camcu512m.h \
     see3cam16cugm.h \
     barcode_camera.h \
-    renderer.h
+    renderer.h \
+    see3cam_cu210.h \
+    ecam_512usb.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
@@ -224,4 +228,6 @@ DISTFILES += \
     qml/qtcam/UVCSettings/see3cam50cugm/see3cam_50cug_m.qml \
     qml/qtcam/UVCSettings/see3cam_cu512M/see3camcu512m.qml \
     qml/qtcam/UVCSettings/see3cam16cugm/see3cam16cugm.qml \
+    qml/qtcam/UVCSettings/eCAM512USB/ecam512usb.qml \
+    qml/qtcam/UVCSettings/See3CamCu210/see3camcu210.qml \
     qml/qtcam/UVCSettings/barcode/barcode_camera.qml

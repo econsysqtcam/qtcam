@@ -70,8 +70,8 @@ public:
 
     enum autoExpRoiModes{
         FULL_ROI    = 0x01,
-        MANUAL_ROI  = 0X02,
-        AE_DISABLED = 0X03
+        MANUAL_ROI  = 0x02,
+        AE_DISABLED = 0x03
     };
     Q_ENUMS(autoExpRoiModes)
 

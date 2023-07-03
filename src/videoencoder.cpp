@@ -52,6 +52,7 @@ VideoEncoder::VideoEncoder()
     m_recStop = false;
 }
 
+//Retrives the current system time in milliseconds
 unsigned int VideoEncoder::getTickCount()
 {
     struct timeval tv;
@@ -66,6 +67,13 @@ VideoEncoder::~VideoEncoder()
 
 }
 
+
+/*
+ * Creating a video file for writing.
+ * Initializes the required video and audio codecs.
+ * Sets the output format.
+ * Opens the file for writing.
+*/
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
 bool VideoEncoder::createFile(QString fileName,AVCodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitrate, int audioDeviceIndex, int sampleRate, int channels)
 #else
@@ -99,6 +107,7 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
     {
         return false;
     }
+    //Format can handle media streams where the frame rate is not constant throughout the duration of the content
     pOutputFormat->flags |= AVFMT_VARIABLE_FPS; // need to check
 
     pFormatCtx->oformat = pOutputFormat;
@@ -259,7 +268,10 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
     return true;
 }
 
-
+/*
+ * Closing the video file.
+ * Perform necessary cleanup operations.
+*/
 bool VideoEncoder::closeFile()
 {
     if(!isOk())
@@ -300,6 +312,8 @@ bool VideoEncoder::closeFile()
     return true;
 }
 
+
+//Encodes the frame using the selected codec and writes the encoded packet to the output file.
 /**
    \brief Encode one frame
     /* buffer - input buffer to encode
@@ -358,7 +372,7 @@ int VideoEncoder::encodePacket(uint8_t *buffer, uint8_t bufferType){
 
     pkt.pts = pkt.dts = ppicture->pts;
 
-    /* encode the image */
+    //Takes an input video frame, encodes it, and produces a compressed output packet
     int ret = avcodec_encode_video2(pCodecCtx, &pkt, ppicture, &got_packet);
     if (ret < 0) {
         char errText[999]="";

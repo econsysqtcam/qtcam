@@ -80,6 +80,8 @@
 #include "see3cam_50cug_m.h"
 #include "see3camcu512m.h"
 #include "see3cam16cugm.h"
+#include "see3cam_cu210.h"
+#include "ecam_512usb.h"
 
 
 //*! \mainpage Qtcam - A econ's camera product
@@ -175,6 +177,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<SEE3CAM_50CUGM>("econ.camera.see3cam_50cug_m",1,0,"SEE3CAM_50CUGM");
     qmlRegisterType<SEE3CAM_CU512M>("econ.camera.see3camcu512m", 1, 0, "See3CAM_CU512M");
     qmlRegisterType<SEE3CAM_16CUGM>("econ.camera.see3cam16cugm", 1, 0, "See3CAM_16CUGM");
+    qmlRegisterType<See3CAM_CU210>("econ.camera.see3camcu210", 1, 0, "See3CAM_CU210");
+    qmlRegisterType<ECAM_512USB>("econ.camera.ecam_512usb", 1, 0, "ECAM_512USB");
 
 
     //For IR Window
@@ -226,9 +230,38 @@ int main(int argc, char *argv[])
     viewer.rootContext()->setContextProperty("audioSupportedFormatList", &audio.audiosupportedFmtListModel);
     viewer.rootContext()->setContextProperty("audioChannelCountModel", &audio.audioChannelCountModel);
 
+    //Creating directory in Home for saving videos & pictures instead of saving it in default root folder
+    if(is20_04detected)
+    {
+        // Create the folder in the home directory
+        QString picturesPath = QDir::homePath() + "/Pictures";
+        QDir pictureDir(picturesPath);
 
-    viewer.rootContext()->setContextProperty("SystemPictureFolder",QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).first());
-    viewer.rootContext()->setContextProperty("SystemVideoFolder",QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first());
+        if (!pictureDir.exists())
+        {//where the directory does not exist
+            pictureDir.mkdir(picturesPath);
+        }
+
+        // Create the folder in the home directory
+        QString videosPath = QDir::homePath() + "/Videos";
+        QDir videosDir(videosPath);
+
+        if (!videosDir.exists())
+        {//where the directory does not exist
+            videosDir.mkdir(videosPath);
+        }
+
+        viewer.rootContext()->setContextProperty("SystemPictureFolder",picturesPath);
+        viewer.rootContext()->setContextProperty("SystemVideoFolder",videosPath);
+    }
+    else
+    {
+        viewer.rootContext()->setContextProperty("SystemPictureFolder",QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).first());
+        viewer.rootContext()->setContextProperty("SystemVideoFolder",QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first());
+    }
+
+
+
 #if LAUNCHPAD
     viewer.setMainQmlFile(QStringLiteral("/usr/share/qml/qtcam/Views/qtcam.qml"));
 #else

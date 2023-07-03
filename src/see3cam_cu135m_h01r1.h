@@ -129,7 +129,7 @@ signals:
     void flashModeValue(uint flashMode);
     void streamModeValue(uint streamMode);
     void flipCtrlValue(uint flipValue);
-    void roiAutoExpMode(uint roiMode, uint winSize);
+    void roiAutoExpMode(uint roiMode, uint x, uint y, uint winSize);
 
     void blackLevelAdjustmentChanged(uint blacklevel);
 

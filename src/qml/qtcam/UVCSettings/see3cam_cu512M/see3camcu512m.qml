@@ -58,6 +58,18 @@ Item {
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
+//        onAutoExposureSelected:{
+//            enableDisableAutoExposureControls(autoExposureSelect)
+//        }
+//        onVideoResolutionChanged:{
+//            getCameraSettingsTimer.start()
+//        }
+//        onPreviewFPSChanged:{
+//            getCameraSettingsTimer.start()
+//        }
+//        onVideoColorSpaceChanged:{
+//            getCameraSettingsTimer.start()
+//        }
     }
     ScrollView{
         id: scrollview
@@ -70,6 +82,8 @@ Item {
             x:2
             y:5
             spacing:20
+
+
 
             Row{
                 Layout.alignment: Qt.AlignCenter
@@ -146,6 +160,7 @@ Item {
             }
 
            Row{
+               // Layout.alignment: Qt.AlignCenter
                 Button {
                     id: f_wversion_selected130
                     opacity: 1
@@ -190,8 +205,9 @@ Item {
                 }
             }
 
-        }
-    }
+        }//Coloumn Layout
+
+    }//ScrollView
 
    See3CAM_CU512M{
      id:see3camcu512m
@@ -317,4 +333,6 @@ Item {
     Component.onCompleted: {
         getValuesFromCamera();
     }
-}
+
+
+}//Item

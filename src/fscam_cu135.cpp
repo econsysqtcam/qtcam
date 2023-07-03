@@ -704,7 +704,7 @@ bool FSCAM_CU135::getSmileDetectMode(){
            smileDetectMode = g_in_packet_buf[2];
            smileDetectEmbedDataValue = g_in_packet_buf[3];
 
-        emit smileDetectModeValue(smileDetectMode, smileDetectEmbedDataValue);
+           emit smileDetectModeValue(smileDetectMode, smileDetectEmbedDataValue);
            return true;
        }
    }

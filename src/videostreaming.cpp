@@ -966,15 +966,23 @@ void FrameRenderer::changeShader(){
         case V4L2_PIX_FMT_Y12:
         case V4L2_PIX_FMT_SGRBG8:
         case V4L2_PIX_FMT_SBGGR8: //Added by M Vishnu Murali: See3CAM_10CUG_CH uses respective pixel format
-            if(shaderType == CommonEnums::UYVY_BUFFER_RENDER)
+            if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83)
             {
-                shaderUYVY();
-                drawUYVYBUffer();
-            }
-            else if(shaderType == CommonEnums::GREY_BUFFER_RENDER)
-            {
-                shaderY8();
-                drawY8BUffer();
+                if(shaderType == CommonEnums::UYVY_BUFFER_RENDER)
+                {
+                    shaderUYVY();
+                    drawUYVYBUffer();
+                }
+                else if(shaderType == CommonEnums::GREY_BUFFER_RENDER)
+                {
+                    shaderY8();
+                    drawY8BUffer();
+                }
+                else
+                {
+                    shaderYUYV();
+                    drawYUYVBUffer();  // To fix white color corruption drawing intially
+                }
             }
             else
             {

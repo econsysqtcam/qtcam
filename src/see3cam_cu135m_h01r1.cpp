@@ -277,6 +277,7 @@ bool See3CAM_CU135M_H01R1::setROIAutoExposure(camROIAutoExpMode see3camAutoexpRO
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+
         if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
@@ -314,7 +315,7 @@ bool See3CAM_CU135M_H01R1::getAutoExpROIModeAndWindowSize(){
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1]==GET_EXP_ROI_MODE_CU1330M &&
             g_in_packet_buf[6]==GET_SUCCESS) {
-            emit roiAutoExpMode(g_in_packet_buf[2], g_in_packet_buf[5]);
+            emit roiAutoExpMode(g_in_packet_buf[2], g_in_packet_buf[3], g_in_packet_buf[4], g_in_packet_buf[5]);
             return true;
         }
     }

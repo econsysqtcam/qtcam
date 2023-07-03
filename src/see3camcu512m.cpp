@@ -42,8 +42,8 @@ bool SEE3CAM_CU512M::setFlashMode(FlashMode flashMode)
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_ID1_SEE3CAM_CU512M; /* set camera control id_1 */
-    g_out_packet_buf[2] = CAMERA_CONTROL_ID2_SEE3CAM_CU512M; /* set camera control id_2 */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID1_SEE3CAM_CU512M; /* set camera control code */
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID2_SEE3CAM_CU512M; /* set camera control code */
     g_out_packet_buf[3] = SET_FLASH_MODE_SEE3CAM_CU512; /* set flash mode */
     g_out_packet_buf[4] = flashMode; /* set flash mode*/
 
@@ -53,8 +53,8 @@ bool SEE3CAM_CU512M::setFlashMode(FlashMode flashMode)
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID1_SEE3CAM_CU512M &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID2_SEE3CAM_CU512M &&
-            g_in_packet_buf[2] == SET_FLASH_MODE_SEE3CAM_CU512 &&
-            g_in_packet_buf[6] == SET_SUCCESS) {
+            g_in_packet_buf[2]==SET_FLASH_MODE_SEE3CAM_CU512 &&
+            g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
         }
     }
@@ -87,8 +87,8 @@ bool SEE3CAM_CU512M::getFlashMode()
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID1_SEE3CAM_CU512M &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID2_SEE3CAM_CU512M &&
-            g_in_packet_buf[2] == GET_FLASH_MODE_SEE3CAM_CU512 &&
-            g_in_packet_buf[6] == GET_SUCCESS) {
+            g_in_packet_buf[2]==GET_FLASH_MODE_SEE3CAM_CU512 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {
             emit flashModeReceived(g_in_packet_buf[3]);
             return true;
         }
@@ -112,8 +112,8 @@ bool SEE3CAM_CU512M::setToDefaultValues()
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_ID1_SEE3CAM_CU512M; /* set camera control id_1 */
-    g_out_packet_buf[2] = CAMERA_CONTROL_ID2_SEE3CAM_CU512M; /* set camera control id_2 */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID1_SEE3CAM_CU512M; /* camera id_1 */
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID2_SEE3CAM_CU512M; /* camera id_2 */
     g_out_packet_buf[3] = SET_DEFAULT_SEE3CAM_CU512M; /* set to default command */
 
     // send request and get reply from camera
@@ -125,8 +125,8 @@ bool SEE3CAM_CU512M::setToDefaultValues()
         }
         else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID1_SEE3CAM_CU512M &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID2_SEE3CAM_CU512M &&
-            g_in_packet_buf[2] == SET_DEFAULT_SEE3CAM_CU512M &&
-            g_in_packet_buf[6] == SET_SUCCESS){
+            g_in_packet_buf[2]==SET_DEFAULT_SEE3CAM_CU512M &&
+            g_in_packet_buf[6]==SET_SUCCESS){
             return true;
         }
     }
