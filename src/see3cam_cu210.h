@@ -51,6 +51,10 @@ private:
 public:
     See3CAM_CU210();
 
+    QString _title;
+    QString _text;
+    QString message;
+
     enum AWSMODE{
         CLOUDY                 = 0x01,
         DAYLIGHT               = 0x02,
@@ -90,7 +94,7 @@ public:
         FLICKER_AUTO     = 0x00,
         FLICKER_50HZ     = 0x01,
         FLICKER_60HZ     = 0x02,
-        FLICKER_DISABLE  = 0x03
+        FLICKER_DISABLE  = 0x04
     };
     Q_ENUMS(FLICKER)
 
@@ -102,13 +106,14 @@ public:
 
 signals:
     void awbModeRecieved(uint awbMode);
-    void awbLockStatusReceived(uint lockStatus);
+    void awbLockStatusReceived(uint awbLockStatus);
     void meteringModeReceived(uint meteringMode);
     void aeLockStatusReceived(uint aeLockStatus);
     void burstLengthReceived(uint burstLength);
     void flickerModeReceived(uint flickerMode);
     void qFactorValueReceived(uint Qfactor);
     void denoiseModeReceived(uint denoise);
+    void titleTextChanged(QString _title,QString _text);
 
 public slots:
     bool setAwbMode(AWSMODE mode);
@@ -134,6 +139,8 @@ public slots:
 
     bool setDenoiseMode(DENOISE denoise);
     bool getDenoiseMode();
+
+    bool readISPFirmwareVersion();
 
     bool setToDefaultValues();
 };

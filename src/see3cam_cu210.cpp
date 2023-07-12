@@ -97,7 +97,6 @@ bool See3CAM_CU210::getAwbMode()
 }
 
 
-
 /**
  * @brief See3CAM_CU210::setAwbLockStatus - setting AWB mode to the camera
  * @param awbMode - Type of AWB mode
@@ -235,7 +234,8 @@ bool See3CAM_CU210::getExposureMeteringMode()
             g_in_packet_buf[1] == CAMERA_CONTROL_ID2_SEE3CAM_CU210 &&
             g_in_packet_buf[2] == GET_EXPOSURE_METERING_MODE_SEE3CAM_CU210 &&
             g_in_packet_buf[6] == GET_SUCCESS) {
-            emit awbLockStatusReceived(g_in_packet_buf[3]);
+            emit meteringModeReceived(g_in_packet_buf[3]);
+
             return true;
         }
     }
@@ -605,6 +605,69 @@ bool See3CAM_CU210::getDenoiseMode()
     return false;
 }
 
+
+/**
+ * @brief See3CAM_CU210::readISPFirmwareVersion - To read the firmware version of ISP
+ * @return true/false
+ */
+bool See3CAM_CU210::readISPFirmwareVersion()
+{
+    _title = tr("ISP Firmware Version");
+
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    bool timeout = true;
+    int ret = 0;
+    unsigned int start, end = 0;
+
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+
+    //Set the Report Number
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID1_SEE3CAM_CU210; 	/* control_id_1 */
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID2_SEE3CAM_CU210; 	/* control_id_2 */
+    g_out_packet_buf[3] = ISP_FIRMWARE_VERSION_SEE3CAM_CU210; 	/* Id to get ISP version */
+
+    /* Send a Report to the Device */
+    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
+    if (ret < 0) {
+        _text = tr("Device not available");
+        return false;
+    }
+
+    /* Read the Firmware Version from the device */
+    start = uvc.getTickCount();
+
+    while(timeout)
+    {
+        /* Get a report from the device */
+        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
+        if (ret < 0) {
+        } else {
+            if(g_in_packet_buf[0] == CAMERA_CONTROL_ID1_SEE3CAM_CU210 &&
+               g_in_packet_buf[1] == CAMERA_CONTROL_ID2_SEE3CAM_CU210 &&
+               g_in_packet_buf[2] == ISP_FIRMWARE_VERSION_SEE3CAM_CU210) {
+
+                timeout = false;
+            }
+        }
+        end = uvc.getTickCount();
+        if(end - start > TIMEOUT)
+        {
+            timeout = false;
+            return false;
+        }
+    }
+
+    _text.clear();
+    _text.append("Version: ");
+    _text.append(QString::number(g_in_packet_buf[3]).append(".").append(QString::number(g_in_packet_buf[4])).append(".").append(QString::number(g_in_packet_buf[5])).append(".").append(QString::number(g_in_packet_buf[6])));
+    emit titleTextChanged(_title,_text);
+    return true;
+}
 
 /**
  * @brief See3CAM_CU210::setToDefaultValues - set all the values to default in camera

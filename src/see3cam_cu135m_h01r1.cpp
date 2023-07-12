@@ -31,7 +31,7 @@ bool See3CAM_CU135M_H01R1::setStreamMode(streamModes streamMode){
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* camera id */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
     g_out_packet_buf[2] = SET_STREAM_MODE_CU1330M; /* set stream mode command */
     g_out_packet_buf[3] = streamMode; /* stream mode to set */
 
@@ -39,7 +39,7 @@ bool See3CAM_CU135M_H01R1::setStreamMode(streamModes streamMode){
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1]==SET_STREAM_MODE_CU1330M &&
             g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
@@ -65,14 +65,14 @@ bool See3CAM_CU135M_H01R1::getStreamMode()
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* camera id */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
     g_out_packet_buf[2] = GET_STREAM_MODE_CU1330M; /* get stream mode command */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1]==GET_STREAM_MODE_CU1330M &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             emit streamModeValue(g_in_packet_buf[2]);
@@ -98,7 +98,7 @@ bool See3CAM_CU135M_H01R1::setFlashState(flashStateValues flashMode)
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] =CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* set camera control code */
+    g_out_packet_buf[1] =CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* set camera control code */
     g_out_packet_buf[2] = SET_FLASH_MODE_CU1330M ; /* set flash mode code */
     g_out_packet_buf[3] = flashMode; /* actual flash mode */
 
@@ -106,7 +106,7 @@ bool See3CAM_CU135M_H01R1::setFlashState(flashStateValues flashMode)
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==GET_FAILURE) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1]==SET_FLASH_MODE_CU1330M  &&
             g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
@@ -132,14 +132,14 @@ bool See3CAM_CU135M_H01R1::getFlashState()
    initializeBuffers();
 
    // fill buffer values
-   g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H;  /* set camera control code */
+   g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;  /* set camera control code */
    g_out_packet_buf[2] = GET_FLASH_MODE_CU1330M ; /* get flash mode code */
 
    // send request and get reply from camera
    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
        if (g_in_packet_buf[6]==GET_FAILURE) {
            return false;
-       } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+       } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
            g_in_packet_buf[1]==GET_FLASH_MODE_CU1330M  &&
            g_in_packet_buf[6]==GET_SUCCESS) {
            emit flashModeValue(g_in_packet_buf[2]);
@@ -178,7 +178,7 @@ bool See3CAM_CU135M_H01R1::setFlipCtrlValue(bool hFlip ,bool vFlip)
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* set camera control code */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* set camera control code */
     g_out_packet_buf[2] = SET_ORIENTATION_CU1330M ; /* set flip control code */
     g_out_packet_buf[3] = flipMode; /* set flipControl value */
 
@@ -186,7 +186,7 @@ bool See3CAM_CU135M_H01R1::setFlipCtrlValue(bool hFlip ,bool vFlip)
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1]==SET_ORIENTATION_CU1330M  &&
             g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
@@ -212,14 +212,14 @@ bool See3CAM_CU135M_H01R1::getFlipCtrlValue()
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* set camera control code */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* set camera control code */
     g_out_packet_buf[2] = GET_ORIENTATION_CU1330M ; /* get flip control code */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1]==GET_ORIENTATION_CU1330M  &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             emit flipCtrlValue(g_in_packet_buf[2]);
@@ -239,7 +239,7 @@ bool See3CAM_CU135M_H01R1::getFlipCtrlValue()
  * @param winSize - ROI window size
  * return true - success /false - failure
  */
-bool See3CAM_CU135M_H01R1::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize)
+bool See3CAM_CU135M_H01R1::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, QString winSize)
 {
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -248,24 +248,23 @@ bool See3CAM_CU135M_H01R1::setROIAutoExposure(camROIAutoExpMode see3camAutoexpRO
     }
 
     //((Input - InputLow) / (InputHigh - InputLow)) * (OutputHigh - OutputLow) + OutputLow // map resolution width and height -  0 to 255
-
     double outputLow = 0;
     double outputHigh = 255;
     double inputXLow = 0;
     double inputXHigh = vidResolnWidth-1;
-    double inputXCord = xCord;
+    double inputXCord = 0;
     int outputXCord = ((inputXCord - inputXLow) / (inputXHigh - inputXLow)) * (outputHigh - outputLow) + outputLow;
 
     double inputYLow = 0;
     double inputYHigh = vidResolnHeight-1;
-    double inputYCord = yCord;
+    double inputYCord = 0;
     int outputYCord = ((inputYCord - inputYLow) / (inputYHigh - inputYLow)) * (outputHigh - outputLow) + outputLow;
 
     //Initialize buffers
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* camera id */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
     g_out_packet_buf[2] = SET_EXP_ROI_MODE_CU1330M; /* set exposure ROI command */
     g_out_packet_buf[3] = see3camAutoexpROIMode; /* exposure ROI mode to set */
 
@@ -280,7 +279,7 @@ bool See3CAM_CU135M_H01R1::setROIAutoExposure(camROIAutoExpMode see3camAutoexpRO
 
         if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1]==SET_EXP_ROI_MODE_CU1330M &&
             g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
@@ -305,17 +304,17 @@ bool See3CAM_CU135M_H01R1::getAutoExpROIModeAndWindowSize(){
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* camera id */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
     g_out_packet_buf[2] = GET_EXP_ROI_MODE_CU1330M; /* get exposure ROI mode  */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==GET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1]==GET_EXP_ROI_MODE_CU1330M &&
             g_in_packet_buf[6]==GET_SUCCESS) {
-            emit roiAutoExpMode(g_in_packet_buf[2], g_in_packet_buf[3], g_in_packet_buf[4], g_in_packet_buf[5]);
+            emit roiAutoExpMode(g_in_packet_buf[2], g_in_packet_buf[5]);
             return true;
         }
     }
@@ -339,14 +338,14 @@ bool See3CAM_CU135M_H01R1::getGainMode()
     uint manualGain;
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H;
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[2] = GET_AUTO_GAIN_MODE_SEE3CAM_CU135M_H01R1_H;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == GET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == GET_AUTO_GAIN_MODE_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6] == GET_SUCCESS) {
 
@@ -380,7 +379,7 @@ bool See3CAM_CU135M_H01R1::setGainMode(gainMode gainType,autoGain autoModes,uint
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H;
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[2] = SET_AUTO_GAIN_MODE_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[3] = gainType;
     if(g_out_packet_buf[3] == 0x00)
@@ -397,7 +396,7 @@ bool See3CAM_CU135M_H01R1::setGainMode(gainMode gainType,autoGain autoModes,uint
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == SET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == SET_AUTO_GAIN_MODE_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6] == SET_SUCCESS) {
             return true;
@@ -424,14 +423,14 @@ bool See3CAM_CU135M_H01R1::getGainLimit()
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H;
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[2] = GET_AUTO_GAIN_LIMIT_SEE3CAM_CU135M_H01R1_H;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[10] == GET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == GET_AUTO_GAIN_LIMIT_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[10] == GET_SUCCESS) {
 
@@ -476,7 +475,7 @@ bool See3CAM_CU135M_H01R1::setGainLimit(uint lowerLimit, uint upperLimit)
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H;
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[2] = SET_AUTO_GAIN_LIMIT_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[3] = ((lowerLimit & 0xFF00) >> 8);
     g_out_packet_buf[4] = ((lowerLimit & 0x00FF) >> 0);
@@ -489,7 +488,7 @@ bool See3CAM_CU135M_H01R1::setGainLimit(uint lowerLimit, uint upperLimit)
         if (g_in_packet_buf[6] == SET_FAIL) {
             emit indicateCommandStatus("Failure","Limit value is failed to set");
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == SET_AUTO_GAIN_LIMIT_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6] == SET_SUCCESS) {
             lowerLimit = (g_in_packet_buf[2] << 8) | (g_in_packet_buf[3] << 0);
@@ -519,7 +518,7 @@ bool See3CAM_CU135M_H01R1::setBlackLevelAdjustment(blackLevelAdjustment blacklev
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H;
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[2] = SET_BLACKLEVEL_CORRECTION_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[3] = blacklevel;
 
@@ -527,7 +526,7 @@ bool See3CAM_CU135M_H01R1::setBlackLevelAdjustment(blackLevelAdjustment blacklev
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == SET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == SET_BLACKLEVEL_CORRECTION_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6] == SET_SUCCESS) {
             return true;
@@ -552,14 +551,14 @@ bool See3CAM_CU135M_H01R1::getBlackLevelAdjustment()
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H;
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[2] = GET_BLACKLEVEL_CORRECTION_SEE3CAM_CU135M_H01R1_H;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == GET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == GET_BLACKLEVEL_CORRECTION_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6] == GET_SUCCESS) {
             emit blackLevelAdjustmentChanged(g_in_packet_buf[2]);
@@ -586,7 +585,7 @@ bool See3CAM_CU135M_H01R1 ::setTargetBrightness(uint targetBrightness)
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* set camera control code */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* set camera control code */
     g_out_packet_buf[2] = SET_TARGET_BRIGHTNESS_SEE3CAM_CU135M_H01R1_H ;
     g_out_packet_buf[3] = ((targetBrightness & 0xFF00) >> 8);
     g_out_packet_buf[4] = ((targetBrightness & 0x00FF) >> 0);
@@ -596,7 +595,7 @@ bool See3CAM_CU135M_H01R1 ::setTargetBrightness(uint targetBrightness)
         if (g_in_packet_buf[6]==GET_FAILURE) {
 
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1]==SET_TARGET_BRIGHTNESS_SEE3CAM_CU135M_H01R1_H  &&
             g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
@@ -624,14 +623,14 @@ bool See3CAM_CU135M_H01R1::getTargetBrightness()
    uint brightness;
    uint sliderMin,sliderMax;
    // fill buffer values
-   g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H;  /* set camera control code */
+   g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;  /* set camera control code */
    g_out_packet_buf[2] = GET_TARGET_BRIGHTNESS_SEE3CAM_CU135M_H01R1_H;
 
    // send request and get reply from camera
    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
        if (g_in_packet_buf[8]==GET_FAILURE) {
            return false;
-       } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+       } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
            g_in_packet_buf[1]==GET_TARGET_BRIGHTNESS_SEE3CAM_CU135M_H01R1_H  &&
            g_in_packet_buf[8]==GET_SUCCESS) {
 
@@ -666,7 +665,7 @@ bool See3CAM_CU135M_H01R1::setExposureMode(exposureModes exposureMode)
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* set camera control code */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* set camera control code */
     g_out_packet_buf[2] = SET_EXPOSURE_MODE_SEE3CAM_CU135M_H01R1_H ;
     g_out_packet_buf[3] = exposureMode;
 
@@ -674,7 +673,7 @@ bool See3CAM_CU135M_H01R1::setExposureMode(exposureModes exposureMode)
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==GET_FAILURE) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1]== SET_EXPOSURE_MODE_SEE3CAM_CU135M_H01R1_H  &&
             g_in_packet_buf[6]== SET_SUCCESS) {
             return true;
@@ -700,13 +699,13 @@ bool See3CAM_CU135M_H01R1::getExposureMode()
    initializeBuffers();
 
    // fill buffer values
-   g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H;  /* set camera control code */
+   g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;  /* set camera control code */
    g_out_packet_buf[2] = GET_EXPOSURE_MODE_SEE3CAM_CU135M_H01R1_H;
    // send request and get reply from camera
    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
        if (g_in_packet_buf[6]==GET_FAILURE) {
            return false;
-       } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+       } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
            g_in_packet_buf[1]== GET_EXPOSURE_MODE_SEE3CAM_CU135M_H01R1_H  &&
            g_in_packet_buf[6]== GET_SUCCESS) {
            emit exposureModeRecieved(g_in_packet_buf[2]);
@@ -735,14 +734,14 @@ bool See3CAM_CU135M_H01R1::getAutoExposureLowerLimit()
     uint expLowerLimit;
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* camera id */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
     g_out_packet_buf[2] = GET_AUTO_EXPOSURE_LOWER_LIMIT_SEE3CAM_CU135M_H01R1_H;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == GET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == GET_AUTO_EXPOSURE_LOWER_LIMIT_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6] == GET_SUCCESS) {
             expLowerLimit = (g_in_packet_buf[2] << 24) | (g_in_packet_buf[3] << 16) | (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
@@ -781,7 +780,7 @@ bool See3CAM_CU135M_H01R1::setAutoExposureLowerLimit(uint lowerLimit){
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* camera id */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
     g_out_packet_buf[2] = SET_AUTO_EXPOSURE_LOWER_LIMIT_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[3] = ((exposureLowerLimit & 0xFF000000) >> 24);
     g_out_packet_buf[4] = ((exposureLowerLimit & 0x00FF0000) >> 16);
@@ -794,7 +793,7 @@ bool See3CAM_CU135M_H01R1::setAutoExposureLowerLimit(uint lowerLimit){
         if (g_in_packet_buf[6]==SET_FAIL) {
             emit indicateCommandStatus("Failure","Set lower limit value failed");
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == SET_AUTO_EXPOSURE_LOWER_LIMIT_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6] == SET_SUCCESS) {
             emit indicateCommandStatus("Success","Lower limit value set successfully");
@@ -821,7 +820,7 @@ bool See3CAM_CU135M_H01R1::getAutoExposureUpperLimit()
 
     uint expUpperLimit;
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* camera id */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
     g_out_packet_buf[2] = GET_AUTO_EXPOSURE_UPPER_LIMIT_SEE3CAM_CU135M_H01R1_H; /* get anti flicker command  */
 
     // send request and get reply from camera
@@ -829,7 +828,7 @@ bool See3CAM_CU135M_H01R1::getAutoExposureUpperLimit()
         if (g_in_packet_buf[6] == GET_FAIL) {
 
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == GET_AUTO_EXPOSURE_UPPER_LIMIT_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6] == GET_SUCCESS) {
             expUpperLimit = (g_in_packet_buf[2] << 24) | (g_in_packet_buf[3] << 16) | (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
@@ -867,7 +866,7 @@ bool See3CAM_CU135M_H01R1::setAutoExposureUpperLimit(uint upperLimit){
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* camera id */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
     g_out_packet_buf[2] = SET_AUTO_EXPOSURE_UPPER_LIMIT_SEE3CAM_CU135M_H01R1_H;
     g_out_packet_buf[3] = ((exposureUpperLimit & 0xFF000000) >> 24);
     g_out_packet_buf[4] = ((exposureUpperLimit & 0x00FF0000) >> 16);
@@ -878,7 +877,7 @@ bool See3CAM_CU135M_H01R1::setAutoExposureUpperLimit(uint upperLimit){
         if (g_in_packet_buf[6]==SET_FAIL) {
             emit indicateCommandStatus("Failure","Set upper limit value failed");
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == SET_AUTO_EXPOSURE_UPPER_LIMIT_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6] == SET_SUCCESS) {
             emit indicateCommandStatus("Success","Upper limit value set successfully");
@@ -904,14 +903,14 @@ bool See3CAM_CU135M_H01R1::setAntiFlickerMode(antiFlickerDetection antiFlickerMo
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* camera id */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
     g_out_packet_buf[2] = SET_ANTI_FLICKER_DETECTION_SEE3CAM_CU135M_H01R1_H; /* set anti flicker command  */
     g_out_packet_buf[3] = antiFlickerMode; /* anti flicker mode to set */
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == SET_ANTI_FLICKER_DETECTION_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6] == SET_SUCCESS) {
             return true;
@@ -936,14 +935,14 @@ bool See3CAM_CU135M_H01R1::getAntiFlickerMode()
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* camera id */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
     g_out_packet_buf[2] = GET_ANTI_FLICKER_DETECTION_SEE3CAM_CU135M_H01R1_H; /* get anti flicker command  */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == GET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == GET_ANTI_FLICKER_DETECTION_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6] == GET_SUCCESS) {
             emit antiFlickerModeRecieved(g_in_packet_buf[2]);
@@ -969,13 +968,13 @@ bool See3CAM_CU135M_H01R1::getStatistics(){
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* camera id */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
     g_out_packet_buf[2] = READ_STATISTICS_SEE3CAM_CU135M_H01R1_H;
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[8]==SET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1]==READ_STATISTICS_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[8]==SET_SUCCESS) {
             exposureStat = (g_in_packet_buf[2] << 24) | (g_in_packet_buf[3] << 16) | (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
@@ -1005,14 +1004,14 @@ bool See3CAM_CU135M_H01R1::setToDefault(){
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H; /* camera id */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
     g_out_packet_buf[2] = SET_TO_DEFAULT_SEE3CAM_CU135M_H01R1_H; /* set to default command */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H &&
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1]==SET_TO_DEFAULT_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[6]==SET_SUCCESS) {
             return true;

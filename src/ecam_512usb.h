@@ -59,6 +59,7 @@
 #define EXPOSURECOMP_MAX 1000000
 
 
+
 class ECAM_512USB : public QObject
 {
     Q_OBJECT
@@ -141,10 +142,22 @@ public:
     };
     Q_ENUMS(camROIAutoExpMode)
 
+    enum camSmileDetectMode {
+        SmileDetectEnable = 0x01,
+        SmileDetectDisable = 0x00
+    };
+    Q_ENUMS(camSmileDetectMode)
+
+    enum camSmileDetectEmbedDataMode {
+        SmileDetectEmbedDataEnable = 0x01,
+        SmileDetectEmbedDataDisable = 0x00
+    };
+    Q_ENUMS(camSmileDetectEmbedDataMode)
+
 signals:
     void specialModeReceived(uint specialMode);
     void denoiseValueReceived(uint denoiseValue);
-    void roiAutoExpMode(uint roiMode, uint x, uint y, uint winSize);
+    void roiAutoExpMode(uint roiMode, uint winSize);
     void burstLengthValueRecieved(uint burstLenVal);
     void qFactorValueReceived(uint Qfactor);
     void flipMirrorModeReceived(uint flipMode);

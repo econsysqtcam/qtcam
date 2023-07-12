@@ -1601,11 +1601,11 @@ Rectangle {
         case CommonEnums.SEE3CAM_135M:
         case CommonEnums.SEE3CAM_27CUG:  //Added by Sushanth.S
         case CommonEnums.SEE3CAM_CU83:   //Added by Sushanth.S
-        case CommonEnums.SEE3CAM_50CUGM:  //Added by Sushanth.S
-        case CommonEnums.SEE3CAM_CU512M:  //Added by Sushanth.S
-        case CommonEnums.SEE3CAM_16CUGM:  //Added by Sushanth.S
+        case CommonEnums.SEE3CAM_50CUGM: //Added by Sushanth.S
+        case CommonEnums.SEE3CAM_CU512M: //Added by Sushanth.S
+        case CommonEnums.SEE3CAM_16CUGM: //Added by Sushanth.S
         case CommonEnums.SEE3CAM_CU210:  //Added by Sushanth.S
-        case CommonEnums.ECAM_512USB:  //Added by Sushanth.S
+        case CommonEnums.ECAM_512USB:    //Added by Sushanth.S
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
             break;

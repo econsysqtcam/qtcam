@@ -699,7 +699,7 @@ bool FSCAM_CU135::getSmileDetectMode(){
            return false;
        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_FSCAM_CU135 &&
            g_in_packet_buf[1]==GET_SMILE_DETECTION_FSCAM_CU135 &&
-           g_in_packet_buf[6]==GET_SUCCESS) {\
+           g_in_packet_buf[6]==GET_SUCCESS) {
 
            smileDetectMode = g_in_packet_buf[2];
            smileDetectEmbedDataValue = g_in_packet_buf[3];

@@ -45,9 +45,6 @@ Item {
     property int minFrameRate: 0
     property int maxFrameRate: 60
 
-    property int xCoordinate: 0
-    property int yCoordinate: 0
-
     property bool setButtonClicked: false
     property bool skipUpdateUIQFactor: false
     property bool skipUpdateUIDenoise: false
@@ -76,6 +73,15 @@ Item {
         onTriggered:
         {
             setToDefaultValues()
+        }
+    }
+    // Used when selecting auto exposure in image Quality settings menu
+    Timer {
+        id: getAutoExpsoureControlValues
+        interval: 1000
+        onTriggered: {
+            ecam512usb.getAutoExpROIModeAndWindowSize()
+            stop()
         }
     }
 
@@ -114,7 +120,7 @@ Item {
             ecam512usb.setExposureCompensation(exposureCompValue.text)
         }
         onAutoExposureSelected:{
-//            enableDisableAutoExposureControls(autoExposureSelect)
+            enableDisableAutoExposureControls(autoExposureSelect)
         }
         onVideoResolutionChanged:{
             getCamValuesTimer.start()
@@ -124,6 +130,11 @@ Item {
         }
         onVideoColorSpaceChanged:{
             getCamValuesTimer.start()
+        }
+        onMouseRightClicked:{
+            if(autoexpManual.enabled && autoexpManual.checked){
+               ecam512usb.setROIAutoExposure(ECAM_512USB.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
+            }
         }
     }
     ScrollView{
@@ -135,7 +146,7 @@ Item {
         style: econscrollViewStyle
 
         Item {
-            height:1300
+            height:1600
 
             ColumnLayout{
                 x:2
@@ -209,10 +220,10 @@ Item {
                         exclusiveGroup: specialEffectsGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            ecam512usb.setSpecialMode(ECAM_512USB.SPECIAL_NEGATIVE)
+                            ecam512usb.setSpecialMode(ECAM_512USB.SPECIAL_SKETCH)
                         }
                         Keys.onReturnPressed: {
-                            ecam512usb.setSpecialMode(ECAM_512USB.SPECIAL_NEGATIVE)
+                            ecam512usb.setSpecialMode(ECAM_512USB.SPECIAL_SKETCH)
                         }
                     }
                     RadioButton
@@ -224,11 +235,11 @@ Item {
                         activeFocusOnPress: true
                         onClicked:
                         {
-                            ecam512usb.setSpecialMode(ECAM_512USB.SPECIAL_SKETCH)
+                            ecam512usb.setSpecialMode(ECAM_512USB.SPECIAL_NEGATIVE)
                         }
                         Keys.onReturnPressed:
                         {
-                            ecam512usb.setSpecialMode(ECAM_512USB.SPECIAL_SKETCH)
+                            ecam512usb.setSpecialMode(ECAM_512USB.SPECIAL_NEGATIVE)
                         }
                     }
                 }
@@ -703,6 +714,23 @@ Item {
                     y:230
                     spacing: 25
                     ExclusiveGroup { id: flashGrp }
+
+                    Column{
+                        RadioButton {
+                            exclusiveGroup: flashGrp
+                            checked: false
+                            id: flashModeOff
+                            text: "Disable"
+                            activeFocusOnPress: true
+                            style: econRadioButtonStyle
+                            onClicked: {
+                                ecam512usb.setFlashMode(ECAM_512USB.FLASH_DISABLE)
+                            }
+                            Keys.onReturnPressed: {
+                                ecam512usb.setFlashMode(ECAM_512USB.FLASH_DISABLE)
+                            }
+                        }
+                    }
                     Column{
                         RadioButton {
                             exclusiveGroup: flashGrp
@@ -732,22 +760,6 @@ Item {
                             }
                             Keys.onReturnPressed: {
                                 ecam512usb.setFlashMode(ECAM_512USB.FLASH_TORCH)
-                            }
-                        }
-                    }
-                    Column{
-                        RadioButton {
-                            exclusiveGroup: flashGrp
-                            checked: false
-                            id: flashModeOff
-                            text: "Disable"
-                            activeFocusOnPress: true
-                            style: econRadioButtonStyle
-                            onClicked: {
-                                ecam512usb.setFlashMode(ECAM_512USB.FLASH_DISABLE)
-                            }
-                            Keys.onReturnPressed: {
-                                ecam512usb.setFlashMode(ECAM_512USB.FLASH_DISABLE)
                             }
                         }
                     }
@@ -866,7 +878,6 @@ Item {
                     opacity: (antiFlickerModeManual.enabled && antiFlickerModeManual.checked) ? 1 : 0.1
                     model: ListModel
                            {
-                                ListElement { text: "AUTO" }
                                 ListElement { text: "50 Hz" }
                                 ListElement { text: "60 Hz" }
                                 ListElement { text: "DISABLE" }
@@ -998,7 +1009,7 @@ Item {
          currentFlipMirrorModeStatus(flipMode)
      }
      onFaceDetectModeValue:{
-         currentFaceDetectionStatus(faceDetectMode)
+         currentFaceDetectionStatus(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect)
      }
      onSmileDetectModeValue:{
          currentSmileDetectionStatus(smileDetectMode, smileDetectEmbedDataValue)
@@ -1010,7 +1021,8 @@ Item {
          skipUpdateUIDenoise = true
      }
      onRoiAutoExpMode:{
-         currentROIAutoExposureMode(roiMode, x, y, winSize)
+
+         currentROIAutoExposureMode(roiMode, winSize)
      }
      onExposureCompValueRecieved:
      {
@@ -1042,8 +1054,8 @@ Item {
          if(setButtonClicked){
              displayMessageBox(title, text)
              setButtonClicked = false
-//             ecam512usb.getExposureCompensation()
-//             ecam512usb.getFrameRateCtrlValue()
+             ecam512usb.getExposureCompensation()
+             ecam512usb.getFrameRateCtrlValue()
          }
      }
    }
@@ -1194,28 +1206,25 @@ Item {
     {
         switch(specialMode)
         {
-            case ECAM_512USB.EFFECT_NORMAL:
+            case ECAM_512USB.SPECIAL_NORMAL:
                 rdoEffectNormal.checked = true
                 break
-            case ECAM_512USB.EFFECT_BLACK_WHITE:
+            case ECAM_512USB.SPECIAL_BLACK_WHITE:
                 rdoEffectBW.checked = true
                 break
-            case ECAM_512USB.EFFECT_GREYSCALE:
+            case ECAM_512USB.SPECIAL_GREYSCALE:
                 rdoEffectGreyScale.checked = true
                 break
-            case ECAM_512USB.EFFECT_NEGATIVE:
+            case ECAM_512USB.SPECIAL_NEGATIVE:
                 rdoEffectNegative.checked = true
                 break
-            case ECAM_512USB.EFFECT_SKETCH:
+            case ECAM_512USB.SPECIAL_SKETCH:
                 rdoEffectSketch.checked = true
                 break
         }
     }
 
-    function currentROIAutoExposureMode(roiMode, xValue, yValue, winSize){
-
-        xCoordinate = xValue
-        yCoordinate = yValue
+    function currentROIAutoExposureMode(roiMode, winSize){
 
         switch(roiMode){
         case ECAM_512USB.AutoExpFull:
@@ -1247,7 +1256,7 @@ Item {
             flipCtrlVertical.checked  = false
             flipCtrlHorizotal.checked = true
             break;
-        case ECAM_512USB.BOTH:
+        case ECAM_512USB.ROATATE_180:
             flipCtrlVertical.checked  = true
             flipCtrlHorizotal.checked = true
             break;
@@ -1258,24 +1267,24 @@ Item {
         }
     }
 
-    function currentFaceDetectionStatus(faceDetectMode)
+    function currentFaceDetectionStatus(faceDetectMode, faceDetectEmbedDataValue, faceDetectOverlayRect)
     {
-        if(faceDetectMode == ecam512usb.FaceRectEnable){
+        if(faceDetectMode == ECAM_512USB.FaceRectEnable){
             faceRectEnable.checked = true
-            if(faceDetectEmbedDataValue == ecam512usb.FaceDetectEmbedDataEnable){
+            if(faceDetectEmbedDataValue == ECAM_512USB.FaceDetectEmbedDataEnable){
                 faceDetectEmbedData.checked = true
             }
-            if(faceDetectOverlayRect == ecam512usb.FaceDetectOverlayRectEnable){
+            if(faceDetectOverlayRect == ECAM_512USB.FaceDetectOverlayRectEnable){
                 overlayRect.checked = true
             }
-        }else if(faceDetectMode == ecam512usb.FaceRectDisable){
+        }else if(faceDetectMode == ECAM_512USB.FaceRectDisable){
             faceRectDisable.checked = true
-            if(faceDetectEmbedDataValue == ecam512usb.FaceDetectEmbedDataEnable){
+            if(faceDetectEmbedDataValue == ECAM_512USB.FaceDetectEmbedDataEnable){
                 faceDetectEmbedData.checked = true
             }else{
                 faceDetectEmbedData.checked = false
             }
-            if(faceDetectOverlayRect == ecam512usb.FaceDetectOverlayRectEnable){
+            if(faceDetectOverlayRect == ECAM_512USB.FaceDetectOverlayRectEnable){
                 overlayRect.checked = true
             }else{
                 overlayRect.checked = false
@@ -1285,14 +1294,14 @@ Item {
 
     function currentSmileDetectionStatus(smileDetectMode, smileDetectEmbedDataValue)
     {
-        if(smileDetectMode == Fscamcu135.SmileDetectEnable){
+        if(smileDetectMode == ECAM_512USB.SmileDetectEnable){
             smileDetectEnable.checked = true
-            if(smileDetectEmbedDataValue == Fscamcu135.SmileDetectEmbedDataEnable){
+            if(smileDetectEmbedDataValue == ECAM_512USB.SmileDetectEmbedDataEnable){
                 smileDetectEmbedData.checked = true
             }
-        }else if(smileDetectMode == Fscamcu135.SmileDetectDisable){
+        }else if(smileDetectMode == ECAM_512USB.SmileDetectDisable){
             smileDetectDisable.checked = true
-            if(smileDetectEmbedDataValue == Fscamcu135.SmileDetectEmbedDataEnable){
+            if(smileDetectEmbedDataValue == ECAM_512USB.SmileDetectEmbedDataEnable){
                 smileDetectEmbedData.checked = true
             }else{
                 smileDetectEmbedData.checked = false
@@ -1336,7 +1345,7 @@ Item {
             case ECAM_512USB.MODE_DISABLE://need to check the flags
                 antiFlickerModeManual.checked = true
                 skipUpdateUIOnAntiFlickerMode = false
-                antiFlickerCombo.currentIndex = 1
+                antiFlickerCombo.currentIndex = 2
                 skipUpdateUIOnAntiFlickerMode = true
                 break
          }
@@ -1367,12 +1376,10 @@ Item {
     function setAntiFlickerMode()
     {
         if(antiFlickerCombo.currentIndex === 0)
-            ecam512usb.setAntiFlickerMode(ECAM_512USB.MODE_AUTO)
-        else if(antiFlickerCombo.currentIndex === 1)
             ecam512usb.setAntiFlickerMode(ECAM_512USB.MODE_50Hz)
-        else if(antiFlickerCombo.currentIndex === 2)
+        else if(antiFlickerCombo.currentIndex === 1)
             ecam512usb.setAntiFlickerMode(ECAM_512USB.MODE_60Hz)
-        else if(antiFlickerCombo.currentIndex === 3)
+        else if(antiFlickerCombo.currentIndex === 2)
             ecam512usb.setAntiFlickerMode(ECAM_512USB.MODE_DISABLE)
     }
 
@@ -1400,18 +1407,21 @@ Item {
         messageDialog.open()
     }
 
+    function enableDisableAutoExposureControls(autoExposureSelect){
+        getAutoExpsoureControlValues.start()
+    }
     function getValuesFromCamera(){
-//        getCamValuesTimer.start()
-//        ecam512usb.getSpecialMode()
-//        ecam512usb.getDenoiseValue()
-//        ecam512usb.getBurstLength()
-//        ecam512usb.getQFactorValue()
-//        ecam512usb.getOrientation()
-//        ecam512usb.getFaceDetectMode()
-//        ecam512usb.getSmileDetectMode()
-//        ecam512usb.getFlashMode()
-//        ecam512usb.getAntiFlickerMode()
-//        ecam512usb.getAutoExpROIModeAndWindowSize()
+        ecam512usb.getSpecialMode()
+        ecam512usb.getDenoiseValue()
+        ecam512usb.getBurstLength()
+        ecam512usb.getQFactorValue()
+        ecam512usb.getOrientation()
+        ecam512usb.getAutoExpROIModeAndWindowSize()
+        ecam512usb.getFaceDetectMode()
+        ecam512usb.getSmileDetectMode()
+        getCamValuesTimer.start()
+        ecam512usb.getFlashMode()
+        ecam512usb.getAntiFlickerMode()
     }
 
     Component.onCompleted: {

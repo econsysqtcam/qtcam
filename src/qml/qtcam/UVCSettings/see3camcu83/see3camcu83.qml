@@ -1067,7 +1067,7 @@ Item{
                 case See3Cam_CU83.MODE_DISABLE://need to check the flags
                     antiFlickerModeManual.checked = true
                     skipUpdateUIOnAntiFlickerMode = false
-                    antiFlickerCombo.currentIndex = 1
+                    antiFlickerCombo.currentIndex = 2
                     skipUpdateUIOnAntiFlickerMode = true
                     break
              }

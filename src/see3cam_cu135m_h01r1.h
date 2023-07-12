@@ -4,7 +4,7 @@
 #include "uvccamera.h"
 #include <QObject>
 
-#define CAMERA_CONTROL_CU1330M_SEE3CAM_CU135M_H01R1_H          0xB0
+#define CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H          0xB0
 
 #define GET_STREAM_MODE_CU1330M                 0x01
 #define SET_STREAM_MODE_CU1330M                 0x02
@@ -129,7 +129,7 @@ signals:
     void flashModeValue(uint flashMode);
     void streamModeValue(uint streamMode);
     void flipCtrlValue(uint flipValue);
-    void roiAutoExpMode(uint roiMode, uint x, uint y, uint winSize);
+    void roiAutoExpMode(uint roiMode, uint winSize);
 
     void blackLevelAdjustmentChanged(uint blacklevel);
 
@@ -170,7 +170,7 @@ public slots:
     bool setFlipCtrlValue(bool horzModeSel, bool vertiModeSel);
     bool getFlipCtrlValue();
 
-    bool setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
+    bool setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, QString winSize);
     bool getAutoExpROIModeAndWindowSize();
 
     bool getGainMode();

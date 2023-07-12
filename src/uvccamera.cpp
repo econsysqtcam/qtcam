@@ -447,7 +447,6 @@ bool uvccamera::closeAscellaDevice(){
 
 bool uvccamera::readFirmwareVersion(quint8 *pMajorVersion, quint8 *pMinorVersion1, quint16 *pMinorVersion2, quint16 *pMinorVersion3) {
 
-
     if(uvccamera::hid_fd < 0)
     {
         return false;

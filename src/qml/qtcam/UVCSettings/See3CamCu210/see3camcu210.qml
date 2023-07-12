@@ -15,9 +15,13 @@ Item {
     property int qFactorMin: 0
     property int qFactorMax: 100
 
-    property bool skipUpdateUIQFactor: false
-    property bool skipUpdateUIOnBurstLength: false
-    property bool skipUpdateUIOnAntiFlickerMode:false
+    property bool skipUpdateUIQFactor           : false
+    property bool skipUpdateUIOnBurstLength     : false
+    property bool skipUpdateUIOnAntiFlickerMode :false
+    property bool skipUpdateUIOnAWBLockStatus   :false
+    property bool skipUpdateUIOnAELockStatus    :false
+    property bool skipUpdateUIOnAWBMode    :false
+
 
     Action {
         id: firmwareVersion
@@ -42,6 +46,14 @@ Item {
         }
     }
 
+    Action {
+        id: ispVersion
+        onTriggered:
+        {
+            getISPFirmwareVersion()
+        }
+    }
+
     Connections
     {
         target: root
@@ -63,18 +75,6 @@ Item {
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
-//        onAutoExposureSelected:{
-//            enableDisableAutoExposureControls(autoExposureSelect)
-//        }
-//        onVideoResolutionChanged:{
-//            getCameraSettingsTimer.start()
-//        }
-//        onPreviewFPSChanged:{
-//            getCameraSettingsTimer.start()
-//        }
-//        onVideoColorSpaceChanged:{
-//            getCameraSettingsTimer.start()
-//        }
     }
 
     ScrollView{
@@ -87,7 +87,7 @@ Item {
         style: econscrollViewStyle
 
         Item{
-            height: 1100
+            height: 900
 
             ColumnLayout{
                 x:2
@@ -124,8 +124,12 @@ Item {
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
-                    onCurrentIndexChanged: {
-                        setAwbMode()
+                    onCurrentIndexChanged: {          
+                        if(skipUpdateUIOnAWBMode)
+                        {
+                            setAwbMode()
+                        }
+                        skipUpdateUIOnAWBMode = true
                     }
                 }
 
@@ -139,36 +143,29 @@ Item {
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                 }
-                ColumnLayout{
-                    spacing: 8
-                    CheckBox {
-                        id: awbOn
-                        activeFocusOnPress : true
-                        text: "AWB On"
-                        style: econCheckBoxTextWrapModeStyle
-                        opacity: enabled ? 1 : 0.1
-                        onClicked:{
-                            see3camcu210.setAwbLockStatus(See3CAM_CU210.AWB_ON)
+                CheckBox {
+                    id: awbLockCheckBox
+                    enabled: true
+                    opacity: 1
+                    activeFocusOnPress : true
+                    text: "AWB Lock"
+                    style: econCheckBoxStyle
+                    Layout.alignment: Qt.AlignCenter
+                    onCheckedChanged: {
+                        if(skipUpdateUIOnAWBLockStatus)
+                        {
+                            if(checked)
+                            {
+                                see3camcu210.setAwbLockStatus(See3CAM_CU210.AWB_ON)
+                            }
+                            else
+                            {
+                                see3camcu210.setAwbLockStatus(See3CAM_CU210.AWB_OFF)
+                            }
                         }
-                        Keys.onReturnPressed: {
-                            see3camcu210.setAwbLockStatus(See3CAM_CU210.AWB_ON)
-                        }
-                    }
-                    CheckBox {
-                        id: awbOff
-                        activeFocusOnPress : true
-                        text: "AWB Off"
-                        style: econCheckBoxTextWrapModeStyle
-                        opacity: enabled ? 1 : 0.1
-                        onClicked:{
-                            see3camcu210.setAwbLockStatus(See3CAM_CU210.AWB_OFF)
-                        }
-                        Keys.onReturnPressed: {
-                            see3camcu210.setAwbLockStatus(See3CAM_CU210.AWB_OFF)
-                        }
+                        skipUpdateUIOnAWBLockStatus = true
                     }
                 }
-
                 Text
                 {
                     id: exposureMeteringMode
@@ -187,10 +184,10 @@ Item {
                     enabled: true
                     model: ListModel {
                         ListElement { text: "Auto Exposure Off" }
-                        ListElement { text: "Centre-Weighted average Mode" }
-                        ListElement { text: "All Block Integral Mode" }
-                        ListElement { text: "Small Area Mode" }
-                        ListElement { text: "Large Area Mode" }
+                        ListElement { text: "Centre-Weighted Average" }
+                        ListElement { text: "All Block Integral" }
+                        ListElement { text: "Small Area" }
+                        ListElement { text: "Large Area" }
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
@@ -209,40 +206,34 @@ Item {
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                 }
-                ColumnLayout{
-                    spacing: 8
-                    CheckBox {
-                        id: aeLockStatusOn
-                        activeFocusOnPress : true
-                        text: "AE On"
-                        style: econCheckBoxTextWrapModeStyle
-                        opacity: enabled ? 1 : 0.1
-                        onClicked:{
-                            see3camcu210.setAeLockStatus(See3CAM_CU210.AE_ON)
+                CheckBox {
+                    id: aeLockCheckBox
+                    enabled: true
+                    opacity: 1
+                    activeFocusOnPress : true
+                    text: "AE Lock"
+                    style: econCheckBoxStyle
+                    Layout.alignment: Qt.AlignCenter
+                    onCheckedChanged: {
+                        if(skipUpdateUIOnAELockStatus)
+                        {
+                            if(checked)
+                            {
+                                see3camcu210.setAeLockStatus(See3CAM_CU210.AE_ON)
+                            }
+                            else
+                            {
+                                see3camcu210.setAeLockStatus(See3CAM_CU210.AE_OFF)
+                            }
                         }
-                        Keys.onReturnPressed: {
-                            see3camcu210.setAeLockStatus(See3CAM_CU210.AE_ON)
-                        }
-                    }
-                    CheckBox {
-                        id: aeLockStatusOff
-                        activeFocusOnPress : true
-                        text: "AE Off"
-                        style: econCheckBoxTextWrapModeStyle
-                        opacity: enabled ? 1 : 0.1
-                        onClicked:{
-                            see3camcu210.setAeLockStatus(See3CAM_CU210.AE_OFF)
-                        }
-                        Keys.onReturnPressed: {
-                            see3camcu210.setAeLockStatus(See3CAM_CU210.AE_OFF)
-                        }
+                        skipUpdateUIOnAELockStatus = true
                     }
                 }
 
                 Text
                 {
                     id: antiFlickerMode
-                    text: "--- Anti Flicker Mode ---"
+                    text: "--- Flicker Mode ---"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -250,62 +241,9 @@ Item {
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                 }
-                Row
-                {
-                      spacing:90
-                      ExclusiveGroup { id: antiFlickerModegroup }
-
-                      RadioButton
-                      {
-                          exclusiveGroup: antiFlickerModegroup
-                          id: antiFlickerModeAuto
-                          text: "Auto"
-                          activeFocusOnPress: true
-                          style: econRadioButtonStyle
-                          opacity: enabled ? 1 : 0.1
-                          onClicked: {
-                              defaultValue.enabled = true
-                              see3camcu210.setFlickerMode(See3CAM_CU210.MODE_AUTO);
-                          }
-                          Keys.onReturnPressed: {
-                              defaultValue.enabled = true
-                              see3camcu210.setFlickerMode(See3CAM_CU210.MODE_AUTO);
-                          }
-                      }
-                      RadioButton
-                      {
-                          exclusiveGroup: antiFlickerModegroup
-                          id: antiFlickerModeManual
-                          text: "Manual"
-                          activeFocusOnPress: true
-                          style: econRadioButtonStyle
-                          opacity: enabled ? 1 : 0.1
-                          onClicked: {
-                              defaultValue.enabled = true
-                              setFlickerMode()
-                          }
-                          Keys.onReturnPressed: {
-                              defaultValue.enabled = true
-                              setFlickerMode()
-                          }
-                      }
-                }
-
-                Text
-                {
-                    id: frequency
-                    text: "Frequency :"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    opacity: (antiFlickerModeManual.enabled && antiFlickerModeManual.checked) ? 1 : 0.1
-                }
                 ComboBox
                 {
-                    id: antiFlickerCombo
-                    enabled: (antiFlickerModeManual.enabled && antiFlickerModeManual.checked) ? true : false
-                    opacity: (antiFlickerModeManual.enabled && antiFlickerModeManual.checked) ? 1 : 0.1
+                    id: flickerModeCombo
                     model: ListModel
                            {
                                 ListElement { text: "AUTO" }
@@ -482,7 +420,6 @@ Item {
                 }
 
                Row{
-                   // Layout.alignment: Qt.AlignCenter
                     Button {
                         id: f_wversion_selected130
                         opacity: 1
@@ -527,6 +464,23 @@ Item {
                     }
                 }
 
+               Row{
+                   Layout.alignment: Qt.AlignCenter
+
+                   Button {
+                       id: ispFirmwareVersion
+                       opacity: 1
+                       action: ispVersion
+                       text: "ISP Version"
+                       activeFocusOnPress : true
+                       tooltip: "Click to view the ISP firmware version"
+                       style: econButtonStyle
+                       Keys.onReturnPressed: {
+                           see3camcu210.readISPFirmwareVersion()
+                       }
+                   }
+               }
+
             }//Coloumn Layout
 
          } // Item
@@ -537,17 +491,22 @@ Item {
      id:see3camcu210
 
      onAwbModeRecieved:{
+         skipUpdateUIOnAWBMode = false
          currentAwbMode(awbMode)
+         skipUpdateUIOnAWBMode = true
      }
-
      onAwbLockStatusReceived: {
-         currentAwbLockStatus(lockStatus)
+         skipUpdateUIOnAWBLockStatus = false
+         currentAwbLockStatus(awbLockStatus)
+         skipUpdateUIOnAWBLockStatus = true
      }
      onMeteringModeReceived: {
          currentExpMeteringMode(meteringMode)
      }
      onAeLockStatusReceived: {
+         skipUpdateUIOnAELockStatus = false
          currentAeLockStatus(aeLockStatus)
+         skipUpdateUIOnAELockStatus = true
      }
      onBurstLengthReceived: {
          skipUpdateUIOnBurstLength = false
@@ -555,7 +514,9 @@ Item {
          skipUpdateUIOnBurstLength = true
      }
      onFlickerModeReceived: {
+         skipUpdateUIOnAntiFlickerMode = false
          currentFlickerValue(flickerMode)
+         skipUpdateUIOnAntiFlickerMode = true
      }
      onQFactorValueReceived: {
          skipUpdateUIQFactor = false
@@ -564,6 +525,11 @@ Item {
      }
      onDenoiseModeReceived: {
          currentDenoiseMode(denoise)
+     }
+     onTitleTextChanged: {
+         messageDialog.title = _title.toString()
+         messageDialog.text = _text.toString()
+         messageDialog.open()
      }
 
    }
@@ -787,11 +753,23 @@ Item {
     function currentAwbLockStatus(mode){
         if(mode == See3CAM_CU210.AWB_ON)
         {
-            awbOn.checked = true
+           awbLockCheckBox.checked = true
         }
         else if(mode == See3CAM_CU210.AWB_OFF)
         {
-            awbOff.checked = true
+           awbLockCheckBox.checked = false
+        }
+    }
+
+    function currentAeLockStatus(status)
+    {
+        if(status == See3CAM_CU210.AE_ON)
+        {
+            aeLockCheckBox.checked = true
+        }
+        else if(status == See3CAM_CU210.AE_OFF)
+        {
+            aeLockCheckBox.checked = false
         }
     }
 
@@ -843,55 +821,35 @@ Item {
         }
     }
 
-    function currentAeLockStatus(status)
-    {
-        if(status == See3CAM_CU210.AWB_ON)
-        {
-            awbOn.checked = true
-        }
-        else if(status == See3CAM_CU210.AWB_OFF)
-        {
-            awbOff.checked = true
-        }
-    }
-
     function currentFlickerValue(flickerVal)
     {
-        switch(flickerVal)
+        if(flickerVal == See3CAM_CU210.FLICKER_AUTO)
         {
-            case See3CAM_CU210.FLICKER_AUTO:
-                antiFlickerModeAuto.checked = true
-                break
-            case See3CAM_CU210.FLICKER_50HZ:
-                antiFlickerModeManual.checked = true
-                skipUpdateUIOnAntiFlickerMode = false
-                antiFlickerCombo.currentIndex = 0
-                skipUpdateUIOnAntiFlickerMode = true
-                break
-            case See3CAM_CU210.FLICKER_60HZ:
-                antiFlickerModeManual.checked = true
-                skipUpdateUIOnAntiFlickerMode = false
-                antiFlickerCombo.currentIndex = 1
-                skipUpdateUIOnAntiFlickerMode = true
-                break
-            case See3CAM_CU210.FLICKER_DISABLE://need to check the flags
-                antiFlickerModeManual.checked = true
-                skipUpdateUIOnAntiFlickerMode = false
-                antiFlickerCombo.currentIndex = 1
-                skipUpdateUIOnAntiFlickerMode = true
-                break
-         }
+            flickerModeCombo.currentIndex = 0
+        }
+        else if(flickerVal == See3CAM_CU210.FLICKER_50HZ)
+        {
+            flickerModeCombo.currentIndex = 1
+        }
+        else if(flickerVal == See3CAM_CU210.FLICKER_60HZ)
+        {
+            flickerModeCombo.currentIndex = 2
+        }
+        else if(flickerVal == See3CAM_CU210.FLICKER_DISABLE)
+        {
+            flickerModeCombo.currentIndex = 3
+        }
     }
 
     function setFlickerMode()
     {
-        if(antiFlickerCombo.currentIndex === 0)
+        if(flickerModeCombo.currentIndex === 0)
             see3camcu210.setFlickerMode(See3CAM_CU210.FLICKER_AUTO)
-        else if(antiFlickerCombo.currentIndex === 1)
+        else if(flickerModeCombo.currentIndex === 1)
             see3camcu210.setFlickerMode(See3CAM_CU210.FLICKER_50HZ)
-        else if(antiFlickerCombo.currentIndex === 2)
+        else if(flickerModeCombo.currentIndex === 2)
             see3camcu210.setFlickerMode(See3CAM_CU210.FLICKER_60HZ)
-        else if(antiFlickerCombo.currentIndex === 3)
+        else if(flickerModeCombo.currentIndex === 3)
             see3camcu210.setFlickerMode(See3CAM_CU210.FLICKER_DISABLE)
     }
 
@@ -925,15 +883,20 @@ Item {
         messageDialog.open()
     }
 
+    function getISPFirmwareVersion(){
+        see3camcu210.readISPFirmwareVersion()
+        messageDialog.open()
+    }
+
     function getValuesFromCamera(){
-//        see3camcu210.getAwbMode()
-//        see3camcu210.getAwbLockStatus()
-//        see3camcu210.getExposureMeteringMode()
-//        see3camcu210.getAeLockStatus()
-//        see3camcu210.getBurstLength()
-//        see3camcu210.getFlickerMode()
-//        see3camcu210.getQFactorValue()
-//        see3camcu210.getDenoiseMode()
+        see3camcu210.getAwbMode()
+        see3camcu210.getAwbLockStatus()
+        see3camcu210.getExposureMeteringMode()
+        see3camcu210.getAeLockStatus()
+        see3camcu210.getBurstLength()
+        see3camcu210.getFlickerMode()
+        see3camcu210.getQFactorValue()
+        see3camcu210.getDenoiseMode()
     }
 
     Component.onCompleted: {

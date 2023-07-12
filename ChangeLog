@@ -1,8 +1,14 @@
+Qtcam Application - 25.0.15
+---------------------------
+*Added support for e-CAM512_USB_CHLBC_H01R1.
+*Added support for See3CAM_CU210.
+
 Qtcam Application - 25.0.14
 ---------------------------
 *Added Support for See3CAM_16CUGM.
 *Added Support for See3CAM_CU512M.
-*Added changes in gain mode & fixed ROI issue for See3CAM_CU135M.
+*Added new resolution (3120x1080), Dual streaming & still capture support for See3CAM_CU83.
+*Added changes in gain mode for See3CAM_CU135M.
 
 Qtcam Application - 25.0.13
 ---------------------------

@@ -43,7 +43,6 @@ bool ECAM_512USB::setSpecialMode(SPECIAL_EFFECTS  specialMode)
     initializeBuffers();
 
     // fill buffer values
-    // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_ID1_ECAM512USB; /* camera id_1 */
     g_out_packet_buf[2] = CAMERA_CONTROL_ID2_ECAM512USB; /* camera id_2 */
     g_out_packet_buf[3] = SET_SPECIAL_EFFECT_ECAM512USB; /* set special effect command */
@@ -87,6 +86,7 @@ bool ECAM_512USB::getSpecialMode()
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+
         if (g_in_packet_buf[6] == GET_FAIL){
             return false;
         }
@@ -125,7 +125,7 @@ bool ECAM_512USB::setDenoiseValue(uint denoiseVal)
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6] == SET_FAIL) {
+        if (g_in_packet_buf[6] == SET_FAIL){
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID1_ECAM512USB &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID2_ECAM512USB &&
@@ -198,12 +198,12 @@ bool ECAM_512USB::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, ui
     double outputHigh = 255;
     double inputXLow = 0;
     double inputXHigh = vidResolnWidth-1;
-    double inputXCord = xCord;
+    double inputXCord = 0;
     int outputXCord = ((inputXCord - inputXLow) / (inputXHigh - inputXLow)) * (outputHigh - outputLow) + outputLow;
 
     double inputYLow = 0;
     double inputYHigh = vidResolnHeight-1;
-    double inputYCord = yCord;
+    double inputYCord = 0;
     int outputYCord = ((inputYCord - inputYLow) / (inputYHigh - inputYLow)) * (outputHigh - outputLow) + outputLow;
 
     //Initialize buffers
@@ -214,7 +214,6 @@ bool ECAM_512USB::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, ui
     g_out_packet_buf[2] = CAMERA_CONTROL_ID2_ECAM512USB; /* camera id_2 */
     g_out_packet_buf[3] = SET_AUTO_EXPOSURE_ROI_ECAM512USB; /* set exposure ROI command */
     g_out_packet_buf[4] = see3camAutoexpROIMode; /* exposure ROI mode to set */
-
     if(see3camAutoexpROIMode == AutoExpManual){
         g_out_packet_buf[5] = outputXCord; // x cord
         g_out_packet_buf[6] = outputYCord; // y cord
@@ -230,6 +229,7 @@ bool ECAM_512USB::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, ui
             g_in_packet_buf[1]  == CAMERA_CONTROL_ID2_ECAM512USB &&
             g_in_packet_buf[2]  == SET_AUTO_EXPOSURE_ROI_ECAM512USB &&
             g_in_packet_buf[15] == SET_SUCCESS) {
+
             return true;
         }
     }
@@ -264,7 +264,7 @@ bool ECAM_512USB::getAutoExpROIModeAndWindowSize(){
             g_in_packet_buf[1]  == CAMERA_CONTROL_ID2_ECAM512USB &&
             g_in_packet_buf[2]  == GET_AUTO_EXPOSURE_ROI_ECAM512USB &&
             g_in_packet_buf[15] == GET_SUCCESS) {
-            emit roiAutoExpMode(g_in_packet_buf[3], g_in_packet_buf[4], g_in_packet_buf[5], g_in_packet_buf[6]);
+            emit roiAutoExpMode(g_in_packet_buf[3], g_in_packet_buf[6]);
             return true;
         }
     }
@@ -481,10 +481,11 @@ bool ECAM_512USB::getOrientation()
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_ID1_ECAM512USB; /* camera id_1 */
     g_out_packet_buf[2] = CAMERA_CONTROL_ID2_ECAM512USB; /* camera id_2 */
-    g_out_packet_buf[2] = GET_ORIENTATION_ECAM512USB; /* get orientation command  */
+    g_out_packet_buf[3] = GET_ORIENTATION_ECAM512USB; /* get orientation command  */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+
         if (g_in_packet_buf[6] == GET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID1_ECAM512USB &&
@@ -504,16 +505,11 @@ bool ECAM_512USB::getOrientation()
  * @return true/false
  */
 bool ECAM_512USB::setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect){
-     u_int8_t faceDetectMode, embedDataMode;
+     u_int8_t faceDetectMode;
     if(enableFaceDetectRect)
         faceDetectMode = ENABLE_FACE_DETECTION; /* enable face detect */
     else
         faceDetectMode = DISBLE_FACE_DETECTION; /* disable face detect */
-
-//    if(embedData)
-//        embedDataMode = ENABLE_EMBED_DATA_FSCAM_CU135; /* enable embed data */
-//    else
-//        embedDataMode = DISABLE_EMBED_DATA_FSCAM_CU135; /* disable embed data */
 
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -577,8 +573,8 @@ bool ECAM_512USB::getFaceDetectMode(){
            faceDetectMode           = g_in_packet_buf[3];
            faceDetectEmbedDataValue = g_in_packet_buf[4];
            faceOverlayRect          = g_in_packet_buf[5];
-           emit faceDetectModeValue(faceDetectMode, faceDetectEmbedDataValue, faceOverlayRect);
 
+           emit faceDetectModeValue(faceDetectMode, faceDetectEmbedDataValue, faceOverlayRect);
            return true;
        }
    }
@@ -657,7 +653,7 @@ bool ECAM_512USB::getSmileDetectMode(){
            g_in_packet_buf[6] == GET_SUCCESS) {
 
            smileDetectMode           = g_in_packet_buf[3];
-           smileDetectEmbedDataValue = g_in_packet_buf[4];
+           smileDetectEmbedDataValue = g_in_packet_buf[5];
 
            emit smileDetectModeValue(smileDetectMode, smileDetectEmbedDataValue);
            return true;
@@ -679,7 +675,6 @@ bool ECAM_512USB::setExposureCompensation(unsigned int exposureCompValue)
         emit indicateExposureValueRangeFailure("Failure", "Given exposure compensation value is invalid");
         return false;
     }
-
 
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -816,13 +811,14 @@ bool ECAM_512USB::getFrameRateCtrlValue()
 
    // send request and get reply from camera
    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-       if (g_in_packet_buf[6]==GET_FAIL) {
+
+       if (g_in_packet_buf[6] == GET_FAIL) {
            return false;
        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID1_ECAM512USB &&
-           g_in_packet_buf[1] == CAMERA_CONTROL_ID1_ECAM512USB &&
+           g_in_packet_buf[1] == CAMERA_CONTROL_ID2_ECAM512USB &&
            g_in_packet_buf[2] == GET_FRAME_RATE_CONTROL_ECAM512USB &&
            g_in_packet_buf[6] == GET_SUCCESS) {
-           emit frameRateCtrlValueRecieved(g_in_packet_buf[2]); /*To get current frame rate*/
+           emit frameRateCtrlValueRecieved(g_in_packet_buf[3]); /*To get current frame rate*/
            return true;
        }
    }
@@ -921,7 +917,6 @@ bool ECAM_512USB::setAntiFlickerMode(ANTI_FLICKER_DETECTION antiFlickerMode){
     g_out_packet_buf[2] = CAMERA_CONTROL_ID2_ECAM512USB; /* camera control id_2 */
     g_out_packet_buf[3] = SET_ANTI_FLICKER_MODE_ECAM512USB; /* anti flicker mode to set */
     g_out_packet_buf[4] = antiFlickerMode; /* anti flicker value to set */
-
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -1045,7 +1040,7 @@ bool ECAM_512USB::setToDefaultValues()
             g_in_packet_buf[1] == CAMERA_CONTROL_ID2_ECAM512USB &&
             g_in_packet_buf[2] == SET_TO_DEFAULT_ECAM512USB &&
             g_in_packet_buf[6] == SET_SUCCESS){
-            emit indicateCommandStatus("Success","Default Value Restored");
+            emit indicateCommandStatus("Success","Default value restored");
             return true;
         }
     }

@@ -676,7 +676,6 @@ skip:
  * @brief FrameRenderer::drawRGBABUffer - Shader for RGBA buffer and render
  */
 void FrameRenderer::drawRGBBUffer(){
-
     m_shaderProgram->bind();
 
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
@@ -3210,6 +3209,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 //Added By Sushanth.S - Preparing Buffer for rendering IR & RGB for See3CAM_27CUG
 bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
     m_renderer->render27CugMutex.lock();
+
     m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
     if(!inputBuffer){
         m_renderer->render27CugMutex.unlock();
@@ -3254,6 +3254,7 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
        helperObj.setImage(qImageRenderer);
     }
     m_renderer->render27CugMutex.unlock();
+
     return true;
 }
 

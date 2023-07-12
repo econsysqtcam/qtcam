@@ -77,7 +77,6 @@
 #include "see3cam_27cug.h"
 #include "renderer.h"
 #include "see3cam_cu83.h"
-#include "see3cam_50cug_m.h"
 #include "see3camcu512m.h"
 #include "see3cam16cugm.h"
 #include "see3cam_cu210.h"
@@ -174,12 +173,10 @@ int main(int argc, char *argv[])
     qmlRegisterType<SEE3CAM_CU83>("econ.camera.see3camcu83",1,0,"See3Cam_CU83");
     qmlRegisterType<BarcodeCamera>("econ.camera.barcode_camera",1,0,"BarcodeCamera");
     qmlRegisterType<ecam83_USB>("econ.camera.ecam83_usb",1,0,"Ecam83USB");//while exposing to qml it is must that first letter should be in caps.
-    qmlRegisterType<SEE3CAM_50CUGM>("econ.camera.see3cam_50cug_m",1,0,"SEE3CAM_50CUGM");
     qmlRegisterType<SEE3CAM_CU512M>("econ.camera.see3camcu512m", 1, 0, "See3CAM_CU512M");
     qmlRegisterType<SEE3CAM_16CUGM>("econ.camera.see3cam16cugm", 1, 0, "See3CAM_16CUGM");
     qmlRegisterType<See3CAM_CU210>("econ.camera.see3camcu210", 1, 0, "See3CAM_CU210");
     qmlRegisterType<ECAM_512USB>("econ.camera.ecam_512usb", 1, 0, "ECAM_512USB");
-
 
     //For IR Window
     qmlRegisterType<ImageItem>("econ.camera.qimagerenderer", 1, 0, "ImageItem");

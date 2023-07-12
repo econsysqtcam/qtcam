@@ -24,9 +24,6 @@ Item {
     property int brightnessMin: 0
     property int brightnessMax: 15
 
-    property int xCoordinate: 0
-    property int yCoordinate: 0
-
     property int gainMin: 1
     property int gainMax: 83
 
@@ -127,7 +124,7 @@ Item {
         }
         onMouseRightClicked:{
             if(autoexpManual.enabled && autoexpManual.checked){
-               see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
+               see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, width, height, autoExpoWinSizeCombo.currentText)
             }
         }
         onAutoExposureSelected:{
@@ -333,11 +330,11 @@ Item {
                     // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
                     // winSize is required only for manual mode
                     onClicked: {
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
+                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = false
                     }
                     Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
+                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = false
                     }
                 }
@@ -349,11 +346,11 @@ Item {
                     style: econRadioButtonStyle
                     opacity: enabled ? 1 : 0.1
                     onClicked: {
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, xCoordinate, yCoordinate, autoExpoWinSizeCombo.currentText);
+                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = true
                     }
                     Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, xCoordinate, yCoordinate, autoExpoWinSizeCombo.currentText);
+                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, autoExpoWinSizeCombo.currentText);
                         autoExpoWinSizeCombo.enabled = true
                     }
                 }
@@ -377,7 +374,7 @@ Item {
                 style: econComboBoxStyle
                 onCurrentIndexChanged: {
                     if(skipUpdateUIOnExpWindowSize){
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, xCoordinate, yCoordinate, autoExpoWinSizeCombo.currentText)
+                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, autoExpoWinSizeCombo.currentText)
                     }
                     skipUpdateUIOnExpWindowSize = true
                 }
@@ -1158,7 +1155,7 @@ Item {
         }
 
         onRoiAutoExpMode:{
-            currentROIAutoExposureMode(roiMode, x, y, winSize)
+            currentROIAutoExposureMode(roiMode, winSize)
         }
 
         onGainModeReceived: {
@@ -1417,11 +1414,7 @@ Item {
         messageDialog.open()
     }
 
-    function currentROIAutoExposureMode(roiMode, xValue, yValue, winSize){
-
-        xCoordinate = xValue
-        yCoordinate = yValue
-
+    function currentROIAutoExposureMode(roiMode, winSize){
         switch(roiMode){
         case See3CAM_CU135M_H01R1.AutoExpFull:
             autoexpFull.checked = true
