@@ -56,8 +56,8 @@
 #define Y16_675p_HEIGHT            675
 #define Y16_675p_HEIGHT_MODIFIED   1080
 
-#define Y16_NEW_RENDERING_WIDTH        1920
-#define Y16_NEW_RENDERING_HEIGHT       1080
+#define Y16_1080p_WIDTH        1920
+#define Y16_1080p_HEIGHT       1080
 
 #define Y16_NEW_WIDTH     3120
 #define Y16_NEW_HEIGHT    1080
@@ -400,10 +400,12 @@ private:
     bool updateOnce;
     bool m_snapShot;
     bool startFrame;
-    bool createWindow = true;//To stop creating window when capturing still
+    bool createWindow = true; //To stop creating window when capturing still
+
 
     bool updateStop;
     bool makeSnapShot;
+    bool irWindowStatus;
     bool changeFpsAndShot; // To change fps and take shot
     bool fpsChangedForStill;
     bool m_burstShot;
@@ -725,6 +727,10 @@ public slots:
      */
     void cameraModeEnabled(int cameraModeValue);
 
+    /**
+     * @brief To get the irWindowCheckbox status
+     */
+    void irWindowCheckboxStatus(bool status);
 
     /**
      * @brief To stop updating the preview in the trigger Mode
@@ -823,6 +829,7 @@ signals:
     void titleTextChanged(QString _title,QString _text);
     void enableCaptureAndRecord();
     void newControlAdded(QString ctrlName,QString ctrlType,QString ctrlID,QString ctrlStepSize = "0",QString ctrlMinValue= "0", QString ctrlMaxValue = "0",QString ctrlDefaultValue="0", QString ctrlHardwareDefault="0");
+    void startEnumerateMenulist();
     void deviceUnplugged(QString _title,QString _text);
     void averageFPS(unsigned fps);
     void defaultStillFrameSize(unsigned int outputIndexValue);

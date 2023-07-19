@@ -1024,7 +1024,7 @@ Item {
                 spacing: 35
                 Text {
                     id: gainLabel
-                    text: "Gain value (10^-2x)"
+                    text: "Gain value (10^-2 x)"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"

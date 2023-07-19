@@ -11,6 +11,19 @@ Window {
     height: 480
     color: "black"
 
+    //Restrict window resizing
+    minimumWidth: 640
+    minimumHeight: 2 //To restrict menubar from minimizing
+
+    onWidthChanged: {
+        if (width < minimumWidth)
+            width = minimumWidth;
+    }
+    onHeightChanged: {
+        if (height < minimumHeight)
+            height = minimumHeight;
+    }
+
     property int camMode
 
     signal closeWindow()

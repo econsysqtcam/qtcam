@@ -1,3 +1,8 @@
+Qtcam Application - 25.0.16
+---------------------------
+*Made UVC controls compatible for all the ubuntu versions.
+*Modified Blacklevel Adjustment controls for See3CAM_50CUGM.
+
 Qtcam Application - 25.0.15
 ---------------------------
 *Added support for e-CAM512_USB_CHLBC_H01R1.

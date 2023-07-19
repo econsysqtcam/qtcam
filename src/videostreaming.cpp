@@ -112,6 +112,7 @@ Videostreaming::Videostreaming() : m_t(0)
     retrieveShot = false;
     m_burstShot = false;
     makeSnapShot = false;
+    irWindowStatus = true;
     changeFpsAndShot = false;
     OnMouseClick=false;
     triggerShot = false;
@@ -805,14 +806,15 @@ void FrameRenderer::drawUYVYBUffer(){
             skipFrames = 4;
         }
         if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83){
+
               if((videoResolutionwidth == Y16_2160p_WIDTH) && (videoResolutionHeight == Y16_2160p_HEIGHT)) {//To render Y16 -> UYVY colorspace
                     if(uyvyBuffer!= NULL){
                         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Y16_2160p_RGB_WIDTH/2, Y16_2160p_RGB_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, uyvyBuffer);
                     }
               }
               else if((videoResolutionwidth == Y16_NEW_WIDTH) && (videoResolutionHeight == Y16_NEW_HEIGHT)) { //3120x1080
-                    if(rgbFromY16Buffer!= NULL){
-                        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Y16_NEW_RENDERING_WIDTH/2, Y16_NEW_RENDERING_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgbFromY16Buffer);
+                  if(rgbFromY16Buffer!= NULL){
+                        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Y16_1080p_WIDTH/2, Y16_1080p_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgbFromY16Buffer);
                     }
               }
               else{  //To render UYVY colorspace
@@ -1354,9 +1356,9 @@ void FrameRenderer::getDisplayRenderArea(int *displayX, int *displayY, int *dest
         }
         else if((videoResolutionwidth == 3120)&&(videoResolutionHeight == 1080)){
             if(previewBgrdAreaHeight == 0){
-                calculateViewport(Y16_NEW_RENDERING_WIDTH, Y16_NEW_RENDERING_HEIGHT, previewBgrdAreaWidth-xMargin, m_viewportSize.height(), &x, &y, &destWindowWidth, &destWindowHeight);
+                calculateViewport(Y16_1080p_WIDTH, Y16_1080p_HEIGHT, previewBgrdAreaWidth-xMargin, m_viewportSize.height(), &x, &y, &destWindowWidth, &destWindowHeight);
             }else{
-                calculateViewport(Y16_NEW_RENDERING_WIDTH, Y16_NEW_RENDERING_HEIGHT, previewBgrdAreaWidth-xMargin, previewBgrdAreaHeight, &x, &y, &destWindowWidth, &destWindowHeight);
+                calculateViewport(Y16_1080p_WIDTH, Y16_1080p_HEIGHT, previewBgrdAreaWidth-xMargin, previewBgrdAreaHeight, &x, &y, &destWindowWidth, &destWindowHeight);
             }
         }
         else if((videoResolutionwidth == Y16_675p_WIDTH)&&(videoResolutionHeight == Y16_675p_HEIGHT)){
@@ -1703,7 +1705,6 @@ void Videostreaming::capFrame()
         //  Ex: cu40 camera
         if(!m_renderer->y16BayerFormat)
         {
-//            clearBuffer = true;
             if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)
             { // y16
                 onY16Format = true;
@@ -1969,9 +1970,9 @@ void Videostreaming::capFrame()
                             }
                         }
                     }
-                    else if((width == 3120) && (height == 1080))//4440x2160
+                    else if((width == Y16_NEW_WIDTH) && (height == Y16_NEW_HEIGHT))//4440x2160
                     {
-                        QImage qImage3(bufferToSave, 1920, 1080, QImage::Format_RGB888);
+                        QImage qImage3(bufferToSave, Y16_1080p_WIDTH, Y16_1080p_HEIGHT, QImage::Format_RGB888);
                         QImageWriter writer(filename);
 
                         if(m_saveImage){
@@ -2986,9 +2987,9 @@ bool Videostreaming::prepareStillBuffer(uint8_t *inputBuffer)
              }
 
              //allocating still buffer to rgb size
-             stillBuffer = (unsigned char*) realloc(stillBuffer,(Y16_NEW_RENDERING_WIDTH*Y16_NEW_RENDERING_HEIGHT*BYTES_PER_PIXEL_UYVY));
+             stillBuffer = (unsigned char*) realloc(stillBuffer,(Y16_1080p_WIDTH*Y16_1080p_HEIGHT*BYTES_PER_PIXEL_UYVY));
              //copying converted buffer to stillbuffer
-             memcpy(stillBuffer, (m_renderer->rgbFromY16Buffer), (Y16_NEW_RENDERING_WIDTH*Y16_NEW_RENDERING_HEIGHT*BYTES_PER_PIXEL_UYVY));
+             memcpy(stillBuffer, (m_renderer->rgbFromY16Buffer), (Y16_1080p_WIDTH*Y16_1080p_HEIGHT*BYTES_PER_PIXEL_UYVY));
 
              //Removing 5th bit from each frame of IRBuffer
              int IRsize = irSize;
@@ -3161,8 +3162,8 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
           }
         }
 
-        QImage qImage3(Y16_NEW_RENDERING_WIDTH, Y16_NEW_RENDERING_HEIGHT, QImage::Format_Grayscale8);
-        memcpy(qImage3.bits(),outputIrBuffer,(Y16_NEW_RENDERING_WIDTH*Y16_NEW_RENDERING_HEIGHT));
+        QImage qImage3(Y16_1080p_WIDTH, Y16_1080p_HEIGHT, QImage::Format_Grayscale8);
+        memcpy(qImage3.bits(),outputIrBuffer,(Y16_1080p_WIDTH*Y16_1080p_HEIGHT));
 
         //passing QImage to the setImage() defined in renderer class
         helperObj.setImage(qImage3);
@@ -3260,6 +3261,7 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
 
 // Added by Sankari: Nov 8 2017 . prepare yuv buffer and give to shader.
 bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 bytesUsed){
+
     if(pixformat == V4L2_PIX_FMT_MJPEG){
         frameMjpeg = true;
         m_renderer->renderBufferFormat = CommonEnums::RGB_BUFFER_RENDER;
@@ -3367,7 +3369,6 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 break;
 
             case V4L2_PIX_FMT_UYVY:{   // directly giving uyvy data for rendering
-
                 //Added By Sushanth - To disable wakeonMotion in UVVY format
                 if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
                 {
@@ -3597,7 +3598,7 @@ void Videostreaming::allocBuffers()
     //Splitted UYVY data from Y16 & used it to render
     m_renderer->uyvyBuffer = (uint8_t*)realloc(m_renderer->uyvyBuffer,Y16_RGB_RESOLUTION*BYTES_PER_PIXEL_UYVY);
 
-    m_renderer->rgbFromY16Buffer = (uint8_t*)realloc(m_renderer->rgbFromY16Buffer,Y16_NEW_RENDERING_WIDTH*Y16_NEW_RENDERING_HEIGHT*BYTES_PER_PIXEL_UYVY);
+    m_renderer->rgbFromY16Buffer = (uint8_t*)realloc(m_renderer->rgbFromY16Buffer,Y16_1080p_WIDTH*Y16_1080p_HEIGHT*BYTES_PER_PIXEL_UYVY);
     //Splitted IR Data from Y16
     inputIrBuffer = (uint8_t*)realloc(inputIrBuffer,Y16_IR_RESOLUTION*BYTES_PER_PIXEL_UYVY);
 
@@ -3696,15 +3697,22 @@ bool Videostreaming::startCapture()
         perror("VIDIOC_STREAMON");
         return false;
     }
-    //To Create window for IR preview & also avoid to create IR window when capturing still
-    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83) && (createWindow))
-    {
-        //condition to check default resolution for creating IR Window
-        if(((width == Y16_2160p_WIDTH)&&(height == Y16_2160p_HEIGHT)) || ((width == 3120)&&(height == 1080)))
-        {
 
-          emit signalToCreateWindow();
-          emit emitResolution(width,height);
+    //To Create window for IR preview & also avoid to create IR window when capturing still
+    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)&&(createWindow))
+    {
+        //condition to check dual streaming supported resolution for creating IR Window
+        if(((width == Y16_2160p_WIDTH)&&(height == Y16_2160p_HEIGHT)) || ((width == Y16_NEW_WIDTH)&&(height == Y16_NEW_HEIGHT)))
+        {
+          if(irWindowStatus){
+              emit signalToCreateWindow();
+              emit emitResolution(width,height);
+          }
+          else{
+              //Added to disable irWindow checkbox while launching the application
+              emit emitResolution(width,height);
+          }
+
         }
         else
         {
@@ -3714,6 +3722,7 @@ bool Videostreaming::startCapture()
         }
     }
     createWindow = true;
+
     // Added by Navya : 11 Feb 2020 -- Enabling capturing images once after streamon
     emit signalToSwitchResoln(true);
 
@@ -4716,7 +4725,9 @@ void Videostreaming::cameraFilterControls(bool actualValue) {
                 qmenu.id = qctrl.id;
                 qmenu.index = i;
                 if (!querymenu(qmenu))
+                {
                     continue;
+                }
                 if (qctrl.type == V4L2_CTRL_TYPE_MENU) {
                     emit newControlAdded((char *)qmenu.name,ctrlType,ctrlID);
                 }
@@ -4725,6 +4736,8 @@ void Videostreaming::cameraFilterControls(bool actualValue) {
                     //menuItems.append(qmenu.value);
                 }
             }
+            //Signal emitted after end of menuList
+            emit startEnumerateMenulist();
             indexValue =  getSettings(qctrl.id).toInt();
             if(actualValue) {
                 emit newControlAdded(ctrlName,ctrlType,ctrlID,ctrlStepSize,ctrlMinValue,ctrlMaxValue,QString::number(getMenuIndex(qctrl.id,indexValue),10));
@@ -5021,6 +5034,11 @@ void Videostreaming::cameraModeEnabled(int cameraModeValue)
     }
     //To send cameraMode to qml
     emit sendCameraMode(cameraMode);
+}
+
+void Videostreaming::irWindowCheckboxStatus(bool status)
+{
+   irWindowStatus = status;
 }
 
 void Videostreaming::triggerModeEnabled() {

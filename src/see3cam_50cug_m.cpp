@@ -243,7 +243,7 @@ bool SEE3CAM_50CUGM::getStrobeMode()
  * @param blacklevel - set blacklevel to enable or disable
  * return true - success /false - failure
  */
-bool SEE3CAM_50CUGM::setBlackLevelAdjustment(blackLevelAdjustment blacklevelMode, uint blackLevelValue)
+bool SEE3CAM_50CUGM::setBlackLevelAdjustment(uint blackLevelValue)
 {
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -257,9 +257,8 @@ bool SEE3CAM_50CUGM::setBlackLevelAdjustment(blackLevelAdjustment blacklevelMode
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_SEE3CAM_50CUG_M;
     g_out_packet_buf[2] = SET_BLACK_LEVEL_ADJUSTMENT_SEE3CAM_50CUG_M;
-    g_out_packet_buf[3] = blacklevelMode;
-    g_out_packet_buf[4] = ((blackLevelValue & 0xFF00) >> 8);
-    g_out_packet_buf[5] = ((blackLevelValue & 0x00FF) >> 0);
+    g_out_packet_buf[3] = ((blackLevelValue & 0xFF00) >> 8);
+    g_out_packet_buf[4] = ((blackLevelValue & 0x00FF) >> 0);
 
 
     // send request and get reply from camera
@@ -303,8 +302,7 @@ bool SEE3CAM_50CUGM::getBlackLevelAdjustment()
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_SEE3CAM_50CUG_M &&
             g_in_packet_buf[1] == GET_BLACK_LEVEL_ADJUSTMENT_SEE3CAM_50CUG_M &&
             g_in_packet_buf[6] == GET_SUCCESS) {
-            emit blackLevelModeChanged(g_in_packet_buf[2]);
-            blackLevelValue = (g_in_packet_buf[3] << 8) | (g_in_packet_buf[4] << 0);
+            blackLevelValue = (g_in_packet_buf[2] << 8) | (g_in_packet_buf[3] << 0);
             emit blackLevelValueChanged(blackLevelValue);
             return true;
         }

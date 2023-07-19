@@ -341,11 +341,11 @@ Item {
                         style: econRadioButtonStyle
                         opacity: enabled ? 1 : 0.1
                         onClicked: {
-                            ecam512usb.setROIAutoExposure(ECAM_512USB.AutoExpManual, 0, 0, xCoordinate, yCoordinate, autoExpoWinSizeCombo.currentText);
+                            ecam512usb.setROIAutoExposure(ECAM_512USB.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                             autoExpoWinSizeCombo.enabled = true
                         }
                         Keys.onReturnPressed: {
-                            ecam512usb.setROIAutoExposure(ECAM_512USB.AutoExpManual, 0, 0, xCoordinate, yCoordinate, autoExpoWinSizeCombo.currentText);
+                            ecam512usb.setROIAutoExposure(ECAM_512USB.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                             autoExpoWinSizeCombo.enabled = true
                         }
                     }
@@ -369,7 +369,7 @@ Item {
                     style: econComboBoxStyle
                     onCurrentIndexChanged: {
                         if(skipUpdateUIOnExpWindowSize){
-                            ecam512usb.setROIAutoExposure(ECAM_512USB.AutoExpManual, 0, 0, xCoordinate, yCoordinate, autoExpoWinSizeCombo.currentText)
+                            ecam512usb.setROIAutoExposure(ECAM_512USB.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
                         }
                         skipUpdateUIOnExpWindowSize = true
                     }

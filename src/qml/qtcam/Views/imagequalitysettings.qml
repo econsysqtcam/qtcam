@@ -1452,86 +1452,96 @@ Item {
             break;
         }
     }
+
+    //Modified by Sushanth - To check the controls with respective control IDs to make platform independant
     function imageSettingsFirstLevel(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID)
     {
-        switch(controlName)
+        switch(controlID)
         {
-            case "Brightness":
+            case 9963776://Brightness
                 brightnessUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "Contrast":
+            case 9963777://Contrast
                 contrastUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "Saturation":
+            case 9963778://Saturation
                 saturationUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "Pan (Absolute)":
+            case 10094856://Pan(Absolute)
                 panUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "Tilt (Absolute)":
+            case 10094857://Tilt(Absolute)
                 tiltUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "Zoom, Absolute":
+            case 10094861://Zoom(Absolute)
                 zoomUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "Hue":
+            case 9963779://Hue
                 hueUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "LED1 Mode":
-                ledModeUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
-                break;
-            case "White Balance Temperature":
+            case 9963802://White Balance(Temperature)
                 whiteBalanceUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "Gamma":
+            case 9963792://Gamma
                 gammaUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "Gain":
+            case 9963795://Gain
                 gainUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "Sharpness":
+            case 9963803://Sharpness
                 sharpnessUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "Exposure (Absolute)":
+            case 10094850://Exposure(Absolute)
                 exposureAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "Focus (absolute)":
-                focusAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
-                break;
-            case "Backlight Compensation":
+            case 9963804://Backlight Compensation
                 backLightUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
+            case 10094860://Focus,Auto
+                focusUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
+                break;
+        }
+
+        switch(controlName)
+        {
             case "Raw bits per pixel":
                 rawBitsUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case "LED1 Frequency":
                 ledFrequencyUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case "Focus":
-                focusUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
+            case "LED1 Mode":
+                ledModeUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
+                break;
+            case "Focus (absolute)":
+                focusAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
         }
     }
+
+    //Modified by Sushanth - To check the controls with respective control IDs to make platform independant
     function imageSettingsSecondLevel(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID)
     {
-        switch(controlName)
+        switch(controlID)
         {
-            case "White Balance Temperature, Auto":
+            case 9963788://White Balance, Auto
                 whiteBalAutoUIUpdate(controlID,controlDefaultValue)
                 break;
-            case "Focus, Auto":
+            case 10094860://Focus, Auto
                 autoFocusUIUpdate(controlID,controlDefaultValue)
                 break;
-            case "Exposure, Auto Priority":
+            case 10094851://Exposure (Auto,Priority)
                 exposureAutoAvailable = true; // Make it true if exposure auto control is available
                 if(root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM)
                 {
                     exposureAutoPriorityUIUpdate(controlID,controlDefaultValue)
                 }
                 break;
-            case "Disable video processing":
-                videoProcessUIUpdate(controlID,controlDefaultValue)
-                break;
+        }
+
+        if(controlName == "Disable video processing")
+        {
+            videoProcessUIUpdate(controlID,controlDefaultValue)
         }
     }
     function brightnessUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
@@ -1803,11 +1813,14 @@ Item {
         disableVideoControlId = controlID
     }
 
+    //Modified by Sushanth - To check the controls with respective control IDs to make platform independant
     function exposureAutoUIUpdate(controlName,controlID,controlMinValue,controlMaxValue,controlDefaultValue)
     {
         menuitems.push(controlName)
-        if(controlName === "Power Line Frequency")
+        //enumerateControls - To allow only when all the controls listed in menulist model
+        if((controlID === 9963800) && (enumerateControls))//PowerLine Frequency
         {
+            enumerateControls = false
             if(enablePowerLineFreq){
                 menuitems.pop() //Control Name should be removed
                 powerLine.opacity = 1
@@ -1828,10 +1841,10 @@ Item {
                   while(menuitems.pop()){}
                 powerLineCombo.enabled = false
             }
-
-        }
-        else if(controlName === "Exposure, Auto")
+        }//enumerateControls - To allow only when all the controls listed in menulist model
+        else if((controlID === 10094849) && (enumerateControls))//Exposure, Auto
         {
+            enumerateControls = false
             menuitems.pop()
             exposureAutoAvailable = true;
             if(root.selectedDeviceEnumValue == CommonEnums.CX3_UVC_CAM && !usb3speed){

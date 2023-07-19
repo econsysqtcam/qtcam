@@ -102,7 +102,7 @@ Item{
             //To enable CheckBox when IR window is created by resolution switch
             irWindowCheckBox.checked = true
 
-            //Enabling IR window CheckBox when switched to default resolution
+            //Enabling IR window CheckBox when switched to dual resolution
             irWindowCheckBox.enabled = true
             irWindowCheckBox.opacity = 1
 
@@ -1275,10 +1275,12 @@ Item{
        if(irWindowCheckBox.checked)
        {
            root.irPreviewWindow()
+           root.irCheckboxStatus(true)
        }
        else
        {
            root.closeIrWindow()
+           root.irCheckboxStatus(false)
        }
     }
 

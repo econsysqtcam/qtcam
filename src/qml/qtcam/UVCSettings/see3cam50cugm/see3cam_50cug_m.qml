@@ -219,61 +219,6 @@ Item{
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                 }
-                ColumnLayout{
-                   ExclusiveGroup { id: blackLeverAdjGroup }
-                   spacing: 25
-                   RadioButton {
-                       id: enableBlackLevel
-                       style:  econRadioButtonStyle
-                       text: qsTr("Auto")
-                       exclusiveGroup: blackLeverAdjGroup
-                       activeFocusOnPress: true
-                       onClicked: {
-
-                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.AUTO,blackLevelSlider.value)
-
-                           blackLevelSlider.enabled    = false
-                           blackLevelSlider.opacity    = 0.1
-                           blackLevelTextField.enabled = false
-                           blackLevelTextField.opacity = 0.1
-                       }
-                       Keys.onReturnPressed: {
-
-                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.AUTO,blackLevelSlider.value)
-
-                           blackLevelSlider.enabled    = false
-                           blackLevelSlider.opacity    = 0.1
-                           blackLevelTextField.enabled = false
-                           blackLevelTextField.opacity = 0.1
-                       }
-                   }
-                   RadioButton {
-                       id: disableBlackLevel
-                       style:  econRadioButtonStyle
-                       text: qsTr("Manual")
-                       exclusiveGroup: blackLeverAdjGroup
-                       activeFocusOnPress: true
-                       onClicked: {
-
-                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.MANUAL,blackLevelSlider.value)
-
-                           blackLevelSlider.enabled    = true
-                           blackLevelSlider.opacity    = 1
-                           blackLevelTextField.enabled = true
-                           blackLevelTextField.opacity = 1
-                       }
-
-                       Keys.onReturnPressed: {
-                           see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.MANUAL,blackLevelSlider.value)
-
-                           blackLevelSlider.enabled    = true
-                           blackLevelSlider.opacity    = 1
-                           blackLevelTextField.enabled = true
-                           blackLevelTextField.opacity = 1
-                       }
-                   }
-               }
-
                 Row
                 {
                     spacing: 35
@@ -290,7 +235,7 @@ Item{
                         onValueChanged:  {
                             blackLevelTextField.text = blackLevelSlider.value
                             if(skipUpdateBlackLevelMode){
-                                see3cam50cugm.setBlackLevelAdjustment(SEE3CAM_50CUGM.MANUAL,blackLevelSlider.value)
+                                see3cam50cugm.setBlackLevelAdjustment(blackLevelSlider.value)
                             }
                             skipUpdateBlackLevelMode = true
                         }
@@ -493,7 +438,6 @@ Item{
            }
          }
        }
-
 }
 
     Component {
@@ -708,30 +652,6 @@ Item{
                 strobeFlash.opacity = 1
                 strobeOff.enabled   = true
                 strobeOff.opacity   = 1
-            }
-        }
-
-        onBlackLevelModeChanged:
-        {
-            if(blacklevelMode == SEE3CAM_50CUGM.AUTO)
-            {
-                enableBlackLevel.checked = true
-                disableBlackLevel.checked = false
-
-                blackLevelSlider.enabled    = false
-                blackLevelSlider.opacity    = 0.1
-                blackLevelTextField.enabled = false
-                blackLevelTextField.opacity = 0.1
-            }
-            else if(blacklevelMode == SEE3CAM_50CUGM.MANUAL)
-            {
-                enableBlackLevel.checked = false
-                disableBlackLevel.checked = true
-
-                blackLevelSlider.enabled    = true
-                blackLevelSlider.opacity    = 1
-                blackLevelTextField.enabled = true
-                blackLevelTextField.opacity = 1
             }
         }
 

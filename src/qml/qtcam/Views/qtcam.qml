@@ -181,6 +181,9 @@ Rectangle {
     // To check mouse click capture function is called
     property bool mouseClickCap: false
 
+    //Added by Sushanth - Allows to enumerate control only when all controls are listed in menuItem model
+    property bool enumerateControls: false
+
     // To disable capture by smile trigger key or external key is pressed when recording video
     property bool disableCaptureImage: false
 
@@ -448,6 +451,10 @@ Rectangle {
 
         onNewControlAdded: {
             setControlValues(ctrlName.toString(),ctrlType,ctrlMinValue,ctrlMaxValue, ctrlStepSize, ctrlDefaultValue,ctrlID);
+        }
+
+        onStartEnumerateMenulist: {
+            enumerateControls = true
         }
 
         // Added by Navya :31 July 2019
@@ -1830,6 +1837,12 @@ Rectangle {
         {
             vidstreamproperty.enableDisableExpCompensation(false)
         }
+    }
+
+    //Added by Sushanth - To get the status of IR checkbox
+    function irCheckboxStatus(isEnable)
+    {
+        vidstreamproperty.irWindowCheckboxStatus(isEnable)
     }
 
     //Added by Sushanth.S - Creating component for IR preview
