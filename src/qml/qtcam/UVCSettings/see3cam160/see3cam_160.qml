@@ -96,7 +96,6 @@ Item {
                 extSettingsBasedOnAutoFocusSelectionInUVCSettings(JS.autoFocusChecked) // Initially get the auto focus mode in UVC settings and enable/disable controls in extension unit
             }
         }
-
     }
 
     ScrollView {

@@ -60,10 +60,10 @@ public:
      Q_ENUMS(STROBE_MODE)
 
     enum getOrientation{
-        NORMAL     = 0x00,
-        HORIZONTAL = 0x01,
-        VERTICAL   = 0x02,
-        ROTATE_180       = 0x03
+        NORMAL       = 0x00,
+        VERTICAL     = 0x01,
+        HORIZONTAL   = 0x02,
+        ROTATE_180   = 0x03
     };
     Q_ENUMS(getOrientation)
 

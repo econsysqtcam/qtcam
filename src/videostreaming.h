@@ -59,6 +59,12 @@
 #define Y16_1080p_WIDTH        1920
 #define Y16_1080p_HEIGHT       1080
 
+#define RGB_LINES_1080p   1080
+#define IR_LINES_1080p    1080
+
+#define RGB_LINES_4K   2160
+#define IR_LINES_4K    1080
+
 #define Y16_NEW_WIDTH     3120
 #define Y16_NEW_HEIGHT    1080
 
@@ -438,6 +444,8 @@ private:
 
     QImage *m_capImage;
     QImage *irRenderer;
+    QImage *qImageRenderer;
+    QImage *cu83IRWindow;
 
 
     QString ctrlName, ctrlType, ctrlID, ctrlStepSize, ctrlMaxValue, ctrlMinValue,ctrlDefaultValue;

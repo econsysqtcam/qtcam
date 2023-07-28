@@ -1,3 +1,9 @@
+Qtcam Application - 25.0.17
+---------------------------
+*HID controls modifications in See3CAM_CU135M_H01R1 .
+*Handled extra data for 4k daul resolution in See3CAM_CU83.
+*Bug fixed in See3CAM_16CUG_MHLCC_H01R1.
+
 Qtcam Application - 25.0.16
 ---------------------------
 *Made UVC controls compatible for all the ubuntu versions.

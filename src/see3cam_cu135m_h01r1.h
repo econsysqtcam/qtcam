@@ -136,18 +136,22 @@ signals:
     void targetBrightnessReceived(uint brightness);
     void brightnessMinSliderReceived(uint sliderMin);
     void brightnessMaxSliderReceived(uint sliderMax);
+    void targetBrightnessStepValue(uint stepValue);
 
     void antiFlickerModeRecieved(uint antiFlicker);
 
     void gainModeReceived(uint gainMode);
-    void autoGainModeRecieved(uint autoGain);
-    void manualGainModeRecieved(uint manualGain);
+    void autoGainFeatureRecieved(uint autoGain);
+    void manualGainValueRecieved(uint manualGain);
+    void gainMinSliderValueReceived(uint minSlider);
+    void gainMaxSliderValueReceived(uint maxSlider);
+    void gainStepValueReceived(uint gainStepValue);
 
     void lowerGainLimitRecieved(uint lowerLimit);
     void upperGainLimitRecieved(uint upperLimit);
-
     void sliderMinimumRecieved(uint sliderMin);
     void sliderMaximumRecieved(uint sliderMax);
+    void gainLimitStepValueReceived(uint stepValue);
 
     void exposureModeRecieved(uint exposureMode);
 

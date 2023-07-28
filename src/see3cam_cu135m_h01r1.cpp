@@ -150,7 +150,7 @@ bool See3CAM_CU135M_H01R1::getFlashState()
 }
 
 /**
- * @brief See3CAM_CU135M_H01R1::setGainMode - Setting orientation - set Normal/horizontal/vertical/Rotate180
+ * @brief See3CAM_CU135M_H01R1::setFlipCtrlValue - Setting orientation - set Normal/horizontal/vertical/Rotate180
  * @param - hFlip - To set horizondal mode
  * @param - vFlip - To set vertical mode
  * return true/false
@@ -321,44 +321,7 @@ bool See3CAM_CU135M_H01R1::getAutoExpROIModeAndWindowSize(){
     return false;
 }
 
-/**
- * @brief See3CAM_CU135M_H01R1::getGainMode - Get gain mode(Auto / Manual)
- * @return true/false
- */
-bool See3CAM_CU135M_H01R1::getGainMode()
-{
-    // hid validation
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
 
-    //Initialize buffers
-    initializeBuffers();
-    uint manualGain;
-
-    // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;
-    g_out_packet_buf[2] = GET_AUTO_GAIN_MODE_SEE3CAM_CU135M_H01R1_H;
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6] == GET_FAIL) {
-            return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
-            g_in_packet_buf[1] == GET_AUTO_GAIN_MODE_SEE3CAM_CU135M_H01R1_H &&
-            g_in_packet_buf[6] == GET_SUCCESS) {
-
-            emit gainModeReceived(g_in_packet_buf[2]);
-            emit autoGainModeRecieved(g_in_packet_buf[3]);
-            manualGain = (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
-            emit manualGainModeRecieved(manualGain);
-
-            return true;
-        }
-    }
-    return false;
-}
 
 /**
  * @brief See3CAM_CU135M_H01R1::setGainMode - Setting gain attributes
@@ -405,6 +368,64 @@ bool See3CAM_CU135M_H01R1::setGainMode(gainMode gainType,autoGain autoModes,uint
     return false;
 }
 
+
+
+/**
+ * @brief See3CAM_CU135M_H01R1::getGainMode - Get gain mode(Auto / Manual)
+ * @return true/false
+ */
+bool See3CAM_CU135M_H01R1::getGainMode()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+    uint manualGain;
+    uint minSliderValue, maxSliderValue;
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;
+    g_out_packet_buf[2] = GET_AUTO_GAIN_MODE_SEE3CAM_CU135M_H01R1_H;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[11] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
+            g_in_packet_buf[1]  == GET_AUTO_GAIN_MODE_SEE3CAM_CU135M_H01R1_H &&
+            g_in_packet_buf[11] == GET_SUCCESS) {
+
+            manualGain = (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
+            minSliderValue = (g_in_packet_buf[6] << 8) | (g_in_packet_buf[7] << 0);
+            maxSliderValue = (g_in_packet_buf[8] << 8) | (g_in_packet_buf[9] << 0);
+
+            //Min & Max slider value
+            emit gainMinSliderValueReceived(minSliderValue);
+            emit gainMaxSliderValueReceived(maxSliderValue);
+
+            //Slider step value
+            emit gainStepValueReceived(g_in_packet_buf[10]);
+
+            //Gain mode - Auto or Manual Mode
+            emit gainModeReceived(g_in_packet_buf[2]);
+
+            //Auto gain feature - Single or Continious
+            emit autoGainFeatureRecieved(g_in_packet_buf[3]);
+
+            //Manual gain value - if manual mode
+            emit manualGainValueRecieved(manualGain);
+
+            return true;
+        }
+    }
+    return false;
+}
+
+
 /**
  * @brief See3CAM_CU135M_H01R1::getGainLimit - To get gain upper and lower limit value in camera
  * return true - success /false - failure
@@ -419,6 +440,7 @@ bool See3CAM_CU135M_H01R1::getGainLimit()
 
     uint lowerLimit, upperLimit;
     uint sliderMin, sliderMax;
+
     //Initialize buffers
     initializeBuffers();
 
@@ -428,11 +450,11 @@ bool See3CAM_CU135M_H01R1::getGainLimit()
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[10] == GET_FAIL) {
+        if (g_in_packet_buf[11] == GET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == GET_AUTO_GAIN_LIMIT_SEE3CAM_CU135M_H01R1_H &&
-            g_in_packet_buf[10] == GET_SUCCESS) {
+            g_in_packet_buf[11] == GET_SUCCESS) {
 
             sliderMin = (g_in_packet_buf[2] << 8) | (g_in_packet_buf[3] << 0);
             sliderMax = (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
@@ -446,6 +468,7 @@ bool See3CAM_CU135M_H01R1::getGainLimit()
             emit lowerGainLimitRecieved(lowerLimit);
             emit upperGainLimitRecieved(upperLimit);
 
+            emit gainLimitStepValueReceived(g_in_packet_buf[10]);
             return true;
         }
     }
@@ -460,11 +483,16 @@ bool See3CAM_CU135M_H01R1::getGainLimit()
  */
 bool See3CAM_CU135M_H01R1::setGainLimit(uint lowerLimit, uint upperLimit)
 {
-    if(lowerLimit > upperLimit)
+    if(lowerLimit == upperLimit)
+    {
+
+    }
+    else if(lowerLimit > upperLimit)
     {
         emit indicateExposureValueRangeFailure("Failure", "Lower limit should be smaller than upper limit");
         return false;
     }
+
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -622,22 +650,25 @@ bool See3CAM_CU135M_H01R1::getTargetBrightness()
 
    uint brightness;
    uint sliderMin,sliderMax;
+   uint stepValue;
    // fill buffer values
    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;  /* set camera control code */
    g_out_packet_buf[2] = GET_TARGET_BRIGHTNESS_SEE3CAM_CU135M_H01R1_H;
 
    // send request and get reply from camera
    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-       if (g_in_packet_buf[8]==GET_FAILURE) {
+       if (g_in_packet_buf[9]==GET_FAILURE) {
            return false;
        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
-           g_in_packet_buf[1]==GET_TARGET_BRIGHTNESS_SEE3CAM_CU135M_H01R1_H  &&
-           g_in_packet_buf[8]==GET_SUCCESS) {
+           g_in_packet_buf[1] == GET_TARGET_BRIGHTNESS_SEE3CAM_CU135M_H01R1_H  &&
+           g_in_packet_buf[9] == GET_SUCCESS) {
 
            sliderMin = (g_in_packet_buf[2] << 8) | (g_in_packet_buf[3] << 0);
            sliderMax = (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
            brightness = (g_in_packet_buf[6] << 8) | (g_in_packet_buf[7] << 0);
+           stepValue = g_in_packet_buf[8];
 
+           emit targetBrightnessStepValue(stepValue);
            emit brightnessMinSliderReceived(sliderMin);
            emit brightnessMaxSliderReceived(sliderMax);
            emit targetBrightnessReceived(brightness);

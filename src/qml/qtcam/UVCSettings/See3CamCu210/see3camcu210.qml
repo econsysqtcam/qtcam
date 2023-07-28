@@ -803,19 +803,19 @@ Item {
         {
             see3camcu210.setExposureMeteringMode(See3CAM_CU210.AUTO_EXPOSURE_OFF)
         }
-        else if(meteringModeCombo.currentText.toString() == "Centre-Weighted average Mode")
+        else if(meteringModeCombo.currentText.toString() == "Centre-Weighted Average")
         {
             see3camcu210.setExposureMeteringMode(See3CAM_CU210.AVERAGE)
         }
-        else if(meteringModeCombo.currentText.toString() == "All Block Integral Mode")
+        else if(meteringModeCombo.currentText.toString() == "All Block Integral")
         {
             see3camcu210.setExposureMeteringMode(See3CAM_CU210.INTEGRAL)
         }
-        else if(meteringModeCombo.currentText.toString() == "Small Area Mode")
+        else if(meteringModeCombo.currentText.toString() == "Small Area")
         {
             see3camcu210.setExposureMeteringMode(See3CAM_CU210.SMALL_AREA)
         }
-        else if(meteringModeCombo.currentText.toString() == "Large Area Mode")
+        else if(meteringModeCombo.currentText.toString() == "Large Area")
         {
             see3camcu210.setExposureMeteringMode(See3CAM_CU210.LARGE_AREA)
         }

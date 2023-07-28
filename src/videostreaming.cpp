@@ -157,6 +157,8 @@ Videostreaming::Videostreaming() : m_t(0)
     m_capNotifier = NULL;
     m_capImage = NULL;
     irRenderer = NULL;
+    qImageRenderer = NULL;
+    cu83IRWindow = NULL;
     frameSkip = false;
     tempSrcBuffer = NULL;
 
@@ -621,7 +623,7 @@ void FrameRenderer::drawBufferFor360p(){
 
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if (yBuffer != NULL && uBuffer != NULL && vBuffer != NULL){
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_16CUGM || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1
         || currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
             skipFrames = frame;
         }
@@ -794,7 +796,6 @@ void FrameRenderer::drawUYVYBUffer(){
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
 
     if(renderyuyvMutex.tryLock()){
-
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
         if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG) | (currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M))
@@ -806,9 +807,8 @@ void FrameRenderer::drawUYVYBUffer(){
             skipFrames = 4;
         }
         if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83){
-
               if((videoResolutionwidth == Y16_2160p_WIDTH) && (videoResolutionHeight == Y16_2160p_HEIGHT)) {//To render Y16 -> UYVY colorspace
-                    if(uyvyBuffer!= NULL){
+                  if(uyvyBuffer!= NULL){
                         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Y16_2160p_RGB_WIDTH/2, Y16_2160p_RGB_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, uyvyBuffer);
                     }
               }
@@ -818,7 +818,7 @@ void FrameRenderer::drawUYVYBUffer(){
                     }
               }
               else{  //To render UYVY colorspace
-                    if(yuvBuffer != NULL){
+                  if(yuvBuffer != NULL){
                         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, videoResolutionwidth/2, videoResolutionHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, yuvBuffer);
                     }
               }
@@ -1347,21 +1347,21 @@ void FrameRenderer::getDisplayRenderArea(int *displayX, int *displayY, int *dest
 
     //changing the height of viewport for See3CAM_CU83
     if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83){
-        if((videoResolutionwidth == Y16_1350p_WIDTH)&&(videoResolutionHeight == Y16_1350p_HEIGHT)){
+        if((videoResolutionwidth == Y16_1350p_WIDTH)&&(videoResolutionHeight == Y16_1350p_HEIGHT)){//3840x2160
             if(previewBgrdAreaHeight == 0){
                 calculateViewport(videoResolutionwidth, Y16_1350p_HEIGHT_MODIFIED, previewBgrdAreaWidth-xMargin, m_viewportSize.height(), &x, &y, &destWindowWidth, &destWindowHeight);
             }else{
                 calculateViewport(videoResolutionwidth, Y16_1350p_HEIGHT_MODIFIED, previewBgrdAreaWidth-xMargin, previewBgrdAreaHeight, &x, &y, &destWindowWidth, &destWindowHeight);
             }
         }
-        else if((videoResolutionwidth == 3120)&&(videoResolutionHeight == 1080)){
+        else if((videoResolutionwidth == Y16_NEW_WIDTH)&&(videoResolutionHeight == Y16_NEW_HEIGHT)){//3120x1080
             if(previewBgrdAreaHeight == 0){
                 calculateViewport(Y16_1080p_WIDTH, Y16_1080p_HEIGHT, previewBgrdAreaWidth-xMargin, m_viewportSize.height(), &x, &y, &destWindowWidth, &destWindowHeight);
             }else{
                 calculateViewport(Y16_1080p_WIDTH, Y16_1080p_HEIGHT, previewBgrdAreaWidth-xMargin, previewBgrdAreaHeight, &x, &y, &destWindowWidth, &destWindowHeight);
             }
         }
-        else if((videoResolutionwidth == Y16_675p_WIDTH)&&(videoResolutionHeight == Y16_675p_HEIGHT)){
+        else if((videoResolutionwidth == Y16_675p_WIDTH)&&(videoResolutionHeight == Y16_675p_HEIGHT)){//1920x675
             if(previewBgrdAreaHeight == 0){
                 calculateViewport(videoResolutionwidth, Y16_675p_HEIGHT_MODIFIED, previewBgrdAreaWidth-xMargin, m_viewportSize.height(), &x, &y, &destWindowWidth, &destWindowHeight);
             }else{
@@ -2907,6 +2907,8 @@ bool Videostreaming::prepareStillBuffer(uint8_t *inputBuffer)
 
              int uyvyBytesToRead = 7680;
              int y8BytesToRead   = 2400;
+             int RGBCounter = 0;
+             int IRCounter =  0;
 
              shaderType = CommonEnums::UYVY_BUFFER_RENDER;
              m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
@@ -2922,6 +2924,7 @@ bool Videostreaming::prepareStillBuffer(uint8_t *inputBuffer)
                      bufferCount += uyvyBytesToRead;
                      uyvySize    += uyvyBytesToRead;
                      frameSize   -= uyvyBytesToRead;
+                     RGBCounter++;
                  }
                  else if(((inputBuffer[bufferCount]) & (0x01)) == 1)
                  {//if the first bit of the first byte of the input buffer is 1, its Y8 data
@@ -2929,6 +2932,7 @@ bool Videostreaming::prepareStillBuffer(uint8_t *inputBuffer)
                      bufferCount += y8BytesToRead;
                      irSize      += y8BytesToRead;
                      frameSize   -= y8BytesToRead;
+                     IRCounter++;
                  }
              }
 
@@ -2940,12 +2944,16 @@ bool Videostreaming::prepareStillBuffer(uint8_t *inputBuffer)
              int IRsize = irSize;
              bufferCount = 0;
              irSize = 0;
-             while (IRsize > 0)
+
+             if((RGBCounter == 2160)&&(IRCounter == 1080))
              {
-                 memcpy((outputIrBuffer) + (irSize), (inputIrBuffer) + bufferCount, 4);
-                 irSize      += 4;
-                 bufferCount += 5;
-                 IRsize      -= 5;
+                 while (IRsize > 0)
+                 {
+                     memcpy((outputIrBuffer) + (irSize), (inputIrBuffer) + bufferCount, 4);
+                     irSize      += 4;
+                     bufferCount += 5;
+                     IRsize      -= 5;
+                 }
              }
        }
        else if((width == Y16_NEW_WIDTH)&&(height == Y16_NEW_HEIGHT))
@@ -3043,11 +3051,12 @@ bool Videostreaming::prepareStillBuffer(uint8_t *inputBuffer)
     m_renderer->render27CugMutex.unlock();
     return true;
 }
+
+
 //Splitting of UYVY & Y8 Buffer from Y16 for See3CAM_CU83
 bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 {
     m_renderer->render27CugMutex.lock();
-
     if(!inputbuffer)
     {
         m_renderer->render27CugMutex.unlock();
@@ -3065,11 +3074,13 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 
         int uyvyBytesToRead = 7680;
         int y8BytesToRead   = 2400;
+        int RGBCounter = 0;
+        int IRCounter =  0;
 
         shaderType = CommonEnums::UYVY_BUFFER_RENDER;
         m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
 
-        frameSize  = width*height*BYTES_PER_PIXEL_UYVY; // for the resolution 4440x1080=19180800
+        frameSize  = width*height*BYTES_PER_PIXEL_Y16; // for the resolution 4440x1080=19180800
 
         while (frameSize > 0)
         {
@@ -3080,6 +3091,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
                 bufferCount += uyvyBytesToRead;
                 uyvySize    += uyvyBytesToRead;
                 frameSize   -= uyvyBytesToRead;
+                RGBCounter ++;
             }
             else if(((inputbuffer[bufferCount]) & (0x01)) == 1)
             {//if the first bit of the first byte of the input buffer is 1, its Y8 data
@@ -3087,6 +3099,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
                 bufferCount += y8BytesToRead;
                 irSize      += y8BytesToRead;
                 frameSize   -= y8BytesToRead;
+                IRCounter++;
             }
         }
 
@@ -3094,19 +3107,23 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         int IRsize = irSize;
         bufferCount = 0;
         irSize = 0;
-        while (IRsize > 0)
+
+        if((RGBCounter == RGB_LINES_4K) && (IRCounter == IR_LINES_4K))
         {
-            memcpy((outputIrBuffer) + (irSize), (inputIrBuffer) + bufferCount, 4);
-            irSize      += 4;
-            bufferCount += 5;
-            IRsize      -= 5;
+            while (IRsize > 0)
+            {
+                memcpy((outputIrBuffer) + (irSize), (inputIrBuffer) + bufferCount, 4);
+                irSize      += 4;
+                bufferCount += 5;
+                IRsize      -= 5;
+            }
         }
 
-        //Convert buffer into QImage to render in another window
-        QImage qImage3(outputIrBuffer, Y16_2160p_Y8_WIDTH, Y16_2160p_Y8_HEIGHT, QImage::Format_Grayscale8);
+        //Copying buffer to QImage to render in another window
+        memcpy(cu83IRWindow->bits(),outputIrBuffer,1920*1080);
 
-       //passing QImage to the setImage() defined in renderer class
-       helperObj.setImage(qImage3);
+        //passing QImage to the setImage() defined in renderer class
+        helperObj.setImage(*cu83IRWindow);
     }
     else if((width == Y16_NEW_WIDTH)&&(height == Y16_NEW_HEIGHT))
     {
@@ -3123,7 +3140,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         shaderType = CommonEnums::UYVY_BUFFER_RENDER;
         m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
 
-        frameSize  = width*height*BYTES_PER_PIXEL_Y16; // for the resolution 4440x1080=19180800
+        frameSize  = width*height*BYTES_PER_PIXEL_Y16; //For the resolution 3120x1080x2 = 6739200
 
         while (frameSize > 0)
         {
@@ -3145,31 +3162,27 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
                 IRCounter++;
             }
         }
-
         //Removing 5th bit from each frame of IRBuffer
         int IRsize = irSize;
         bufferCount = 0;
         irSize = 0;
 
-        if((RGBCounter == 1080) && (IRCounter == 1080))
+        if((RGBCounter == RGB_LINES_1080p) && (IRCounter == IR_LINES_1080p))
         {
-          while (IRsize > 0)
-          {
-              memcpy((outputIrBuffer) + (irSize), (inputIrBuffer) + bufferCount, 4);
-              irSize      += 4;
-              bufferCount += 5;
-              IRsize      -= 5;
-          }
+              while (IRsize > 0)
+              {
+                  memcpy((outputIrBuffer) + (irSize), (inputIrBuffer) + bufferCount, 4);
+                  irSize      += 4;
+                  bufferCount += 5;
+                  IRsize      -= 5;
+              }
         }
-
-        QImage qImage3(Y16_1080p_WIDTH, Y16_1080p_HEIGHT, QImage::Format_Grayscale8);
-        memcpy(qImage3.bits(),outputIrBuffer,(Y16_1080p_WIDTH*Y16_1080p_HEIGHT));
-
+        //Copying buffer to QImage to render in another window
+        memcpy(cu83IRWindow->bits(),outputIrBuffer,Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
         //passing QImage to the setImage() defined in renderer class
-        helperObj.setImage(qImage3);
-
+        helperObj.setImage(*cu83IRWindow);
     }
-    else if((width == Y16_1350p_WIDTH)&&(height == Y16_1350p_HEIGHT))
+    else if((width == Y16_1350p_WIDTH)&&(height == Y16_1350p_HEIGHT))//3840x1080
     {
         m_renderer->renderBufferFormat = CommonEnums::GREY_BUFFER_RENDER;
         shaderType = CommonEnums::GREY_BUFFER_RENDER;
@@ -3241,21 +3254,19 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
             return false;
         }
 
-       QImage qImageRenderer(width, height, QImage::Format_RGB888);
-
-       memcpy(qImageRenderer.bits(),irRenderer->bits(),(height*width*BYTES_PER_PIXEL_RGB));
+       memcpy(qImageRenderer->bits(),irRenderer->bits(),(height*width*BYTES_PER_PIXEL_RGB));
 
        //set black color in the preview window, when device is in trigger mode
        if(clearBuffer)
        {
-           qImageRenderer.fill(Qt::black);
+           qImageRenderer->fill(Qt::black);
        }
 
        //passing QImage to the setImage() defined in renderer class
-       helperObj.setImage(qImageRenderer);
+       helperObj.setImage(*qImageRenderer);
+       qImageRenderer->fill(Qt::transparent);
     }
     m_renderer->render27CugMutex.unlock();
-
     return true;
 }
 
@@ -3593,17 +3604,16 @@ void Videostreaming::allocBuffers()
     m_renderer->ir675pBuffer = (uint8_t*)realloc(m_renderer->ir675pBuffer,Y16_675p_WIDTH*Y16_675p_HEIGHT_MODIFIED);
     m_renderer->greyBuffer = (uint8_t*)realloc(m_renderer->greyBuffer,buffLength);
 
-
     //See3CAM_CU83
     //Splitted UYVY data from Y16 & used it to render
-    m_renderer->uyvyBuffer = (uint8_t*)realloc(m_renderer->uyvyBuffer,Y16_RGB_RESOLUTION*BYTES_PER_PIXEL_UYVY);
+    m_renderer->uyvyBuffer = (uint8_t*)realloc(m_renderer->uyvyBuffer,Y16_1350p_WIDTH*Y16_1350p_HEIGHT_MODIFIED*BYTES_PER_PIXEL_Y16); //4440x2160 - RGB buffer
 
-    m_renderer->rgbFromY16Buffer = (uint8_t*)realloc(m_renderer->rgbFromY16Buffer,Y16_1080p_WIDTH*Y16_1080p_HEIGHT*BYTES_PER_PIXEL_UYVY);
+    m_renderer->rgbFromY16Buffer = (uint8_t*)realloc(m_renderer->rgbFromY16Buffer,Y16_1080p_WIDTH*Y16_1080p_HEIGHT*BYTES_PER_PIXEL_Y16); //3120*1080*2 - RGB frame
     //Splitted IR Data from Y16
-    inputIrBuffer = (uint8_t*)realloc(inputIrBuffer,Y16_IR_RESOLUTION*BYTES_PER_PIXEL_UYVY);
+    inputIrBuffer = (uint8_t*)realloc(inputIrBuffer,Y16_1080p_WIDTH*Y16_1080p_HEIGHT*BYTES_PER_PIXEL_Y16);
 
     //To Render IR data
-    outputIrBuffer = (uint8_t*)realloc(outputIrBuffer,Y16_IR_RESOLUTION);
+    outputIrBuffer = (uint8_t*)realloc(outputIrBuffer,Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
 
     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_160)
         tempSrcBuffer = (unsigned char *)realloc(tempSrcBuffer,SEE3CAM160_MJPEG_MAXBYTESUSED);
@@ -3712,7 +3722,6 @@ bool Videostreaming::startCapture()
               //Added to disable irWindow checkbox while launching the application
               emit emitResolution(width,height);
           }
-
         }
         else
         {
@@ -4173,6 +4182,8 @@ void Videostreaming::displayFrame() {
     m_capDestFormat.fmt.pix.sizeimage = width*height*3;
 
     m_capImage = new QImage(width, height, QImage::Format_RGB888);
+    qImageRenderer = new QImage(width, height, QImage::Format_RGB888);
+    cu83IRWindow = new QImage(1920,1080,QImage::Format_Grayscale8);
     if(cameraMode == 1)// cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
     {
         irRenderer = new QImage(width, height, QImage::Format_RGB888);
@@ -4288,7 +4299,6 @@ void Videostreaming::stopCapture() {
     }
     m_renderer->gotFrame = false;
     m_renderer->updateStop = true;
-
     m_renderer->y16BayerFormat = false; // BY default this will be false, If cu40 [ y16 bayer format ] is selected ,
     //this will be enabled.
     y16FormatFor20CUG = false;
@@ -4325,8 +4335,15 @@ void Videostreaming::stopCapture() {
             delete irRenderer;
             irRenderer = NULL;
         }
+        if (qImageRenderer != NULL) {
+            delete qImageRenderer;
+            qImageRenderer = NULL;
+        }
+        if (cu83IRWindow != NULL) {
+            delete cu83IRWindow;
+            cu83IRWindow = NULL;
+        }
     }
-
     m_renderer->renderyuyvMutex.lock();
 
     if(m_renderer->rgbaDestBuffer != NULL){
@@ -4379,7 +4396,7 @@ void Videostreaming::stopCapture() {
     }
 
     m_renderer->renderyuyvMutex.unlock();
-    skipImageCapture =0;
+    skipImageCapture = 0;
     startFrame = true;
 }
 
@@ -4394,8 +4411,12 @@ void Videostreaming::closeDevice() {
             delete m_capImage;
             m_capNotifier = NULL;
             m_capImage = NULL;
+            delete qImageRenderer;
             delete irRenderer;
-            irRenderer = NULL;
+            delete cu83IRWindow;
+            qImageRenderer = NULL;
+            irRenderer     = NULL;
+            cu83IRWindow   = NULL;
         }
         if(m_convertData)
         {
@@ -4451,7 +4472,6 @@ void Videostreaming::setResoultion(QString resolution)
     m_height = height;
     try_fmt(fmt);
     s_fmt(fmt);
-
     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode)
     {
      triggerModeSkipframes();            //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when format changed in trigger mode.

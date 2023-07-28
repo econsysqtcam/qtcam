@@ -57,11 +57,10 @@ Window {
     }
 
     ImageItem{
-        id: liveImageItem
+         id: liveImageItem
          height: parent.height
          width: parent.width
     }
-
 
     Component.onCompleted:
     {

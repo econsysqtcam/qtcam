@@ -18,14 +18,12 @@ Item {
     property bool skipUpdateUIOnAntiFlickerMode : false
     property bool skipUpdateGainMode            : false
 
-    property bool skipUpdateGainFromUVC         : false
+    property bool skipUpdateSingleShotExposure  : false
 
+    property bool skipUpdateGainFromUVC         : false
 
     property int brightnessMin: 0
     property int brightnessMax: 15
-
-    property int gainMin: 1
-    property int gainMax: 83
 
     property int lowerLimitMin: 100
     property int lowerLimitMax: 1000000
@@ -156,972 +154,947 @@ Item {
         width: 257
         height: 500
         style: econscrollViewStyle
-        ColumnLayout{
-            x:2
-            y:5
-            spacing:20
-            Row{
-                Layout.alignment: Qt.AlignCenter
-                Text {
-                    id: stream_modes
-                    text: "--- Stream Modes ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    opacity: 0.50196078431373
-                }
-            }
-            Grid {
-                x: 23
-                y: 235
-                columns: 2
-                spacing: 15
-                ExclusiveGroup { id: streamModeGroup }
-                RadioButton {
-                    id: rdoModeMaster
-                    style:  econRadioButtonStyle
-                    text:   qsTr("Master")
-                    exclusiveGroup: streamModeGroup
-                    activeFocusOnPress: true
-                    onClicked: {
-                        setMasterMode()
-                    }
-                    Keys.onReturnPressed:  {
-                         setMasterMode()
-                    }
-                }
-                RadioButton {
-                    id: rdoModeTrigger
-                    style:  econRadioButtonStyle
-                    text: qsTr("Trigger")
-                    exclusiveGroup: streamModeGroup
-                    activeFocusOnPress: true
-                    onClicked: {
-                        root.checkForTriggerMode(true)
-                        setTriggerMode()
-                    }
-                    Keys.onReturnPressed: {
-                        root.checkForTriggerMode(true)
-                        setTriggerMode()
-                    }
-                }
-            }
-            Row{
-                Layout.alignment: Qt.AlignCenter
-                Text {
-                    id: flash_modes
-                    text: "--- Flash Modes ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    opacity: 0.50196078431373
-                }
-            }
-            Grid {
-                x: 23
-                y: 235
-                columns: 2
-                spacing: 15
-                ExclusiveGroup { id: flashModeGroup }
-                RadioButton {
-                    id: rdoModeOff
-                    style:  econRadioButtonStyle
-                    text:   qsTr("OFF")
-                    exclusiveGroup: flashModeGroup
-                    activeFocusOnPress: true
-                    onClicked: {
-                        see3camcu135mH01r1.setFlashState(See3CAM_CU135M_H01R1.FLASHMODE_OFF)
-                    }
-                    Keys.onReturnPressed:  {
-                        see3camcu135mH01r1.setFlashState(See3CAM_CU135M_H01R1.FLASHMODE_OFF)
-                    }
-                }
-                RadioButton {
-                    id: rdoModeStrobe
-                    style:  econRadioButtonStyle
-                    text: qsTr("Strobe")
-                    exclusiveGroup: flashModeGroup
-                    activeFocusOnPress: true
-                    onClicked: {
-                        see3camcu135mH01r1.setFlashState(See3CAM_CU135M_H01R1.FLASHMODE_STROBE)
-                    }
-                    Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setFlashState(See3CAM_CU135M_H01R1.FLASHMODE_STROBE)
-                    }
-                }
-                RadioButton {
-                    id: rdoModeTorch
-                    style:  econRadioButtonStyle
-                    text: qsTr("Torch")
-                    exclusiveGroup: flashModeGroup
-                    activeFocusOnPress: true
-                    onClicked: {
-                        see3camcu135mH01r1.setFlashState(See3CAM_CU135M_H01R1.FLASHMODE_TORCH)
-                    }
-                    Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setFlashState(See3CAM_CU135M_H01R1.FLASHMODE_TORCH)
-                    }
-                }
-            }
-            Text {
-                id: flipControlText
-                text: "--- Flip Control ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-            Grid{
-                columns :2
-                spacing: 10
-                ExclusiveGroup { id: enableflipCtrlGrp }
-                CheckBox {
-                    id: flipHorizontal
-                    activeFocusOnPress : true
-                    text: "Horizontal"
-                    style: econCheckBoxStyle
-                    onClicked:{
-                        see3camcu135mH01r1.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
-                    }
-                    Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
-                    }
-                }
-                CheckBox {
-                    id: flipVertical
-                    activeFocusOnPress : true
-                    text: "Vertical"
-                    style: econCheckBoxStyle
-                    onClicked:{
-                        see3camcu135mH01r1.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
-                    }
-                    Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
-                    }
-                }
-
-            }
-            Text {
-                id: roiAutoExpMode
-                text: "--- ROI - Auto Exposure ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-
+        Item{
+            height: 1800
             ColumnLayout{
-                spacing:25
-                ExclusiveGroup { id: roiExpogroup }
-                RadioButton {
-                    exclusiveGroup: roiExpogroup
-                    id: autoexpFull
-                    text: "Full"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    opacity: enabled ? 1 : 0.1
-                    // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
-                    // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
-                    // winSize is required only for manual mode
-                    onClicked: {
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, autoExpoWinSizeCombo.currentText);
-                        autoExpoWinSizeCombo.enabled = false
-                    }
-                    Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, autoExpoWinSizeCombo.currentText);
-                        autoExpoWinSizeCombo.enabled = false
-                    }
-                }
-                RadioButton {
-                    exclusiveGroup: roiExpogroup
-                    id: autoexpManual
-                    text: "Manual"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    opacity: enabled ? 1 : 0.1
-                    onClicked: {
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, autoExpoWinSizeCombo.currentText);
-                        autoExpoWinSizeCombo.enabled = true
-                    }
-                    Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, autoExpoWinSizeCombo.currentText);
-                        autoExpoWinSizeCombo.enabled = true
-                    }
-                }
-            }
-            ComboBox
-            {
-                id: autoExpoWinSizeCombo
-                enabled: (autoexpManual.enabled && autoexpManual.checked) ? true : false
-                opacity: (autoexpManual.enabled && autoexpManual.checked) ? 1 : 0.1
-                model: ListModel {
-                    ListElement { text: "1" }
-                    ListElement { text: "2" }
-                    ListElement { text: "3" }
-                    ListElement { text: "4" }
-                    ListElement { text: "5" }
-                    ListElement { text: "6" }
-                    ListElement { text: "7" }
-                    ListElement { text: "8" }
-                }
-                activeFocusOnPress: true
-                style: econComboBoxStyle
-                onCurrentIndexChanged: {
-                    if(skipUpdateUIOnExpWindowSize){
-                        see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, autoExpoWinSizeCombo.currentText)
-                    }
-                    skipUpdateUIOnExpWindowSize = true
-                }
-            }
-
-            Text {
-                id: blackLevelAdj
-                text: "--- black Level Adjustment ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-            ColumnLayout{
-               ExclusiveGroup { id: blackLeverAdjGroup }
-               spacing: 25
-               RadioButton {
-                   id: enableBlackLevel
-                   style:  econRadioButtonStyle
-                   text: qsTr("Enable")
-                   exclusiveGroup: blackLeverAdjGroup
-                   activeFocusOnPress: true
-                   onClicked: {
-                       see3camcu135mH01r1.setBlackLevelAdjustment(See3CAM_CU135M_H01R1.ENABLE)
-                   }
-                   Keys.onReturnPressed: {
-                       see3camcu135mH01r1.setBlackLevelAdjustment(See3CAM_CU135M_H01R1.ENABLE)
-                   }
-               }
-               RadioButton {
-                   id: disableBlackLevel
-                   style:  econRadioButtonStyle
-                   text: qsTr("Disable")
-                   exclusiveGroup: blackLeverAdjGroup
-                   activeFocusOnPress: true
-                   onClicked: {
-                       see3camcu135mH01r1.setBlackLevelAdjustment(See3CAM_CU135M_H01R1.DISABLE)
-                   }
-                   Keys.onReturnPressed: {
-                       see3camcu135mH01r1.setBlackLevelAdjustment(See3CAM_CU135M_H01R1.DISABLE)
-                   }
-               }
-           }
-
-            //target brightness
-            Text
-            {
-                id: brightnessText
-                text: "--- Target Brightness ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-            Row{
-                spacing: 35
-                Slider {
-                    activeFocusOnPress: true
-                    updateValueWhileDragging: false
-                    id: targetBrightness
-                    width: 150
-                    stepSize: 1
-                    style:econSliderStyle
-                    onValueChanged:  {
-                        brightnessTextField.text = targetBrightness.value
-                        if(skipUpdateTargetBrightness){
-                            see3camcu135mH01r1.setTargetBrightness(targetBrightness.value)
-                        }
-                        skipUpdateTargetBrightness = true
-                    }
-                }
-                TextField {
-                    id: brightnessTextField
-                    text: targetBrightness.value
-                    font.pixelSize: 10
-                    font.family: "Ubuntu"
-                    smooth: true
-                    horizontalAlignment: TextInput.AlignHCenter
-                    style: econTextFieldStyle
-                    validator: IntValidator {bottom: targetBrightness.minimumValue; top: targetBrightness.maximumValue}
-                    onTextChanged: {
-                        if(text.length > 0){
-                            targetBrightness.value = brightnessTextField.text
-                        }
-                    }
-                }
-            }
-
-
-            Text {
-                id: gainMode
-                text: "--- Gain Mode ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-            Grid{
-               ExclusiveGroup { id: gainModeGroup }
-               spacing: 25
-               RadioButton {
-                   id: autoGain
-                   style:  econRadioButtonStyle
-                   text: qsTr("Auto")
-                   exclusiveGroup: gainModeGroup
-                   activeFocusOnPress: true
-                   onClicked: {
-                       setAutoGain()
-                   }
-                   Keys.onReturnPressed: {
-                       setAutoGain()
-                   }
-               }
-               RadioButton {
-                   id: manualGain
-                   style:  econRadioButtonStyle
-                   text: qsTr("Manual")
-                   exclusiveGroup: gainModeGroup
-                   activeFocusOnPress: true
-                   onClicked: {
-                       setManualGain()
-                   }
-                   Keys.onReturnPressed: {
-                       setManualGain()
-                   }
-               }
-           }
-
-            Row{
-                spacing:10
-                ExclusiveGroup { id: afgroup }
-                RadioButton {
-                    exclusiveGroup: afgroup
-                    id: radioContin
-                    text: "Continuous"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    opacity: enabled ? 1 : 0.1
-                    onClicked: {
-                          see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.CONTINUOUS, 1)
-                          triggerGainBtn.enabled = false
-                          triggerGainBtn.opacity = 0.1
-                    }
-                      Keys.onReturnPressed: {
-                          see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.CONTINUOUS, 1)
-
-                          triggerGainBtn.enabled = false
-                          triggerGainBtn.opacity = 0.1
-                      }
-                  }
-            }
-            Row{
-                spacing:25
-                RadioButton {
-                    exclusiveGroup: afgroup
-                    id: radioOneshot
-                    text: "Single Shot"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    opacity: enabled ? 1 : 0.1
-                    onClicked: {
-                        see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.SINGLE_SHOT, 1)
-
-                        triggerGainBtn.enabled = true
-                        triggerGainBtn.opacity = 1
-                    }
-                    Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.SINGLE_SHOT, 1)
-
-                        triggerGainBtn.enabled = true
-                        triggerGainBtn.opacity = 1
-                    }
-                }
-                Button {
-                    id: triggerGainBtn
-                    activeFocusOnPress : true
-                    text: "Trigger"
-                    style: econButtonStyle
-                    enabled: (radioOneshot.enabled && radioOneshot.checked) ? true : false
-                    opacity: (radioOneshot.enabled && radioOneshot.checked) ? 1 : 0.1
-                    implicitHeight: 25
-                    implicitWidth: 120
-                    action: (radioOneshot.enabled && radioOneshot.checked) ? triggerGain : null
-                    Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.SINGLE_SHOT, 1)
-                    }
-                }
-            }
-
-            Row
-            {
-                spacing: 35
-                Slider
-                {
-                    activeFocusOnPress: true
-                    updateValueWhileDragging: false
-                    id: gainSlider
-                    width: 150
-                    stepSize: 1
-                    style:econSliderStyle
-                    minimumValue: gainMin
-                    maximumValue: gainMax
-                    onValueChanged:  {
-                        gainTextField.text = gainSlider.value
-                        root.getGainValueFromHID(gainSlider.value)
-                        if(skipUpdateGainMode){
-
-                            if(manualGain.checked == true)
-                            {
-                                see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.MANUAL_GAIN,0,gainSlider.value)
-                            }
-                            else if(autoGain.checked == true)
-                            {
-                                if(radioContin.checked == true)
-                                {
-                                    see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.CONTINUOUS, gainSlider.value)
-                                }
-                                else if(radioOneshot.checked == true)
-                                {
-                                    see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.SINGLE_SHOT, gainSlider.value)
-                                }
-                            }
-                        }
-                        skipUpdateGainMode = true
-                    }
-                }
-                TextField
-                {
-                    id: gainTextField
-                    text: gainSlider.value
-                    font.pixelSize: 10
-                    font.family: "Ubuntu"
-                    smooth: true
-                    horizontalAlignment: TextInput.AlignHCenter
-                    style: econTextFieldStyle
-                    validator: IntValidator {bottom: gainSlider.minimumValue; top: gainSlider.maximumValue}
-                    onTextChanged: {
-                        if(text.length > 0){
-                            gainSlider.value = gainTextField.text
-                        }
-                    }
-                }
-            }
-
-            Text {
-                id: gainLowerLimit
-                text: "--- Gain Lower Limit ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-
-            Row{
-                spacing: 35
-                Slider {
-                    activeFocusOnPress: true
-                    updateValueWhileDragging: false
-                    id: gainLowerLimitSlider
-                    width: 150
-                    stepSize: 25
-                    style:econSliderStyle
-                    onValueChanged:  {
-                        gainLowerLimitTextField.text = gainLowerLimitSlider.value
-                        if(skipUpdateLowerLimitSlider){
-                            setButtonClicked = true
-                            see3camcu135mH01r1.setGainLimit(gainLowerLimitSlider.value, gainUpperLimitSlider.value)
-                        }
-                        skipUpdateLowerLimitSlider = true
-                    }
-                }
-                TextField {
-                    id: gainLowerLimitTextField
-                    text: gainLowerLimitSlider.value
-                    font.pixelSize: 10
-                    font.family: "Ubuntu"
-                    smooth: true
-                    horizontalAlignment: TextInput.AlignHCenter
-                    style: econTextFieldStyle
-                    validator: IntValidator {bottom: gainLowerLimitSlider.minimumValue; top: gainLowerLimitSlider.maximumValue}
-                    onTextChanged: {
-                        if(text.length > 0){
-                            gainLowerLimitSlider.value = gainLowerLimitTextField.text
-                        }
-                    }
-                }
-            }
-
-            Text {
-                id: gainUpperLimit
-                text: "--- Gain Upper Limit ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-
-            Row{
-                spacing: 35
-                Slider {
-                    activeFocusOnPress: true
-                    updateValueWhileDragging: false
-                    id: gainUpperLimitSlider
-                    width: 150
-                    stepSize: 25
-                    style:econSliderStyle
-                    onValueChanged:  {
-                        gainUpperLimitTextField.text = gainUpperLimitSlider.value
-                        if(skipUpdateUpperLimitSlider){
-                            setButtonClicked = true
-                            see3camcu135mH01r1.setGainLimit(gainLowerLimitSlider.value, gainUpperLimitSlider.value)
-                        }
-                        skipUpdateUpperLimitSlider = true
-                    }
-                }
-                TextField {
-                    id: gainUpperLimitTextField
-                    text: gainLowerLimitSlider.value
-                    font.pixelSize: 10
-                    font.family: "Ubuntu"
-                    smooth: true
-                    horizontalAlignment: TextInput.AlignHCenter
-                    style: econTextFieldStyle
-                    validator: IntValidator {bottom: gainUpperLimitSlider.minimumValue; top: gainUpperLimitSlider.maximumValue}
-                    onTextChanged: {
-                        if(text.length > 0){
-                            gainUpperLimitSlider.value = gainUpperLimitTextField.text
-                        }
-                    }
-                }
-            }
-
-            Text {
-                id: exposureMode
-                text: "--- Auto Exposure Mode ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-
-            Row{
-                spacing:10
-                ExclusiveGroup { id: autoExpGroup }
-                RadioButton {
-                    exclusiveGroup: autoExpGroup
-                    id: continousExposure
-                    text: "Continuous"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    opacity: enabled ? 1 : 0.1
-                    onClicked: {
-                        see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.CONTINIOUS_EXPOSURE)
-
-                        //Enable flicker mode when auto exposure continious mode
-                        antiFlickerCombo.enabled = true
-                        antiFlickerCombo.opacity = 1
-                        frequency.enabled        = true
-                        frequency.opacity        = 1
-
-                        triggerExposureBtn.enabled = false
-                        triggerExposureBtn.opacity = 0.1
-                      }
-                      Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.CONTINIOUS_EXPOSURE)
-
-                        //Enable flicker mode when auto exposure continious mode
-                        antiFlickerCombo.enabled = true
-                        antiFlickerCombo.opacity = 1
-                        frequency.enabled        = true
-                        frequency.opacity        = 1
-
-                        triggerExposureBtn.enabled = false
-                        triggerExposureBtn.opacity = 0.1
-                      }
-                  }
-            }
-            Row{
-                spacing:25
-                RadioButton {
-                    exclusiveGroup: autoExpGroup
-                    id: singleShotExposure
-                    text: "Single shot"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    opacity: enabled ? 1 : 0.1
-                    onClicked: {
-                        see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
-
-                        //Disable flicker mode when auto singleShotExposure
-                        antiFlickerCombo.enabled = false
-                        antiFlickerCombo.opacity = 0.1
-                        frequency.enabled        = false
-                        frequency.opacity        = 0.1
-
-                        triggerExposureBtn.enabled = true
-                        triggerExposureBtn.opacity = 1
-                    }
-                    Keys.onReturnPressed: {
-                        see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
-
-                        //Disable flicker mode when auto singleShotExposure
-                        antiFlickerCombo.enabled = false
-                        antiFlickerCombo.opacity = 0.1
-                        frequency.enabled        = false
-                        frequency.opacity        = 0.1
-
-                        triggerExposureBtn.enabled = true
-                        triggerExposureBtn.opacity = 1
-                    }
-                }
-                Button {
-                    id: triggerExposureBtn
-                    activeFocusOnPress : true
-                    text: "Trigger"
-                    style: econButtonStyle
-                    enabled: (singleShotExposure.enabled && singleShotExposure.checked) ? true : false
-                    opacity: (singleShotExposure.enabled && singleShotExposure.checked) ? 1 : 0.1
-                    implicitHeight: 25
-                    implicitWidth: 120
-                    action: (singleShotExposure.enabled && singleShotExposure.checked) ? triggerExposure : null
-                    Keys.onReturnPressed: {
-
-                        //Disable flicker mode when auto singleShotExposure
-                        antiFlickerCombo.enabled = false
-                        antiFlickerCombo.opacity = 0.1
-                        frequency.enabled        = false
-                        frequency.opacity        = 0.1
-
-                        see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
-                    }
-                }
-            }
-
-
-            Text {
-                id: lowerLimitMode
-                text: "--- Exposure Lower Limit ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-            Row{
-                    spacing: 9
-
+                x:2
+                y:5
+                spacing:20
+                Row{
+                    Layout.alignment: Qt.AlignCenter
                     Text {
-                        id: lowerLimitModetext
-                        text: "value(µs)[100 - 1000000]"
+                        id: stream_modes
+                        text: "--- Stream Modes ---"
                         font.pixelSize: 14
                         font.family: "Ubuntu"
                         color: "#ffffff"
                         smooth: true
-                        width: 80
-                        wrapMode: Text.WordWrap
-                        opacity: 1
+                        opacity: 0.50196078431373
                     }
-                    TextField {
-                        id: lowerLimitTextField
-                        font.pixelSize: 10
-                        font.family: "Ubuntu"
-                        smooth: true
-                        horizontalAlignment: TextInput.AlignHCenter
-                        opacity: 1
-                        style: econTextFieldStyle
-                        implicitHeight: 25
-                        implicitWidth: 80
-                        validator: IntValidator {bottom: lowerLimitMin; top: lowerLimitMax}
-                    }
-                    Button {
-                        id: lowerLimtSetBtn
-                        activeFocusOnPress : true
-                        text: "Set"
-                        tooltip: "You can set the required limit value by changing the
-    value in the text box and click the Set button"
-                        style: econButtonStyle
-                        enabled: true
-                        opacity: 1
-                        implicitHeight: 25
-                        implicitWidth: 60
+                }
+                Grid {
+                    x: 23
+                    y: 235
+                    columns: 2
+                    spacing: 15
+                    ExclusiveGroup { id: streamModeGroup }
+                    RadioButton {
+                        id: rdoModeMaster
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Master")
+                        exclusiveGroup: streamModeGroup
+                        activeFocusOnPress: true
                         onClicked: {
-                            lowerLimtSetBtn.enabled = false
-                            setButtonClicked = true
-                            see3camcu135mH01r1.setAutoExposureLowerLimit(lowerLimitTextField.text)
-                            lowerLimtSetBtn.enabled = true
+                            setMasterMode()
+                        }
+                        Keys.onReturnPressed:  {
+                             setMasterMode()
+                        }
+                    }
+                    RadioButton {
+                        id: rdoModeTrigger
+                        style:  econRadioButtonStyle
+                        text: qsTr("Trigger")
+                        exclusiveGroup: streamModeGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            root.checkForTriggerMode(true)
+                            setTriggerMode()
                         }
                         Keys.onReturnPressed: {
-                            lowerLimtSetBtn.enabled = false
-                            setButtonClicked = true
-                            see3camcu135mH01r1.setAutoExposureLowerLimit(lowerLimitTextField.text)
-                            lowerLimtSetBtn.enabled = true
+                            root.checkForTriggerMode(true)
+                            setTriggerMode()
                         }
                     }
-            }
-
-            Text {
-                id: upperLimitMode
-                text: "--- Exposure Upper Limit ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-            Row{
-                    spacing: 9
-
+                }
+                Row{
+                    Layout.alignment: Qt.AlignCenter
                     Text {
-                        id: upperLimitModetext
-                        text: "value(µs)[100 - 1000000]"
+                        id: flash_modes
+                        text: "--- Flash Modes ---"
                         font.pixelSize: 14
                         font.family: "Ubuntu"
                         color: "#ffffff"
                         smooth: true
-                        width: 80
-                        wrapMode: Text.WordWrap
-                        opacity: 1
+                        opacity: 0.50196078431373
+                    }
+                }
+                Grid {
+                    x: 23
+                    y: 235
+                    columns: 2
+                    spacing: 15
+                    ExclusiveGroup { id: flashModeGroup }
+                    RadioButton {
+                        id: rdoModeOff
+                        style:  econRadioButtonStyle
+                        text:   qsTr("OFF")
+                        exclusiveGroup: flashModeGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            see3camcu135mH01r1.setFlashState(See3CAM_CU135M_H01R1.FLASHMODE_OFF)
+                        }
+                        Keys.onReturnPressed:  {
+                            see3camcu135mH01r1.setFlashState(See3CAM_CU135M_H01R1.FLASHMODE_OFF)
+                        }
+                    }
+                    RadioButton {
+                        id: rdoModeStrobe
+                        style:  econRadioButtonStyle
+                        text: qsTr("Strobe")
+                        exclusiveGroup: flashModeGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            see3camcu135mH01r1.setFlashState(See3CAM_CU135M_H01R1.FLASHMODE_STROBE)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu135mH01r1.setFlashState(See3CAM_CU135M_H01R1.FLASHMODE_STROBE)
+                        }
+                    }
+                    RadioButton {
+                        id: rdoModeTorch
+                        style:  econRadioButtonStyle
+                        text: qsTr("Torch")
+                        exclusiveGroup: flashModeGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            see3camcu135mH01r1.setFlashState(See3CAM_CU135M_H01R1.FLASHMODE_TORCH)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu135mH01r1.setFlashState(See3CAM_CU135M_H01R1.FLASHMODE_TORCH)
+                        }
+                    }
+                }
+                Text {
+                    id: flipControlText
+                    text: "--- Flip Control ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                Grid{
+                    columns :2
+                    spacing: 10
+                    ExclusiveGroup { id: enableflipCtrlGrp }
+                    CheckBox {
+                        id: flipHorizontal
+                        activeFocusOnPress : true
+                        text: "Horizontal"
+                        style: econCheckBoxStyle
+                        onClicked:{
+                            see3camcu135mH01r1.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu135mH01r1.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
+                        }
+                    }
+                    CheckBox {
+                        id: flipVertical
+                        activeFocusOnPress : true
+                        text: "Vertical"
+                        style: econCheckBoxStyle
+                        onClicked:{
+                            see3camcu135mH01r1.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu135mH01r1.setFlipCtrlValue(flipHorizontal.checked,flipVertical.checked)
+                        }
+                    }
+
+                }
+                Text {
+                    id: roiAutoExpMode
+                    text: "--- ROI - Auto Exposure ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+
+                ColumnLayout{
+                    spacing:25
+                    ExclusiveGroup { id: roiExpogroup }
+                    RadioButton {
+                        exclusiveGroup: roiExpogroup
+                        id: autoexpFull
+                        text: "Full"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
+                        // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
+                        // winSize is required only for manual mode
+                        onClicked: {
+                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, autoExpoWinSizeCombo.currentText);
+                            autoExpoWinSizeCombo.enabled = false
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, autoExpoWinSizeCombo.currentText);
+                            autoExpoWinSizeCombo.enabled = false
+                        }
+                    }
+                    RadioButton {
+                        exclusiveGroup: roiExpogroup
+                        id: autoexpManual
+                        text: "Manual"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        onClicked: {
+                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, autoExpoWinSizeCombo.currentText);
+                            autoExpoWinSizeCombo.enabled = true
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, autoExpoWinSizeCombo.currentText);
+                            autoExpoWinSizeCombo.enabled = true
+                        }
+                    }
+                }
+                ComboBox
+                {
+                    id: autoExpoWinSizeCombo
+                    enabled: (autoexpManual.enabled && autoexpManual.checked) ? true : false
+                    opacity: (autoexpManual.enabled && autoexpManual.checked) ? 1 : 0.1
+                    model: ListModel {
+                        ListElement { text: "1" }
+                        ListElement { text: "2" }
+                        ListElement { text: "3" }
+                        ListElement { text: "4" }
+                        ListElement { text: "5" }
+                        ListElement { text: "6" }
+                        ListElement { text: "7" }
+                        ListElement { text: "8" }
+                    }
+                    activeFocusOnPress: true
+                    style: econComboBoxStyle
+                    onCurrentIndexChanged: {
+                        if(skipUpdateUIOnExpWindowSize){
+                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, autoExpoWinSizeCombo.currentText)
+                        }
+                        skipUpdateUIOnExpWindowSize = true
+                    }
+                }
+
+                Text {
+                    id: blackLevelAdj
+                    text: "--- black Level Adjustment ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                ColumnLayout{
+                   ExclusiveGroup { id: blackLeverAdjGroup }
+                   spacing: 25
+                   RadioButton {
+                       id: enableBlackLevel
+                       style:  econRadioButtonStyle
+                       text: qsTr("Enable")
+                       exclusiveGroup: blackLeverAdjGroup
+                       activeFocusOnPress: true
+                       onClicked: {
+                           see3camcu135mH01r1.setBlackLevelAdjustment(See3CAM_CU135M_H01R1.ENABLE)
+                       }
+                       Keys.onReturnPressed: {
+                           see3camcu135mH01r1.setBlackLevelAdjustment(See3CAM_CU135M_H01R1.ENABLE)
+                       }
+                   }
+                   RadioButton {
+                       id: disableBlackLevel
+                       style:  econRadioButtonStyle
+                       text: qsTr("Disable")
+                       exclusiveGroup: blackLeverAdjGroup
+                       activeFocusOnPress: true
+                       onClicked: {
+                           see3camcu135mH01r1.setBlackLevelAdjustment(See3CAM_CU135M_H01R1.DISABLE)
+                       }
+                       Keys.onReturnPressed: {
+                           see3camcu135mH01r1.setBlackLevelAdjustment(See3CAM_CU135M_H01R1.DISABLE)
+                       }
+                   }
+               }
+
+                //target brightness
+                Text
+                {
+                    id: brightnessText
+                    text: "--- Target Brightness ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                Row{
+                    spacing: 35
+                    Slider {
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        id: targetBrightness
+                        width: 150
+                        style:econSliderStyle
+                        onValueChanged:  {
+                            brightnessTextField.text = targetBrightness.value
+                            if(skipUpdateTargetBrightness){
+                                see3camcu135mH01r1.setTargetBrightness(targetBrightness.value)
+                            }
+                            skipUpdateTargetBrightness = true
+                        }
                     }
                     TextField {
-                        id: upperLimitTextField
+                        id: brightnessTextField
+                        text: targetBrightness.value
                         font.pixelSize: 10
                         font.family: "Ubuntu"
                         smooth: true
                         horizontalAlignment: TextInput.AlignHCenter
-                        opacity: 1
                         style: econTextFieldStyle
-                        implicitHeight: 25
-                        implicitWidth: 80
-                        validator: IntValidator {bottom: lowerLimitMin; top: lowerLimitMax}
+                        validator: IntValidator {bottom: targetBrightness.minimumValue; top: targetBrightness.maximumValue}
+                        onTextChanged: {
+                            if(text.length > 0){
+                                targetBrightness.value = brightnessTextField.text
+                            }
+                        }
                     }
-                    Button {
-                        id: upperLimitSetBtn
-                        activeFocusOnPress : true
-                        text: "Set"
-                        tooltip: "You can set the required limit value by changing the
-    value in the text box and click the Set button"
-                        style: econButtonStyle
-                        enabled: true
-                        opacity: 1
-                        implicitHeight: 25
-                        implicitWidth: 60
+                }
+
+
+                Text {
+                    id: gainMode
+                    text: "--- Gain Mode ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                Grid{
+                   ExclusiveGroup { id: gainModeGroup }
+                   spacing: 25
+                   RadioButton {
+                       id: autoGain
+                       style:  econRadioButtonStyle
+                       text: qsTr("Auto")
+                       exclusiveGroup: gainModeGroup
+                       activeFocusOnPress: true
+                       onClicked: {
+                           setAutoGain()
+                       }
+                       Keys.onReturnPressed: {
+                           setAutoGain()
+                       }
+                   }
+                   RadioButton {
+                       id: manualGain
+                       style:  econRadioButtonStyle
+                       text: qsTr("Manual")
+                       exclusiveGroup: gainModeGroup
+                       activeFocusOnPress: true
+                       onClicked: {
+                           setManualGain()
+                       }
+                       Keys.onReturnPressed: {
+                           setManualGain()
+                       }
+                   }
+               }
+
+                Row{
+                    spacing:10
+                    ExclusiveGroup { id: afgroup }
+                    RadioButton {
+                        exclusiveGroup: afgroup
+                        id: radioContin
+                        text: "Continuous"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
                         onClicked: {
-                            upperLimitSetBtn.enabled = false
-                            setButtonClicked = true
-                            see3camcu135mH01r1.setAutoExposureUpperLimit(upperLimitTextField.text)
-                            upperLimitSetBtn.enabled = true
+                              skipUpdateSingleShotExposure = true
+                              see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.CONTINUOUS, 1)
+                              triggerGainBtn.enabled = false
+                              triggerGainBtn.opacity = 0.1
+                        }
+                          Keys.onReturnPressed: {
+                              skipUpdateSingleShotExposure = true
+                              see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.CONTINUOUS, 1)
+
+                              triggerGainBtn.enabled = false
+                              triggerGainBtn.opacity = 0.1
+                          }
+                      }
+                }
+                Row{
+                    spacing:25
+                    RadioButton {
+                        exclusiveGroup: afgroup
+                        id: radioOneshot
+                        text: "Single Shot"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        onClicked: {
+                            if(skipUpdateSingleShotExposure)
+                            {
+                                skipUpdateSingleShotExposure = false
+                                see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.SINGLE_SHOT, 1)
+                            }
+
+                            triggerGainBtn.enabled = true
+                            triggerGainBtn.opacity = 1
                         }
                         Keys.onReturnPressed: {
-                            upperLimitSetBtn.enabled = false
-                            setButtonClicked = true
-                            see3camcu135mH01r1.setAutoExposureUpperLimit(upperLimitTextField.text)
-                            upperLimitSetBtn.enabled = true
+                            if(skipUpdateSingleShotExposure)
+                            {
+                                skipUpdateSingleShotExposure = false
+                                see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.SINGLE_SHOT, 1)
+                            }
+                            triggerGainBtn.enabled = true
+                            triggerGainBtn.opacity = 1
                         }
                     }
-            }
-
-            //Anti-Flicker Mode
-            Text {
-                id: antiFlickerMode
-                text: "--- Anti Flicker Mode ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-
-            Text {
-                id: frequency
-                text: "Frequency :"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-            }
-            ComboBox
-            {
-                id: antiFlickerCombo
-                model: ListModel {
-                    ListElement { text: "50 Hz" }
-                    ListElement { text: "60 Hz" }
-                    ListElement { text: "Disable" }
-                }
-                activeFocusOnPress: true
-                style: econComboBoxStyle
-                onCurrentIndexChanged: {
-                    if(skipUpdateUIOnAntiFlickerMode){
-                        setAntiFlickerMode()
+                    Button {
+                        id: triggerGainBtn
+                        activeFocusOnPress : true
+                        text: "Trigger"
+                        style: econButtonStyle
+                        enabled: (radioOneshot.enabled && radioOneshot.checked) ? true : false
+                        opacity: (radioOneshot.enabled && radioOneshot.checked) ? 1 : 0.1
+                        implicitHeight: 25
+                        implicitWidth: 120
+                        action: (radioOneshot.enabled && radioOneshot.checked) ? triggerGain : null
+                        Keys.onReturnPressed: {
+                            see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.SINGLE_SHOT, 1)
+                        }
                     }
-                    skipUpdateUIOnAntiFlickerMode = true
                 }
-            }
 
-            Row{
-                Layout.alignment: Qt.AlignCenter
-
-                Text {
-                    id: readStatistics
-                    text: "--- Read Statistics ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                }
-            }
-
-            Row
-            {
-                spacing: 35
-                Text {
-                    id: exposureLabel
-                    text: "Exposure value (us)"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                }
-                TextField
+                Row
                 {
-                    id: exposureStatTextField
-                    font.pixelSize: 10
-                    font.family: "Ubuntu"
-                    smooth: true
-                    horizontalAlignment: TextInput.AlignHCenter
-                    style: econTextFieldStyle
-                }
-            }
+                    spacing: 35
+                    Slider
+                    {
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        id: gainSlider
+                        width: 150
+                        style:econSliderStyle
+                        onValueChanged:  {
+                            gainTextField.text = gainSlider.value
+                            root.getGainValueFromHID(gainSlider.value)
+                            if(skipUpdateGainMode){
 
-            Row
-            {
-                spacing: 35
+                                if(manualGain.checked == true)
+                                {
+                                    see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.MANUAL_GAIN,0,gainSlider.value)
+                                }
+                                else if(autoGain.checked == true)
+                                {
+                                    if(radioContin.checked == true)
+                                    {
+                                        see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.CONTINUOUS, gainSlider.value)
+                                    }
+                                    else if(radioOneshot.checked == true)
+                                    {
+                                        see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.SINGLE_SHOT, gainSlider.value)
+                                    }
+                                }
+                            }
+                            skipUpdateGainMode = true
+                        }
+                    }
+                    TextField
+                    {
+                        id: gainTextField
+                        text: gainSlider.value
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        validator: IntValidator {bottom: gainSlider.minimumValue; top: gainSlider.maximumValue}
+                        onTextChanged: {
+                            if(text.length > 0){
+                                gainSlider.value = gainTextField.text
+                            }
+                        }
+                    }
+                }
+
                 Text {
-                    id: gainLabel
-                    text: "Gain value (10^-2 x)"
+                    id: gainLowerLimit
+                    text: "--- Gain Lower Limit ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+
+                Row{
+                    spacing: 35
+                    Slider {
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        id: gainLowerLimitSlider
+                        width: 150
+                        style:econSliderStyle
+                        onValueChanged:  {
+                            gainLowerLimitTextField.text = gainLowerLimitSlider.value
+                            if(skipUpdateLowerLimitSlider){
+                                setButtonClicked = true
+                                see3camcu135mH01r1.setGainLimit(gainLowerLimitSlider.value, gainUpperLimitSlider.value)
+                            }
+                            skipUpdateLowerLimitSlider = true
+                        }
+                    }
+                    TextField {
+                        id: gainLowerLimitTextField
+                        text: gainLowerLimitSlider.value
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        validator: IntValidator {bottom: gainLowerLimitSlider.minimumValue; top: gainLowerLimitSlider.maximumValue}
+                        onTextChanged: {
+                            if(text.length > 0){
+                                gainLowerLimitSlider.value = gainLowerLimitTextField.text
+                            }
+                        }
+                    }
+                }
+
+                Text {
+                    id: gainUpperLimit
+                    text: "--- Gain Upper Limit ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+
+                Row{
+                    spacing: 35
+                    Slider {
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        id: gainUpperLimitSlider
+                        width: 150
+                        style:econSliderStyle
+                        onValueChanged:  {
+                            gainUpperLimitTextField.text = gainUpperLimitSlider.value
+                            if(skipUpdateUpperLimitSlider){
+                                setButtonClicked = true
+                                see3camcu135mH01r1.setGainLimit(gainLowerLimitSlider.value, gainUpperLimitSlider.value)
+                            }
+                            skipUpdateUpperLimitSlider = true
+                        }
+                    }
+                    TextField {
+                        id: gainUpperLimitTextField
+                        text: gainLowerLimitSlider.value
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        validator: IntValidator {bottom: gainUpperLimitSlider.minimumValue; top: gainUpperLimitSlider.maximumValue}
+                        onTextChanged: {
+                            if(text.length > 0){
+                                gainUpperLimitSlider.value = gainUpperLimitTextField.text
+                            }
+                        }
+                    }
+                }
+
+                Text {
+                    id: exposureMode
+                    text: "--- Auto Exposure Mode ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+
+                Row{
+                    spacing:10
+                    ExclusiveGroup { id: autoExpGroup }
+                    RadioButton {
+                        exclusiveGroup: autoExpGroup
+                        id: continousExposure
+                        text: "Continuous"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        onClicked: {
+                            see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.CONTINIOUS_EXPOSURE)
+                            triggerExposureBtn.enabled = false
+                            triggerExposureBtn.opacity = 0.1
+                          }
+                          Keys.onReturnPressed: {
+                            see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.CONTINIOUS_EXPOSURE)
+                            triggerExposureBtn.enabled = false
+                            triggerExposureBtn.opacity = 0.1
+                          }
+                      }
+                }
+                Row{
+                    spacing:25
+                    RadioButton {
+                        exclusiveGroup: autoExpGroup
+                        id: singleShotExposure
+                        text: "Single shot"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        onClicked: {
+                            see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
+
+                            triggerExposureBtn.enabled = true
+                            triggerExposureBtn.opacity = 1
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
+
+                            triggerExposureBtn.enabled = true
+                            triggerExposureBtn.opacity = 1
+                        }
+                    }
+                    Button {
+                        id: triggerExposureBtn
+                        activeFocusOnPress : true
+                        text: "Trigger"
+                        style: econButtonStyle
+                        enabled: (singleShotExposure.enabled && singleShotExposure.checked) ? true : false
+                        opacity: (singleShotExposure.enabled && singleShotExposure.checked) ? 1 : 0.1
+                        implicitHeight: 25
+                        implicitWidth: 120
+                        action: (singleShotExposure.enabled && singleShotExposure.checked) ? triggerExposure : null
+                        Keys.onReturnPressed: {
+                            see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
+                        }
+                    }
+                }
+
+
+                Text {
+                    id: lowerLimitMode
+                    text: "--- Exposure Lower Limit ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                Row{
+                        spacing: 9
+
+                        Text {
+                            id: lowerLimitModetext
+                            text: "value(µs)[100 - 1000000]"
+                            font.pixelSize: 14
+                            font.family: "Ubuntu"
+                            color: "#ffffff"
+                            smooth: true
+                            width: 80
+                            wrapMode: Text.WordWrap
+                            opacity: 1
+                        }
+                        TextField {
+                            id: lowerLimitTextField
+                            font.pixelSize: 10
+                            font.family: "Ubuntu"
+                            smooth: true
+                            horizontalAlignment: TextInput.AlignHCenter
+                            opacity: 1
+                            style: econTextFieldStyle
+                            implicitHeight: 25
+                            implicitWidth: 80
+                            validator: IntValidator {bottom: lowerLimitMin; top: lowerLimitMax}
+                        }
+                        Button {
+                            id: lowerLimtSetBtn
+                            activeFocusOnPress : true
+                            text: "Set"
+                            tooltip: "You can set the required limit value by changing the
+        value in the text box and click the Set button"
+                            style: econButtonStyle
+                            enabled: true
+                            opacity: 1
+                            implicitHeight: 25
+                            implicitWidth: 60
+                            onClicked: {
+                                lowerLimtSetBtn.enabled = false
+                                setButtonClicked = true
+                                see3camcu135mH01r1.setAutoExposureLowerLimit(lowerLimitTextField.text)
+                                lowerLimtSetBtn.enabled = true
+                            }
+                            Keys.onReturnPressed: {
+                                lowerLimtSetBtn.enabled = false
+                                setButtonClicked = true
+                                see3camcu135mH01r1.setAutoExposureLowerLimit(lowerLimitTextField.text)
+                                lowerLimtSetBtn.enabled = true
+                            }
+                        }
+                }
+
+                Text {
+                    id: upperLimitMode
+                    text: "--- Exposure Upper Limit ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                Row{
+                        spacing: 9
+
+                        Text {
+                            id: upperLimitModetext
+                            text: "value(µs)[100 - 1000000]"
+                            font.pixelSize: 14
+                            font.family: "Ubuntu"
+                            color: "#ffffff"
+                            smooth: true
+                            width: 80
+                            wrapMode: Text.WordWrap
+                            opacity: 1
+                        }
+                        TextField {
+                            id: upperLimitTextField
+                            font.pixelSize: 10
+                            font.family: "Ubuntu"
+                            smooth: true
+                            horizontalAlignment: TextInput.AlignHCenter
+                            opacity: 1
+                            style: econTextFieldStyle
+                            implicitHeight: 25
+                            implicitWidth: 80
+                            validator: IntValidator {bottom: lowerLimitMin; top: lowerLimitMax}
+                        }
+                        Button {
+                            id: upperLimitSetBtn
+                            activeFocusOnPress : true
+                            text: "Set"
+                            tooltip: "You can set the required limit value by changing the
+        value in the text box and click the Set button"
+                            style: econButtonStyle
+                            enabled: true
+                            opacity: 1
+                            implicitHeight: 25
+                            implicitWidth: 60
+                            onClicked: {
+                                upperLimitSetBtn.enabled = false
+                                setButtonClicked = true
+                                see3camcu135mH01r1.setAutoExposureUpperLimit(upperLimitTextField.text)
+                                upperLimitSetBtn.enabled = true
+                            }
+                            Keys.onReturnPressed: {
+                                upperLimitSetBtn.enabled = false
+                                setButtonClicked = true
+                                see3camcu135mH01r1.setAutoExposureUpperLimit(upperLimitTextField.text)
+                                upperLimitSetBtn.enabled = true
+                            }
+                        }
+                }
+
+                //Anti-Flicker Mode
+                Text {
+                    id: antiFlickerMode
+                    text: "--- Anti Flicker Mode ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+
+                Text {
+                    id: frequency
+                    text: "Frequency :"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
                     smooth: true
                 }
-                TextField
+                ComboBox
                 {
-                    id: gainStatTextField
-                    font.pixelSize: 10
-                    font.family: "Ubuntu"
-                    smooth: true
-                    horizontalAlignment: TextInput.AlignHCenter
-                    style: econTextFieldStyle
-                }
-            }
-
-            Row{
-                Layout.alignment: Qt.AlignCenter
-                Button {
-                    id: readStatisticsBtn
-                    opacity: 1
-                    activeFocusOnPress : true
-                    text: "Read Statistics"
-                    action: getStatisticsCall
-                    style: econButtonStyle
-                    Keys.onReturnPressed: {
-                        see3camcu135mH01r1.getStatistics()
+                    id: antiFlickerCombo
+                    model: ListModel {
+                        ListElement { text: "50 Hz" }
+                        ListElement { text: "60 Hz" }
+                        ListElement { text: "Disable" }
                     }
-                }
-            }
-
-            Row{
-                Layout.alignment: Qt.AlignCenter
-                Button {
-                    id: defaultValue
-                    opacity: 1
-                    activeFocusOnPress : true
-                    text: "Default"
-                    tooltip: "Click to set default values in extension controls"
-                    action: setDefault
-                    style: econButtonStyle
-                    Keys.onReturnPressed: {
-                        setToDefaultValues()
-                    }
-                }
-            }
-
-           Row{
-               // Layout.alignment: Qt.AlignCenter
-                Button {
-                    id: f_wversion_selected130
-                    opacity: 1
-                    action: firmwareVersion
-                    activeFocusOnPress : true
-                    tooltip: "Click to view the firmware version of the camera"
-                    style: ButtonStyle {
-                        background: Rectangle {
-                        border.width: control.activeFocus ? 3 :0
-                        color: "#222021"
-                        border.color: control.activeFocus ? "#ffffff" : "#222021"
-                        radius: 5
+                    activeFocusOnPress: true
+                    style: econComboBoxStyle
+                    onCurrentIndexChanged: {
+                        if(skipUpdateUIOnAntiFlickerMode){
+                            setAntiFlickerMode()
                         }
-                        label: Image {
-                        source: "images/f_wversion_selected.png"
-                        }
-                    }
-                    Keys.onReturnPressed: {
-                        getFirmwareVersion()
+                        skipUpdateUIOnAntiFlickerMode = true
                     }
                 }
-                Button {
-                    id: serial_no_selected
-                    opacity: 1
-                    action: serialNumber
-                    activeFocusOnPress : true
-                    tooltip: "Click to view the Serial Number"
-                    style: ButtonStyle {
-                        background: Rectangle {
-                        border.width: control.activeFocus ? 3 :0
-                        color: "#222021"
-                        border.color: control.activeFocus ? "#ffffff" : "#222021"
-                        radius: 5
-                        }
-                        label: Image {
-                        source: "images/serial_no_selected.png"
-                        }
-                    }
-                    Keys.onReturnPressed: {
-                       getSerialNumber()
-                    }
-                }
-            }
 
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+
+                    Text {
+                        id: readStatistics
+                        text: "--- Read Statistics ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                    }
+                }
+
+                Row
+                {
+                    spacing: 35
+                    Text {
+                        id: exposureLabel
+                        text: "Exposure value (us)"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                    }
+                    TextField
+                    {
+                        id: exposureStatTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        readOnly: true
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                    }
+                }
+
+                Row
+                {
+                    spacing: 35
+                    Text {
+                        id: gainLabel
+                        text: "Gain value                  "
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                    }
+                    TextField
+                    {
+                        id: gainStatTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        readOnly: true
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                    }
+                }
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Button {
+                        id: readStatisticsBtn
+                        opacity: 1
+                        activeFocusOnPress : true
+                        text: "Read Statistics"
+                        action: getStatisticsCall
+                        style: econButtonStyle
+                        Keys.onReturnPressed: {
+                            see3camcu135mH01r1.getStatistics()
+                        }
+                    }
+                }
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Button {
+                        id: defaultValue
+                        opacity: 1
+                        activeFocusOnPress : true
+                        text: "Default"
+                        tooltip: "Click to set default values in extension controls"
+                        action: setDefault
+                        style: econButtonStyle
+                        Keys.onReturnPressed: {
+                            setToDefaultValues()
+                        }
+                    }
+                }
+
+               Row{
+                    Button {
+                        id: f_wversion_selected130
+                        opacity: 1
+                        action: firmwareVersion
+                        activeFocusOnPress : true
+                        tooltip: "Click to view the firmware version of the camera"
+                        style: ButtonStyle {
+                            background: Rectangle {
+                            border.width: control.activeFocus ? 3 :0
+                            color: "#222021"
+                            border.color: control.activeFocus ? "#ffffff" : "#222021"
+                            radius: 5
+                            }
+                            label: Image {
+                            source: "images/f_wversion_selected.png"
+                            }
+                        }
+                        Keys.onReturnPressed: {
+                            getFirmwareVersion()
+                        }
+                    }
+                    Button {
+                        id: serial_no_selected
+                        opacity: 1
+                        action: serialNumber
+                        activeFocusOnPress : true
+                        tooltip: "Click to view the Serial Number"
+                        style: ButtonStyle {
+                            background: Rectangle {
+                            border.width: control.activeFocus ? 3 :0
+                            color: "#222021"
+                            border.color: control.activeFocus ? "#ffffff" : "#222021"
+                            radius: 5
+                            }
+                            label: Image {
+                            source: "images/serial_no_selected.png"
+                            }
+                        }
+                        Keys.onReturnPressed: {
+                           getSerialNumber()
+                        }
+                    }
+                }
+
+            }
         }
     }
     See3CAM_CU135M_H01R1{
         id:see3camcu135mH01r1
+
         onStreamModeValue:{
             if(streamMode == See3CAM_CU135M_H01R1.MODE_MASTER){
                 rdoModeMaster.checked = true
@@ -1162,13 +1135,27 @@ Item {
             getCurrentGainMode(gainMode)
         }
 
-        onAutoGainModeRecieved: {
+        onAutoGainFeatureRecieved: {
             getAutoGainMode(autoGain)
         }
 
-        onManualGainModeRecieved:{
+        onManualGainValueRecieved:{
             gainSlider.value = manualGain
         }
+
+
+        onGainMinSliderValueReceived:{
+            gainSlider.minimumValue = minSlider
+        }
+
+        onGainMaxSliderValueReceived:{
+            gainSlider.maximumValue = maxSlider
+        }
+
+        onGainStepValueReceived:{
+            gainSlider.stepSize = gainStepValue
+        }
+
 
         onSliderMinimumRecieved: {
             gainUpperLimitSlider.minimumValue = sliderMin
@@ -1192,6 +1179,11 @@ Item {
             skipUpdateUpperLimitSlider = true
         }
 
+        onGainLimitStepValueReceived:{
+            gainUpperLimitSlider.stepSize = stepValue
+            gainLowerLimitSlider.stepSize = stepValue
+        }
+
         onBlackLevelAdjustmentChanged: {
             getBlackLevelValue(blacklevel)
         }
@@ -1207,6 +1199,9 @@ Item {
         onBrightnessMaxSliderReceived: {
             targetBrightness.maximumValue = sliderMax
         }
+        onTargetBrightnessStepValue:{
+            targetBrightness.stepSize = stepValue
+        }
 
         onExposureModeRecieved: {
             getAutoExposureMode(exposureMode)
@@ -1221,22 +1216,8 @@ Item {
         }
 
         onAntiFlickerModeRecieved: {
-
-            if(continousExposure.checked == true)
-            {
-                antiFlickerCombo.enabled = true
-                antiFlickerCombo.opacity = 1
-
-                frequency.enabled        = true
-                frequency.opacity        = 1
-            }
-            else{
-                antiFlickerCombo.enabled = false
-                antiFlickerCombo.opacity = 0.1
-
-                frequency.enabled        = false
-                frequency.opacity        = 0.1
-            }
+            antiFlickerCombo.enabled = true
+            antiFlickerCombo.opacity = 1
             getAntiFlickerModes(antiFlicker)
         }
 
@@ -1488,6 +1469,9 @@ Item {
         if(autoGain == See3CAM_CU135M_H01R1.CONTINUOUS)
         {
             radioContin.checked = true
+
+            //To stop updating single shot when single shot radio button is clicked continiously
+            skipUpdateSingleShotExposure = true
         }
         else if(autoGain == See3CAM_CU135M_H01R1.SINGLE_SHOT)
         {
@@ -1651,7 +1635,7 @@ Item {
         triggerGainBtn.opacity = 0.1
 
         //To disable gainLimit in manual Gain mode
-        gainUpperLimitSlider.enabled    = false
+        gainLowerLimitSlider.enabled    = false
         gainLowerLimitSlider.opacity    = 0.1
         gainLowerLimitTextField.enabled = false
         gainLowerLimitTextField.opacity = 0.1
@@ -1701,20 +1685,11 @@ Item {
             {
                 triggerExposureBtn.enabled = true
                 triggerExposureBtn.opacity = 1
-
-                //Disable flicker mode when auto singleShotExposure
-                antiFlickerCombo.enabled = false
-                antiFlickerCombo.opacity = 0.1
-                frequency.enabled        = false
-                frequency.opacity        = 0.1
             }
             else if(continousExposure.checked)
             {
-                //Enable flicker mode when auto exposure continious mode
-                antiFlickerCombo.enabled = true
-                antiFlickerCombo.opacity = 1
-                frequency.enabled        = true
-                frequency.opacity        = 1
+                triggerExposureBtn.enabled = false
+                triggerExposureBtn.opacity = 0
             }
 
             //Enable readStatistics in auto exposure mode
