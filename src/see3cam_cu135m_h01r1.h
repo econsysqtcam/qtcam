@@ -174,7 +174,7 @@ public slots:
     bool setFlipCtrlValue(bool horzModeSel, bool vertiModeSel);
     bool getFlipCtrlValue();
 
-    bool setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, QString winSize);
+    bool setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
     bool getAutoExpROIModeAndWindowSize();
 
     bool getGainMode();

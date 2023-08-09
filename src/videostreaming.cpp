@@ -3085,7 +3085,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         while (frameSize > 0)
         {
             //if the first bit of the first byte of the input buffer is 0, its UYVY data
-            if(((inputbuffer[bufferCount]) & (0x01)) == 0)
+            if(((inputbuffer[bufferCount]) & (0x01))  == 0)
             {
                 memcpy((m_renderer->uyvyBuffer)+(uyvySize),(inputbuffer+bufferCount),uyvyBytesToRead - 1);
                 bufferCount += uyvyBytesToRead;
@@ -3093,7 +3093,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
                 frameSize   -= uyvyBytesToRead;
                 RGBCounter ++;
             }
-            else if(((inputbuffer[bufferCount]) & (0x01)) == 1)
+            else if(((inputbuffer[bufferCount]) & (0x01))  == 1)
             {//if the first bit of the first byte of the input buffer is 1, its Y8 data
                 memcpy((inputIrBuffer)+(irSize),(inputbuffer+bufferCount),y8BytesToRead - 1);
                 bufferCount += y8BytesToRead;
@@ -3153,7 +3153,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
                 frameSize   -= RgbLinesToRead;
                 RGBCounter++;
             }
-            else if(((inputbuffer[bufferCount]) & (0x01)) == 1)
+            else if(((inputbuffer[bufferCount]) & (0x01))  == 1)
             {//if the first bit of the first byte of the input buffer is 1, its Y8 data
                 memcpy((inputIrBuffer)+(irSize),(inputbuffer+bufferCount),IrLinesToRead - 1);
                 bufferCount += IrLinesToRead;
@@ -3177,6 +3177,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
                   IRsize      -= 5;
               }
         }
+
         //Copying buffer to QImage to render in another window
         memcpy(cu83IRWindow->bits(),outputIrBuffer,Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
         //passing QImage to the setImage() defined in renderer class
@@ -4183,7 +4184,7 @@ void Videostreaming::displayFrame() {
 
     m_capImage = new QImage(width, height, QImage::Format_RGB888);
     qImageRenderer = new QImage(width, height, QImage::Format_RGB888);
-    cu83IRWindow = new QImage(1920,1080,QImage::Format_Grayscale8);
+    cu83IRWindow = new QImage(Y16_1080p_WIDTH,Y16_1080p_HEIGHT,QImage::Format_Grayscale8);
     if(cameraMode == 1)// cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
     {
         irRenderer = new QImage(width, height, QImage::Format_RGB888);
@@ -4202,7 +4203,7 @@ void Videostreaming::displayFrame() {
         m_renderer->y16BayerFormat = true;
     }
 
-    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG || currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedCameraEnum == CommonEnums::SEE3CAM_135M || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU136M) && (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)) {
+    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_16CUGM ||currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedCameraEnum == CommonEnums::SEE3CAM_135M || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU136M) && (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)) {
         y16FormatFor20CUG = true;
     }
     if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264){

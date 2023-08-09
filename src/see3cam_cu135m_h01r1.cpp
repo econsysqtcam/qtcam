@@ -229,6 +229,7 @@ bool See3CAM_CU135M_H01R1::getFlipCtrlValue()
     return false;
 }
 
+
 /**
  * @brief See3CAM_CU135M_H01R1::setROIAutoExposure - Set ROI auto exposure to camera
  * @param camROIAutoExposureMode - ROI mode
@@ -239,7 +240,7 @@ bool See3CAM_CU135M_H01R1::getFlipCtrlValue()
  * @param winSize - ROI window size
  * return true - success /false - failure
  */
-bool See3CAM_CU135M_H01R1::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, QString winSize)
+bool See3CAM_CU135M_H01R1::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize)
 {
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -248,45 +249,45 @@ bool See3CAM_CU135M_H01R1::setROIAutoExposure(camROIAutoExpMode see3camAutoexpRO
     }
 
     //((Input - InputLow) / (InputHigh - InputLow)) * (OutputHigh - OutputLow) + OutputLow // map resolution width and height -  0 to 255
+
     double outputLow = 0;
     double outputHigh = 255;
     double inputXLow = 0;
     double inputXHigh = vidResolnWidth-1;
-    double inputXCord = 0;
+    double inputXCord = xCord;
     int outputXCord = ((inputXCord - inputXLow) / (inputXHigh - inputXLow)) * (outputHigh - outputLow) + outputLow;
 
     double inputYLow = 0;
     double inputYHigh = vidResolnHeight-1;
-    double inputYCord = 0;
+    double inputYCord = yCord;
     int outputYCord = ((inputYCord - inputYLow) / (inputYHigh - inputYLow)) * (outputHigh - outputLow) + outputLow;
 
     //Initialize buffers
     initializeBuffers();
 
-    // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera id */
-    g_out_packet_buf[2] = SET_EXP_ROI_MODE_CU1330M; /* set exposure ROI command */
-    g_out_packet_buf[3] = see3camAutoexpROIMode; /* exposure ROI mode to set */
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H; /* camera control id for camera See3CAM_CU135M */
+    g_out_packet_buf[2] = SET_EXP_ROI_MODE_CU1330M; /* set Auto exposure ROI mode command  */
+    g_out_packet_buf[3] = see3camAutoexpROIMode; /* ROI mode which is need to set */
 
     if(see3camAutoexpROIMode == AutoExpManual){
-        g_out_packet_buf[4] = outputXCord; // x cord
-        g_out_packet_buf[5] = outputYCord; // y cord
-        g_out_packet_buf[6] = winSize.toUInt(); // window size
+        g_out_packet_buf[4] = outputXCord;
+        g_out_packet_buf[5] = outputYCord;
+        g_out_packet_buf[6] = winSize.toUInt();
     }
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-
         if (g_in_packet_buf[6]==SET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
-            g_in_packet_buf[1]==SET_EXP_ROI_MODE_CU1330M &&
-            g_in_packet_buf[6]==SET_SUCCESS) {
+            g_in_packet_buf[1] == SET_EXP_ROI_MODE_CU1330M &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
             return true;
         }
     }
     return false;
 }
+
 
 
 /**
@@ -710,7 +711,6 @@ bool See3CAM_CU135M_H01R1::setExposureMode(exposureModes exposureMode)
             return true;
         }
     }
-
     return false;
 }
 

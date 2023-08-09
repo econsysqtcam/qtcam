@@ -155,7 +155,7 @@ Item{
 
         onMouseRightClicked:{
             if(autoexpManual.enabled && autoexpManual.checked){
-                see3camcu83.setROIAutoExposure(See3Cam_CU83.AE_DISABLED, 0, 0, 0, 0, 0);
+                see3camcu83.setROIAutoExposure(See3Cam_CU83.MANUAL_ROI, width, height, x, y, autoExpoWinSizeCombo.currentText)
             }
         }
     }
@@ -371,44 +371,40 @@ Item{
                   // winSize is required only for manual mode
 
                   onClicked: {
-                      see3camcu83.setROIAutoExposure(See3Cam_CU83.AE_DISABLED, 0, 0, 0, 0, 0);
+                      see3camcu83.setROIAutoExposure(See3Cam_CU83.AE_DISABLED, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                       autoExpoWinSizeCombo.enabled = false
                       autoExpoWinSizeCombo.opacity = 0.1
 
                   }
                   Keys.onReturnPressed: {
-                      see3camcu83.setROIAutoExposure(See3Cam_CU83.AE_DISABLED, 0, 0, 0, 0, 0);
+                      see3camcu83.setROIAutoExposure(See3Cam_CU83.AE_DISABLED, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                       autoExpoWinSizeCombo.enabled = false
                       autoExpoWinSizeCombo.opacity = 0.1
 
                   }
               }
-              RadioButton
-              {
+              RadioButton {
                   exclusiveGroup: roiExpogroup
                   id: autoexpFull
                   text: "Full"
                   activeFocusOnPress: true
                   style: econRadioButtonStyle
                   opacity: enabled ? 1 : 0.1
-
                   // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
                   // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
                   // winSize is required only for manual mode
-
                   onClicked: {
-                      see3camcu83.setROIAutoExposure(See3Cam_CU83.FULL_ROI, 0, 0, 0, 0, 0);
+                      see3camcu83.setROIAutoExposure(See3Cam_CU83.FULL_ROI, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                       autoExpoWinSizeCombo.enabled = false
                       autoExpoWinSizeCombo.opacity = 0.1
                   }
                   Keys.onReturnPressed: {
-                      see3camcu83.setROIAutoExposure(See3Cam_CU83.FULL_ROI, 0, 0, 0, 0, 0);
+                      see3camcu83.setROIAutoExposure(See3Cam_CU83.FULL_ROI, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                       autoExpoWinSizeCombo.enabled = false
                       autoExpoWinSizeCombo.opacity = 0.1
                   }
               }
-              RadioButton
-              {
+              RadioButton {
                   exclusiveGroup: roiExpogroup
                   id: autoexpManual
                   text: "Manual"
@@ -416,14 +412,14 @@ Item{
                   style: econRadioButtonStyle
                   opacity: enabled ? 1 : 0.1
                   onClicked: {
-                      see3camcu83.setROIAutoExposure(See3Cam_CU83.MANUAL_ROI, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
-                      autoExpoWinSizeCombo.enabled = true
-                      autoExpoWinSizeCombo.opacity = 1
+                    see3camcu83.setROIAutoExposure(See3Cam_CU83.MANUAL_ROI, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
+                    autoExpoWinSizeCombo.enabled = true
+                    autoExpoWinSizeCombo.opacity = 1
                   }
                   Keys.onReturnPressed: {
-                      see3camcu83.setROIAutoExposure(See3Cam_CU83.MANUAL_ROI, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
-                      autoExpoWinSizeCombo.enabled = true
-                      autoExpoWinSizeCombo.opacity = 1
+                    see3camcu83.setROIAutoExposure(See3Cam_CU83.MANUAL_ROI, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
+                    autoExpoWinSizeCombo.enabled = true
+                    autoExpoWinSizeCombo.opacity = 1
                   }
               }
         }

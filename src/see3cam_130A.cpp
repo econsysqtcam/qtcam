@@ -256,7 +256,7 @@ bool See3CAM_130A::setAutoFocusMode(camAfMode afMode){
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130A &&
             g_in_packet_buf[1]==SET_AF_MODE_130A &&
-            g_in_packet_buf[6]==SET_SUCCESS) {\
+            g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
         }
     }

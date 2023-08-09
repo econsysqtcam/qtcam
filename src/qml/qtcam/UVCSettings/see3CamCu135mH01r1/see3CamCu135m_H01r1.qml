@@ -19,6 +19,7 @@ Item {
     property bool skipUpdateGainMode            : false
 
     property bool skipUpdateSingleShotExposure  : false
+    property bool skipUpdateSingleShotGain      : false
 
     property bool skipUpdateGainFromUVC         : false
 
@@ -122,7 +123,7 @@ Item {
         }
         onMouseRightClicked:{
             if(autoexpManual.enabled && autoexpManual.checked){
-               see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, width, height, autoExpoWinSizeCombo.currentText)
+               see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, width, height,x, y, autoExpoWinSizeCombo.currentText)
             }
         }
         onAutoExposureSelected:{
@@ -316,45 +317,47 @@ Item {
                     opacity: 0.50196078431373
                 }
 
-                ColumnLayout{
-                    spacing:25
-                    ExclusiveGroup { id: roiExpogroup }
-                    RadioButton {
-                        exclusiveGroup: roiExpogroup
-                        id: autoexpFull
-                        text: "Full"
-                        activeFocusOnPress: true
-                        style: econRadioButtonStyle
-                        opacity: enabled ? 1 : 0.1
-                        // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
-                        // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
-                        // winSize is required only for manual mode
-                        onClicked: {
-                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, autoExpoWinSizeCombo.currentText);
+                Row{
+                      spacing:38
+                      ExclusiveGroup { id: roiExpogroup }
+
+                      RadioButton {
+                          exclusiveGroup: roiExpogroup
+                          id: autoexpFull
+                          text: "Full"
+                          activeFocusOnPress: true
+                          style: econRadioButtonStyle
+                          opacity: enabled ? 1 : 0.1
+                          // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
+                          // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
+                          // winSize is required only for manual mode
+                          onClicked: {
+                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                             autoExpoWinSizeCombo.enabled = false
-                        }
-                        Keys.onReturnPressed: {
-                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, autoExpoWinSizeCombo.currentText);
+                          }
+                          Keys.onReturnPressed: {
+                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpFull, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                             autoExpoWinSizeCombo.enabled = false
-                        }
-                    }
-                    RadioButton {
-                        exclusiveGroup: roiExpogroup
-                        id: autoexpManual
-                        text: "Manual"
-                        activeFocusOnPress: true
-                        style: econRadioButtonStyle
-                        opacity: enabled ? 1 : 0.1
-                        onClicked: {
-                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, autoExpoWinSizeCombo.currentText);
+                          }
+                      }
+                      RadioButton {
+                          exclusiveGroup: roiExpogroup
+                          id: autoexpManual
+                          text: "Manual"
+                          activeFocusOnPress: true
+                          style: econRadioButtonStyle
+                          opacity: enabled ? 1 : 0.1
+                          onClicked: {
+                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                             autoExpoWinSizeCombo.enabled = true
-                        }
-                        Keys.onReturnPressed: {
-                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, autoExpoWinSizeCombo.currentText);
+                          }
+                          Keys.onReturnPressed: {
+                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                             autoExpoWinSizeCombo.enabled = true
-                        }
-                    }
+                          }
+                      }
                 }
+
                 ComboBox
                 {
                     id: autoExpoWinSizeCombo
@@ -374,7 +377,7 @@ Item {
                     style: econComboBoxStyle
                     onCurrentIndexChanged: {
                         if(skipUpdateUIOnExpWindowSize){
-                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, autoExpoWinSizeCombo.currentText)
+                            see3camcu135mH01r1.setROIAutoExposure(See3CAM_CU135M_H01R1.AutoExpManual, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
                         }
                         skipUpdateUIOnExpWindowSize = true
                     }
@@ -519,13 +522,13 @@ Item {
                         style: econRadioButtonStyle
                         opacity: enabled ? 1 : 0.1
                         onClicked: {
-                              skipUpdateSingleShotExposure = true
+                              skipUpdateSingleShotGain = true
                               see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.CONTINUOUS, 1)
                               triggerGainBtn.enabled = false
                               triggerGainBtn.opacity = 0.1
                         }
                           Keys.onReturnPressed: {
-                              skipUpdateSingleShotExposure = true
+                              skipUpdateSingleShotGain = true
                               see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.CONTINUOUS, 1)
 
                               triggerGainBtn.enabled = false
@@ -543,9 +546,9 @@ Item {
                         style: econRadioButtonStyle
                         opacity: enabled ? 1 : 0.1
                         onClicked: {
-                            if(skipUpdateSingleShotExposure)
+                            if(skipUpdateSingleShotGain)
                             {
-                                skipUpdateSingleShotExposure = false
+                                skipUpdateSingleShotGain = false
                                 see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.SINGLE_SHOT, 1)
                             }
 
@@ -553,9 +556,9 @@ Item {
                             triggerGainBtn.opacity = 1
                         }
                         Keys.onReturnPressed: {
-                            if(skipUpdateSingleShotExposure)
+                            if(skipUpdateSingleShotGain)
                             {
-                                skipUpdateSingleShotExposure = false
+                                skipUpdateSingleShotGain = false
                                 see3camcu135mH01r1.setGainMode(See3CAM_CU135M_H01R1.AUTO_GAIN,See3CAM_CU135M_H01R1.SINGLE_SHOT, 1)
                             }
                             triggerGainBtn.enabled = true
@@ -745,11 +748,15 @@ Item {
                             see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.CONTINIOUS_EXPOSURE)
                             triggerExposureBtn.enabled = false
                             triggerExposureBtn.opacity = 0.1
+
+                            skipUpdateSingleShotExposure = true
                           }
                           Keys.onReturnPressed: {
                             see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.CONTINIOUS_EXPOSURE)
                             triggerExposureBtn.enabled = false
                             triggerExposureBtn.opacity = 0.1
+
+                            skipUpdateSingleShotExposure = true
                           }
                       }
                 }
@@ -763,18 +770,29 @@ Item {
                         style: econRadioButtonStyle
                         opacity: enabled ? 1 : 0.1
                         onClicked: {
-                            see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
+                            if(skipUpdateSingleShotExposure)
+                            {
+                                skipUpdateSingleShotExposure = false
 
-                            triggerExposureBtn.enabled = true
-                            triggerExposureBtn.opacity = 1
+                                see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
+
+                                triggerExposureBtn.enabled = true
+                                triggerExposureBtn.opacity = 1
+                            }
                         }
                         Keys.onReturnPressed: {
-                            see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
+                            if(skipUpdateSingleShotExposure)
+                            {
+                                skipUpdateSingleShotExposure = false
 
-                            triggerExposureBtn.enabled = true
-                            triggerExposureBtn.opacity = 1
+                                see3camcu135mH01r1.setExposureMode(See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
+
+                                triggerExposureBtn.enabled = true
+                                triggerExposureBtn.opacity = 1
+                            }
                         }
                     }
+
                     Button {
                         id: triggerExposureBtn
                         activeFocusOnPress : true
@@ -790,7 +808,6 @@ Item {
                         }
                     }
                 }
-
 
                 Text {
                     id: lowerLimitMode
@@ -1433,6 +1450,10 @@ Item {
             continousExposure.checked = true
             triggerExposureBtn.enabled = false
             triggerExposureBtn.opacity = 0.1
+
+            //To stop updating single shot gain when single shot radio button is clicked continiously
+            skipUpdateSingleShotExposure = true
+
         }
         else if(exposureMode == See3CAM_CU135M_H01R1.SINGLE_SHOT_EXPOSURE)
         {
@@ -1470,12 +1491,18 @@ Item {
         {
             radioContin.checked = true
 
-            //To stop updating single shot when single shot radio button is clicked continiously
-            skipUpdateSingleShotExposure = true
+            triggerGainBtn.enabled = false
+            triggerGainBtn.opacity = 0.1
+
+            //To stop updating single shot gain when single shot radio button is clicked continiously
+            skipUpdateSingleShotGain = true
         }
         else if(autoGain == See3CAM_CU135M_H01R1.SINGLE_SHOT)
         {
             radioOneshot.checked = true
+
+            triggerGainBtn.enabled = true
+            triggerGainBtn.opacity = 1
         }
     }
 

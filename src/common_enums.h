@@ -67,12 +67,12 @@ public:
         SEE3CAM_CU55_MH, // cu55 monochrome
         SEE3CAM_CU22,
         SEE3CAM_1332,
-        See3CAM_CU135M_H01R1, //Modified By Sushanth
+        See3CAM_CU135M_H01R1, //Added By Sushanth
         SEE3CAM_135M,
         SEE3CAM_CU136M,
         BARCODE_CAMERA,
         NILECAM20_USB,
-        SEE3CAM_27CUG,
+        SEE3CAM_27CUG,  //Added By Sushanth
         SEE3CAM_CU83,   //Added By Sushanth
         SEE3CAM_50CUGM, //Added By Sushanth
         SEE3CAM_CU512M, //Added By Sushanth
