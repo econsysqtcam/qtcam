@@ -1638,6 +1638,7 @@ Item {
         white_balance_Slider.minimumValue = controlMinValue
         white_balance_Slider.maximumValue = controlMaxValue
         white_balance_Slider.value = controlDefaultValue
+        autoSelect_wb.checked = controlDefaultValue
         white_balance_Slider.stepSize = controlStepSize
     }
     function gammaUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)

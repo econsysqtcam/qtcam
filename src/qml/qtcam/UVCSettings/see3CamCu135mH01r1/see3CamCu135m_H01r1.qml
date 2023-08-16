@@ -1115,8 +1115,16 @@ Item {
         onStreamModeValue:{
             if(streamMode == See3CAM_CU135M_H01R1.MODE_MASTER){
                 rdoModeMaster.checked = true
+                root.checkForTriggerMode(false)
+                root.captureBtnEnable(true)
+                root.videoRecordBtnEnable(true)
+
             }else if(streamMode == See3CAM_CU135M_H01R1.MODE_TRIGGER){
                 rdoModeTrigger.checked = true
+                root.videoRecordBtnEnable(false)
+                root.captureBtnEnable(false)
+                root.checkForTriggerMode(true)
+
             }
         }
 
@@ -1233,8 +1241,6 @@ Item {
         }
 
         onAntiFlickerModeRecieved: {
-            antiFlickerCombo.enabled = true
-            antiFlickerCombo.opacity = 1
             getAntiFlickerModes(antiFlicker)
         }
 
@@ -1250,6 +1256,13 @@ Item {
             if(setButtonClicked){
                 displayMessageBox(title, text)
                 setButtonClicked = false
+            }
+        }
+
+        onIndicateGainValueRangeFailure:{
+            if(setButtonClicked){
+                setButtonClicked = false
+                see3camcu135mH01r1.getGainLimit()
             }
         }
         onIndicateExposureValueRangeFailure:{
@@ -1414,20 +1427,20 @@ Item {
 
     function currentROIAutoExposureMode(roiMode, winSize){
         switch(roiMode){
-        case See3CAM_CU135M_H01R1.AutoExpFull:
-            autoexpFull.checked = true
-            autoExpoWinSizeCombo.enabled = false
-            autoExpoWinSizeCombo.currentIndex = winSize-1
-            break
-        case See3CAM_CU135M_H01R1.AutoExpManual:
-            skipUpdateUIOnExpWindowSize = false
-            autoexpManual.checked = true
-            // If window size is got from camera is 0 then set window size to 1 in UI
-            if(winSize == 0){
-                autoExpoWinSizeCombo.currentIndex = 0
-            }else
+            case See3CAM_CU135M_H01R1.AutoExpFull:
+                autoexpFull.checked = true
+                autoExpoWinSizeCombo.enabled = false
                 autoExpoWinSizeCombo.currentIndex = winSize-1
-            break
+                break
+            case See3CAM_CU135M_H01R1.AutoExpManual:
+                skipUpdateUIOnExpWindowSize = false
+                autoexpManual.checked = true
+                // If window size is got from camera is 0 then set window size to 1 in UI
+                if(winSize == 0){
+                    autoExpoWinSizeCombo.currentIndex = 0
+                }else
+                    autoExpoWinSizeCombo.currentIndex = winSize-1
+                break
         }
     }
 
@@ -1501,8 +1514,11 @@ Item {
         {
             radioOneshot.checked = true
 
-            triggerGainBtn.enabled = true
-            triggerGainBtn.opacity = 1
+            if(autoGain.checked == true)
+            {
+                triggerGainBtn.enabled = true
+                triggerGainBtn.opacity = 1
+            }
         }
     }
 
@@ -1512,7 +1528,7 @@ Item {
             autoGain.checked = true
 
             radioContin.enabled = true
-            radioOneshot.opacity = 1
+            radioContin.opacity = 1
             radioOneshot.enabled = true
             radioOneshot.opacity = 1
 
@@ -1537,13 +1553,17 @@ Item {
             gainStatTextField.enabled = true
             gainLabel.opacity      = 1
             gainStatTextField.opacity = 1
+
+            //To Enable trigger button when app opens in manual gain mode
+            triggerGainBtn.enabled = true
+            triggerGainBtn.opacity = 1
         }
         else if(currentMode == See3CAM_CU135M_H01R1.MANUAL_GAIN)
         {
             manualGain.checked = true
 
             radioContin.enabled  = false
-            radioOneshot.opacity = 0.1
+            radioContin.opacity  = 0.1
             radioOneshot.enabled = false
             radioOneshot.opacity = 0.1
 
@@ -1568,6 +1588,10 @@ Item {
             gainStatTextField.enabled = false
             gainLabel.opacity         = 0.1
             gainStatTextField.opacity = 0.1
+
+            //To disable trigger button when app opens in manual gain mode
+            triggerGainBtn.enabled = false
+            triggerGainBtn.opacity = 0.1
         }
     }
 
@@ -1590,14 +1614,13 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
-        root.masterEnableForMonochrome()
         see3camcu135mH01r1.setStreamMode(See3CAM_CU135M_H01R1.MODE_MASTER)
     }
 
     function setAutoGain()
     {
         radioContin.enabled = true
-        radioOneshot.opacity = 1
+        radioContin.opacity = 1
         radioOneshot.enabled = true
         radioOneshot.opacity = 1
 
@@ -1626,7 +1649,7 @@ Item {
         gainStatTextField.opacity = 1
 
         //To enable gainLimit in Auto Gain mode
-        gainUpperLimitSlider.enabled = true
+        gainLowerLimitSlider.enabled = true
         gainLowerLimitSlider.opacity = 1
         gainLowerLimitTextField.enabled = true
         gainLowerLimitTextField.opacity = 1
@@ -1640,7 +1663,7 @@ Item {
     function setManualGain()
     {
         radioContin.enabled = false
-        radioOneshot.opacity = 0.1
+        radioContin.opacity = 0.1
         radioOneshot.enabled = false
         radioOneshot.opacity = 0.1
 
@@ -1700,7 +1723,6 @@ Item {
 
     function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
-
             //Enable Auto exposure modes
             continousExposure.enabled  = true
             continousExposure.opacity  = 1
@@ -1724,6 +1746,12 @@ Item {
             exposureStatTextField.enabled = true
             exposureLabel.opacity         = 1
             exposureStatTextField.opacity = 1
+
+            //Enable flicker mode exposure is in auto exposure mode
+            antiFlickerCombo.enabled = true
+            antiFlickerCombo.opacity = 1
+            frequency.enabled        = true
+            frequency.opacity        = 1
 
             //Enable exposure limit
             lowerLimitModetext.enabled    = true
@@ -1750,7 +1778,6 @@ Item {
             autoexpManual.opacity = 1
             autoexpFull.opacity = 1
         }else{
-
             //Disable Auto exposure modes in manual mode
             continousExposure.enabled = false
             continousExposure.opacity = 0.1

@@ -1546,6 +1546,12 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.ECAM_512USB) {
             see3cam = Qt.createComponent("../UVCSettings/eCAM512USB/ecam512usb.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_50CUG) {
+            see3cam = Qt.createComponent("../UVCSettings/see3cam50cug/see3cam50cug.qml").createObject(root)
+        }
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU84) {
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu84/see3camcu84.qml").createObject(root)
+        }
         else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
@@ -1613,6 +1619,8 @@ Rectangle {
         case CommonEnums.SEE3CAM_16CUGM: //Added by Sushanth.S
         case CommonEnums.SEE3CAM_CU210:  //Added by Sushanth.S
         case CommonEnums.ECAM_512USB:    //Added by Sushanth.S
+        case CommonEnums.SEE3CAM_50CUG:  //Added by Sushanth.S
+        case CommonEnums.SEE3CAM_CU84:   //Added by Sushanth.S
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
             break;

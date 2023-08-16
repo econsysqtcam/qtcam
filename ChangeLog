@@ -1,3 +1,8 @@
+Qtcam Application - 25.0.19
+---------------------------
+*Added support for See3CAM_CU84.
+*Bug Fixed for See3CAM_CU135M.
+
 Qtcam Application - 25.0.18
 ---------------------------
 *Fixed ROI issue in See3CAM_CU135M_H01R1.

@@ -490,7 +490,7 @@ bool See3CAM_CU135M_H01R1::setGainLimit(uint lowerLimit, uint upperLimit)
     }
     else if(lowerLimit > upperLimit)
     {
-        emit indicateExposureValueRangeFailure("Failure", "Lower limit should be smaller than upper limit");
+        emit indicateGainValueRangeFailure();
         return false;
     }
 
@@ -523,7 +523,6 @@ bool See3CAM_CU135M_H01R1::setGainLimit(uint lowerLimit, uint upperLimit)
             lowerLimit = (g_in_packet_buf[2] << 8) | (g_in_packet_buf[3] << 0);
             upperLimit = (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
 
-            emit indicateCommandStatus("Success","Limit value is set successfully!");
             return true;
         }
     }
@@ -795,7 +794,7 @@ bool See3CAM_CU135M_H01R1::setAutoExposureLowerLimit(uint lowerLimit){
     exposureLowerLimit = lowerLimit;
 
     //Validating the limit values -> Lower auto exposure limit <= Upper auto exposure limit
-    if(exposureLowerLimit > exposureUpperLimit)
+    if((exposureLowerLimit > exposureUpperLimit) || (exposureLowerLimit < EXPOSURE_LIMIT_MIN))
     {
       emit indicateExposureValueRangeFailure("Failure", "Exposure lower limit should be smaller than Exposure upper limit");
       return false;
@@ -822,7 +821,7 @@ bool See3CAM_CU135M_H01R1::setAutoExposureLowerLimit(uint lowerLimit){
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==SET_FAIL) {
-            emit indicateCommandStatus("Failure","Set lower limit value failed");
+            emit indicateExposureValueRangeFailure("Failure","Set lower limit value failed");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
             g_in_packet_buf[1] == SET_AUTO_EXPOSURE_LOWER_LIMIT_SEE3CAM_CU135M_H01R1_H &&
@@ -881,7 +880,7 @@ bool See3CAM_CU135M_H01R1::setAutoExposureUpperLimit(uint upperLimit){
     exposureUpperLimit = upperLimit;
 
     //Validating the limit values -> Lower auto exposure limit <= Upper auto exposure limit
-    if(exposureLowerLimit > exposureUpperLimit)
+    if((exposureLowerLimit > exposureUpperLimit) || (exposureUpperLimit > EXPOSURE_LIMIT_MAX))
     {
       emit indicateExposureValueRangeFailure("Failure", "Exposure Upper limit should be smaller than Exposure upper limit");
       return false;

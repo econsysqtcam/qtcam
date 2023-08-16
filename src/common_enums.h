@@ -79,6 +79,8 @@ public:
         SEE3CAM_CU210,  //Added By Sushanth
         SEE3CAM_16CUGM, //Added By Sushanth
         ECAM_512USB,    //Added By Sushanth
+        SEE3CAM_50CUG,  //Added By Sushanth
+        SEE3CAM_CU84,   //Added By Sushanth
         SEE3CAM_20CUG
     }ECameraNames;
     //Enum for capture shot type

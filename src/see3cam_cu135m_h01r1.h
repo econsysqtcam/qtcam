@@ -50,6 +50,8 @@
 #define GET_SUCCESS                                            0x01
 #define GET_FAILURE                                            0x00
 
+#define EXPOSURE_LIMIT_MIN     100
+#define EXPOSURE_LIMIT_MAX     1000000
 
 
 class See3CAM_CU135M_H01R1 : public QObject
@@ -78,8 +80,8 @@ public:
      Q_ENUMS(flashStateValues)
 
     enum streamModes {
-       MODE_MASTER =0x00,
-       MODE_TRIGGER =0x01
+       MODE_MASTER  = 0x00,
+       MODE_TRIGGER = 0x01
     };
     Q_ENUMS(streamModes)
 
@@ -162,6 +164,7 @@ signals:
 
     void indicateCommandStatus(QString title, QString text);
     void indicateExposureValueRangeFailure(QString title, QString text);
+    void indicateGainValueRangeFailure();
 
 public slots:
 

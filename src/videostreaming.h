@@ -159,6 +159,9 @@ public:
     uint8_t *ir675pBuffer;
     uint8_t *rgbFromY16Buffer;
 
+    uint8_t *inputIrBuffer;
+    uint8_t *outputIrBuffer;
+
       __u32 xcord,ycord;
     unsigned frame;
 
@@ -268,7 +271,6 @@ public:
     void displayFrame();
 
     unsigned char *tempSrcBuffer;
-    unsigned char *outputIrBuffer,*inputIrBuffer;
 
     //Buffer to stillCapture for See3CAM_27CUG => Added By Sushanth.S
     unsigned char *stillBuffer;
