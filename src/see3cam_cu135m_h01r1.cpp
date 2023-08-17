@@ -793,10 +793,16 @@ bool See3CAM_CU135M_H01R1::setAutoExposureLowerLimit(uint lowerLimit){
 
     exposureLowerLimit = lowerLimit;
 
-    //Validating the limit values -> Lower auto exposure limit <= Upper auto exposure limit
-    if((exposureLowerLimit > exposureUpperLimit) || (exposureLowerLimit < EXPOSURE_LIMIT_MIN))
+    if(exposureLowerLimit < EXPOSURE_LIMIT_MIN)
     {
-      emit indicateExposureValueRangeFailure("Failure", "Exposure lower limit should be smaller than Exposure upper limit");
+        emit indicateExposureValueRangeFailure("Failure", "Invalid Lower Limit Value");
+        return false;
+    }
+
+    //Validating the limit values -> Lower auto exposure limit <= Upper auto exposure limit
+    if(exposureLowerLimit > exposureUpperLimit)
+    {
+      emit indicateExposureValueRangeFailure("Failure", "Exposure lower limit should be smaller than exposure upper limit");
       return false;
     }
 
@@ -879,10 +885,16 @@ bool See3CAM_CU135M_H01R1::setAutoExposureUpperLimit(uint upperLimit){
 
     exposureUpperLimit = upperLimit;
 
-    //Validating the limit values -> Lower auto exposure limit <= Upper auto exposure limit
-    if((exposureLowerLimit > exposureUpperLimit) || (exposureUpperLimit > EXPOSURE_LIMIT_MAX))
+    if(exposureUpperLimit > EXPOSURE_LIMIT_MAX)
     {
-      emit indicateExposureValueRangeFailure("Failure", "Exposure Upper limit should be smaller than Exposure upper limit");
+        emit indicateExposureValueRangeFailure("Failure", "Invalid Upper Limit Value");
+        return false;
+    }
+
+    //Validating the limit values -> Lower auto exposure limit <= Upper auto exposure limit
+    if(exposureLowerLimit > exposureUpperLimit)
+    {
+      emit indicateExposureValueRangeFailure("Failure", "Exposure upper limit should be greater than Exposure lower limit");
       return false;
     }
 
@@ -904,7 +916,7 @@ bool See3CAM_CU135M_H01R1::setAutoExposureUpperLimit(uint upperLimit){
     g_out_packet_buf[6] = ((exposureUpperLimit & 0x000000FF) >> 0);
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6]==SET_FAIL) {
+        if (g_in_packet_buf[6] == SET_FAIL) {
             emit indicateCommandStatus("Failure","Set upper limit value failed");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&

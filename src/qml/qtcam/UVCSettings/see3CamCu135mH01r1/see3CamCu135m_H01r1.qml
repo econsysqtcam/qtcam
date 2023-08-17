@@ -580,7 +580,16 @@ Item {
                         }
                     }
                 }
-
+                Text {
+                    id: manualGainSlider
+                    text: "--- Manual Gain Slider ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
                 Row
                 {
                     spacing: 35
