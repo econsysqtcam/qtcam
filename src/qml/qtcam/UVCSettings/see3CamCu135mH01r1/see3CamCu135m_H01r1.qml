@@ -580,7 +580,16 @@ Item {
                         }
                     }
                 }
-
+                Text {
+                    id: manualGainSlider
+                    text: "--- Manual Gain Slider ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
                 Row
                 {
                     spacing: 35
@@ -1538,7 +1547,7 @@ Item {
             gainTextField.opacity = 0.1
 
             //To enable gain limit sliders in auto gain mode
-            gainUpperLimitSlider.enabled = true
+            gainLowerLimitSlider.enabled = true
             gainLowerLimitSlider.opacity = 1
             gainLowerLimitTextField.enabled = true
             gainLowerLimitTextField.opacity = 1
@@ -1573,7 +1582,7 @@ Item {
             gainTextField.opacity = 1
 
             //To disable gain limit sliders in manual Gain mode
-            gainUpperLimitSlider.enabled    = false
+            gainLowerLimitSlider.enabled    = false
             gainLowerLimitSlider.opacity    = 0.1
             gainLowerLimitTextField.enabled = false
             gainLowerLimitTextField.opacity = 0.1
