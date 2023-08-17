@@ -779,6 +779,8 @@ skip:
  * @brief FrameRenderer::drawUYVYBUffer - draw uyvy buffer
  */
 void FrameRenderer::drawUYVYBUffer(){
+    qDebug()<<"\ndraw_UYVY_START";
+
     int skipFrames = 4;
 
     m_shaderProgram->bind();
@@ -799,6 +801,8 @@ void FrameRenderer::drawUYVYBUffer(){
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
 
     if(renderyuyvMutex.tryLock()){
+        qDebug()<<"\nDRAW_UYVY_LOCK";
+
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
         if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG) | (currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M))
@@ -811,14 +815,19 @@ void FrameRenderer::drawUYVYBUffer(){
         }
         if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83){
               if((videoResolutionwidth == Y16_2160p_WIDTH) && (videoResolutionHeight == Y16_2160p_HEIGHT)) {//To render Y16 -> UYVY colorspace
+                  qDebug()<<"\nOLD_START";
                   if(uyvyBuffer!= NULL){
                         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Y16_2160p_RGB_WIDTH/2, Y16_2160p_RGB_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, uyvyBuffer);
                     }
+                  qDebug()<<"\nOLD_END";
               }
               else if((videoResolutionwidth == Y16_NEW_WIDTH) && (videoResolutionHeight == Y16_NEW_HEIGHT)) { //3120x1080
+                  qDebug()<<"\nNEW_START";
+
                   if(rgbFromY16Buffer!= NULL){
                         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Y16_1080p_WIDTH/2, Y16_1080p_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgbFromY16Buffer);
                     }
+                  qDebug()<<"\nNEW_END";
               }
               else{  //To render UYVY colorspace
                   if(yuvBuffer != NULL){
@@ -849,6 +858,8 @@ void FrameRenderer::drawUYVYBUffer(){
         if(gotFrame && !updateStop && skipFrames >3){
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
         }
+        qDebug()<<"\nDRAW_UYVY_UN_LOCK";
+
         renderyuyvMutex.unlock();
     }
     else{
@@ -860,6 +871,7 @@ void FrameRenderer::drawUYVYBUffer(){
     // Not strictly needed for this example, but generally useful for when
     // mixing with raw OpenGL.
     m_window->resetOpenGLState();
+    qDebug()<<"\nDRAW_UYVY_END";
 }
 
 /** Added by Navya - 29 Nov 2019
@@ -3060,6 +3072,7 @@ bool Videostreaming::prepareStillBuffer(uint8_t *inputBuffer)
 bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 {
     m_renderer->render27CugMutex.lock();
+    qDebug()<<"\nPREAPRE_CU83_LOCK";
     if(!inputbuffer)
     {
         m_renderer->render27CugMutex.unlock();
@@ -3070,6 +3083,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 
     if((width == defaultWidth) && (height == defaultHeight))
     {
+        qDebug()<<"\nFIRST_START";
         long int frameSize  = 0; //Total Frame Size
         int bufferCount     = 0; //To iterate through the buffer
         int uyvySize        = 0; //To store the size of UYVY buffer
@@ -3088,7 +3102,9 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         while (frameSize > 0)
         {
             //if the first bit of the first byte of the input buffer is 0, its UYVY data
-            if(((inputbuffer[bufferCount]) & (0x01))  == 0)
+//            if(((inputbuffer[bufferCount]) & (0x01))  == 0)
+            //            else if(((inputbuffer[bufferCount]) & (0x01))  == 1)
+            if((((inputbuffer[bufferCount]) & (0x01))  == 0) && (((inputbuffer[bufferCount]) & (0x02))  == 0))
             {
                 memcpy((m_renderer->uyvyBuffer)+(uyvySize),(inputbuffer+bufferCount),uyvyBytesToRead - 1);
                 bufferCount += uyvyBytesToRead;
@@ -3096,7 +3112,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
                 frameSize   -= uyvyBytesToRead;
                 RGBCounter ++;
             }
-            else if(((inputbuffer[bufferCount]) & (0x01))  == 1)
+            else if((((inputbuffer[bufferCount]) & (0x01))  == 1)  && (((inputbuffer[bufferCount]) & (0x02))  == 2))
             {//if the first bit of the first byte of the input buffer is 1, its Y8 data
                 memcpy((m_renderer->inputIrBuffer)+(irSize),(inputbuffer+bufferCount),y8BytesToRead - 1);
                 bufferCount += y8BytesToRead;
@@ -3105,6 +3121,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
                 IRCounter++;
             }
         }
+        qDebug()<<"\nFIRST_WHILE_END";
 
         //Removing 5th bit from each frame of IRBuffer
         int IRsize = irSize;
@@ -3121,15 +3138,23 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
                 IRsize      -= 5;
             }
         }
+        else
+        {
+            qDebug()<<"\n EXTRA_DATA_4K";
+        }
+        qDebug()<<"\nFIRST_WHILE_2_END";
 
         //Copying buffer to QImage to render in another window
         memcpy(cu83IRWindow->bits(),(m_renderer->outputIrBuffer),1920*1080);
+        qDebug()<<"\nFIRST_MEMCPY";
 
         //passing QImage to the setImage() defined in renderer class
         helperObj.setImage(*cu83IRWindow);
+        qDebug()<<"\nFIRST_END";
     }
     else if((width == Y16_NEW_WIDTH)&&(height == Y16_NEW_HEIGHT))
     {
+        qDebug()<<"\nSECOND_START";
         long int frameSize  = 0; //Total Frame Size
         int bufferCount     = 0; //To iterate through the buffer
         int uyvySize        = 0; //To store the size of UYVY buffer
@@ -3144,27 +3169,36 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
 
         frameSize  = width*height*BYTES_PER_PIXEL_Y16; //For the resolution 3120x1080x2 = 6739200
+        qDebug()<<"\nSECOND_WHILE_START";
 
         while (frameSize > 0)
         {
             //if the first bit of the first byte of the input buffer is 0, its UYVY data
-            if(((inputbuffer[bufferCount]) & (0x01))  == 0)
+//            if(((inputbuffer[bufferCount]) & (0x01))  == 0)
+            //            else if(((inputbuffer[bufferCount]) & (0x01))  == 1)
+            if((((inputbuffer[bufferCount]) & (0x01))  == 0) && (((inputbuffer[bufferCount]) & (0x02))  == 0))
             {
+                qDebug()<<"\nCONDITION_1";
                 memcpy((m_renderer->rgbFromY16Buffer)+(uyvySize),(inputbuffer+bufferCount),RgbLinesToRead - 1);
                 bufferCount += RgbLinesToRead;
                 uyvySize    += RgbLinesToRead;
                 frameSize   -= RgbLinesToRead;
                 RGBCounter++;
+                qDebug()<<"\nCONDITION_1_END";
             }
-            else if(((inputbuffer[bufferCount]) & (0x01))  == 1)
+            else if((((inputbuffer[bufferCount]) & (0x01)) == 1)  && (((inputbuffer[bufferCount]) & (0x02)) == 2))
             {//if the first bit of the first byte of the input buffer is 1, its Y8 data
+                qDebug()<<"\nCONDITION_2";
                 memcpy((m_renderer->inputIrBuffer)+(irSize),(inputbuffer+bufferCount),IrLinesToRead - 1);
                 bufferCount += IrLinesToRead;
                 irSize      += IrLinesToRead;
                 frameSize   -= IrLinesToRead;
                 IRCounter++;
+                qDebug()<<"\nCONDITION_2_END";
             }
         }
+        qDebug()<<"\nSECOND_WHILE_END";
+
         //Removing 5th bit from each frame of IRBuffer
         int IRsize = irSize;
         bufferCount = 0;
@@ -3180,14 +3214,23 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
                   IRsize      -= 5;
               }
         }
+        else
+        {
+            qDebug()<<"\n EXTRA_DATA_1080p";
+        }
+        qDebug()<<"\nSECOND_WHILE_2_END";
 
         //Copying buffer to QImage to render in another window
         memcpy(cu83IRWindow->bits(),(m_renderer->outputIrBuffer),Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
+        qDebug()<<"\nSECOND_MEMCPY";
+
         //passing QImage to the setImage() defined in renderer class
         helperObj.setImage(*cu83IRWindow);
+        qDebug()<<"\nSECOND_END";
     }
     else if((width == Y16_1350p_WIDTH)&&(height == Y16_1350p_HEIGHT))//3840x1080
     {
+        qDebug()<<"\nTHIRD_START";
         m_renderer->renderBufferFormat = CommonEnums::GREY_BUFFER_RENDER;
         shaderType = CommonEnums::GREY_BUFFER_RENDER;
 
@@ -3201,9 +3244,11 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
             bufferCount += 5;
             IRsize      -= 5;
         }
+        qDebug()<<"\nTHIRD_END";
     }
     else if((width == Y16_675p_WIDTH)&&(height == Y16_675p_HEIGHT))
     {
+        qDebug()<<"\nFOURTH_START";
         m_renderer->renderBufferFormat = CommonEnums::GREY_BUFFER_RENDER;
         shaderType = CommonEnums::GREY_BUFFER_RENDER;
 
@@ -3217,10 +3262,13 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
             bufferCount += 5;
             IRsize      -= 5;
         }
+        qDebug()<<"\nFOURTH_END";
     }
 
     m_renderer->gotFrame = true;
     m_renderer->render27CugMutex.unlock();
+    qDebug()<<"\nPREAPRE_CU83_UN_LOCK";
+
     return true;
 }
 
@@ -3591,6 +3639,7 @@ void Videostreaming::freeBuffers(unsigned char *destBuffer, unsigned char *copyB
 
 void Videostreaming::allocBuffers()
 {
+    qDebug()<<"\nALLOC_BUF_START";
     m_renderer->videoResolutionwidth = m_width;
     m_renderer->videoResolutionHeight = m_height;
 
@@ -3607,18 +3656,22 @@ void Videostreaming::allocBuffers()
     m_renderer->ir1350pBuffer = (uint8_t*)realloc(m_renderer->ir1350pBuffer,Y16_1350p_WIDTH*Y16_1350p_HEIGHT_MODIFIED);
     m_renderer->ir675pBuffer = (uint8_t*)realloc(m_renderer->ir675pBuffer,Y16_675p_WIDTH*Y16_675p_HEIGHT_MODIFIED);
     m_renderer->greyBuffer = (uint8_t*)realloc(m_renderer->greyBuffer,buffLength);
+    qDebug()<<"\nALLOC_1";
 
     //See3CAM_CU83
     //Splitted UYVY data from Y16 & used it to render
     m_renderer->uyvyBuffer = (uint8_t*)realloc(m_renderer->uyvyBuffer, (Y16_2160p_RGB_WIDTH * Y16_2160p_RGB_HEIGHT * BYTES_PER_PIXEL_Y16)); //4440x2160 - RGB buffer
+    qDebug()<<"\nALLOC_2";
 
     m_renderer->rgbFromY16Buffer = (uint8_t*)realloc(m_renderer->rgbFromY16Buffer, (Y16_1080p_WIDTH*Y16_1080p_HEIGHT*BYTES_PER_PIXEL_Y16)); //3120*1080*2 - RGB frame
-
+    qDebug()<<"\nALLOC_3";
     //Splitted IR Data from Y16
     m_renderer->inputIrBuffer = (uint8_t*)realloc(m_renderer->inputIrBuffer,Y16_1080p_WIDTH*Y16_1080p_HEIGHT*BYTES_PER_PIXEL_Y16);
+    qDebug()<<"\nALLOC_4";
 
     //To Render IR data
     m_renderer->outputIrBuffer = (uint8_t*)realloc(m_renderer->outputIrBuffer ,Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
+    qDebug()<<"\nALLOC_5";
 
     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_160)
         tempSrcBuffer = (unsigned char *)realloc(tempSrcBuffer,SEE3CAM160_MJPEG_MAXBYTESUSED);
@@ -3631,6 +3684,7 @@ void Videostreaming::allocBuffers()
     }
     yuyvBuffer = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
     yuyvBuffer_Y12 = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
+    qDebug()<<"\nALLOC_END";
 }
 
 void Videostreaming::getFrameRates(){
@@ -4260,6 +4314,7 @@ void Videostreaming::openMessageDialogBox()
 }
 
 void Videostreaming::stopCapture() {
+    qDebug()<<"\nSTOP_CAPTURE_START";
     threadMonitor.waitForFinished();   //Added by M.Vishnu Murali:Inorder to finish jpegDecoding then stop else preview corruption will occur
     if(h264Decode!=NULL){
         h264Decode->closeFile();
@@ -4292,7 +4347,7 @@ void Videostreaming::stopCapture() {
         m_renderer->yBuffer = NULL;
     }
 
-
+    qDebug()<<"\nSTOP_CAPTURE_1";
     if(m_renderer->uBuffer != NULL){
         free(m_renderer->uBuffer);
         m_renderer->uBuffer = NULL;
@@ -4349,6 +4404,7 @@ void Videostreaming::stopCapture() {
             cu83IRWindow = NULL;
         }
     }
+    qDebug()<<"\nSTOP_CAPTURE_2";
     m_renderer->renderyuyvMutex.lock();
 
     if(m_renderer->rgbaDestBuffer != NULL){
@@ -4360,6 +4416,7 @@ void Videostreaming::stopCapture() {
         free(m_renderer->yuvBuffer);
         m_renderer->yuvBuffer = NULL;
     }
+    qDebug()<<"\nSTOP_CAPTURE_3";
 
     if(m_renderer->rgbBuffer != NULL){
         free(m_renderer->rgbBuffer);
@@ -4375,6 +4432,7 @@ void Videostreaming::stopCapture() {
         free(m_renderer->uyvyBuffer);
         m_renderer->uyvyBuffer = NULL;
     }
+    qDebug()<<"\nSTOP_CAPTURE_4";
 
     if(m_renderer->rgbFromY16Buffer != NULL){
        free(m_renderer->rgbFromY16Buffer);
@@ -4403,6 +4461,7 @@ void Videostreaming::stopCapture() {
     m_renderer->renderyuyvMutex.unlock();
     skipImageCapture = 0;
     startFrame = true;
+    qDebug()<<"\nSTOP_CAPTURE_END";
 }
 
 void Videostreaming::closeDevice() {
@@ -4464,6 +4523,7 @@ void Videostreaming::lastFPS(QString fps) {
 
 void Videostreaming::setResoultion(QString resolution)
 {
+    qDebug()<<"\nSET_RES_START";
     emit logDebugHandle("Resolution set at::"+resolution);
     v4l2_format fmt;
     unsigned int width, height;
@@ -4484,6 +4544,7 @@ void Videostreaming::setResoultion(QString resolution)
     m_renderer->m_videoResolnChange = true;
     emit emitResolution(m_width,m_height);
     emit sendResolutionChange(m_renderer->m_videoResolnChange);
+    qDebug()<<"\nSET_RES_END";
 }
 
 /**
