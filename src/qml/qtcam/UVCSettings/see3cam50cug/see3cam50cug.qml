@@ -96,6 +96,12 @@ Item{
     property real colorCorrectionMin: 0
     property real colorCorrectionMax: 3.2
 
+    property real adjustedRGain: 0.0
+    property real adjustedBGain: 0.0
+    property real adjustedBrightness: 0.0
+    property real adjustedSaturation: 0.0
+    property real adjustedGammaCorrection: 0.0
+
     property int expMin: 100
     property int expMax: 10000000
 
@@ -214,7 +220,9 @@ Item{
                             onValueChanged:  {
                                 gainRTextField.text = gainRSlider.value
                                 if(skipUpdateRGainMode){
-                                    see3cam50cug.setRBGain(gainRSlider.value, gainBSlider.value)
+                                    adjustedRGain = parseFloat((gainRSlider.value).toFixed(3));
+                                    gainRTextField.text = adjustedRGain
+                                    see3cam50cug.setRBGain(adjustedRGain, gainBSlider.value)
                                 }
                                 skipUpdateRGainMode = true
                             }
@@ -222,7 +230,6 @@ Item{
                         TextField
                         {
                             id: gainRTextField
-                            text: gainRSlider.value
                             font.pixelSize: 10
                             font.family: "Ubuntu"
                             smooth: true
@@ -270,7 +277,9 @@ Item{
                             onValueChanged:  {
                                 gainBTextField.text = gainBSlider.value
                                 if(skipUpdateBGainMode){
-                                    see3cam50cug.setRBGain(gainRSlider.value, gainBSlider.value)
+                                    adjustedBGain = parseFloat((gainBSlider.value).toFixed(3));
+                                    gainBTextField.text = adjustedBGain
+                                    see3cam50cug.setRBGain(gainRSlider.value, adjustedBGain)
                                 }
                                 skipUpdateBGainMode = true
                             }
@@ -278,8 +287,6 @@ Item{
                         TextField
                         {
                             id: gainBTextField
-                            text: gainBSlider.value
-
                             font.pixelSize: 10
                             font.family: "Ubuntu"
                             smooth: true
@@ -526,14 +533,16 @@ Recommended value is : 240"
                        onValueChanged:  {
                            brightnessTextField.text = brightnessSlider.value
                            if(skipUpdateBrightness){
-                               see3cam50cug.setBrightness(brightnessSlider.value)
+                               // Round the slider and TextField to three decimal places
+                               adjustedBrightness = parseFloat((brightnessSlider.value).toFixed(3));
+                               brightnessTextField.text = adjustedBrightness
+                               see3cam50cug.setBrightness(adjustedBrightness)
                            }
                            skipUpdateBrightness = true
                        }
                    }
                    TextField {
                        id: brightnessTextField
-                       text: brightnessSlider.value
                        font.pixelSize: 10
                        font.family: "Ubuntu"
                        smooth: true
@@ -630,14 +639,16 @@ Recommended value is : 240"
                        onValueChanged:  {
                            saturationTextField.text = saturationSlider.value
                            if(skipUpdateSaturation){
-                               see3cam50cug.setSaturation(saturationSlider.value)
+                               // Round the slider and TextField to three decimal places
+                               adjustedSaturation = parseFloat((saturationSlider.value).toFixed(3));
+                               saturationTextField.text = adjustedSaturation
+                               see3cam50cug.setSaturation(adjustedSaturation)
                            }
                            skipUpdateSaturation = true
                        }
                    }
                    TextField {
                        id: saturationTextField
-                       text: saturationSlider.value
                        font.pixelSize: 10
                        font.family: "Ubuntu"
                        smooth: true
@@ -771,19 +782,22 @@ Note:  For temperature other than the possible values(2300, 2800, 3000,4000, 600
                        onValueChanged:  {
                            gammaCorrectionTextField.text = gammaCorrectionSlider.value
                            if(skipUpdateGammaCorrection){
-                               see3cam50cug.setGammaCorrection(gammaCorrectionSlider.value)
+                               // Round the slider and TextField to three decimal places
+                               adjustedGammaCorrection = parseFloat((gammaCorrectionSlider.value).toFixed(1));
+                               gammaCorrectionTextField.text = adjustedGammaCorrection
+                               see3cam50cug.setGammaCorrection(adjustedGammaCorrection)
                            }
                            skipUpdateGammaCorrection = true
                        }
                    }
                    TextField {
                        id: gammaCorrectionTextField
-                       text: gammaCorrectionSlider.value
                        font.pixelSize: 10
                        font.family: "Ubuntu"
                        smooth: true
                        horizontalAlignment: TextInput.AlignHCenter
                        style: econTextFieldStyle
+                       readOnly:true
                        validator: IntValidator {bottom: gammaCorrectionSlider.minimumValue; top: gammaCorrectionSlider.maximumValue}
                        onTextChanged: {
                            if(text.length > 0){
@@ -1236,6 +1250,7 @@ This feature is supported in Acquisition trigger."
             skipUpdateRGainMode = false
             RGain = parseFloat((RGain).toFixed(3));
             gainRSlider.value = RGain
+            gainRTextField.text = RGain
             skipUpdateRGainMode = true
         }
 
@@ -1243,6 +1258,7 @@ This feature is supported in Acquisition trigger."
             skipUpdateBGainMode = false
             BGain = parseFloat((BGain).toFixed(3));
             gainBSlider.value = BGain
+            gainBTextField.text = BGain
             skipUpdateBGainMode = true
         }
 
@@ -1254,6 +1270,7 @@ This feature is supported in Acquisition trigger."
             skipUpdateBrightness = false
             brightness = parseFloat((brightness).toFixed(3));
             brightnessSlider.value = brightness
+            brightnessTextField.text = brightness
             skipUpdateBrightness = true
         }
 
@@ -1267,6 +1284,7 @@ This feature is supported in Acquisition trigger."
             skipUpdateSaturation = false
             saturation = parseFloat((saturation).toFixed(3));
             saturationSlider.value = saturation
+            saturationTextField.text = saturation
             skipUpdateSaturation = true
         }
 
@@ -1306,6 +1324,7 @@ This feature is supported in Acquisition trigger."
             skipUpdateGammaCorrection = false
             gammaCorrection = parseFloat((gammaCorrection).toFixed(1));
             gammaCorrectionSlider.value = gammaCorrection
+            gammaCorrectionTextField.text = gammaCorrection
             skipUpdateGammaCorrection = true
         }
 
