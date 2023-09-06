@@ -157,10 +157,14 @@ Item {
                             if(checked)
                             {
                                 see3camcu210.setAwbLockStatus(See3CAM_CU210.AWB_ON)
+                                awbModeCombo.enabled = false
+                                awbModeCombo.opacity = 0.1
                             }
                             else
                             {
                                 see3camcu210.setAwbLockStatus(See3CAM_CU210.AWB_OFF)
+                                awbModeCombo.enabled = true
+                                awbModeCombo.opacity = 1
                             }
                         }
                         skipUpdateUIOnAWBLockStatus = true
@@ -220,10 +224,14 @@ Item {
                             if(checked)
                             {
                                 see3camcu210.setAeLockStatus(See3CAM_CU210.AE_ON)
+                                meteringModeCombo.enabled = false
+                                meteringModeCombo.opacity = 0.1
                             }
                             else
                             {
                                 see3camcu210.setAeLockStatus(See3CAM_CU210.AE_OFF)
+                                meteringModeCombo.enabled = true
+                                meteringModeCombo.opacity = 1
                             }
                         }
                         skipUpdateUIOnAELockStatus = true
@@ -754,10 +762,14 @@ Item {
         if(mode == See3CAM_CU210.AWB_ON)
         {
            awbLockCheckBox.checked = true
+           awbModeCombo.enabled = false
+           awbModeCombo.opacity = 0.1
         }
         else if(mode == See3CAM_CU210.AWB_OFF)
         {
            awbLockCheckBox.checked = false
+           awbModeCombo.enabled = true
+           awbModeCombo.opacity = 1
         }
     }
 
@@ -766,10 +778,14 @@ Item {
         if(status == See3CAM_CU210.AE_ON)
         {
             aeLockCheckBox.checked = true
+            meteringModeCombo.enabled = false
+            meteringModeCombo.opacity = 0.1
         }
         else if(status == See3CAM_CU210.AE_OFF)
         {
             aeLockCheckBox.checked = false
+            meteringModeCombo.enabled = true
+            meteringModeCombo.opacity = 1
         }
     }
 

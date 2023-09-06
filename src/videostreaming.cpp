@@ -1364,6 +1364,13 @@ void FrameRenderer::getDisplayRenderArea(int *displayX, int *displayY, int *dest
                 calculateViewport(Y16_1080p_WIDTH, Y16_1080p_HEIGHT, previewBgrdAreaWidth-xMargin, previewBgrdAreaHeight, &x, &y, &destWindowWidth, &destWindowHeight);
             }
         }
+        else if((videoResolutionwidth == Y16_2160p_WIDTH)&&(videoResolutionHeight == Y16_2160p_HEIGHT)){//Y16 - 4440x2160 => RGB 3840 x 2160
+            if(previewBgrdAreaHeight == 0){
+                calculateViewport(Y16_2160p_RGB_WIDTH, Y16_2160p_RGB_HEIGHT, previewBgrdAreaWidth-xMargin, m_viewportSize.height(), &x, &y, &destWindowWidth, &destWindowHeight);
+            }else{
+                calculateViewport(Y16_2160p_RGB_WIDTH, Y16_2160p_RGB_HEIGHT, previewBgrdAreaWidth-xMargin, previewBgrdAreaHeight, &x, &y, &destWindowWidth, &destWindowHeight);
+            }
+        }
         else if((videoResolutionwidth == Y16_675p_WIDTH)&&(videoResolutionHeight == Y16_675p_HEIGHT)){//1920x675
             if(previewBgrdAreaHeight == 0){
                 calculateViewport(videoResolutionwidth, Y16_675p_HEIGHT_MODIFIED, previewBgrdAreaWidth-xMargin, m_viewportSize.height(), &x, &y, &destWindowWidth, &destWindowHeight);
@@ -1534,6 +1541,8 @@ void Videostreaming::capFrame()
         // stop the timer when device is unplugged
         if(!retrieveFrame)
             m_timer.stop();
+
+
         closeDevice();
         // Added by Sankari:19 Dec 2017.
         //Bug Fix: 1. Streaming is not available for higher resolution when unplug and plug cu130 camera without closing application
@@ -3165,6 +3174,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
                 IRCounter++;
             }
         }
+
         //Removing 5th bit from each frame of IRBuffer
         int IRsize = irSize;
         bufferCount = 0;
@@ -3183,10 +3193,11 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 
         //Copying buffer to QImage to render in another window
         memcpy(cu83IRWindow->bits(),(m_renderer->outputIrBuffer),Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
+
         //passing QImage to the setImage() defined in renderer class
         helperObj.setImage(*cu83IRWindow);
     }
-    else if((width == Y16_1350p_WIDTH)&&(height == Y16_1350p_HEIGHT))//3840x1080
+    else if((width == Y16_1350p_WIDTH)&&(height == Y16_1350p_HEIGHT))//3840x1350 => 3840x1080
     {
         m_renderer->renderBufferFormat = CommonEnums::GREY_BUFFER_RENDER;
         shaderType = CommonEnums::GREY_BUFFER_RENDER;
@@ -4292,7 +4303,6 @@ void Videostreaming::stopCapture() {
         m_renderer->yBuffer = NULL;
     }
 
-
     if(m_renderer->uBuffer != NULL){
         free(m_renderer->uBuffer);
         m_renderer->uBuffer = NULL;
@@ -4881,11 +4891,17 @@ void Videostreaming::recordVideo(){  // Added by Navya : 25 Nov 2019 -- To confi
         {
             if((width == Y16_1350p_WIDTH)&&(height == Y16_1350p_HEIGHT))
             {
-                videoEncoder->encodeImage(m_renderer->ir1350pBuffer,videoEncoder->Y8_BUFFER);
+                if(m_renderer->ir1350pBuffer != NULL)
+                {
+                    videoEncoder->encodeImage(m_renderer->ir1350pBuffer,videoEncoder->Y8_BUFFER);
+                }
             }
             else if((width == Y16_675p_WIDTH)&&(height == Y16_675p_HEIGHT))
             {
-                videoEncoder->encodeImage(m_renderer->ir675pBuffer,videoEncoder->Y8_BUFFER);
+                if(m_renderer->ir675pBuffer != NULL)
+                {
+                    videoEncoder->encodeImage(m_renderer->ir675pBuffer,videoEncoder->Y8_BUFFER);
+                }
             }
         }//For other formats like UYVY, Y8, YUYV
         else if(width !=320 && height != 240 ){   //Stop recording video in 320x240 resolution for See3CAM_20CUG camera.

@@ -522,7 +522,6 @@ bool See3CAM_CU135M_H01R1::setGainLimit(uint lowerLimit, uint upperLimit)
             g_in_packet_buf[6] == SET_SUCCESS) {
             lowerLimit = (g_in_packet_buf[2] << 8) | (g_in_packet_buf[3] << 0);
             upperLimit = (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
-
             return true;
         }
     }

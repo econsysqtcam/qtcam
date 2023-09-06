@@ -1,7 +1,12 @@
+Qtcam Application - 25.0.20
+---------------------------
+*Added Support for See3CAM_50CUG.
+*Bug fixed for See3CAM_CU135M_H01R1
+
 Qtcam Application - 25.0.19
 ---------------------------
 *Added support for See3CAM_CU84.
-*Bug Fixed for See3CAM_CU135M.
+*Bug Fixed for See3CAM_CU135M_H01R1.
 
 Qtcam Application - 25.0.18
 ---------------------------

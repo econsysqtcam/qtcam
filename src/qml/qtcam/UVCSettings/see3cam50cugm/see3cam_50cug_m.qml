@@ -274,7 +274,7 @@ Item{
                     RadioButton {
                         exclusiveGroup: strobesGrp
                         checked: false
-                        id: strobeFlash
+                        id: strobeOn
                         text: "On"
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
@@ -588,8 +588,8 @@ Item{
                 triggerCombo.enabled = false
                 triggerCombo.opacity = 0.1
 
-                strobeFlash.enabled = false
-                strobeFlash.opacity = 0.1
+                strobeOn.enabled = false
+                strobeOn.opacity = 0.1
                 strobeOff.enabled   = false
                 strobeOff.opacity   = 0.1
             }
@@ -605,8 +605,8 @@ Item{
 
                 if(cameraMode == SEE3CAM_50CUGM.TRIGGER_EXP_CONTROL)
                 {
-                    strobeFlash.enabled = false
-                    strobeFlash.opacity = 0.1
+                    strobeOn.enabled = false
+                    strobeOn.opacity = 0.1
                     strobeOff.enabled   = false
                     strobeOff.opacity   = 0.1
 
@@ -616,8 +616,8 @@ Item{
                 {
                     triggerCombo.currentIndex = 1
 
-                    strobeFlash.enabled = true
-                    strobeFlash.opacity = 1
+                    strobeOn.enabled = true
+                    strobeOn.opacity = 1
                     strobeOff.enabled   = true
                     strobeOff.opacity   = 1
                 }
@@ -634,22 +634,22 @@ Item{
             currentStrobeMode(strobe)
             if(masterMode.checked == true)
             {
-                strobeFlash.enabled = false
-                strobeFlash.opacity = 0.1
+                strobeOn.enabled = false
+                strobeOn.opacity = 0.1
                 strobeOff.enabled   = false
                 strobeOff.opacity   = 0.1
             }
             else if(triggerCombo.currentIndex == 0)
             {
-                strobeFlash.enabled = false
-                strobeFlash.opacity = 0.1
+                strobeOn.enabled = false
+                strobeOn.opacity = 0.1
                 strobeOff.enabled   = false
                 strobeOff.opacity   = 0.1
             }
             else
             {
-                strobeFlash.enabled = true
-                strobeFlash.opacity = 1
+                strobeOn.enabled = true
+                strobeOn.opacity = 1
                 strobeOff.enabled   = true
                 strobeOff.opacity   = 1
             }
@@ -694,8 +694,8 @@ Item{
     function setMasterMode()
     {
         //disable strobe mode when the camera is in Master mode
-        strobeFlash.enabled = false
-        strobeFlash.opacity = 0.1
+        strobeOn.enabled = false
+        strobeOn.opacity = 0.1
         strobeOff.enabled   = false
         strobeOff.opacity   = 0.1
 
@@ -729,8 +729,8 @@ Item{
         root.captureBtnEnable(false)
 
         //disable strobe mode when the camera is in Master mode
-        strobeFlash.enabled = false
-        strobeFlash.opacity = 0.1
+        strobeOn.enabled = false
+        strobeOn.opacity = 0.1
         strobeOff.enabled   = false
         strobeOff.opacity   = 0.1
 
@@ -744,8 +744,8 @@ Item{
         root.captureBtnEnable(false)
 
         //enable strobe mode when the camera is in trigger mode
-        strobeFlash.enabled = true
-        strobeFlash.opacity = 1
+        strobeOn.enabled = true
+        strobeOn.opacity = 1
         strobeOff.enabled   = true
         strobeOff.opacity   = 1
 
@@ -780,11 +780,11 @@ Item{
         switch(mode){
             case SEE3CAM_50CUGM.OFF:
                 strobeOff.checked   = true
-                strobeFlash.checked = false
+                strobeOn.checked = false
                 break;
             case SEE3CAM_50CUGM.FLASH:
                 strobeOff.checked   = false
-                strobeFlash.checked = true
+                strobeOn.checked = true
                 break;
         }
     }

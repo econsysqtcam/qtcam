@@ -122,7 +122,7 @@ bool SEE3CAM_50CUGM::setCameraMode(cameraModes cameraMode)
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_SEE3CAM_50CUG_M; /* camera id */
     g_out_packet_buf[2] = SET_CAMERA_MODE_SEE3CAM_50CUG_M;
-    g_out_packet_buf[3] = cameraMode;  /* BOTH MODE DISABLE */
+    g_out_packet_buf[3] = cameraMode;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){

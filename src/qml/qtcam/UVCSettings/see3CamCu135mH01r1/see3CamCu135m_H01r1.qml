@@ -664,7 +664,6 @@ Item {
                         onValueChanged:  {
                             gainLowerLimitTextField.text = gainLowerLimitSlider.value
                             if(skipUpdateLowerLimitSlider){
-                                setButtonClicked = true
                                 see3camcu135mH01r1.setGainLimit(gainLowerLimitSlider.value, gainUpperLimitSlider.value)
                             }
                             skipUpdateLowerLimitSlider = true
@@ -709,7 +708,6 @@ Item {
                         onValueChanged:  {
                             gainUpperLimitTextField.text = gainUpperLimitSlider.value
                             if(skipUpdateUpperLimitSlider){
-                                setButtonClicked = true
                                 see3camcu135mH01r1.setGainLimit(gainLowerLimitSlider.value, gainUpperLimitSlider.value)
                             }
                             skipUpdateUpperLimitSlider = true
@@ -1269,10 +1267,7 @@ Item {
         }
 
         onIndicateGainValueRangeFailure:{
-            if(setButtonClicked){
-                setButtonClicked = false
-                see3camcu135mH01r1.getGainLimit()
-            }
+            see3camcu135mH01r1.getGainLimit()
         }
         onIndicateExposureValueRangeFailure:{
             if(setButtonClicked){
