@@ -274,8 +274,25 @@ Rectangle {
     signal disableStillProp(bool status);
 
     //Added by Sushanth 15th May 2023
-    signal sendGainValueToUVC(int gain);
     signal sendGainValueToHID(int gainHid);
+
+    signal getBrightnessFromUVC(var brightnessFromUVC);
+    signal getContrastFromUVC(int contrastFromUVC);
+    signal getSaturationFromUVC(var saturationFromUVC);
+    signal getGammaFromUVC(var gammaFromUVC);
+    signal getColorTempFromUVC(int colorTempFromUVC);
+    signal getExposureFromUVC(int exposureFromUVC);
+
+    //Added by Sushanth 15th May 2023
+    signal sendGainValueToUVC(int gain);
+
+    signal getBrightnessFromHID(int brightnessFromHID);
+    signal getContrastFromHID(int contrastFromHID);
+    signal getSaturationFromHID(int saturationFromHID);
+    signal getGammaFromHID(int gammaFromHID);
+    signal getColorTempFromHID(int colorTempFromHID);
+    signal getExposureFromHID(int exposureFromHID);
+
 
     width:Screen.width
     height:Screen.height
@@ -1815,16 +1832,80 @@ Rectangle {
         destroyIrWindow();
     }
 
-    //To get gain value from HID settings & set it to UVC
+    //Functions to get HID values and set it to UVC
     function getGainValueFromHID(gainValue)
     {
         sendGainValueToUVC(gainValue)
     }
 
-    //To get gain value from UVC and set it to HID
+
+    function sendBrightnessToUVC(brightness)
+    {
+        getBrightnessFromHID(brightness)
+    }
+
+    function sendContrastToUVC(Contrast)
+    {
+        getContrastFromHID(Contrast)
+    }
+
+    function sendSaturationToUVC(Saturation)
+    {
+        getSaturationFromHID(Saturation)
+    }
+
+    function sendGammaToUVC(gamma)
+    {
+        getGammaFromHID(gamma)
+    }
+
+    function sendColorTemperatureToUVC(colorTemp)
+    {
+        getColorTempFromHID(colorTemp)
+    }
+
+    function sendExposureToUVC(exposure)
+    {
+        getExposureFromHID(exposure)
+    }
+
+
+
+
+    //Functions to get UVC values and set it to HID
     function getGainValueFromUVC(gainValue)
     {
         sendGainValueToHID(gainValue)
+    }
+
+    function getBrightness(brightness)
+    {
+        getBrightnessFromUVC(brightness)
+    }
+
+    function getContrast(Contrast)
+    {
+        getContrastFromUVC(Contrast)
+    }
+
+    function getSaturation(Saturation)
+    {
+        getSaturationFromUVC(Saturation)
+    }
+
+    function getGamma(gamma)
+    {
+        getGammaFromUVC(gamma)
+    }
+
+    function getColorTemperature(colorTemp)
+    {
+        getColorTempFromUVC(colorTemp)
+    }
+
+    function getExposureUVC(exposure)
+    {
+        getExposureFromUVC(exposure)
     }
 
     //Added by Sushanth - To clear buffer when device is in trigger mode

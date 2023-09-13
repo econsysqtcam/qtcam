@@ -171,7 +171,7 @@ bool SEE3CAM_50CUGM::getCameraMode()
 }
 
 /*
- * @brief SEE3CAM_50CUGM::setStrobeMode - Setting orientation - set Normal/horizontal/vertical/Rotate180
+ * @brief SEE3CAM_50CUGM::setStrobeMode - Setting Strobe mode to the camera
  * @param - strobe - To switch between OFF, Flash and Torch modes
  * return true/false
 */

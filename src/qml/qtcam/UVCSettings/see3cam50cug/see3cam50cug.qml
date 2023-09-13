@@ -73,6 +73,61 @@ Item{
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
+
+        //Signals getting values from UVC & set its values to the HID controls
+        onSendGainValueToHID:{
+            gainSlider.value = gainHid
+        }
+        onGetBrightnessFromUVC:{
+            brightnessSlider.value = brightnessFromUVC
+        }
+        onGetContrastFromUVC:{
+            contrastSlider.value = contrastFromUVC
+        }
+        onGetSaturationFromUVC:{
+            saturationSlider.value = saturationFromUVC
+        }
+        onGetGammaFromUVC:{
+            gammaCorrectionSlider.value = gammaFromUVC
+        }
+        onGetColorTempFromUVC:{
+            skipUpdateColorTemperature = false
+            colorTempTextField.text = colorTempFromUVC
+
+            if(colorTempFromUVC == "2300")
+            {
+               colorTempSlider.value = 0
+            }
+            else if(colorTempFromUVC == "2800")
+            {
+                colorTempSlider.value = 1
+            }
+            else if(colorTempFromUVC == "3000")
+            {
+                colorTempSlider.value = 2
+            }
+            else if(colorTempFromUVC == "4000")
+            {
+                colorTempSlider.value = 3
+            }
+            else if(colorTempFromUVC == "6000")
+            {
+                colorTempSlider.value = 4
+            }
+            else if(colorTempFromUVC == "6500")
+            {
+                colorTempSlider.value = 5
+            }
+
+            skipUpdateColorTemperature = true
+
+            //To get color correction matrix and RB gain after color temperature is set
+            see3cam50cug.getColorCorrectionMatrix()
+            see3cam50cug.getRBGain()
+        }
+        onGetExposureFromUVC:{
+            manualExpTextField.text = exposureFromUVC
+        }
     }
 
     property int gainMin: 0
@@ -118,6 +173,12 @@ Item{
     property bool skipUpdateBGainMode            : false
 
 
+    property int brightnessInt: 0
+    property int saturationInt: 0
+    property int gammaInt: 0
+    property int exposureInt: 0
+    property int exposureText: 0
+
     ScrollView{
         id: scrollview
         x: 10
@@ -135,7 +196,7 @@ Item{
 
                Text{
                     id: manualGainSlider
-                    text: "--- Gain Mode ---"
+                    text: "--- Gain ---"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -143,7 +204,8 @@ Item{
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                     ToolButton{
-                        tooltip: "Used for modifying Digital Gain of B channel in steps of 0.04"
+                        tooltip: "Gain:
+Used for modifying Digital Gain of B channel in steps of 0.04"
                         width: 200
                         opacity: 0
                     }
@@ -163,6 +225,9 @@ Item{
                         stepSize: 1
 
                         onValueChanged:  {
+                            //Sending HID value to UVC
+                            root.getGainValueFromHID(gainSlider.value)
+
                             gainTextField.text = gainSlider.value
                             if(skipUpdateGainMode){
                                 see3cam50cug.setGainMode(SEE3CAM_50CUG.MANUAL_MODE, gainSlider.value)
@@ -199,7 +264,8 @@ Item{
                         opacity: 0.50196078431373
 
                         ToolButton{
-                            tooltip: "R Gain : Used for modifying Digital Gain of R channel in steps of 0.04"
+                            tooltip: "R Gain :
+Used for modifying Digital Gain of R channel in steps of 0.04"
                             width: 200
                             opacity: 0
                         }
@@ -255,7 +321,8 @@ Item{
                         opacity: 0.50196078431373
 
                         ToolButton{
-                            tooltip: "B Gain : Used for modifying Digital Gain of B channel in steps of 0.04"
+                            tooltip: "B Gain :
+Used for modifying Digital Gain of B channel in steps of 0.04"
                             width: 200
                             opacity: 0
                         }
@@ -444,7 +511,7 @@ For manual color temperature the CCM is predefined and it can be overwritten by 
 
                Text {
                    id: blackLevelAdj
-                   text: "--- Black Level Adjustment ---"
+                   text: "--- Black Level ---"
                    font.pixelSize: 14
                    font.family: "Ubuntu"
                    color: "#ffffff"
@@ -514,7 +581,8 @@ Recommended value is : 240"
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
                    ToolButton{
-                       tooltip: "Brightness : Used for changing brightness by modifying Y channel gain in steps of 0.04"
+                       tooltip: "Brightness :
+Used for changing brightness by modifying Y channel gain in steps of 0.04"
                        width: 200
                        opacity: 0
                    }
@@ -531,10 +599,16 @@ Recommended value is : 240"
                        maximumValue: brightnessMax
                        stepSize: 0.005
                        onValueChanged:  {
+
                            brightnessTextField.text = brightnessSlider.value
                            if(skipUpdateBrightness){
                                // Round the slider and TextField to three decimal places
                                adjustedBrightness = parseFloat((brightnessSlider.value).toFixed(3));
+
+                               //Sending HID value to UVC
+                               brightnessInt = adjustedBrightness * 200;
+                               root.sendBrightnessToUVC(brightnessInt)
+
                                brightnessTextField.text = adjustedBrightness
                                see3cam50cug.setBrightness(adjustedBrightness)
                            }
@@ -568,7 +642,8 @@ Recommended value is : 240"
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
                    ToolButton{
-                       tooltip: "Contrast : Used for changing contrast by modifying the strengths of S curve applied to Y channel "
+                       tooltip: "Contrast :
+Used for changing contrast by modifying the strengths of S curve applied to Y channel "
                        width: 200
                        opacity: 0
                    }
@@ -587,6 +662,9 @@ Recommended value is : 240"
                        onValueChanged:  {
                            contrastTextField.text = contrastSlider.value
                            if(skipUpdateContrast){
+                               //Sending HID value to UVC
+                               root.sendContrastToUVC(contrastSlider.value)
+
                                see3cam50cug.setContrast(contrastSlider.value)
                            }
                            skipUpdateContrast = true
@@ -620,7 +698,8 @@ Recommended value is : 240"
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
                    ToolButton{
-                       tooltip: "Saturation : Used for changing saturation by modifying the gain of Z curve applied to UV channel in steps of 0.04"
+                       tooltip: "Saturation :
+Used for changing saturation by modifying the gain of Z curve applied to UV channel in steps of 0.04"
                        width: 200
                        opacity: 0
                    }
@@ -641,6 +720,11 @@ Recommended value is : 240"
                            if(skipUpdateSaturation){
                                // Round the slider and TextField to three decimal places
                                adjustedSaturation = parseFloat((saturationSlider.value).toFixed(3));
+
+                               //Sending HID value to UVC
+                               saturationInt = adjustedSaturation * 200
+                               root.sendSaturationToUVC(saturationInt)
+
                                saturationTextField.text = adjustedSaturation
                                see3cam50cug.setSaturation(adjustedSaturation)
                            }
@@ -674,7 +758,8 @@ Recommended value is : 240"
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
                    ToolButton{
-                       tooltip: "Color temperature : Used for white balancing the scene based on the temperature set by applying predefined R and B digital gain.
+                       tooltip: "Color temperature :
+Used for white balancing the scene based on the temperature set by applying predefined R and B digital gain.
 Note:  For temperature other than the possible values(2300, 2800, 3000,4000, 6000, 6500) individual R and B digital gain can be manually adjusted."
                        width: 200
                        opacity: 0
@@ -700,31 +785,37 @@ Note:  For temperature other than the possible values(2300, 2800, 3000,4000, 600
 
                                switch (value) {
                                    case 0:
+                                       root.sendColorTemperatureToUVC(1)
                                        colorTempTextField.text = "2300"
                                        see3cam50cug.setColorTemperature(2300)
 
                                        break;
                                    case 1:
+                                       root.sendColorTemperatureToUVC(2)
                                        colorTempTextField.text = "2800"
                                        see3cam50cug.setColorTemperature(2800)
 
                                        break;
                                    case 2:
+                                       root.sendColorTemperatureToUVC(3)
                                        colorTempTextField.text = "3000"
                                        see3cam50cug.setColorTemperature(3000)
 
                                        break;
                                    case 3:
+                                       root.sendColorTemperatureToUVC(4)
                                        colorTempTextField.text = "4000"
                                        see3cam50cug.setColorTemperature(4000)
 
                                        break;
                                    case 4:
+                                       root.sendColorTemperatureToUVC(5)
                                        colorTempTextField.text = "6000"
                                        see3cam50cug.setColorTemperature(6000)
 
                                        break;
                                    case 5:
+                                       root.sendColorTemperatureToUVC(6)
                                        colorTempTextField.text = "6500"
                                        see3cam50cug.setColorTemperature(6500)
 
@@ -763,7 +854,8 @@ Note:  For temperature other than the possible values(2300, 2800, 3000,4000, 600
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
                    ToolButton{
-                       tooltip: "Gamma Correction: Used for changing gamma by modifying strengths of gamma correction curve applied to Y channel in steps of 0.1"
+                       tooltip: "Gamma Correction:
+Used for changing gamma by modifying strengths of gamma correction curve applied to Y channel in steps of 0.1"
                        width: 200
                        opacity: 0
                    }
@@ -784,6 +876,11 @@ Note:  For temperature other than the possible values(2300, 2800, 3000,4000, 600
                            if(skipUpdateGammaCorrection){
                                // Round the slider and TextField to three decimal places
                                adjustedGammaCorrection = parseFloat((gammaCorrectionSlider.value).toFixed(1));
+
+                               //Sending HID value to UVC
+                               gammaInt = adjustedGammaCorrection * 10
+                               root.sendGammaToUVC(gammaInt)
+
                                gammaCorrectionTextField.text = adjustedGammaCorrection
                                see3cam50cug.setGammaCorrection(adjustedGammaCorrection)
                            }
@@ -867,6 +964,19 @@ This feature controls the integration time of the sensor. Values are expressed i
                        {
                            exposureSetBtn.enabled = false
                            setButtonClicked = true
+
+                           //Sending HID value to UVC
+                           exposureText = manualExpTextField.text
+                           if(manualExpTextField.text <= 2000000)
+                           {
+                               exposureInt = manualExpTextField.text / 100
+                               root.sendExposureToUVC(exposureInt)
+                           }
+                           else{
+                               root.sendExposureToUVC(200000)
+                           }
+                           manualExpTextField.text = exposureText
+
                            see3cam50cug.setExposure(SEE3CAM_50CUG.MANUAL_EXPOSURE, manualExpTextField.text);
                            exposureSetBtn.enabled = true
                        }
@@ -874,6 +984,19 @@ This feature controls the integration time of the sensor. Values are expressed i
                        {
                            exposureSetBtn.enabled = false
                            setButtonClicked = true
+
+                           //Sending HID value to UVC
+                           exposureText = manualExpTextField.text
+                           if(manualExpTextField.text <= 2000000)
+                           {
+                               exposureInt = manualExpTextField.text / 100
+                               root.sendExposureToUVC(exposureInt)
+                           }
+                           else{
+                               root.sendExposureToUVC(200000)
+                           }
+                           manualExpTextField.text = exposureText
+
                            see3cam50cug.setExposure(SEE3CAM_50CUG.MANUAL_EXPOSURE, manualExpTextField.text);
                            exposureSetBtn.enabled = true
                        }
@@ -900,6 +1023,9 @@ This feature controls the integration time of the sensor. Values are expressed i
                       text: qsTr("Master")
                       exclusiveGroup: cameraModeGroup
                       activeFocusOnPress: true
+                      tooltip: " Master Mode :
+After choosing master mode, the application starts steaming.
+This is a simple mode of operation for the camera without any external trigger capability."
                       onClicked: {
                           setMasterMode()
                       }

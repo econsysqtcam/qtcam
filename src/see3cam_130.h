@@ -1,83 +1,125 @@
 #ifndef SEE3CAM_130_H
 #define SEE3CAM_130_H
+
+
 #include <QObject>
 #include "uvccamera.h"
+
+
 #define DENOISE_MIN 0
 #define DENOISE_MAX 15
+
 #define EXPOSURECOMP_MIN 8000
 #define EXPOSURECOMP_MAX 1000000
 
-#define SET_DENOISE_CONTROL  0x06
-#define GET_DENOISE_CONTROL  0x05
 
 /* SEE3CAM_130 */
 #define CAMERA_CONTROL_130              0x7B
+
 #define GET_SCENEMODE_130				0x01
 #define SET_SCENEMODE_130				0x02
-#define GET_SPECIALEFFECT_130			0x03
-#define SET_SPECIALEFFECT_130			0x04
-#define GET_DENOISE_130					0x05
-#define SET_DENOISE_130					0x06
+
+#define GET_SPECIAL_EFFECT_130			0x03
+#define SET_SPECIAL_EFFECT_130			0x04
+
+#define GET_DENOISE_CONTROL             0x05
+#define SET_DENOISE_CONTROL             0x06
+
 #define GET_AF_MODE_130					0x07
 #define SET_AF_MODE_130					0x08
+
 #define GET_AF_ROI_MODE_130				0x09
 #define SET_AF_ROI_MODE_130				0x0A
+
 #define GET_EXP_ROI_MODE_130			0x0B
 #define SET_EXP_ROI_MODE_130			0x0C
+
 #define GET_BURST_LENGTH_130			0x0D
 #define SET_BURST_LENGTH_130			0x0E
+
 #define GET_HDR_MODE_130				0x0F
 #define SET_HDR_MODE_130				0x10
+
 #define GET_Q_FACTOR_130				0x11
 #define SET_Q_FACTOR_130				0x12
+
 #define ENABLE_DISABLE_MODE_AF_RECTANGLE_130     0x13
+
+#define GET_STREAM_MODE_130             0x14
+#define SET_STREAM_MODE_130             0x15
+
 #define GET_AF_RECT_MODE                0x16
-#define ENABLE_AF_RECTANGLE_130     0x01
-#define DISABLE_AF_RECTANGLE_130     0x00
-#define SET_TO_DEFAULT                0x17
-#define MANUAL_ROI_AF_130             0x02
-#define MANUAL_ROI_EXP_130			  0x02
+
+#define SET_TO_DEFAULT                  0x17
+
 #define SET_FLIP_MODE_130                 0x19
 #define GET_FLIP_MODE_130                 0x18
-#define FLIP_ENABLE                   0x01
-#define FLIP_DISABLE                  0x00
+
+#define GET_AWB_130                     0x1A
+#define GET_AUTO_EXPOSURE               0x1B
+
+#define GET_FLASH_MODE_130              0x1C
+#define SET_FLASH_MODE_130              0x1D
+
+#define GET_FACE_DETECT_RECT            0x1E
+#define SET_FACE_DETECT_RECT            0x1F
+
+#define GET_AF_POSITION                 0x20
+
+#define GET_EXPOSURE_COMPENSATION       0x22
+#define SET_EXPOSURE_COMPENSATION       0x23
+
+#define GET_FRAME_RATE_130              0x24
+#define SET_FRAME_RATE_130              0x25
+
+#define STILL_CAPTURE_STATUS            0x26
+
+#define GET_FLICKER_DETECTION_130       0x27
+#define SET_FLICKER_DETECTION_130       0x28
+
+#define GET_RED_GAIN                    0x29
+#define SET_RED_GAIN                    0x2A
+
+#define GET_BLUE_GAIN                   0x2B
+#define SET_BLUE_GAIN                   0x2C
+
+#define GET_GREEN_GAIN                  0x2D
+#define SET_GREEN_GAIN                  0x2E
+
+
+//Face Detection
+#define ENABLE_FACE_RECT                0x01
+#define DISABLE_FACE_RECT               0x00
+
+#define ENABLE_EMBED_DATA               0x01
+#define DISABLE_EMBED_DATA              0x00
+
+#define ENABLE_OVERLAY_RECT             0x01
+#define DISABLE_OVERLAY_RECT            0x00
+
+
+//Enable/Disable AF Rectangle
+#define ENABLE_AF_RECTANGLE_130     0x01
+#define DISABLE_AF_RECTANGLE_130     0x00
+
+
+//Still Capture Status
+#define STILL_CAPTURE_DISABLE_RECTANGLE      0x00
+#define STILL_CAPTURE_ENABLE_RECTANGLE       0x01
+
+//Status
+#define GET_FAIL		0x00
+#define GET_SUCCESS		0x01
+
 #define SET_HORZ_FLIP_MODE_130             0x00
 #define SET_VERT_FLIP_MODE_130             0x01
 
-#define SET_STREAM_MODE_130               0x15
-#define GET_STREAM_MODE_130               0x14
+#define SET_FAIL		0x00
+#define SET_SUCCESS		0x01
 
 #define ENABLE_DISABLE_MODE_FACE_RECTANGLE_130       0x26
 #define ENABLE_FACE_RECTANGLE_130       0x01
 #define DISABLE_FACE_RECTANGLE_130      0x00
-#define SET_FACE_DETECT_RECT            0x1F
-#define GET_FACE_DETECT_RECT            0x1E
-#define ENABLE_FACE_RECT                0x01
-#define DISABLE_FACE_RECT               0x00
-#define ENABLE_EMBED_DATA               0x01
-#define DISABLE_EMBED_DATA              0x00
-#define ENABLE_SMILE_TRIGGER_130        0x01
-#define DISABLE_SMILE_TRIGGER_130        0x00
-#define ENABLE_OVERLAY_RECT             0x01
-#define DISABLE_OVERLAY_RECT            0x00
-#define FACE_RECT_SUCCESS               0x01
-#define FACE_RECT_FAIL                  0x00
-
-#define SET_SMILE_DETECTION             0x21
-#define GET_SMILE_DETECTION             0x20
-#define ENABLE_SMILE_DETECT             0x01
-#define DISABLE_SMILE_DETECT            0x00
-#define SMILE_DETECT_SUCCESS            0x01
-#define SMILE_DETECT_FAIL               0x00
-
-#define SET_EXPOSURE_COMPENSATION       0x23
-#define GET_EXPOSURE_COMPENSATION       0x22
-
-#define SET_FRAME_RATE_130              0x25
-#define GET_FRAME_RATE_130              0x24
-
-#define SET_FLICKER_DETECTION_130           0x28
-#define GET_FLICKER_DETECTION_130           0x27
 
 
 class See3CAM_130 : public QObject
@@ -94,50 +136,72 @@ private:
 public:
     explicit See3CAM_130(QObject *parent = 0);
 
-    enum sceneModes {
-        SCENE_NORMAL = 0x01,
+    enum SCENE_MODES {
+        SCENE_NORMAL   = 0x01,
         SCENE_DOCUMENT = 0x0C
     };
-    Q_ENUMS(sceneModes)
+    Q_ENUMS(SCENE_MODES)
 
-    enum specialEffects {
-        EFFECT_NORMAL = 0x01,        
-        EFFECT_BLACK_WHITE = 0x04,
-        EFFECT_GREYSCALE = 0x07,
-        EFFECT_NEGATIVE = 0x08,
-        EFFECT_SKETCH = 0x10
+    enum SPECIAL_EFFECTS {
+        EFFECT_NORMAL       = 0x01,
+        EFFECT_BLACK_WHITE  = 0x04,
+        EFFECT_GREYSCALE    = 0x07,
+        EFFECT_NEGATIVE     = 0x08,
+        EFFECT_SKETCH       = 0x10
     };
+    Q_ENUMS(SPECIAL_EFFECTS)
 
-     Q_ENUMS(specialEffects)
-
-    enum camAfMode {
-        Continuous = 0x01,
-        OneShot = 0x02,
-        AfModeDisabled = 0x03
+    enum AUTO_FOCUS_MODE {
+        CONTINIOUS_SCAN     = 0x01,
+        SINGLE_TRIGGER      = 0x02
     };
-    Q_ENUMS(camAfMode)
+    Q_ENUMS(AUTO_FOCUS_MODE)
 
-    enum camiHDRMode {
-        HdrOff = 0x01,
-        HdrAuto = 0x02,
+    enum AUTO_FOCUS_ROI {
+        AF_CENTERED_ROI = 0x01,
+        AF_MANUAL_ROI   = 0x02
+    };
+    Q_ENUMS(AUTO_FOCUS_ROI)
+
+    enum AUTO_EXPOSURE_ROI {
+        AE_CENTERED_ROI   = 0x01,
+        AE_MANUAL_ROI     = 0x02
+    };
+    Q_ENUMS(AUTO_EXPOSURE_ROI)
+
+    enum iHDR_MODE {
+        HdrOff    = 0x01,
+        HdrAuto   = 0x02,
         HdrManual = 0x03
     };
-    Q_ENUMS(camiHDRMode)
+    Q_ENUMS(iHDR_MODE)
 
-    enum camROIAfMode {
-        AFCentered = 0x01,
-        AFManual = 0x02,
-        AFDisabled = 0x03
+    enum STREAM_MODE {
+        STREAM_MASTER = 0x00,
+        STREAM_TRIGGER = 0x01
     };
-    Q_ENUMS(camROIAfMode)
+    Q_ENUMS(STREAM_MODE)
 
-    enum camROIAutoExpMode {
-        AutoExpFace = 0x00,
-        AutoExpFull = 0x01,
-        AutoExpManual = 0x02,
-        AutoExpDisabled = 0x03
+    enum camFlipMode {
+            FlipHorizontal = 0x00,
+            FlipVertical = 0x01,
+            FlipBoth = 0x02
+    };Q_ENUMS(camFlipMode)
+
+
+    enum FLASH_MODE {
+        DISABLE  = 0x00,
+        STROBE   = 0x01,
+        TORCH    = 0x02
     };
-    Q_ENUMS(camROIAutoExpMode)
+    Q_ENUMS(FLASH_MODE)
+
+    enum FLICKER_MODE {
+         MODE_50Hz    = 0x00,
+         MODE_60Hz    = 0x01,
+         MODE_DISABLE = 0x02
+    };
+    Q_ENUMS(FLICKER_MODE)
 
     enum camAFRectMode {
         AFRectEnable = 0x01,
@@ -145,12 +209,17 @@ public:
     };
     Q_ENUMS(camAFRectMode)
 
-    enum camFlipMode {
-        FlipHorizontal = 0x00,
-        FlipVertical = 0x01,
-        FlipBoth = 0x02
+    enum AFRectangleStatus{
+        AF_RECT_DISABLE = 0x00,
+        AF_RECT_ENABLE  = 0x01
     };
-    Q_ENUMS(camFlipMode)
+    Q_ENUMS(AFRectangleStatus)
+
+    enum camFaceRectMode {
+        FaceRectDisable = 0x00,
+        FaceRectEnable  = 0x01
+    };
+    Q_ENUMS(camFaceRectMode)
 
     enum camFlipEnableDisableMode {
         FlipEnable = 0x01,
@@ -158,20 +227,8 @@ public:
     };
     Q_ENUMS(camFlipEnableDisableMode)
 
-    enum camStreamMode {
-        STREAM_MASTER = 0x00,
-        STREAM_TRIGGER = 0x01
-    };
-    Q_ENUMS(camStreamMode)
-
-    enum camFaceRectMode {
-        FaceRectEnable = 0x01,
-        FaceRectDisable = 0x00
-    };
-    Q_ENUMS(camFaceRectMode)
-
     enum camFaceDetectEmbedDataMode {
-        FaceDetectEmbedDataEnable = 0x01,
+        FaceDetectEmbedDataEnable  = 0x01,
         FaceDetectEmbedDataDisable = 0x00
     };
     Q_ENUMS(camFaceDetectEmbedDataMode)
@@ -194,92 +251,117 @@ public:
     };
     Q_ENUMS(camSmileDetectEmbedDataMode)
 
-    enum camFlickerMode {
-         MODE_AUTO = 0x00,
-         MODE_50Hz =0x01,
-         MODE_60Hz =0x02,
-         MODE_DISABLE =0x03
-       };
-       Q_ENUMS(camFlickerMode)
-
-   
 signals:
-     void sceneModeValue(uint sceneMode);
-     void effectModeValue(uint effectMode);
-     void afModeValue(uint afMode);
-     void hDRModeValueReceived(uint hdrMode, uint hdrValue);
+
+     void sceneModeValueReceived(uint sceneMode);
+     void effectModeValueReceived(uint effectMode);
      void denoiseValueReceived(uint denoiseValue);
-     void burstLengthValue(uint burstLength);
-     void qFactorValue(uint qFactor);
-     void roiAfModeValue(uint roiMode, uint winSize);
-     void roiAutoExpModeValue(uint roiMode, uint winSize);
-     void afRectModeValue(uint afRectMode);
+     void afModeValueReceived(uint afMode);
+     void roiAfModeValueReceived(uint roiMode, uint winSize);
+     void roiAutoExpModeValueReceived(uint roiMode, uint winSize);
+     void burstLengthValueReceived(uint burstLength);
+     void hDRModeValueReceived(uint hdrMode, uint hdrValue);
+     void qFactorValueReceived(uint qFactor);
+     void afRectModeValueReceived(uint afRectMode);
+
+     void streamModeValueReceived(uint streamMode);
      void flipModeValue(uint flipMode, uint flipEnableDisableMode);
-     void streamModeValue(uint streamMode);
-     void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
-     void smileDetectModeValue(uint smileDetectMode, uint smileDetectEmbedDataValue);
+     void autoWhiteBalanceReceived(uint autoWhiteBalance);
+     void autoExposureReceived(uint autoExposure);
+     void flashModeReceived(uint flashMode);
+     void faceDetectModeValueReceived(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
+     void autoFocusPositionReceived(uint afPosition);
      void exposureCompValueReceived(uint exposureCompensation);
      void frameRateCtrlValueReceived(uint frameRateCtrlValue);
+     void flickerDetectionModeReceived(uint flickerMode);
+
+     void redGainMinReceived(uint minRed);
+     void redGainMaxReceived(uint maxRed);
+     void redGainCurrentReceived(uint currentRed);
+
+     void blueGainMinReceived(uint minBlue);
+     void blueGainMaxReceived(uint maxBlue);
+     void blueGainCurrentReceived(uint currentBlue);
+
+     void greenGainMinReceived(uint minGreen);
+     void greenGainMaxReceived(uint maxGreen);
+     void greenGainCurrentReceived(uint currentGreen);
+
      void indicateCommandStatus(QString title, QString text);
      void indicateExposureValueRangeFailure(QString title, QString text);
-     void flickerDetectionMode(uint flickerMode);
 
 public slots:
     bool getSceneMode();
-    bool setSceneMode(const sceneModes& sceneMode);
+    bool setSceneMode(SCENE_MODES sceneMode);
 
     bool getEffectMode();
-    bool setEffectMode(const specialEffects& specialEffect);
+    bool setEffectMode(SPECIAL_EFFECTS specialEffect);
 
     bool setDenoiseValue(int deNoiseVal);
     bool getDenoiseValue();
 
-    bool setAutoFocusMode(camAfMode afMode);
+    bool setAutoFocusMode(AUTO_FOCUS_MODE afMode);
     bool getAutoFocusMode();
 
-    bool setiHDRMode(camiHDRMode iHDRMode, uint iHDRValue);
-    bool getiHDRMode();    
-
-    bool setROIAutoFoucs(camROIAfMode see3camAfROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
-    bool setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
-
+    bool setROIAutoFocus(AUTO_FOCUS_ROI see3camAfROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
     bool getAutoFocusROIModeAndWindowSize();
+
+    bool setROIAutoExposure(AUTO_EXPOSURE_ROI see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
     bool getAutoExpROIModeAndWindowSize();
 
-    bool setBurstLength(uint burstLength);
     bool getBurstLength();
+    bool setBurstLength(uint burstLength);
 
-    bool setQFactor(uint qFactor);
+    bool getiHDRMode();
+    bool setiHDRMode(iHDR_MODE iHDRMode, uint iHDRValue);
+
     bool getQFactor();
+    bool setQFactor(uint qFactor);
 
-    bool enableDisableAFRectangle(bool enableRFRect);    
+    bool enableDisableAFRectangle(bool enableRFRect);
+
+    bool getStreamMode();
+    bool setStreamMode(STREAM_MODE streamMode);
+
     bool getAFRectMode();
-
-    bool setToDefault();
 
     bool setFlipHorzMode(bool horizModeSel);
     bool setFlipVertiMode(bool vertiModeSel);
     bool getFlipMode();
 
-    bool setStreamMode(camStreamMode streamMode);
-    bool getStreamMode();
+    bool getAutoWhiteBalance();
 
-    bool setFlickerDetection(camFlickerMode flickerMode);
-    bool getFlickerDetection();
+    bool getAutoExposure();
 
-    bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
+    bool getFlashMode();
+    bool setFlashMode(FLASH_MODE mode);
+
     bool getFaceDetectMode();
+    bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
 
-    bool setSmileDetection(bool enableSmileDetect, bool embedData);
-    bool getSmileDetectMode();
+    bool getAutoFocusPosition();
 
-    bool setExposureCompensation(unsigned int exposureCompValue);
     bool getExposureCompensation();
+    bool setExposureCompensation(unsigned int exposureCompValue);
 
-    bool setFrameRateCtrlValue(uint frameRate);
     bool getFrameRateCtrlValue();
+    bool setFrameRateCtrlValue(uint frameRate);
+
+    bool getFlickerDetection();
+    bool setFlickerDetection(FLICKER_MODE flickerMode);
+
+    bool getRedGain();
+    bool setRedGain(uint redGain);
+
+    bool getBlueGain();
+    bool setBlueGain(uint blueGain);
+
+    bool getGreenGain();
+    bool setGreenGain(uint greenGain);
 
     bool enableDisableFaceRectangle(bool enableFaceRect);
+
+    bool setToDefault();
 
 };
 #endif // SEE3CAM_130_H

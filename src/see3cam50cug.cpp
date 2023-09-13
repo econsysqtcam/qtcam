@@ -1057,6 +1057,7 @@ bool SEE3CAM_50CUG::setExposure(EXPOSURE_MODE expMode, uint exposure)
             g_in_packet_buf[7] == GET_SUCCESS) {
 
             emit indicateCommandStatus("Success", "Exposure is set successfully");
+
             return true;
         }
     }

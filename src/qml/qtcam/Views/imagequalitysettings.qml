@@ -90,6 +90,8 @@ Item {
     property bool exposureAutoAvailable: false
     property var menuitems:[]
 
+    property int adjustedExposure
+
     // It needs some time to get exposure control correct index value recently set in image quality settings when selecting camera in UI.
     Timer {
         id: queryctrlTimer
@@ -203,8 +205,12 @@ Item {
                         opacity: enabled ? 1 : 0.1
                         width: 110
                         style:econSliderStyle
-                        onValueChanged:  {
+                        onValueChanged: {
                             if(brightValueChangeProperty) {
+                                //Sending UVC value to HID
+                                var adjustedBrightness = (brightness_Slider.value) / 200.0;
+                                root.getBrightness(adjustedBrightness)
+
                                 root.logInfo("Brightness changed to: "+ value.toString())
                                 root.changeCameraSettings(brightnessControlId,value.toString())
                             }
@@ -242,6 +248,9 @@ Item {
                         opacity: enabled ? 1 : 0.1
                         onValueChanged: {
                             if(contrastValueChangeProperty) {
+                                //Sending UVC value to HID
+                                root.getContrast(contrast_Slider.value)
+
                                 root.changeCameraSettings(contrastControlId,value.toString())
                             }
                         }
@@ -278,6 +287,10 @@ Item {
                         style:econSliderStyle
                         onValueChanged: {
                             if(saturationValueChangeProperty) {
+                                //Sending UVC value to HID
+                                var adjustedSaturation = (saturation_Slider.value) / 200.0;
+                                root.getSaturation(adjustedSaturation)
+
                                 root.logInfo("Saturation changed to: "+ value.toString())
                                 root.changeCameraSettings(saturationControlId,value.toString())
                             }
@@ -472,6 +485,9 @@ Item {
                         onValueChanged: {
                             if(wbValueChangeProperty) {
                                 if(!autoSelect_wb.checked) {
+                                    //Sending UVC value to HID
+                                    updateHIDIn50CUG(white_balance_Slider.value)
+
                                     root.logInfo("White Balance changed to: "+ value.toString())
                                     root.changeCameraSettings(whiteBalanceControlId,value.toString())
                                     root.manualWbSliderValueChanged()
@@ -512,6 +528,10 @@ Item {
                         style:econSliderStyle
                         onValueChanged: {
                             if(gammaValueChangeProperty){
+                                //Sending UVC value to HID
+                                var adjustedGamma = (gamma_Slider.value) / 10.0;
+                                root.getGamma(adjustedGamma)
+
                                 root.changeCameraSettings(gammaControlId,value.toString())
                             }
                         }
@@ -786,6 +806,10 @@ Item {
                         opacity: enabled ? 1 : 0.1
                         style:econSliderStyle
                         onValueChanged: {
+                            //Sending UVC value to HID
+                            adjustedExposure = exposure_Slider.value * 100
+                            root.getExposureUVC(adjustedExposure)
+
                             if((exposureCombo.currentText == "Manual Mode") && (root.selectedDeviceEnumValue == CommonEnums.CX3_UVC_CAM)){
                                 exposureValueAscella = exposureOrigAscella[value]
                                 exposure_value.text = exposureOrigAscella[value]
@@ -1245,8 +1269,28 @@ Item {
         {
             videoFilter.visible = status;
         }
+
+        //Added by Sushanth - Signals getting values from HID settings and set it to UVC
         onSendGainValueToUVC:{
             gain_Slider.value = gain
+        }
+        onGetBrightnessFromHID:{
+            brightness_Slider.value = brightnessFromHID
+        }
+        onGetContrastFromHID:{
+            contrast_Slider.value = contrastFromHID
+        }
+        onGetSaturationFromHID:{
+            saturation_Slider.value = saturationFromHID
+        }
+        onGetGammaFromHID:{
+            gamma_Slider.value = gammaFromHID
+        }
+        onGetColorTempFromHID:{
+            white_balance_Slider.value = colorTempFromHID
+        }
+        onGetExposureFromHID:{
+            exposure_Slider.value = exposureFromHID
         }
     }
     Connections
@@ -1413,6 +1457,32 @@ Item {
         }
         onQueryUvcControls:{
             queryctrlTimer.start()
+        }
+
+    }
+
+    function updateHIDIn50CUG(whiteBalance)
+    {
+        switch(whiteBalance)
+        {
+             case 1:
+                 root.getColorTemperature(2300)
+                 break
+             case 2:
+                 root.getColorTemperature(2800)
+                 break
+             case 3:
+                 root.getColorTemperature(3000)
+                 break
+             case 4:
+                 root.getColorTemperature(4000)
+                 break
+             case 5:
+                 root.getColorTemperature(6000)
+                 break
+             case 6:
+                 root.getColorTemperature(6500)
+                 break
         }
 
     }

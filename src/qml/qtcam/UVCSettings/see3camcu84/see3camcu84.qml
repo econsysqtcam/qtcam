@@ -377,32 +377,6 @@ Item{
               spacing:15
               ExclusiveGroup { id: roiExpogroup }
 
-              RadioButton
-              {
-                  exclusiveGroup: roiExpogroup
-                  id: autoexpDisabled
-                  text: "Disable"
-                  activeFocusOnPress: true
-                  style: econRadioButtonStyle
-                  opacity: enabled ? 1 : 0.1
-
-                  // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
-                  // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
-                  // winSize is required only for manual mode
-
-                  onClicked: {
-                      see3camcu84.setROIAutoExposure(SEE3CAM_CU84.DISABLED, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
-                      autoExpoWinSizeCombo.enabled = false
-                      autoExpoWinSizeCombo.opacity = 0.1
-
-                  }
-                  Keys.onReturnPressed: {
-                      see3camcu84.setROIAutoExposure(SEE3CAM_CU84.DISABLED, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
-                      autoExpoWinSizeCombo.enabled = false
-                      autoExpoWinSizeCombo.opacity = 0.1
-
-                  }
-              }
               RadioButton {
                   exclusiveGroup: roiExpogroup
                   id: autoexpFull
@@ -939,19 +913,11 @@ Item{
 
     function currentROIAutoExposureMode(roiMode, winSize){
         switch(roiMode){
-            case SEE3CAM_CU84.DISABLED:
-                autoexpDisabled.checked = true
-                //To disable comboBox in Disable mode
-                autoExpoWinSizeCombo.enabled = false
-                autoExpoWinSizeCombo.opacity = 0.1
-                autoExpoWinSizeCombo.currentIndex = winSize-1
-                break
             case SEE3CAM_CU84.FULL_ROI:
                 autoexpFull.checked = true
 
                 autoExpoWinSizeCombo.enabled = false
                 autoExpoWinSizeCombo.opacity = 0.1
-                autoExpoWinSizeCombo.currentIndex = winSize-1
                 break
             case SEE3CAM_CU84.MANUAL_ROI:
                 skipUpdateUIOnExpWindowSize = false
@@ -1024,14 +990,12 @@ Item{
 
             autoexpManual.enabled = true
             autoexpFull.enabled = true
-            autoexpDisabled.enabled = true
             if(autoexpManual.checked)
                 autoExpoWinSizeCombo.enabled = true
             if(autoexpFull.checked)
                 autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 1
             autoexpFull.opacity = 1
-            autoexpDisabled.opacity = 1
             exposureCompValue.enabled = true
             exposureCompValue.opacity = 1
             exposureCompSet.enabled = true
@@ -1046,8 +1010,6 @@ Item{
             autoExpoWinSizeCombo.enabled = false
             autoexpManual.opacity = 0.1
             autoexpFull.opacity = 0.1
-            autoexpDisabled.enabled = false
-            autoexpDisabled.opacity = 0.1
             exposureCompValue.enabled = false
             exposureCompValue.opacity = 0.1
             exposureCompSet.enabled = false
