@@ -1264,8 +1264,6 @@ bool See3CAM_130::getAutoFocusPosition(){
     g_out_packet_buf[1] = CAMERA_CONTROL_130; /* set camera control code */
     g_out_packet_buf[2] = GET_AF_POSITION; /* get auto focus position command */
 
-    unsigned int autoFocusPosition;
-
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == GET_FAIL) {
@@ -1273,9 +1271,8 @@ bool See3CAM_130::getAutoFocusPosition(){
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130 &&
             g_in_packet_buf[1] == GET_AF_POSITION &&
             g_in_packet_buf[6] == GET_SUCCESS) {
-            autoFocusPosition = (g_in_packet_buf[2] << 8) | (g_in_packet_buf[3] << 0);
 
-            emit autoFocusPositionReceived(autoFocusPosition);
+            emit autoFocusPositionReceived(g_in_packet_buf[2]);
             return true;
         }
     }
@@ -1757,6 +1754,47 @@ bool See3CAM_130::setToDefault(){
     }
     return false;
 }
+
+
+
+/**
+ * @brief See3CAM_130::saveConfiguration
+ * @return true/false
+ */
+bool See3CAM_130::saveConfiguration()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = SAVE_CONFIGURATION; /* camera id */
+    g_out_packet_buf[2] = SAVE;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH))
+    {
+        if (g_in_packet_buf[6] == SET_FAIL)
+        {
+            emit indicateCommandStatus("Failure", "Saving Configurations Failed");
+            return false;
+        }
+        else if(g_in_packet_buf[0] == SAVE_CONFIGURATION  &&
+            g_in_packet_buf[1] == SAVE &&
+            g_in_packet_buf[6] == SET_SUCCESS){
+            emit indicateCommandStatus("Success", "Configurations saved successfully");
+            return true;
+        }
+    }
+    return false;
+}
+
+
 
 /**
  * @brief See3CAM_130::initializeBuffers - Initialize input and output buffers

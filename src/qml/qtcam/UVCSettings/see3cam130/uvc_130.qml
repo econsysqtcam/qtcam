@@ -128,6 +128,8 @@ Item {
             seecam130.getQFactor()
             seecam130.getExposureCompensation()            
             seecam130.getFrameRateCtrlValue()
+            seecam130.getAutoExposure()
+            seecam130.getAutoFocusPosition()
             stop()
         }
     }
@@ -1472,7 +1474,7 @@ Item {
             Text
             {
                 id: blueGainTitle
-                text: "--- Red Gain ---"
+                text: "--- Blue Gain ---"
                 font.pixelSize: 14
                 font.family: "Ubuntu"
                 color: "#ffffff"
@@ -1520,7 +1522,7 @@ Item {
             Text
             {
                 id: greenGainTitle
-                text: "--- Red Gain ---"
+                text: "--- Green Gain ---"
                 font.pixelSize: 14
                 font.family: "Ubuntu"
                 color: "#ffffff"
@@ -1626,6 +1628,25 @@ Item {
                 }
             }
             Row{
+                Layout.alignment: Qt.AlignCenter
+                Button {
+                    id: saveConfig
+                    opacity: 1
+                    activeFocusOnPress : true
+                    text: "Save Configuration"
+                    style: econButtonStyle
+                    tooltip: "This feature will save the current configurations and are retained after the following power cycles."
+                    onClicked:{
+                        setButtonClicked = true
+                        saveConfigurations()
+                    }
+                    Keys.onReturnPressed: {
+                        setButtonClicked = true
+                        saveConfigurations()
+                    }
+                }
+            }
+            Row{
                 Button {
                     id: dummy
                     opacity: 0
@@ -1660,15 +1681,6 @@ Item {
                 afManual.checked = true
                 afWindowSizeCombo.currentIndex = winSize-1
             }
-//            else if(roiMode == See3Cam130.AFDisabled){
-//                rectEnable.enabled = false
-//                rectDisable.enabled = false
-//                rectEnable.opacity = 0.1
-//                rectDisable.opacity = 0.1
-//                afCentered.enabled = false
-//                afManual.enabled = false
-//                afWindowSizeCombo.enabled = false
-//            }
         }
         onRoiAutoExpModeValueReceived:{
             currentROIAutoExposureMode(roiMode, winSize)
@@ -2049,6 +2061,11 @@ Item {
         }
     }
 
+    function saveConfigurations()
+    {
+        seecam130.saveConfiguration()
+    }
+
     function setiHDRValues()
     {
         if(iHDRCombo.currentIndex == 0)
@@ -2130,7 +2147,7 @@ Item {
         seecam130.getQFactor()
         seecam130.getStreamMode()
         seecam130.getAFRectMode()
-        seecam130.getOrientation()
+        seecam130.getFlipMode()
         seecam130.getAutoWhiteBalance()
         seecam130.getAutoExposure()
         seecam130.getFlashMode()

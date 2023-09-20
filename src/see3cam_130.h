@@ -86,6 +86,8 @@
 #define GET_GREEN_GAIN                  0x2D
 #define SET_GREEN_GAIN                  0x2E
 
+#define SAVE_CONFIGURATION               0x42
+#define SAVE                             0x01
 
 //Face Detection
 #define ENABLE_FACE_RECT                0x01
@@ -362,6 +364,8 @@ public slots:
     bool enableDisableFaceRectangle(bool enableFaceRect);
 
     bool setToDefault();
+
+    bool saveConfiguration();
 
 };
 #endif // SEE3CAM_130_H

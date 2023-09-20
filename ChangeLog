@@ -1,8 +1,12 @@
+Qtcam Application - 25.0.22
+---------------------------
+*Added new HID controls for See3CAM130.
+*Removed Disable button in auto exposure ROI in See3CAM_CU84.
+*Fixed issue in auto exposure ROI mode while setting default values in See3CAM_CU84.
+
 Qtcam Application - 25.0.21
 ---------------------------
 *Connecting UVC & HID values for See3CAM_50CUG.
-*Added new HID controls for See3CAM130.
-*Fixed set default issue & removed disable button in auto exposure ROI.
 
 Qtcam Application - 25.0.20
 ---------------------------
