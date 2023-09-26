@@ -675,7 +675,6 @@ Rectangle {
             To Set exposure compensation when cross resolution still capture
         */
         onSetExpAfterCrossStill:{
-            console.log("qtcam.qml called")
             setExpCompensation();
         }
 
@@ -2126,4 +2125,3 @@ Rectangle {
         }
     }
 }
-
