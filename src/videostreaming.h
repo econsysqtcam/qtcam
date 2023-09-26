@@ -824,6 +824,14 @@ signals:
 
     /*
      * Added by Sushanth S
+     * To set Gain & target brightness while switching resolution during cross resolution still capture
+     */
+    void setBrightness();
+
+    void setGain();
+
+    /*
+     * Added by Sushanth S
      * To disable videoRecording..which enables after capturing still
      */
     void disableVideoRecord();

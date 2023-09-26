@@ -74,6 +74,9 @@ Rectangle {
     //signal to set exposure compensation while still capture
     signal setExpCompensation();
 
+    signal setGainInStream();
+    signal setBrightnessInStream();
+
     //signal close IR window after unplugging the device
     signal windowCloseAfterUnplug()
 
@@ -672,7 +675,16 @@ Rectangle {
             To Set exposure compensation when cross resolution still capture
         */
         onSetExpAfterCrossStill:{
+            console.log("qtcam.qml called")
             setExpCompensation();
+        }
+
+        onSetBrightness:{
+            setBrightnessInStream()
+        }
+
+        onSetGain:{
+            setGainInStream()
         }
 
         /*

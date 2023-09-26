@@ -3875,6 +3875,13 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
              //to set exposure compensation after capturing still in cross resolution.
              emit setExpAfterCrossStill();
         }
+
+        //To set Gain & Target Brightess in captured still
+        if(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1)
+        {
+            emit setBrightness();
+            emit setGain();
+        }
     }
 }
 
@@ -5185,6 +5192,12 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
         {
              //to set exposure compensation after capturing still in cross resolution.
              emit setExpAfterCrossStill();
+        }
+
+        if(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1)
+        {
+            emit setBrightness();
+            emit setGain();
         }
     }
 }

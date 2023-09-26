@@ -97,6 +97,7 @@ Item {
             see3camcu135mH01r1.getAutoExposureLowerLimit()
             see3camcu135mH01r1.getAutoExposureUpperLimit()
             see3camcu135mH01r1.getGainLimit()
+            see3camcu135mH01r1.getTargetBrightness()
            stop()
         }
     }
@@ -137,13 +138,18 @@ Item {
         }
         onVideoColorSpaceChanged:{
             getCameraSettingsTimer.start()
-            see3camcu135mH01r1.getTargetBrightness()
         }
         onSetExpCompensation:{
             see3camcu135mH01r1.setAutoExposureLowerLimit(lowerLimitTextField.text)
             see3camcu135mH01r1.setAutoExposureUpperLimit(upperLimitTextField.text)
+        }
+        onSetGainInStream:{
             see3camcu135mH01r1.setGainLimit(gainLowerLimitSlider.value, gainUpperLimitSlider.value)
         }
+        onSetBrightnessInStream:{
+            see3camcu135mH01r1.setTargetBrightness(targetBrightness.value)
+        }
+
         onSendGainValueToHID:{
            gainSlider.value = gainHid
         }
@@ -1727,6 +1733,10 @@ Item {
 
     function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
+
+            //To enable exposure compensation when device is in manual exposure mode in UVC
+            root.enableDisableExposureCompensation(autoExposureSelect)
+
             //Enable Auto exposure modes
             continousExposure.enabled  = true
             continousExposure.opacity  = 1
@@ -1782,6 +1792,10 @@ Item {
             autoexpManual.opacity = 1
             autoexpFull.opacity = 1
         }else{
+
+            //To disable exposure compensation when device is in manual exposure mode in UVC
+            root.enableDisableExposureCompensation(autoExposureSelect)
+
             //Disable Auto exposure modes in manual mode
             continousExposure.enabled = false
             continousExposure.opacity = 0.1
