@@ -205,12 +205,6 @@ public:
     };
     Q_ENUMS(FLICKER_MODE)
 
-    enum camAFRectMode {
-        AFRectEnable = 0x01,
-        AFRectDisable = 0x00
-    };
-    Q_ENUMS(camAFRectMode)
-
     enum AFRectangleStatus{
         AF_RECT_DISABLE = 0x00,
         AF_RECT_ENABLE  = 0x01
@@ -264,7 +258,6 @@ signals:
      void burstLengthValueReceived(uint burstLength);
      void hDRModeValueReceived(uint hdrMode, uint hdrValue);
      void qFactorValueReceived(uint qFactor);
-     void afRectModeValueReceived(uint afRectMode);
 
      void streamModeValueReceived(uint streamMode);
      void flipModeValue(uint flipMode, uint flipEnableDisableMode);
@@ -324,8 +317,6 @@ public slots:
 
     bool getStreamMode();
     bool setStreamMode(STREAM_MODE streamMode);
-
-    bool getAFRectMode();
 
     bool setFlipHorzMode(bool horizModeSel);
     bool setFlipVertiMode(bool vertiModeSel);

@@ -36,6 +36,7 @@ import cameraenum 1.0
 import econ.camera.uvcsettings 1.0
 import econ.camera.qimagerenderer 1.0
 import econ.camera.see3camcu83 1.0
+import econ.camera.see3camcu200 1.0
 
 Rectangle {
     id: root
@@ -285,6 +286,7 @@ Rectangle {
     signal getGammaFromUVC(var gammaFromUVC);
     signal getColorTempFromUVC(int colorTempFromUVC);
     signal getExposureFromUVC(int exposureFromUVC);
+    signal exposureComponentsFromUVC(int seconds, int milliSeconds, int microSeconds);
 
     //Added by Sushanth 15th May 2023
     signal sendGainValueToUVC(int gain);
@@ -295,7 +297,7 @@ Rectangle {
     signal getGammaFromHID(int gammaFromHID);
     signal getColorTempFromHID(int colorTempFromHID);
     signal getExposureFromHID(int exposureFromHID);
-
+    signal getExposureStatusFromHID(bool isAutoEnable, int exposure)
 
     width:Screen.width
     height:Screen.height
@@ -1580,6 +1582,9 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU84) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu84/see3camcu84.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200) {
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu200/see3camcu200.qml").createObject(root)
+        }
         else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
@@ -1649,6 +1654,7 @@ Rectangle {
         case CommonEnums.ECAM_512USB:    //Added by Sushanth.S
         case CommonEnums.SEE3CAM_50CUG:  //Added by Sushanth.S
         case CommonEnums.SEE3CAM_CU84:   //Added by Sushanth.S
+        case CommonEnums.SEE3CAM_CU200:  //Added By Sushanth.S
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
             break;
@@ -1880,8 +1886,10 @@ Rectangle {
         getExposureFromHID(exposure)
     }
 
-
-
+    function sendExposureStatusToUVC(isAutoEnable, exposure)
+    {
+        getExposureStatusFromHID(isAutoEnable, exposure)
+    }
 
     //Functions to get UVC values and set it to HID
     function getGainValueFromUVC(gainValue)
@@ -1917,6 +1925,11 @@ Rectangle {
     function getExposureUVC(exposure)
     {
         getExposureFromUVC(exposure)
+    }
+
+    function getExposureComponentsUVC(seconds, milliSeconds, microSeconds)
+    {
+        exposureComponentsFromUVC(seconds, milliSeconds, microSeconds)
     }
 
     //Added by Sushanth - To clear buffer when device is in trigger mode

@@ -859,41 +859,6 @@ bool See3CAM_130::getStreamMode()
 
 
 /**
- * @brief See3CAM_130::getAFRectMode - get AF rectangle mode[ disable/enable ] from camera
- * return true - success /false - failure
- */
-bool See3CAM_130::getAFRectMode()
-{
-    // hid validation
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    //Initialize buffers
-    initializeBuffers();
-
-    // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_130; /* camera id */
-    g_out_packet_buf[2] = GET_AF_RECT_MODE; /* get af rect mode command  */
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6] == GET_FAIL) {
-            return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130 &&
-            g_in_packet_buf[1] == GET_AF_RECT_MODE &&
-            g_in_packet_buf[6] == GET_SUCCESS) {
-
-            emit afRectModeValueReceived(g_in_packet_buf[2]);
-
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
  * @brief See3CAM_130::setFlipHorzMode - Setting horizontal flip mode
  * @param horizModeSel - mode selected / unselected in UI
  * @return true/false

@@ -73,7 +73,8 @@ SOURCES += main.cpp \
     see3cam_cu210.cpp \
     ecam_512usb.cpp \
     see3cam50cug.cpp \
-    see3camcu84.cpp
+    see3camcu84.cpp \
+    see3cam_cu200.cpp
 
 # Installation path
 # target.path =
@@ -147,7 +148,8 @@ HEADERS += \
     see3cam_cu210.h \
     ecam_512usb.h \
     see3cam50cug.h \
-    see3camcu84.h
+    see3camcu84.h \
+    see3cam_cu200.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
@@ -236,4 +238,5 @@ DISTFILES += \
     qml/qtcam/UVCSettings/See3CamCu210/see3camcu210.qml \
     qml/qtcam/UVCSettings/see3cam50cug/see3cam50cug.qml \
     qml/qtcam/UVCSettings/see3camcu84/see3camcu84.qml \
+    qml/qtcam/UVCSettings/see3camcu200/see3camcu200.qml \
     qml/qtcam/UVCSettings/barcode/barcode_camera.qml

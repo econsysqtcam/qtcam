@@ -195,8 +195,8 @@ public slots:
     bool setExposureMode(exposureModes exposureMode);
     bool getExposureMode();
 
-    bool setAutoExposureLowerLimit(uint lowerLimit);
     bool getAutoExposureLowerLimit();
+    bool setAutoExposureLowerLimit(uint lowerLimit);
 
     bool setAutoExposureUpperLimit(uint upperLimit);
     bool getAutoExposureUpperLimit();

@@ -872,49 +872,6 @@ Item {
             }
 
 
-            Text
-            {
-                id: afRectStatusText
-                text: "--- Enable/Disable AF Rectangle ---"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                Layout.alignment: Qt.AlignCenter
-                opacity: 0.50196078431373
-            }
-
-            Row{
-                spacing:75
-                ExclusiveGroup { id: afRectStatusGroup }
-                RadioButton {
-                    exclusiveGroup: afRectStatusGroup
-                    id: rectStatusEnable
-                    text: "Enable"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    onClicked:{
-                        seecam130.getAFRectMode(true)
-                    }
-                    Keys.onReturnPressed: {
-                        seecam130.getAFRectMode(true)
-                    }
-                }
-                RadioButton {
-                    exclusiveGroup: afRectStatusGroup
-                    id:rectStatusDisable
-                    text: "Disable"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    onClicked: {
-                        seecam130.getAFRectMode(false)
-                    }
-                    Keys.onReturnPressed: {
-                        seecam130.getAFRectMode(false)
-                    }
-                }
-            }
-
             Text {
                 id: flipText
                 text: "--- Flip Control ---"
@@ -955,7 +912,7 @@ Item {
 
             Text {
                 id: autoWhiteBalanceTitle
-                text: "--- Auto White Balance ---"
+                text: "--- Current Auto White Balance ---"
                 font.pixelSize: 14
                 font.family: "Ubuntu"
                 color: "#ffffff"
@@ -994,7 +951,7 @@ Item {
                         id: getAutoWBBtn
                         activeFocusOnPress : true
                         text: "Get"
-                        tooltip: "You can get the Auto White Balance value by clicking the Get button"
+                        tooltip: "You can get the Current Auto White Balance value by clicking the Get button"
                         style: econButtonStyle
                         enabled: true
                         opacity: 1
@@ -1019,7 +976,7 @@ Item {
 
             Text {
                 id: autoExposureTitle
-                text: "--- Auto Exposure ---"
+                text: "--- Current Auto Exposure ---"
                 font.pixelSize: 14
                 font.family: "Ubuntu"
                 color: "#ffffff"
@@ -1057,7 +1014,7 @@ Item {
                         id: getAutoExpBtn
                         activeFocusOnPress : true
                         text: "Get"
-                        tooltip: "You can get the Auto White Balance value by clicking the Get button"
+                        tooltip: "You can get the Current Auto Exposure value by clicking the Get button"
                         style: econButtonStyle
                         enabled: true
                         opacity: 1
@@ -1224,7 +1181,7 @@ Item {
 
             Text {
                 id: autoFocusPositionTitle
-                text: "--- Auto Focus Position ---"
+                text: "--- Current Auto Focus Position ---"
                 font.pixelSize: 14
                 font.family: "Ubuntu"
                 color: "#ffffff"
@@ -1714,9 +1671,7 @@ Item {
               qFactorSlider.value = qFactor
               skipUpdateUIQFactor = true
         }
-        onAfRectModeValueReceived:{
-            currentAutoFocusValue(afRectMode)
-        }
+
         onStreamModeValueReceived:{
             currentStreamMode(streamMode)
         }
@@ -1995,17 +1950,6 @@ Item {
         messageDialog.open()
     }
 
-
-    function currentAutoFocusValue(afRectMode)
-    {
-        if(afRectMode == See3Cam130.AFRectEnable){
-            rectEnable.checked = true
-
-        }else if(afRectMode == See3Cam130.AFRectDisable){
-            rectDisable.checked = true
-        }
-    }
-
     function currentStreamMode(streamMode)
     {
         if(streamMode == See3Cam130.STREAM_MASTER){
@@ -2146,7 +2090,6 @@ Item {
         seecam130.getiHDRMode()
         seecam130.getQFactor()
         seecam130.getStreamMode()
-        seecam130.getAFRectMode()
         seecam130.getFlipMode()
         seecam130.getAutoWhiteBalance()
         seecam130.getAutoExposure()
@@ -2300,6 +2243,23 @@ Item {
 
     function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
+
+            //Disabling RGB Gain in Auto exposure mode
+            redGainSlider.enabled    = false
+            redGainSlider.opacity    = 0.1
+            redGainTextField.enabled = false
+            redGainTextField.opacity = 0.1
+
+            blueGainSlider.enabled    = false
+            blueGainSlider.opacity    = 0.1
+            blueGainTextField.enabled = false
+            blueGainTextField.opacity = 0.1
+
+            greenGainSlider.enabled    = false
+            greenGainSlider.opacity    = 0.1
+            greenGainTextField.enabled = false
+            greenGainTextField.opacity = 0.1
+
             autoexpManual.enabled = true
             autoexpFull.enabled = true
             if(autoexpManual.checked)
@@ -2314,6 +2274,23 @@ Item {
             exposureCompSet.opacity = 1
             exposureCompText.opacity = 1
         }else{
+
+            //Enabling RGB Gain in manual exposure mode
+            redGainSlider.enabled    = true
+            redGainSlider.opacity    = 1
+            redGainTextField.enabled = true
+            redGainTextField.opacity = 1
+
+            blueGainSlider.enabled    = true
+            blueGainSlider.opacity    = 1
+            blueGainTextField.enabled = true
+            blueGainTextField.opacity = 1
+
+            greenGainSlider.enabled    = true
+            greenGainSlider.opacity    = 1
+            greenGainTextField.enabled = true
+            greenGainTextField.opacity = 1
+
             autoexpManual.enabled = false
             autoexpFull.enabled = false
             autoExpoWinSizeCombo.enabled = false
@@ -2340,7 +2317,6 @@ Item {
         seecam130.getBurstLength()
         seecam130.getiHDRMode()
         seecam130.getStreamMode()
-        seecam130.getAFRectMode()
         seecam130.getFlipMode()
         seecam130.getAutoWhiteBalance()
         seecam130.getAutoExposure()

@@ -1140,7 +1140,7 @@ bool SEE3CAM_50CUG::saveConfiguration()
 
 
 /*
- * @brief SEE3CAM_50CUGM::initializeBuffers - Initialize input and output buffers
+ * @brief SEE3CAM_50CUG::initializeBuffers - Initialize input and output buffers
  */
 void SEE3CAM_50CUG::initializeBuffers(){
     //Initialize input and output buffers
