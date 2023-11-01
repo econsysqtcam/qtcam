@@ -85,7 +85,7 @@ static pthread_t my_read_thread;
 static pa_stream *recordstream = NULL;
 
 bool AudioInput::is20_04 = false;
-
+bool AudioInput::is22_04 = false;
 
 AudioInfo::AudioInfo(const QAudioFormat &format, QObject *parent)
     :   QIODevice(parent)
@@ -377,7 +377,7 @@ void AudioInput::pa_sourcelist_cb(pa_context *c, const pa_source_info *l, int eo
     int state = 0;
     int pa_ready = 0;
 
-    if(is20_04)
+    if(is20_04 || is22_04)
     {
         process.start("bash", QStringList() << "-c" << "sudo pulseaudio -D");
         process.waitForFinished();
@@ -723,7 +723,8 @@ void AudioInput::recordAudio(){
     int r;
     int pa_ready = 0;
 
-    if(audioInput->is20_04)
+    //To start pulse audio server for ubuntu 20.04 & 22.04
+    if(audioInput->is20_04 || audioInput->is22_04)
     {
         audioInput->process.start("bash", QStringList() << "-c" << "sudo pulseaudio -D");
         audioInput->process.waitForFinished();

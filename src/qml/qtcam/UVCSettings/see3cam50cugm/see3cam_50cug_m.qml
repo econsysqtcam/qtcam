@@ -86,16 +86,6 @@ Item{
         }
     }
 
-
-    // Used when selecting auto exposure in image Quality settings menu
-    Timer {
-        id: getAutoExpsoureControlValues
-        interval: 1000
-        onTriggered: {
-            stop()
-        }
-    }
-
     Connections{
         target: root
 
@@ -2043,6 +2033,7 @@ Item{
                                 opacity: (enableUSExp.enabled && enableUSExp.checked) ? 1 : 0.1
                                 onValueChanged:  {
                                     ultraShortExpTextField.text = ultraShortExpSlider.value
+
                                     if(skipUpdateUltraShortExposure){
                                         see3cam50cugm.setUltraShortExposure(SEE3CAM_50CUGM.EXP_ENABLE, ultraShortExpSlider.value)
                                     }
@@ -2576,12 +2567,18 @@ Item{
         onUltraShortExposureModeReceived:{
             currentUltraShortExposureReceived(mode)
         }
-        onUltraShortExposureValuesReceived:{
+
+        onCurrentUltraShortExpValueReceived:{
             skipUpdateUltraShortExposure     = false
             ultraShortExpSlider.value        = current
-            ultraShortExpSlider.minimumValue = min
-            ultraShortExpSlider.maximumValue = max
             skipUpdateUltraShortExposure     = true
+        }
+
+        onMinUltraShortExposureReceived:{
+            ultraShortExpSlider.minimumValue = min
+        }
+        onMaxUltraShortExposureReceived:{
+            ultraShortExpSlider.maximumValue = max
         }
 
         onCurrentTriggerValueReceived:{
@@ -3600,7 +3597,6 @@ Item{
             milliSecExpStat.opacity = 0.1
             microSecExpStat.opacity = 0.1
         }
-        getAutoExpsoureControlValues.start()
     }
 
     function sendConvertedExpToUVC()

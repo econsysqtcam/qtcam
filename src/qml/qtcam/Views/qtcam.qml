@@ -297,7 +297,7 @@ Rectangle {
     signal getGammaFromHID(int gammaFromHID);
     signal getColorTempFromHID(int colorTempFromHID);
     signal getExposureFromHID(int exposureFromHID);
-    signal getExposureStatusFromHID(bool isAutoEnable, int exposure)
+    signal getExposureStatusFromHID(bool isAutoEnable, int exposure);
 
     width:Screen.width
     height:Screen.height
@@ -869,8 +869,9 @@ Rectangle {
 
                         // Added by Sankari: 12 Feb 2018 : stop Getting key from camera.
                         keyEvent.stopGetKeyFromCamera()
-                        //			 if(!is20_04detcted)
-                        	enumerateAudioSettings();
+
+                        //To Enumerate Audio devices
+                        enumerateAudioSettings();
 
                         cameraSelected()
                         //Added by Dhurka - 20th Oct 2016
@@ -1702,14 +1703,13 @@ Rectangle {
         {
             videoSettingsRootObject = videoViewComponent.createObject(root,{"imageFormatY" : imageFormatYValue,"stillPropertyY" : stillPropertyYValue});
         }
-//        if(!is20_04detcted)
+
+        var AudioViewComponent = Qt.createComponent("audiocapturesettings.qml")
+        if (AudioViewComponent.status === Component.Ready)
         {
-            var AudioViewComponent = Qt.createComponent("audiocapturesettings.qml")
-            if (AudioViewComponent.status === Component.Ready)
-            {
-                audioSettingsRootObject = AudioViewComponent.createObject(root,{"imageFormatY" : imageFormatYValue,"stillPropertyY" : stillPropertyYValue});
-            }
+            audioSettingsRootObject = AudioViewComponent.createObject(root,{"imageFormatY" : imageFormatYValue,"stillPropertyY" : stillPropertyYValue});
         }
+
         //Capture and Video recording
         var captureVideoRecordComponent = Qt.createComponent("captureandvideorecord.qml")
         if (captureVideoRecordComponent.status === Component.Ready)

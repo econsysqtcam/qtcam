@@ -1377,7 +1377,10 @@ bool SEE3CAM_50CUGM::getUltraShortExposure(){
             g_in_packet_buf[6] == SET_SUCCESS) {
 
             emit ultraShortExposureModeReceived(g_in_packet_buf[2]);
-            emit ultraShortExposureValuesReceived(g_in_packet_buf[3], g_in_packet_buf[4], g_in_packet_buf[5]);
+
+            emit minUltraShortExposureReceived(g_in_packet_buf[4]);
+            emit maxUltraShortExposureReceived(g_in_packet_buf[5]);
+            emit currentUltraShortExpValueReceived(g_in_packet_buf[3]);
 
             return true;
         }

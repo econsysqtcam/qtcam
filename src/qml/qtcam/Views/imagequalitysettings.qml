@@ -1300,9 +1300,6 @@ Item {
         onGetColorTempFromHID:{
             white_balance_Slider.value = colorTempFromHID
         }
-        onGetExposureFromHID:{
-            exposure_Slider.value = exposureFromHID
-        }
         onGetExposureStatusFromHID:{
             if(isAutoEnable)
             {
@@ -1314,7 +1311,11 @@ Item {
                 exposure_Slider.value = exposure
             }
         }
+        onGetExposureFromHID:{
+            exposure_Slider.value = exposureFromHID
+        }
     }
+
     Connections
     {
         target: root

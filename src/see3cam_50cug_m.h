@@ -235,7 +235,9 @@ public:
         void frameSet4Received(uint gainVal4, uint sec4, uint milliSec4, uint microSec4);
 
         void ultraShortExposureModeReceived(uint mode);
-        void ultraShortExposureValuesReceived(uint current, uint min, uint max);
+        void minUltraShortExposureReceived(uint min);
+        void maxUltraShortExposureReceived(uint max);
+        void currentUltraShortExpValueReceived(uint current);
 
         void currentTriggerValueReceived(uint triggerValue);
 

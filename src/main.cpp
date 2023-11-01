@@ -102,12 +102,20 @@ int main(int argc, char *argv[])
     process.waitForFinished();
     char *os_name = strdup(process.readAllStandardOutput());
     bool is20_04detected =false;
+    bool is22_04detected = false;
 
     if(strstr(os_name,"20.04"))
-         is20_04detected = true;
+    {
+        is20_04detected = true;
+    }
+    else if(strstr(os_name,"22.04"))
+    {
+        is22_04detected = true;
+    }
 
     QApplication app(argc, argv);
-
+    app.setOrganizationName("econsystems");
+    app.setOrganizationDomain("econsystems.com");
 
     qmlRegisterType<Cameraproperty>("econ.camera.property",1,0,"Camproperty");
     qmlRegisterType<Videostreaming>("econ.camera.stream", 1, 0, "Videostreaming");
@@ -221,9 +229,16 @@ int main(int argc, char *argv[])
         viewer.rootContext()->setContextProperty("is20_04detcted", QVariant(true));
         audio.is20_04 = true;
     }
+    else if(is22_04detected)
+    {
+        viewer.rootContext()->setContextProperty("is22_04detcted", QVariant(true));
+        audio.is22_04 = true;
+    }
     else {
          viewer.rootContext()->setContextProperty("is20_04detcted", QVariant(false));
+         viewer.rootContext()->setContextProperty("is22_04detcted", QVariant(false));
          audio.is20_04 = false;
+         audio.is22_04 = false;
     }
 
     viewer.rootContext()->setContextProperty("resolutionModel", &vs.resolution);
@@ -236,7 +251,7 @@ int main(int argc, char *argv[])
     viewer.rootContext()->setContextProperty("audioChannelCountModel", &audio.audioChannelCountModel);
 
     //Creating directory in Home for saving videos & pictures instead of saving it in default root folder
-    if(is20_04detected)
+    if(is20_04detected || is22_04detected)
     {
         // Create the folder in the home directory
         QString picturesPath = QDir::homePath() + "/Pictures";

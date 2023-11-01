@@ -1,5 +1,6 @@
-Qtcam Application - 25.0.23
+Qtcam Application - 26.0.0
 ---------------------------
+*Added support for Ubuntu 22.04.
 *Added new HID controls for See3CAM_50CUGM second phase.
 *UI changes in See3CAM_130.
 

@@ -149,6 +149,7 @@ public:
 
    Alsa alsa;
    static bool is20_04;
+   static bool is22_04;
 
 private:
     static void finish(pa_context *pa_ctx, pa_mainloop *pa_ml);

@@ -524,8 +524,8 @@ private slots:
 
 public slots:
     void openMessageDialogBox();
-     void switchToStillPreviewSettings(bool stillSettings);
-     void retrieveFrameFromStoreCam();
+    void switchToStillPreviewSettings(bool stillSettings);
+    void retrieveFrameFromStoreCam();
     void sync();
     void cleanup();
     void setPreviewBgrndArea(int width, int height, bool sidebarAvailable);
@@ -828,6 +828,10 @@ signals:
      */
     void setBrightness();
 
+    /*
+     * Added by Sushanth S
+     * To set Brightness while switching resolution during cross resolution still capture
+     */
     void setGain();
 
     /*

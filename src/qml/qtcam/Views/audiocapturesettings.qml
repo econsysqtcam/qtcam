@@ -414,7 +414,7 @@ Item {
             cameraSelect = true
         }
 
-	onCameraDeviceUnplugged:
+        onCameraDeviceUnplugged:
         {
             audioDevicesList.currentIndex = 0
             audio_Capture_property_Child.visible = false
