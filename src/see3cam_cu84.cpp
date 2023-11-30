@@ -18,7 +18,7 @@
  * along with Qtcam. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "see3camcu84.h"
+#include "see3cam_cu84.h"
 
 SEE3CAM_CU84::SEE3CAM_CU84()
 {

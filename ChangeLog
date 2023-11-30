@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.1
+---------------------------
+*Added new HID controls (Stream & Flip Modes) for See3CAM_CU512_M.
+
 Qtcam Application - 26.0.0
 ---------------------------
 *Added support for Ubuntu 22.04.

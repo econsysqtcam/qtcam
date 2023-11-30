@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Qtcam. If not, see <http://www.gnu.org/licenses/>.
 */
-#include "ecam_512usb.h"
+#include "ecam512_usb.h"
 
 ECAM_512USB::ECAM_512USB()
 {

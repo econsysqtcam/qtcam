@@ -86,15 +86,15 @@ SOURCES += main.cpp \
     see3cam_cu136m.cpp \
     see3cam_50cug_m.cpp \
     see3cam_cu135m_h01r1.cpp \
-    see3camcu512m.cpp \
-    see3cam16cugm.cpp \
     barcode_camera.cpp \
     renderer.cpp \
     see3cam_cu210.cpp \
-    ecam_512usb.cpp \
-    see3cam50cug.cpp \
-    see3camcu84.cpp \
-    see3cam_cu200.cpp
+    see3cam_cu200.cpp \
+    ecam512_usb.cpp \
+    see3cam_16cug_m.cpp \
+    see3cam_50cug.cpp \
+    see3cam_cu512_m.cpp \
+    see3cam_cu84.cpp
 
 # Installation path
 # target.path =
@@ -161,15 +161,15 @@ HEADERS += \
     see3cam_cu136m.h \
     see3cam_cu135m_h01r1.h \
     see3cam_50cug_m.h \
-    see3camcu512m.h \
-    see3cam16cugm.h \
     barcode_camera.h \
     renderer.h \
     see3cam_cu210.h \
-    ecam_512usb.h \
-    see3cam50cug.h \
-    see3camcu84.h \
-    see3cam_cu200.h
+    see3cam_cu200.h \
+    ecam512_usb.h \
+    see3cam_16cug_m.h \
+    see3cam_50cug.h \
+    see3cam_cu84.h \
+    see3cam_cu512_m.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \

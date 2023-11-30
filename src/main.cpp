@@ -77,13 +77,13 @@
 #include "see3cam_27cug.h"
 #include "renderer.h"
 #include "see3cam_cu83.h"
-#include "see3camcu512m.h"
-#include "see3cam16cugm.h"
+#include "see3cam_cu512_m.h"
+#include "see3cam_16cug_m.h"
 #include "see3cam_cu210.h"
-#include "ecam_512usb.h"
+#include "ecam512_usb.h"
 #include "see3cam_50cug_m.h"
-#include "see3cam50cug.h"
-#include "see3camcu84.h"
+#include "see3cam_50cug.h"
+#include "see3cam_cu84.h"
 #include "see3cam_cu200.h"
 
 

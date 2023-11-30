@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Qtcam. If not, see <http://www.gnu.org/licenses/>.
  */
-#include "see3cam50cug.h"
+#include "see3cam_50cug.h"
 #include <cmath>
 #include <iostream>
 #include <iomanip> // Include the header for std::setprecision
