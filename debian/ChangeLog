@@ -1,0 +1,135 @@
+qtcam (26.0.1-0ubuntu1) bionic; urgency=medium
+ *Added new HID controls (Stream & Flip Modes) for See3CAM_CU512_M.
+ *Added Support for Ubuntu 22.04. Changed .pro file
+ *Added new HID controls for See3CAM_50CUGM second phase
+ *Added support for See3CAM130
+ *Connecting UVC-HID for See3CAM_50CUG.
+ *Added Support for See3CAM_50CUG.
+ *Added support for See3CAM_CU84 & See3CAM_CU135 bug fixed.
+ *Fixed ROI issue in See3CAM_CU135 and low brightness issue in preview for See3CAM_16CUGM.
+ *See3CAM_CU135M HID modifications, See3CAM_16CUG Bug fixed & Handled extra data in 4k for See3CAM_CU83.
+ *Made UVC controls compatible for all Ubuntu versions.
+ *Added support for See3CAM_CU210 & e-CAM512_USB.
+ *Added support for See3cam16cug, See3CAM_512M & bug fixed for See3CAM_CU135M.
+ *IR window Checkbox added for See3CAM_CU83.
+ *iHDR modification for See3CAM_130 & See3CAM_CU135.
+ *Modification for See3CAM_50CUG, See3CAM_135M and Bug fixed for See3CAM_135M, See3CAMCU83
+ *Added support for See3CAM_CU135M & Bug fixed for See3CAM_CU83
+ *Bug fix & modification of UI for See3CAM_CU83
+ *Added Changes in UI for See3CAM_50CUG and Bug fix for SeeCAM_CU83 & See3CAM_27CUG
+ *Added HID setting for See3CAM_50CUG_M & See3CAM_27CUG Bug fix
+ *Clear buffer when device is in trigger mode.
+ *set exposure compensation while resolution switching during cross resolution still capture.
+ *Added stillTimeOutTimer.
+ *Bug fix for See3CAM_27CUG
+ *Added support for See3CAM_CU83
+ *Bug fixed for See3CAM_27CUG
+ *Added support for See3CAM_27CUG
+ *Added support for NileCam20_USB.
+ *Added limitations by checking if it's PIN1 instead of checking for H264 format for e-cam83USB.
+ *Added support for Barcode Camera.
+ *Added pop up of warning message when trying to change fps in H264 pin during dual stream for e-cam83USB.
+ *Integrated See3CAM_CU135M_H03R1.
+ *Bug fix for e-cam83USB.
+ *Added necessary changes for e-CAM83USB.
+ *Disabled still capture in H264 pin for e-cam83USB.
+ *Added support for See3CAM_135M.
+ *Bug fix for See3CAM_1332.
+ *Added support for See3CAM_CU1330M.
+ *Added support for e-cam83USB.
+ *Added FlashState control for See3CAM_30.
+ *Bug fix for See3CAM_1332.
+ *Added support for See3CAM_1332.
+ *Added support for See3CAM_CU27.
+ *Added support for Night HDR mode for See3CAM_CU81.
+ *Fixed for application crash when changed from UYVY to MJPEG format in See3CAM_160 in 16.04(32 bit).
+ *Fixed for application crash when See3CAM_CU81 is selected in 16.04(32 bit).
+ *Fixed for AEmetermode not setting to default value when manual mode is selected for See3cam_160.
+ *Bug fixes for ecam51b_USB.
+ *Fixed Images not saved in given location pop up issue while streaming.
+ *Added 500ms delay for getAFStatus() for ecam51b_USB.
+ *Removed tooltips for See3CAM_160.
+ *Bug fixes for See3CAM_CU81.
+ *Removed Auto focus ROI and added burst length control for See3CAM_160.
+ *Reverting allocBuffers() in videostreaming.cpp.
+ *Added support for e-CAM82_USB.
+ *Added fix for not getting preview during change from trigger to master mode for See3CAM_24CUG in certain PC's.
+ *Added fix for image getting captured while changing from master to trigger mode and vice versa in See3CAM_24CUG.
+ *Added fix for not getting preview during change from trigger to master mode in See3CAM_24CUG.
+ *Added fix for Preview during Trigger Mode in MJPEG for See3CAM_24CUG.
+ *Updated Exposure Compensation value for See3CAM_24CUG.
+ *See3CAM_24CUG bug fixes.
+ *Changed Stream mode control for See3CAM_24CUG.
+ *Added autofocuslock control for See3CAM_24CUG.
+ *Added Connections in qml for ECAM51A_USB. 
+ *Added fix for disabling AF rect while stillcapture for See3CAM_130D.
+ *Added support for See3CAM_CU81 and ECAM51A_USB.
+ *Added fix for not enumerating all the devices connected to the host.
+ *Removed Scene mode for See3CAM_24CUG.
+ *Images will be captured and stored when device is in Trigger mode for See3CAM_24CUG.
+ *Disabled Still resolution and colorspace combobox when device is in trigger mode.
+ *Added Stream modes for See3CAM_24CUG.
+ *Changed strobe control for See3CAM_24CUG.
+ *Added fix for See3cam_130D AF Rectangle was displayed in the preview even though it was disabled.
+ *Added fix: Flip control was not getting updated when hardware default was pressed.
+ *Added fix: When we click Hardware default, Focus absolute slider was enabled in Auto mode.
+ *Added support for See3CAM_130D and See3CAM_24CUG.
+ *Added See3CAM_160_EVALKIT PID.
+ *Changed all png images with incorrect icc profile.
+ *Suppressed libavcodec warnings.
+ *Added fix for live preview corruption in 18.04 when swicted between Preview and Record node in Hypreyon Dual Stream.
+ *Added fix for manual focus issue in See3CAM_CU55MH.
+ *Added Fix H264 Quality was disabled when CBR mode was active.
+ *Added PID for enumetating extension unit HyperyonDualStream Device.
+ *Added CBR control for HyperyonDualStream Device.
+ *Added fix for Inconsistently corruption occurs while switching to Record mode from Preview mode in Hyperyon Dual stream.
+ *Added fix for crash while streaming mjpeg on embedded boards.
+ *Added fix for crash while streaming on See3CAM_10CUG_CH
+ * Added fix to avoid image capture while application is in recording mode.
+ * Added fix for cu135 when changed from trigger mode to master mode Image capturing even when application is in recording mode.
+ * Implemented Flicker Detection Mode for See3CAM_CU130
+ * Added fix for preview corruption while changing AutoExposureMode in Hyperyon
+ * Added fix for Hyperyon Cross Resolution bug
+ * Added Default button in extension settings for See3CAM_CU22.
+ * Removed HDR + LFM mode from extension settings for See3CAM_CU22.
+ * Added fix to avoid aliasing effect in preview for 640x480 resolution.
+ * Added fix to avoid Green frame while switching between resolutions in H264 format for Hyperyon.
+ * Added fix to avoid flicker while switching between resolutions in MJPG format in Hyperyon.
+ * Added Fix for Disable option in ROI Exposure for Hyperyon.
+ * Disabled Default button in extension settings for See3CAM_CU22.
+ * Added Disable option in ROI Exposure for Hyperyon.
+ * Implemented support to change the frameRate while capturing still in Hyperyon.
+ * Disabled "i" key for image capture while UI is in video Record Mode.
+ * Fixed issue of failing Set Request for Exposure in See3CAM_CU30 camera.
+ * Added fixes for See3CAM_20CUG issues.
+ * Added support for See3CAM_CU22 camera.
+ * Added fix for the preview hang issue while swiching between resolutions for See3CAM_CU30 camera and See3CAM_CU22 camera.
+ * Rendering the preview using Opengl Shaders.
+ * Disabled video record option for 320x240 resolution in See3CAM_20CUG camera.
+ * Fixed issue of getting Streaming in Trigger Mode for See3CAM_CU20 camera.
+ * Not allowing White Balance Text box to be modified by user.
+ * Added fix for the issue of enumerating Device name twice in case of higher Kernal Version's.
+ * Fixed issue of disabling camera Settings option on switching Trigger mode to Master Mode in See3CAM_CU135 camera. 
+ * Added support to flip Controls in Extension Unit for Hyperyon.
+ * Fixed issue of no preview while switcing between camera's for See3CAM_CU55M
+ * Added fix to avoid glitches in a recorded video for h264 encoder type. 
+ * Fixed issue of Video Record and Image Capture Button disabling while switching from Trigger to Master Mode in See3CAM_CU55_MH camera.
+ * Fixed issue of preview resize window in 18.04. 
+ * Fixed issue of Preview hang in Stream Mode when unplug and plug the device for See3CAM_CU55_MH camera.
+ * Fixed issue of "Unable to record Video" display message while recording video in h264 encoder format for See3CAM_CU55_MH camera.
+ * Fixed issue of preview hang while capturing multiple images(more than 50) in 1080p resolution in Y12 (.jpg)format for See3CAM_CU55_MH camera.
+ * Fixed issue of no preview while using Retrieve in higher resolutions for FSCAM_CU135 camera. 
+ * Changed product name for Storagecamera as FSCAM_CU135.
+ * Added support for See3CAM_CU55-MH
+ * Fixed issue of updating led controls wrongly in See3CAM_CU1317 camera.
+ * Fixed issue of application hang in 32-bit PC for See3CAM_CU50 camera
+ * Fixed issue of getting Green/Pink colour preview while switching resolutions in Hyperyon
+ * Fixed issue of getting greencolour image on capturing still in H264 in Hyperyon.
+ * Fixed issue of updating exposure UI in UVC Settings wrongly for See3cam cameras.
+ * Fixed exposurecompensation issue on unplugging and plugging device for See3CAM_CU55 camera.
+ * Fixed issue of whitebalance textbox enabled even when whitebalance control is disabled for all See3cam cameras.
+ * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
+ * Initial release. 
+
+ -- econsysqtcam <qtcam@e-consystems.com> Sat 16th Dec 2023 14:00:05 +0530
+

@@ -1,0 +1,15 @@
+Source: qtcam
+Section: video
+Priority: extra
+Maintainer: econsysqtcam <qtcam@e-consystems.com>
+Build-Depends: debhelper (>= 9.0.0), libv4l-dev, qt5-default, libavcodec-dev, libavformat-dev, libavutil-dev, libswscale-dev, libavresample-dev, libudev-dev, libavcodec-extra, qt5-default, qtdeclarative5-dev, freeglut3, freeglut3-dev, libjpeg-turbo8-dev, libusb-1.0-0-dev, libusb-dev, libevdev-dev, libpulse-dev, qtmultimedia5-dev, libasound2-dev , libturbojpeg0-dev ,g++-5 ,lsb-core,lsb-release
+Standards-Version: 3.9.3
+Homepage: http://www.e-consystems.com/opensource-linux-webcam-software-application.asp
+#Vcs-Git: git://git.debian.org/collab-maint/qtcam.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/qtcam.git;a=summary
+
+Package: qtcam
+Architecture: any
+Depends:  ${shlibs:Depends}, ${misc:Depends}, qtdeclarative5-window-plugin, qtdeclarative5-qtquick2-plugin,mkvtoolnix, qml-module-qtquick-controls, qml-module-qtquick-dialogs ,qml-module-qtquick-extras,qml-module-qtquick-privatewidgets,qtquickcontrols5-doc ,libavutil-dev ,libavcodec-dev,libavformat-dev,libswscale-dev ,libturbojpeg0-dev ,qtmultimedia5-dev
+Description: It is a webcam application for linux.
+ It is a webcam application for linux developed by e-con systems. 
