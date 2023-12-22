@@ -51,7 +51,7 @@ binary-arch: build install
 	dh_installexamples
 	dh_installman
 	dh_link
-	dh_strip
+	dh_strip 
 	dh_compress
 	dh_fixperms
 	dh_installdeb
