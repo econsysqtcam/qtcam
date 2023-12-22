@@ -37,8 +37,9 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
-	# Add here commands to install the package into debian/your_appname
-	cd builddir && cp -f -R ${CURDIR}/src/qml/ ${CURDIR}/debian/qtcam/usr/share/qml/ && cp ${CURDIR}/src/Qtcam_16.04.desktop ${CURDIR}/debian/qtcam/usr/share/applications/ && install -m 755 -p "Qtcam" "${CURDIR}/debian/qtcam/usr/bin/qtcam"
+	#Commands to install the package into debian/QtCAM
+	cd builddir && cp -f -R ${CURDIR}/src/ub22_qml/ ${CURDIR}/debian/qtcam/usr/share/qml/ && cp ${CURDIR}/src/Qtcam_16.04.desktop ${CURDIR}/debian/qtcam/usr/share/applications/ && install -m 755 -p "Qtcam" "${CURDIR}/debian/qtcam/usr/bin/qtcam"
+
 # Build architecture-independent files here.
 binary-indep: build install
 # We have nothing to do by default.
@@ -51,7 +52,7 @@ binary-arch: build install
 	dh_installexamples
 	dh_installman
 	dh_link
-	dh_strip 
+	dh_strip
 	dh_compress
 	dh_fixperms
 	dh_installdeb
