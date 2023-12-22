@@ -1,8 +1,8 @@
-qtcam (26.0.1-0ubuntu1) xenial; urgency=medium
- *Added support for ubuntu 22.04 & changed .pro file accordingly
- *Added support for See3CAM130.
+qtcam (26.0.0-0ubuntu1) focal; urgency=medium
+ *Added support for Ubuntu 22.04.
+ *Added support for See3CAM130
  *Connecting HID-UVC controls for See3CAM_50CUG.
- *Added Support for See3CAM_50CUG.
+ *Added Support for See3CAM_50CUG
  *Added support for See3CAM_CU84 & See3CAM_CU135 bug fixed.
  *Fixed ROI issue in See3CAM_CU135 and low brightness issue in preview for See3CAM_16CUGM.
  *See3CAM_CU135M HID modifications, See3CAM_16CUG Bug fixed & Handled extra data in 4k for See3CAM_CU83.
@@ -12,7 +12,7 @@ qtcam (26.0.1-0ubuntu1) xenial; urgency=medium
  *IR window Checkbox added for See3CAM_CU83.
  *iHDR modification for See3CAM_130 & See3CAM_CU135.
  *Modification for See3CAM_50CUG, See3CAM_135M and Bug fixed for See3CAM_135M, See3CAM_CU83
- *Added Support for See3CAM_CU135M & Bug fixed for See3CAM_CU83
+ *Added support for See3CAM_CU135 & Bug fix for See3CAM_CU83
  *Bug fix & modification of UI for See3CAM_CU83
  *Added Changes in UI for See3CAM_50CUG and Bug fix for SeeCAM_CU83 & See3CAM_27CUG
  *Added HID setting for See3CAM_50CUG_M & See3CAM_27CUG Bug fix
@@ -20,9 +20,9 @@ qtcam (26.0.1-0ubuntu1) xenial; urgency=medium
  *set exposure compensation while resolution switching during cross resolution still capture.
  *Added stillTimeOutTimer.
  *Bug fix for See3CAM_27CUG
- *Added support for See3Cam_CU83 
- *Bug fix for See3Cam_27CUG 
- *Added support for See3Cam_27CUG 
+ *Added support for See3CAM_CU83
+ *Bug fix for See3CAM_27CUG
+ *Added support for See3CAM_27CUG
  *Added support for NileCam20_USB.
  *Added limitations by checking if it's PIN1 instead of checking for H264 format for e-cam83USB.
  *Added support for Barcode Camera.
@@ -108,20 +108,18 @@ qtcam (26.0.1-0ubuntu1) xenial; urgency=medium
  * Not allowing White Balance Text box to be modified by user.
  * Added fix for the issue of enumerating Device name twice in case of higher Kernal Version's.
  * Fixed issue of disabling camera Settings option on switching Trigger mode to Master Mode in See3CAM_CU135 camera. 
- * Added support to See3CAM_20CUG camera.
- * Fixed issue of getting video save message box on pressing Space bar.
  * Added support to flip Controls in Extension Unit for Hyperyon.
- * Fixed issue of no preview while switching between camera's for See3CAM_CU55M.
- * Added fix to avoid glitches in recorded video for h264 encoder type.
+ * Fixed issue of no preview while switcing between camera's for See3CAM_CU55M
+ * Added fix to avoid glitches in a recorded video for h264 encoder type. 
  * Fixed issue of Video Record and Image Capture Button disabling while switching from Trigger to Master Mode in See3CAM_CU55_MH camera.
  * Fixed issue of preview resize window in 18.04. 
  * Fixed issue of Preview hang in Stream Mode when unplug and plug the device for See3CAM_CU55_MH camera.
  * Fixed issue of "Unable to record Video" display message while recording video in h264 encoder format for See3CAM_CU55_MH camera.
  * Fixed issue of preview hang while capturing multiple images(more than 50) in 1080p resolution in Y12 (.jpg)format for See3CAM_CU55_MH camera.
- * Fixed issue of no preview while using Retrieve in higher resolutions for FSCAM_CU135 camera.  
+ * Fixed issue of no preview while using Retrieve in higher resolutions for FSCAM_CU135 camera. 
  * Changed product name for Storagecamera as FSCAM_CU135.
  * Added support for See3CAM_CU55-MH
- * Fixed issue of updating led controls wrongly
+ * Fixed issue of updating led controls wrongly in See3CAM_CU1317 camera.
  * Fixed issue of application hang in 32-bit PC for See3CAM_CU50 camera
  * Fixed issue of getting Green/Pink colour preview while switching resolutions in Hyperyon
  * Fixed issue of getting greencolour image on capturing still in H264 in Hyperyon.
@@ -129,43 +127,7 @@ qtcam (26.0.1-0ubuntu1) xenial; urgency=medium
  * Fixed exposurecompensation issue on unplugging and plugging device for See3CAM_CU55 camera.
  * Fixed issue of whitebalance textbox enabled even when whitebalance control is disabled for all See3cam cameras.
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
-  * Implemented ROI Exposure only in case of HDR OFF for Hyperyon.
-  * Getting ROI WindowSize dynamically from camera and set the Dewarp Mode to OFF on Default in Hyperyon camera.
-  * Implemeted Flicker Detection control for See3CAM_CU135,See3CAM-CU30,See3CAM_CU55,See3CAM_130 and disabled PowerLineFrequency for these cameras in UVC Settings. 
-  * Implemented LED Control and Flicker Detection Control for See3CAM_CU1317 camera.
-  * Fixed issue of not allowing video record and image capture in case of Trigger Modes for See3CAM_Cu1317 camera.
-  * Fixed issue for Store button enabled in case of trigger modes for See3CAM_CU1317 camera.
-  * Implemented SkipFrames based on Usbspeed for See3CAM_CU50 camera.
-  * Fixed crash issue for Hyperyon while switching resolutions and corruption while streaming.
-  * Added support for ROI Exposure and Gain Control(LGC/HGC)in Hyperyon.
-  * Fixed hang issue while capturing image in See3CAM_CU51.
-  * Fixed for ROI Exposure issue in See3CAM_CU1317.
-  * Added support for See3CAM_CU1317 camera.
-  * Added support for see3cam_cu38 camera.
-  * Added support for ecam22_usb camera.
-  * Added support for face ROI and flash controls in cu30 camera.
-  * Fixed trigger capture issue in see3cam_cu30 camera 
-  *BugFix in Tania camera[cam names],Added options in lens position mode^Cnd AWB mode, disable focus controls for resolutions which contain both front and rear cam, display device not found message when displaying some window and unplug camera.
-  * Added support for cx3-sni camera.
-  * Added R2 features for see3cam_cu30 camera 1. Scene Mode, 2. ROI control 3. Burst Mode 4.Q Factor 5.Flip controls 6.Face Detection 7. Smile Detection 8. Frame rate control 9. Exposure compensation
-  * Added support for see3cam_cu135 camera.
-  * Bugfixes in features of see3cam_130 camera.
-  * Implemented flash control for See3cam_cu40 camera.
-  * Added see3cam_30 camera support and fixed issue of invalid frame rate while recording video.
-  * In 81cam, Fixed firmware version showing 0.0.0.0 issue when double clicking single trigger button.
-  * Added support for see3cam_130 camera, see3cam_81 camera.
-  * Added support for see3camcu30.
-  * Added support for ubuntu 15.10 and ubuntu 16.04.
-  * Added shortcut for launching Qtcam application from Dash home.
-  * Fixed warnings in the application.
-  * Added support for logitech C920 Webcam Pro camera.
-  * Added support for logitech C525 Webcam camera.
-  * Added support for logitech C310 HD Webcam camera.
-  * Added support for logitech C615 HD Webcam camera.
-  * Added support for LifeCam HD-3000.
-  * Added support LifeCam Cinema HD.  
-  * Added support for all uvc cameras.
-  * Added ARM support.
-  * Initial release.  
+ * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> 22nd Dec 2023 11:19:00 +0530
+ -- econsysqtcam <qtcam@e-consystems.com>  Wed, 1st Nov 2023 14:43:01 +0530
+
