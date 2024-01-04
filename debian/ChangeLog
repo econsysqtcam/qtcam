@@ -1,4 +1,6 @@
-qtcam (26.0.0-0ubuntu1) focal; urgency=medium
+qtcam (26.0.2-0ubuntu1) focal; urgency=medium
+ *Set Gain, Exposure, Brightness while capturing still in cross resolution using HID control for See3CAM_CU135M_H01R1.
+ *Added New HID controls for See3CAM_CU512_M.
  *Added support for Ubuntu 22.04.
  *Added support for See3CAM130
  *Connecting HID-UVC controls for See3CAM_50CUG.
@@ -129,5 +131,5 @@ qtcam (26.0.0-0ubuntu1) focal; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com>  Wed, 1st Nov 2023 14:43:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com>  Thu 04 Jan 2023 19:33:00 +0530
 
