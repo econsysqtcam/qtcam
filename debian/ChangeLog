@@ -1,4 +1,5 @@
-qtcam (26.0.1-0ubuntu1) bionic; urgency=medium
+qtcam (26.0.2-0ubuntu1) bionic; urgency=medium
+ *Set Gain, Exposure, Brightness while capturing still in cross resolution using HID control for See3CAM_CU135M_H01R1.
  *Added new HID controls (Stream & Flip Modes) for See3CAM_CU512_M.
  *Added Support for Ubuntu 22.04. Changed .pro file
  *Added new HID controls for See3CAM_50CUGM second phase
@@ -131,5 +132,5 @@ qtcam (26.0.1-0ubuntu1) bionic; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Sat 16th Dec 2023 14:00:05 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Thu 04 Jan 2024 19:30:00 +0530
 
