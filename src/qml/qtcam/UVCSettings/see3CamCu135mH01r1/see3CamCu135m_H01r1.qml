@@ -98,6 +98,7 @@ Item {
             see3camcu135mH01r1.getAutoExposureUpperLimit()
             see3camcu135mH01r1.getGainLimit()
             see3camcu135mH01r1.getTargetBrightness()
+            see3camcu135mH01r1.getStatistics()
            stop()
         }
     }
@@ -139,15 +140,16 @@ Item {
         onVideoColorSpaceChanged:{
             getCameraSettingsTimer.start()
         }
-        onSetExpCompensation:{
-            see3camcu135mH01r1.setAutoExposureLowerLimit(lowerLimitTextField.text)
-            see3camcu135mH01r1.setAutoExposureUpperLimit(upperLimitTextField.text)
-        }
-        onSetGainInStream:{
-            see3camcu135mH01r1.setGainLimit(gainLowerLimitSlider.value, gainUpperLimitSlider.value)
-        }
-        onSetBrightnessInStream:{
-            see3camcu135mH01r1.setTargetBrightness(targetBrightness.value)
+
+        onUpdateCrossStillCaptureProperty:{
+            if(isEnable)
+            {
+                see3camcu135mH01r1.setPropertiesForCrossStill(true)
+            }
+            else
+            {
+                see3camcu135mH01r1.setPropertiesForCrossStill(false)
+            }
         }
 
         onSendGainValueToHID:{
@@ -1752,7 +1754,7 @@ Item {
             else if(continousExposure.checked)
             {
                 triggerExposureBtn.enabled = false
-                triggerExposureBtn.opacity = 0
+                triggerExposureBtn.opacity = 0.1
             }
 
             //Enable readStatistics in auto exposure mode
@@ -1846,14 +1848,10 @@ Item {
         see3camcu135mH01r1.getFlipCtrlValue()
         see3camcu135mH01r1.getAutoExpROIModeAndWindowSize()
         see3camcu135mH01r1.getBlackLevelAdjustment()
-        see3camcu135mH01r1.getTargetBrightness()
         see3camcu135mH01r1.getGainMode()
-        see3camcu135mH01r1.getGainLimit()
         see3camcu135mH01r1.getExposureMode()
-        see3camcu135mH01r1.getAutoExposureLowerLimit()
-        see3camcu135mH01r1.getAutoExposureUpperLimit()
         see3camcu135mH01r1.getAntiFlickerMode()
-        see3camcu135mH01r1.getStatistics()
+        getCameraSettingsTimer.start()
     }
 
     Component.onCompleted: {

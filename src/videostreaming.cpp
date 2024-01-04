@@ -45,6 +45,7 @@ bool isOneFrameCaptured  = false;
 bool clearBuffer = false;
 bool triggerMode = false;
 int skipFrameForTrigger = 0;
+
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define SEE3CAM160_MJPEG_MAXBYTESUSED       4193280
 
@@ -1542,7 +1543,6 @@ void Videostreaming::capFrame()
         if(!retrieveFrame)
             m_timer.stop();
 
-
         closeDevice();
         // Added by Sankari:19 Dec 2017.
         //Bug Fix: 1. Streaming is not available for higher resolution when unplug and plug cu130 camera without closing application
@@ -1575,6 +1575,14 @@ void Videostreaming::capFrame()
                     triggermode_skipframes--;
         else
             emit triggerShotCap();
+    }
+    else if(gotTriggerKey && currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode)
+    {
+        m_renderer->gotFrame = false;
+        m_renderer->updateStop = true;
+        emit masterShotCap();
+
+        gotTriggerKey = false;
     }
     else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode)
     {
@@ -1710,6 +1718,7 @@ void Videostreaming::capFrame()
     if(!m_snapShot && !retrieveShot && !frameMjpeg){  // Checking for retrieveshot flag inorder to avoid, updating still frame to UI
         m_renderer->gotFrame = true;
     }
+
     if(m_snapShot || m_burstShot)
     {
         int err = -1;
@@ -2211,6 +2220,8 @@ void Videostreaming::capFrame()
         }
         retrieveframeStoreCam=false;
     }
+
+
     if(stillBuffer){
         free(stillBuffer);
         stillBuffer = NULL;
@@ -3724,6 +3735,7 @@ bool Videostreaming::startCapture()
         return false;
     }
 
+
     //To Create window for IR preview & also avoid to create IR window when capturing still
     if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)&&(createWindow))
     {
@@ -3839,7 +3851,8 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     triggerShot = false;
     changeFpsAndShot = false;
     m_displayCaptureDialog = true;
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG&&trigger_mode)
+
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode)
         return;
 
     //Added by Sushanth - Capturing frame only if the filePath is valid
@@ -3853,6 +3866,13 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     else if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {
         m_renderer->updateStop = true;
+
+        //Added By Sushanth - To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
+        if(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1)
+        {
+            emit setCrossStillProperties(false);
+        }
+
         stopCapture();
         vidCapFormatChanged(stillOutFormat);
         setResoultion(stillSize);
@@ -3863,24 +3883,16 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
         }
         startAgain();
 
-        //Added by Sushanth
+        //Added by Sushanth - To clear buffer in IR preview while cross resolution stillCapture
         if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG)
         {
-            clearBuffer = true; // to clear buffer in IR preview while cross resolution stillCapture
+            clearBuffer = true;
         }
 
-        //Added by Sushanth - autoExposureMode in UVC settings
-        if(autoExposureMode)
+        //Added by Sushanth - To Set exposure compensation when cross resolution still capture
+        if(autoExposureMode && !(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1))
         {
-             //to set exposure compensation after capturing still in cross resolution.
              emit setExpAfterCrossStill();
-        }
-
-        //To set Gain & Target Brightess in captured still
-        if(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1)
-        {
-            emit setBrightness();
-            emit setGain();
         }
     }
 }
@@ -5084,6 +5096,13 @@ void Videostreaming::cameraModeEnabled(int cameraModeValue)
     emit sendCameraMode(cameraMode);
 }
 
+
+//Added by Sushanth - To get triggerKey from CamKeyEventReceive Class
+void Videostreaming::isTriggerKeyReceived(bool isReceived)
+{
+    gotTriggerKey = isReceived;
+}
+
 void Videostreaming::irWindowCheckboxStatus(bool status)
 {
    irWindowStatus = status;
@@ -5159,6 +5178,12 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
 {
     if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {
+        //Added By Sushanth - To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
+        if(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1)
+        {
+            emit setCrossStillProperties(true);
+        }
+
         resolnSwitch();   //Replaced stopCapture() with resolnSwitch() inorder to get preview in higher resolns while using Retrieve button.
 
         if(stillSettings){
@@ -5185,19 +5210,14 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
         {
             frameIntervalChanged(lastFPSValue.toUInt(),FPS_DEFAULT);
         }
+
         startAgain();
 
         //Added by Sushanth - autoExposureMode in UVC settings
-        if(autoExposureMode)
+        if(autoExposureMode && !(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1))
         {
              //to set exposure compensation after capturing still in cross resolution.
              emit setExpAfterCrossStill();
-        }
-
-        if(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1)
-        {
-            emit setBrightness();
-            emit setGain();
         }
     }
 }
@@ -5214,7 +5234,7 @@ void Videostreaming::enableDisableExpCompensation(bool isEnable)
   if(isEnable)
   {
     autoExposureMode = true;
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG)
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG ||currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG)
     {
         //To set exposure after cross resolution still capture in manual mode (when switched to auto mode)
         emit setExpAfterCrossStill();

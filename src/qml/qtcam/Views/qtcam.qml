@@ -75,8 +75,8 @@ Rectangle {
     //signal to set exposure compensation while still capture
     signal setExpCompensation();
 
-    signal setGainInStream();
-    signal setBrightnessInStream();
+    //To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
+    signal updateCrossStillCaptureProperty(bool isEnable);
 
     //signal close IR window after unplugging the device
     signal windowCloseAfterUnplug()
@@ -680,12 +680,19 @@ Rectangle {
             setExpCompensation();
         }
 
-        onSetBrightness:{
-            setBrightnessInStream()
-        }
-
-        onSetGain:{
-            setGainInStream()
+        /*
+         * Added By Sushanth
+         * To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
+        */
+        onSetCrossStillProperties: {
+            if(isEnable)
+            {
+                updateCrossStillCaptureProperty(true)
+            }
+            else
+            {
+                updateCrossStillCaptureProperty(false)
+            }
         }
 
         /*
@@ -1149,7 +1156,13 @@ Rectangle {
         id: keyEvent
         onCameraTriggerKeyReceived:{
             m_Snap = false
-            if(!disableCaptureImage){ // disable capture by smile trigger key or external key is pressed when recording video
+
+            //Only for See3CAM_24CUG - Sending trigger key when device is in Master mode
+            if((selectedDeviceEnumValue == CommonEnums.SEE3CAM_24CUG) && !disableCaptureImage && !getTriggerMode)
+            {
+                sendingTriggerKey()
+            }
+            else if(!disableCaptureImage){ // disable capture by smile trigger key or external key is pressed when recording video
                 takeScreenShot(true)
             }
         }
@@ -1841,6 +1854,12 @@ Rectangle {
     {
         cameraMode = Mode
         vidstreamproperty.cameraModeEnabled(cameraMode)
+    }
+
+    //Added by Sushanth
+    function sendingTriggerKey()
+    {
+        vidstreamproperty.isTriggerKeyReceived(true)
     }
 
     //function to create & destroy IR window via CheckBox

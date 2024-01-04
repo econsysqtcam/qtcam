@@ -1060,3 +1060,38 @@ bool See3CAM_CU135M_H01R1::setToDefault(){
     }
     return false;
 }
+
+
+
+/**
+ * @brief See3CAM_CU135M_H01R1::setPropertiesForCrossStill - set Gain, Brightness, Exposure while capturing still in cross resolution
+ * @return true/false
+ */
+bool See3CAM_CU135M_H01R1::setPropertiesForCrossStill(bool isEnable){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H;
+    g_out_packet_buf[2] = SET_CROSS_STILL_PROPERTIES_SEE3CAM_CU135M_H01R1_H;
+    g_out_packet_buf[3] = isEnable;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_SEE3CAM_CU135M_H01R1_H &&
+            g_in_packet_buf[1] == SET_CROSS_STILL_PROPERTIES_SEE3CAM_CU135M_H01R1_H &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}

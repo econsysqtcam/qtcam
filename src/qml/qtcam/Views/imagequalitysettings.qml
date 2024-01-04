@@ -468,8 +468,8 @@ Item {
                                     root.autoWhiteBalanceSelected(false)
                                     if(wbAutoChangeProperty){
                                         root.changeCameraSettings(whiteBalanceControl_auto_Id,0)
-					// When click hardware default, selecting manual whitebalance, set to default wb.
-					root.changeCameraSettings(whiteBalanceControlId,white_balance_Slider.value.toString())
+                                        // When click hardware default, selecting manual whitebalance, set to default wb.
+                                        root.changeCameraSettings(whiteBalanceControlId,white_balance_Slider.value.toString())
                                     }
                                     if(root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM){
                                         white_balance_Slider.opacity = 1
@@ -1572,7 +1572,7 @@ Item {
             case 9963779://Hue
                 hueUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case 9963802://White Balance(Temperature)
+            case 9963802://Manual White Balance(Temperature)
                 whiteBalanceUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case 9963792://Gamma
@@ -1733,6 +1733,22 @@ Item {
         white_balance_Slider.value = controlDefaultValue
         white_balance_Slider.stepSize = controlStepSize
     }
+
+    function whiteBalAutoUIUpdate(controlID,controlDefaultValue)
+    {
+        white_balance.opacity = 1
+        autoSelect_wb.opacity = 1
+        autoSelect_wb.enabled = true
+        autoSelect_wb.checked = controlDefaultValue
+        whiteBalanceControl_auto_Id = controlID
+        if(!autoSelect_wb.checked && root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM) {
+            white_balance_Slider.enabled = true
+            JS.autoWhiteBalSelected = false             // manual white balance selected
+        }else{
+            JS.autoWhiteBalSelected = true              // auto white balance selected
+        }
+    }
+
     function gammaUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         gamma.opacity = 1
@@ -1855,20 +1871,7 @@ Item {
         focusLogitechControlId = controlID
         focusLogitechSlider.stepSize = controlStepSize
     }
-    function whiteBalAutoUIUpdate(controlID,controlDefaultValue)
-    {
-        white_balance.opacity = 1
-        autoSelect_wb.opacity = 1
-        autoSelect_wb.enabled = true
-        autoSelect_wb.checked = controlDefaultValue
-        whiteBalanceControl_auto_Id = controlID
-        if(!autoSelect_wb.checked && root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM) {
-            white_balance_Slider.enabled = true
-            JS.autoWhiteBalSelected = false             // manual white balance selected
-        }else{
-            JS.autoWhiteBalSelected = true              // auto white balance selected
-        }
-    }
+
     function autoFocusUIUpdate(controlID,controlDefaultValue)
     {
         autoSelect_focus.opacity = 1

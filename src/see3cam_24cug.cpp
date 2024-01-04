@@ -565,7 +565,7 @@ bool See3CAM_24CUG::setToDefault()
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_24CUG &&
             g_in_packet_buf[1]==SET_TO_DEFAULT_24CUG &&
-            g_in_packet_buf[6]==SET_SUCCESS) {\
+            g_in_packet_buf[6]==SET_SUCCESS) {
             return true;
         }
     }

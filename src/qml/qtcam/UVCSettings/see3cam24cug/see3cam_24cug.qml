@@ -32,9 +32,11 @@ Item {
         target: vidstreamproperty
         onTriggerShotCap:
         {
-             root.imageCapture(CommonEnums.SNAP_SHOT)
+            root.imageCapture(CommonEnums.SNAP_SHOT)
         }
-
+        onMasterShotCap:{
+            root.imageCapture(CommonEnums.SNAP_SHOT)
+        }
     }
 
     Connections
@@ -42,7 +44,7 @@ Item {
         target: root
         onTakeScreenShot:
         {
-                root.imageCapture(CommonEnums.BURST_SHOT);
+            root.imageCapture(CommonEnums.BURST_SHOT);
         }
         onGetVideoPinStatus:
         {
@@ -56,6 +58,10 @@ Item {
             stillImageFormat.push("raw")
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
+        }
+        onSetExpCompensation:{
+            see3cam24cug.setExposureCompensation(exposureCompValue.text)
+            see3cam24cug.setFrameRateCtrlValue(frameRateSlider.value)
         }
     }
 
@@ -1218,6 +1224,9 @@ value in the text box and click the Set button"
 
     function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
+            //To enable exposure when device is in manual exposure mode in UVC
+            root.enableDisableExposureCompensation(autoExposureSelect)
+
             autoexpManual.enabled = true
             autoexpFull.enabled = true
             if(autoexpManual.checked)
@@ -1232,6 +1241,9 @@ value in the text box and click the Set button"
             exposureCompSet.opacity = 1
             exposureCompText.opacity = 1
         }else{
+            //To disable exposure compensation when device is in manual exposure mode in UVC
+            root.enableDisableExposureCompensation(autoExposureSelect)
+
             autoexpManual.enabled = false
             autoexpFull.enabled = false
             autoExpoWinSizeCombo.enabled = false
@@ -1276,9 +1288,17 @@ value in the text box and click the Set button"
 
     function setDefaultValues(){
         defaultValue.enabled = false //To avoid multiple clicks over Default button
-        see3cam24cug.setToDefault()
+
+        root.checkForTriggerMode(false)
+        root.captureBtnEnable(true)
+        root.videoRecordBtnEnable(true)
+
+        if(see3cam24cug.setToDefault())
+        {
+            getCameraValues()
+        }
+
         root.keyEventFiltering = false
-        getCameraValues()
         defaultValue.enabled = true
     }
 
@@ -1338,4 +1358,3 @@ value in the text box and click the Set button"
         }
     }
 }
-

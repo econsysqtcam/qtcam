@@ -47,6 +47,8 @@
 
 #define SET_TO_DEFAULT_SEE3CAM_CU135M_H01R1_H                  0xFF
 
+#define SET_CROSS_STILL_PROPERTIES_SEE3CAM_CU135M_H01R1_H      0x1A
+
 #define GET_SUCCESS                                            0x01
 #define GET_FAILURE                                            0x00
 
@@ -207,6 +209,8 @@ public slots:
     bool getStatistics();
 
     bool setToDefault();
+
+    bool setPropertiesForCrossStill(bool isEnable);
 };
 
 #endif // SEE3CAM_CU1330M_H

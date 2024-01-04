@@ -236,7 +236,7 @@ private:
     GLint samplerLocGREY;
     GLint samplerLocUV;
 
-     static CommonEnums::ECameraNames currentlySelectedEnumValue;
+    static CommonEnums::ECameraNames currentlySelectedEnumValue;
 };
 
 class Videostreaming :  public QQuickItem, public v4l2
@@ -418,6 +418,7 @@ private:
     bool fpsChangedForStill;
     bool m_burstShot;
     bool triggerShot;
+    bool gotTriggerKey;
     bool m_has_interval;
     bool tempMsgBoxValue;
     bool m_VideoRecord;
@@ -738,6 +739,11 @@ public slots:
     void cameraModeEnabled(int cameraModeValue);
 
     /**
+     * @brief To get the trigger key from CamKeyEventReceive Class
+     */
+    void isTriggerKeyReceived(bool isReceived);
+
+    /**
      * @brief To get the irWindowCheckbox status
      */
     void irWindowCheckboxStatus(bool status);
@@ -779,6 +785,8 @@ public slots:
 
 signals:
     void triggerShotCap();
+
+    void masterShotCap();
 
     void sendResolutionChange(bool frame);
     // from qml file , rendering animation duration t changed
@@ -824,15 +832,10 @@ signals:
 
     /*
      * Added by Sushanth S
-     * To set Gain & target brightness while switching resolution during cross resolution still capture
+     * For See3CAM_CU135M_H01R1
+     * To enable/disable HID control for setting Gain, Brightness, Exposure while capturing still in cross resolution
      */
-    void setBrightness();
-
-    /*
-     * Added by Sushanth S
-     * To set Brightness while switching resolution during cross resolution still capture
-     */
-    void setGain();
+    void setCrossStillProperties(bool isEnable);
 
     /*
      * Added by Sushanth S
