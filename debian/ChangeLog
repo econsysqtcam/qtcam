@@ -1,4 +1,5 @@
-qtcam (26.0.1-0ubuntu1) xenial; urgency=medium
+qtcam (26.0.2-0ubuntu1) xenial; urgency=medium
+ *Set Gain, Exposure, Brightness while capturing still in cross resolution using HID control for See3CAM_CU135M_H01R1.
  *Added support for ubuntu 22.04 & changed .pro file accordingly
  *Added support for See3CAM130.
  *Connecting HID-UVC controls for See3CAM_50CUG.
@@ -168,4 +169,4 @@ qtcam (26.0.1-0ubuntu1) xenial; urgency=medium
   * Added ARM support.
   * Initial release.  
 
- -- econsysqtcam <qtcam@e-consystems.com> 22nd Dec 2023 11:19:00 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> 04 Jan 2024 19:37:00 +0530
