@@ -1,4 +1,5 @@
-qtcam (26.0.0-0ubuntu1) jammy; urgency=medium
+qtcam (26.0.3-0ubuntu1) jammy; urgency=medium
   * Initial release.  
-  * Added support for ubuntu 22.04
-econsysqtcam <qtcam@e-consystems.com> Wed 01 Nov 2023 12:55:01 +0530
+  * Added support for ubuntu 22.04.
+  * Fix for Mipi Camera streaming issue & Manual white balance in UVC.
+ econsysqtcam <qtcam@e-consystems.com> Fri 12 Jan 2024 16:15:00 +0530
