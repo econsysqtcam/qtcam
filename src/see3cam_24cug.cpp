@@ -852,7 +852,6 @@ bool See3CAM_24CUG::getStreamMode()
         }
     }
     return false;
-
 }
 
 bool See3CAM_24CUG::setStreamMode(See3CAM_24CUG::streamModes streamMode, bool autoFunctionLock)
@@ -886,3 +885,4 @@ bool See3CAM_24CUG::setStreamMode(See3CAM_24CUG::streamModes streamMode, bool au
     return false;
 
 }
+

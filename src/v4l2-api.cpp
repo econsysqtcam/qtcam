@@ -465,7 +465,7 @@ bool v4l2::reqbufs_mmap(v4l2_requestbuffers &reqbuf, __u32 buftype, int count)
 
 bool v4l2::dqbuf_mmap(v4l2_buffer &buf, __u32 buftype, bool &again)
 {
-	v4l2_plane *planes = buf.m.planes;
+    v4l2_plane *planes = buf.m.planes;
 	unsigned length = buf.length;
 	int res;
 
@@ -475,8 +475,8 @@ bool v4l2::dqbuf_mmap(v4l2_buffer &buf, __u32 buftype, bool &again)
 	buf.type = buftype;
 	buf.memory = V4L2_MEMORY_MMAP;
 	res = ioctl(VIDIOC_DQBUF, &buf);
-	again = res < 0 && errno == EAGAIN;
-	return res >= 0 || again;
+    again = res < 0 && errno == EAGAIN;
+    return res >= 0 || again;
 }
 
 bool v4l2::dqbuf_user(v4l2_buffer &buf, __u32 buftype, bool &again)

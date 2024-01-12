@@ -187,7 +187,6 @@ public slots:
     bool getDenoiseValue();
     bool setDenoiseValue(int deNoiseVal);
 
-
     bool getAutoExpROIModeAndWindowSize();
     bool setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
 

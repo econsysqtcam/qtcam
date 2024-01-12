@@ -1339,6 +1339,7 @@ bool uvccamera::sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len)
     if (ret < 0) {
         return false;
     }
+
     struct timeval tv;
     fd_set rfds;
 

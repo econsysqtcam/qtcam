@@ -82,7 +82,7 @@ Item {
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
-	onFrameSkipCount:{
+        onFrameSkipCount:{
             nilecam30usb.setStillSkipCount(stillOutFormat)
         }
 

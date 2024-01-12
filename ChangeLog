@@ -1,6 +1,11 @@
+Qtcam Application - 26.0.3
+---------------------------
+*Implemented a fix, addressing the issue where a USB camera was unable to stream when a MIPI camera was connected first.
+*Fix for enabling manual white balance when the firmware exclusively supports manual white balance alone.
+
 Qtcam Application - 26.0.2
 ---------------------------
-*Set Gain, Exposure, Brightness while capturing still in cross resolution using HID control.
+*Set Gain, Exposure, Brightness while capturing still in cross resolution using HID control for See3CAM_CU135M_H01R1.
 
 Qtcam Application - 26.0.1
 ---------------------------

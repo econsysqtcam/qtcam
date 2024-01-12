@@ -174,6 +174,7 @@ Videostreaming::Videostreaming() : m_t(0)
     videoEncoder=new VideoEncoder();
     m_convertData = NULL;
     trigger_mode = false;
+    gotTriggerKey = false;
     triggermode_skipframes = 0;
     skipImageCapture = 0;
 }
@@ -1576,13 +1577,9 @@ void Videostreaming::capFrame()
         else
             emit triggerShotCap();
     }
-    else if(gotTriggerKey && currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode)
+    else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode && gotTriggerKey) //Added By Sushanth : For Capturing master mode images using external trigger board
     {
-        m_renderer->gotFrame = false;
-        m_renderer->updateStop = true;
-        emit masterShotCap();
-
-        gotTriggerKey = false;
+            emit triggerShotCap();
     }
     else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode)
     {
@@ -1715,6 +1712,7 @@ void Videostreaming::capFrame()
         emit signalTograbPreviewFrame(retrieveframeStoreCam,true);  //Added by Navya  ---Querying the buffer again
         return;
     }
+
     if(!m_snapShot && !retrieveShot && !frameMjpeg){  // Checking for retrieveshot flag inorder to avoid, updating still frame to UI
         m_renderer->gotFrame = true;
     }
@@ -1892,13 +1890,14 @@ void Videostreaming::capFrame()
                emit signalTograbPreviewFrame(retrieveframeStoreCam,true);
                return;
            }
-
         }
     }
 
     // Taking single shot or burst shot - Skip frames if needed
     if(((m_frame > frameToSkip) && m_snapShot) || ((m_frame > frameToSkip) && m_burstShot))
     {
+        gotTriggerKey = false;
+
         getFileName(getFilePath(),getImageFormatType());
         /*Added by Navya: 27 Mar 2019
            Checking whether the frame is still/preview. */
@@ -2220,7 +2219,6 @@ void Videostreaming::capFrame()
         }
         retrieveframeStoreCam=false;
     }
-
 
     if(stillBuffer){
         free(stillBuffer);
@@ -3852,7 +3850,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     changeFpsAndShot = false;
     m_displayCaptureDialog = true;
 
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode)
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && (trigger_mode  || (!trigger_mode && gotTriggerKey)))
         return;
 
     //Added by Sushanth - Capturing frame only if the filePath is valid
@@ -4192,7 +4190,7 @@ void Videostreaming::displayFrame() {
         }
         return void();
     }
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode)
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && (trigger_mode  || (!trigger_mode && gotTriggerKey)))
         triggerModeSkipframes();            //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when format changed in trigger mode.
 
     if (getInterval(interval))
@@ -4506,9 +4504,9 @@ void Videostreaming::setResoultion(QString resolution)
     m_height = height;
     try_fmt(fmt);
     s_fmt(fmt);
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode)
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && (trigger_mode  || (!trigger_mode && gotTriggerKey)))
     {
-     triggerModeSkipframes();            //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when format changed in trigger mode.
+        triggerModeSkipframes();            //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when format changed in trigger mode.
     }
     m_renderer->m_videoResolnChange = true;
     emit emitResolution(m_width,m_height);
@@ -4613,7 +4611,7 @@ void Videostreaming::vidCapFormatChanged(QString idx)
     fmt.fmt.pix.pixelformat = desc.pixelformat;
     try_fmt(fmt);
     s_fmt(fmt);
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode)
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && (trigger_mode  || (!trigger_mode && gotTriggerKey)))
         triggerModeSkipframes();             //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when format changed in trigger mode.
     if(!makeSnapShot){
         updateVidOutFormat();

@@ -150,6 +150,7 @@ void Cameraproperty::checkforDevice() {
     deviceNodeMap.clear();
     int deviceIndex = 1;
     bool metaCapture = false;
+    bool tegraMetaCapture = false;
     availableCam.clear();
 
     QStringList deviceNames,devicePaths;
@@ -158,60 +159,94 @@ void Cameraproperty::checkforDevice() {
     QCollator collator;             //Added by M.Vishnu Murali: for sorting alphanumeric values.
     collator.setNumericMode(true);
 
+    char driverName[16];
+    char tegraDeviceName[20];
+
+    //Checking v4l2 devices only - not USB device
     if(qDir.cd("/sys/class/video4linux/")) {
-        QStringList filters,list;
-        filters << "video*";
-        qDir.setNameFilters(filters);
-        list << qDir.entryList(filters,QDir::Dirs ,QDir::Name);
+            QStringList filters,list;
+            filters << "video*";
+            qDir.setNameFilters(filters);
+            list << qDir.entryList(filters,QDir::Dirs ,QDir::Name);
 
-        std::sort(list.begin(),list.end(),collator); //Changed by M.Vishnu Murali: Inorder to properly sort alphanumeric values.
-        deviceBeginNumber = list.value(0).mid(5).toInt();   //Fetching all values after "video"
-        deviceEndNumber = list.value(list.count()-1).mid(5).toInt();
-        for(int qDevCount=deviceBeginNumber;qDevCount<=deviceEndNumber;qDevCount++) {
-            QString qTempStr = qDir.path().append("/video" + QString::number(qDevCount));
-            if(open("/dev/video" +QString::number(qDevCount),false)) {
-                if (querycap(m_querycap)) {
-                    QString cameraName = (char*)m_querycap.card;
-                    if(cameraName.length()>22){
-                        cameraName.insert(22,"\n");
-                    }
-                    // Added by Navya: 12-Dec-2019
-                    // For Kernal Version >= 4.15 ,single device is detecting as two Nodes ,one as VideoCapture and other as MetaData Capture.Enumerating the Node which is VideoCapture.
-                    if(!(m_querycap.device_caps & V4L2_CAP_META_CAPTURE)){
-                        for(int i=0;i<devicePaths.size();i++)
+            std::sort(list.begin(),list.end(),collator); //Changed by M.Vishnu Murali: Inorder to properly sort alphanumeric values.
+            deviceBeginNumber = list.value(0).mid(5).toInt();   //Fetching all values after "video"
+            deviceEndNumber = list.value(list.count()-1).mid(5).toInt();
+            for(int qDevCount=deviceBeginNumber;qDevCount<=deviceEndNumber;qDevCount++) {
+
+                QString qTempStr = qDir.path().append("/video" + QString::number(qDevCount));
+                if(open("/dev/video" +QString::number(qDevCount),false)) {
+                    if (querycap(m_querycap)) {
+
+                        //Added by Sushanth - To avoid accessing MIPI devices node
+                        strncpy(driverName, reinterpret_cast<const char*>(m_querycap.driver), sizeof(driverName) - 1);
+                        driverName[sizeof(driverName) - 1] = '\0';
+
+                        if(strcmp(driverName, "uvcvideo") == 0)
                         {
-                            QString path = devicePaths.at(i);
-                            if(!(path.compare(path,"video" + QString::number(qDevCount),Qt::CaseInsensitive)))
-                            {
-                                cameraName = deviceNames.at(i);
-                                if(cameraName.length()>22){
-                                    cameraName.insert(22,"\n");
-                                }
-                                availableCam.append(cameraName);
+                            QString cameraName = (char*)m_querycap.card;
+                            if(cameraName.length()>22){
+                                cameraName.insert(22,"\n");
                             }
+
+                            // Added by Navya: 12-Dec-2019
+                            // For Kernal Version >= 4.15 ,single device is detecting as two Nodes ,one as VideoCapture and other as MetaData Capture.Enumerating the Node which is VideoCapture.
+                            if(!(m_querycap.device_caps & V4L2_CAP_META_CAPTURE))
+                            {
+                                for(int i=0;i<devicePaths.size();i++)
+                                {
+                                    QString path = devicePaths.at(i);
+                                    if(!(path.compare(path,"video" + QString::number(qDevCount),Qt::CaseInsensitive)))
+                                    {
+                                        cameraName = deviceNames.at(i);
+                                        if(cameraName.length()>22){
+                                            cameraName.insert(22,"\n");
+                                        }
+                                        availableCam.append(cameraName);
+                                    }
+                                }
+                                cameraMap.insert(qDevCount,QString::number(deviceIndex,10));
+                                deviceNodeMap.insert(deviceIndex,(char*)m_querycap.bus_info);
+                                metaCapture = false;
+                            }
+
+                            // Added by Navya : 24th Jan 2020
+                            // Increasing the deviceIndex only if the /dev/video node is VideoCapture Node.
+                            if(!metaCapture){
+                                deviceIndex++;
+                            }
+
+                            metaCapture = true;
+                            close();
                         }
-                        cameraMap.insert(qDevCount,QString::number(deviceIndex,10));
-                        deviceNodeMap.insert(deviceIndex,(char*)m_querycap.bus_info);
-                        //availableCam.append(cameraName);
-                        metaCapture = false;
-                    }
-                    // Added by Navya : 24th Jan 2020
-                    // Increasing the deviceIndex only if the /dev/video node is VideoCapture Node.
+                        else if(strcmp(driverName, "tegra-video") == 0) //Added by Sushanth - Support for MIPI cameras
+                        {
+                            if(!(m_querycap.device_caps & V4L2_CAP_META_CAPTURE))
+                            {
+                                sprintf(tegraDeviceName, "%s_%d", driverName, qDevCount);
 
-                    if(!metaCapture){
-                        deviceIndex++;
-                    }
-                    metaCapture = true;
-                    close();
+                                availableCam.append(tegraDeviceName);
 
+                                cameraMap.insert(qDevCount,QString::number(deviceIndex,10));
+                                deviceNodeMap.insert(deviceIndex,(char*)m_querycap.bus_info);
+
+                                tegraMetaCapture = false;
+                            }
+
+                            if(!tegraMetaCapture){
+                                deviceIndex++;
+                            }
+                            tegraMetaCapture = true;
+                            close();
+                        }
+                    } else {
+                        emit logWriter(QtCriticalMsg, "Cannot open device: /dev/video"+qDevCount);
+                        return void();
+                    }
                 } else {
-                    emit logWriter(QtCriticalMsg, "Cannot open device: /dev/video"+qDevCount);
-                    return void();
+                    emit logHandle(QtCriticalMsg, qTempStr+"Device opening failed"+qDevCount);
                 }
-            } else {
-                emit logHandle(QtCriticalMsg, qTempStr+"Device opening failed"+qDevCount);
             }
-        }
     } else {
         emit logHandle(QtCriticalMsg,"/sys/class/video4linux/ path is Not available");
     }

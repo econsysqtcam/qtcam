@@ -92,6 +92,8 @@ Rectangle {
 
     signal irWindowCloseBtnSignal()
 
+    //To disable manual white balance when the device is closed
+    signal disableUVCSettings()
 
     property int burstLength;
     property int cameraMode;
@@ -864,6 +866,7 @@ Rectangle {
             onCurrentIndexChanged: {
                 if(currentIndex.toString() != "-1" && currentIndex.toString() != "0") {
                     if(oldIndex!=currentIndex) {
+                        disableUVCSettings()
                         seqAni.restart
                         // when switching camera make "exposureAutoAvailable" as false
                         imageSettingsRootObject.exposureAutoAvailable = false

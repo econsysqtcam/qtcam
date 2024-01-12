@@ -483,6 +483,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: white_balance_Slider
+                        enabled: false
                         opacity: enabled ? 1 : 0.1
                         width: 110
                         style:econSliderStyle
@@ -496,7 +497,14 @@ Item {
                                     root.changeCameraSettings(whiteBalanceControlId,value.toString())
                                     root.manualWbSliderValueChanged()
                                 } else {
-                                    white_balance_Slider.enabled = false
+                                    if(white_balance.opacity == 1)
+                                    {
+                                        white_balance_Slider.enabled = true
+                                    }
+                                    else{
+                                        white_balance_Slider.enabled = false
+                                    }
+
                                 }
                             }
                         }
@@ -1314,6 +1322,11 @@ Item {
         onGetExposureFromHID:{
             exposure_Slider.value = exposureFromHID
         }
+        onDisableUVCSettings:{
+            white_balance_Slider.enabled = false
+            white_balance_Slider.opacity = 0.1
+            powerLineCombo.enabled = false
+        }
     }
 
     Connections
@@ -1724,9 +1737,25 @@ Item {
         ledModeCombo.opacity = 1
         ledModeCombo.currentIndex = controlDefaultValue
     }
+
+    //Manual White Balance
     function whiteBalanceUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         white_balance.opacity = 1
+
+        //Added by Sushanth - To enable manual white balance when the firmware exclusively supports manual white balance alone.
+        if(((autoSelect_wb.enabled == false) || ((autoSelect_wb.checked == false) && (autoSelect_wb.enabled == true ))) && (root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM))
+        {
+            JS.autoWhiteBalSelected = false             // manual white balance selected
+            white_balance_Slider.enabled = true
+            white_balance_Slider.opacity = 1
+        }
+        else{
+            JS.autoWhiteBalSelected = true              // auto white balance selected
+            white_balance_Slider.enabled = false
+            white_balance_Slider.opacity = 0.1
+        }
+
         whiteBalanceControlId = controlID
         white_balance_Slider.minimumValue = controlMinValue
         white_balance_Slider.maximumValue = controlMaxValue
@@ -1734,6 +1763,7 @@ Item {
         white_balance_Slider.stepSize = controlStepSize
     }
 
+    //Auto White Balance
     function whiteBalAutoUIUpdate(controlID,controlDefaultValue)
     {
         white_balance.opacity = 1
@@ -1741,6 +1771,7 @@ Item {
         autoSelect_wb.enabled = true
         autoSelect_wb.checked = controlDefaultValue
         whiteBalanceControl_auto_Id = controlID
+
         if(!autoSelect_wb.checked && root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM) {
             white_balance_Slider.enabled = true
             JS.autoWhiteBalSelected = false             // manual white balance selected
