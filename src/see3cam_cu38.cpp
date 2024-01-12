@@ -1,6 +1,6 @@
 /*
  * see3cam_cu38.cpp -- Handling special feature of seecamcu30 plus audio camera
- * Copyright © 2015  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
  *

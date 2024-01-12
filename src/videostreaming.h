@@ -1,6 +1,6 @@
 /*
  * videostreaming.h -- preview the camera buffer
- * Copyright © 2015  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
  *

@@ -1,6 +1,6 @@
 /*
  * see3camcu200.qml -- extension settings for SEE3CAM_CU200 camera
- * Copyright © 2015  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
  *

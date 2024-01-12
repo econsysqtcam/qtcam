@@ -2,7 +2,7 @@
 // Added by Sankari - 5 Oct 2018
 /*
  * H264Camera.cpp -- Access the extension unit of h264 camera.
- * Copyright © 2015  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
  *

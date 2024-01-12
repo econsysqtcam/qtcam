@@ -2,7 +2,7 @@
  * Created by Sushanth S
  * This file is used to recieve QImage from another file/Class
  * and render it in another window
- * Copyright © 2015  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  * This file is part of Qtcam.
  * Qtcam is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

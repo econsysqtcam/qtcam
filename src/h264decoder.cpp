@@ -1,6 +1,6 @@
 /*
  * h264decoder.cpp -- decode h264.
- * Copyright © 2015  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
  *

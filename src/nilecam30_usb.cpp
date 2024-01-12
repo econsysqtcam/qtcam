@@ -1,6 +1,6 @@
 /*
  * nilecam30_usb.cpp -- Handling special feature of nilecam30_usb camera
- * Copyright © 2015  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
  *

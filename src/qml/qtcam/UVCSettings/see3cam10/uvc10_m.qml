@@ -1,6 +1,6 @@
 /*
  * uvc10_m.qml -- extension settings for 10cug mono cameras
- * Copyright © 2015  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
  *

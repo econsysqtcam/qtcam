@@ -1,6 +1,6 @@
 /*
  * about.qml -- Display the about window
- * Copyright © 2015  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
  *
@@ -90,7 +90,7 @@ Window {
 
     Text {
         id: copyrights
-        text: "Copyright © 2015  e-con Systems India Pvt. Limited"
+        text: "Copyright © 2024  e-con Systems India Pvt. Limited"
         font.pixelSize: 15
         font.family: "Ubuntu Light"
         color: "#ffffff"

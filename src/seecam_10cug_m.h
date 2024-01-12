@@ -1,6 +1,6 @@
 /*
  * seecam_10cug_m.h -- Handling special feature of seecam10cug monochorme camera
- * Copyright © 2015  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
  *

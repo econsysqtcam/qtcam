@@ -1,6 +1,6 @@
 /*
  * see3cam_50cug_m.qml -- extension settings for other cameras
- * Copyright © 2015  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
  *
