@@ -1,3 +1,9 @@
+Qtcam Application - 26.0.4
+---------------------------
+*Added support for See3CAM_CU31.
+*Added UYVY shader following BT.709 standard for See3CAM_CU31.
+*Bug fixing for See3CAM_24CUG.
+
 Qtcam Application - 26.0.3
 ---------------------------
 *Implemented a fix, addressing the issue where a USB camera was unable to stream when a MIPI camera was connected first.

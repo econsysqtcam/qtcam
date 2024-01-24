@@ -1326,6 +1326,7 @@ Item {
             white_balance_Slider.enabled = false
             white_balance_Slider.opacity = 0.1
             powerLineCombo.enabled = false
+            exposureCombo.enabled = false
         }
     }
 
@@ -1983,6 +1984,7 @@ Item {
             while(menuitems.pop()){}
             exposureAutoControlId = controlID
             exposureCombo.currentIndex = controlDefaultValue
+
             //getting auto or manual exposure mode
             if(exposureCombo.currentText.toString()=="Manual Mode" || exposureCombo.currentText.toString()=="Shutter Priority Mode")
             {

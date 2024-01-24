@@ -139,6 +139,7 @@ public:
     void shaderRGB();
     void shaderYUYV();
     void shaderUYVY();
+    void shaderUYVYBT709();
     void shaderY8();
     void getDisplayRenderArea(int *displayX, int *displayY, int *destWidth, int *destHeight);
     void updateBuffer();
@@ -293,6 +294,8 @@ public:
     bool saveRawFile(void *inputBuffer, int buffersize);
     bool saveIRImage();
 
+    //Added By Sushanth - To Convert UYVY to RGB following BT.709 standard
+    bool convertUYVYToRGB(unsigned char *inputBuffer, int inputSize, unsigned char *outputBuffer);
 
     static int jpegDecode(Videostreaming *obj, unsigned char **pic, unsigned char *buf, unsigned long bytesUsed);
     static int decomp(Videostreaming *obj, unsigned char **jpegbuf,
@@ -634,7 +637,7 @@ public slots:
      * @brief To set the camera resolution.
      * @param resolution - Actual resolution set to the camera.  For example, 640x480.
      */
-    void setResoultion(QString resolution);
+    void setResolution(QString resolution);
 
     /**
      * @brief To open the camera device(video node).

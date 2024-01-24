@@ -1271,7 +1271,7 @@ Rectangle {
         vidstreamproperty.lastFPS(fps)
         vidstreamproperty.vidCapFormatChanged(format)
         if (!vidFormatChanged){
-            vidstreamproperty.setResoultion(str)
+            vidstreamproperty.setResolution(str)
         }
         vidstreamproperty.frameIntervalChanged(fps,Videostreaming.FPS_DEFAULT)
         vidstreamproperty.startAgain()
@@ -1290,7 +1290,7 @@ Rectangle {
         {
             vidstreamproperty.vidCapFormatChanged(JS.videoCaptureFormat)
             checkForResoln()      //To set Resolution with the updated one,specially for Hyperyon.
-            vidstreamproperty.setResoultion(JS.videoCaptureResolution)
+            vidstreamproperty.setResolution(JS.videoCaptureResolution)
         }
         vidstreamproperty.startAgain()
     }
@@ -1300,14 +1300,14 @@ Rectangle {
     function getFPSList(str, format) {
         vidstreamproperty.stopCapture()
         vidstreamproperty.vidCapFormatChanged(JS.stillCaptureFormat)
-        vidstreamproperty.setResoultion(JS.stillCaptureResolution)
+        vidstreamproperty.setResolution(JS.stillCaptureResolution)
         vidstreamproperty.updateFrameInterval(stillSettingsRootObject.stillClorComboValue, stillSettingsRootObject.stillOutputTextValue)
         JS.videoCaptureFormat = videoSettingsRootObject.videoColorComboIndex
         JS.stillCaptureResolution = stillSettingsRootObject.stillOutputTextValue
         if(JS.videoCaptureFormat !== JS.stillCaptureFormat  || JS.stillCaptureResolution !== JS.videoCaptureResolution)
         {
             vidstreamproperty.vidCapFormatChanged(JS.videoCaptureFormat)
-            vidstreamproperty.setResoultion(JS.videoCaptureResolution)
+            vidstreamproperty.setResolution(JS.videoCaptureResolution)
         }
         vidstreamproperty.startAgain()
     }
@@ -1348,7 +1348,7 @@ Rectangle {
         vidstreamproperty.triggerModeEnabled()
         vidstreamproperty.stopCapture()
         vidstreamproperty.vidCapFormatChanged(JS.stillCaptureFormat)
-        vidstreamproperty.setResoultion(JS.stillCaptureResolution);
+        vidstreamproperty.setResolution(JS.stillCaptureResolution);
         vidstreamproperty.startAgain();
     }
 
@@ -1364,7 +1364,7 @@ Rectangle {
         {
             vidstreamproperty.stopCapture()
             vidstreamproperty.vidCapFormatChanged(JS.videoCaptureFormat)
-            vidstreamproperty.setResoultion(JS.videoCaptureResolution);
+            vidstreamproperty.setResolution(JS.videoCaptureResolution);
             vidstreamproperty.startAgain();
         }
     }
@@ -1373,7 +1373,7 @@ Rectangle {
     function masterEnableForMonochrome(){
         vidstreamproperty.resolnSwitch();
         vidstreamproperty.vidCapFormatChanged(JS.videoCaptureFormat)
-        vidstreamproperty.setResoultion(JS.videoCaptureResolution);
+        vidstreamproperty.setResolution(JS.videoCaptureResolution);
         vidstreamproperty.startAgain();
     }
 
@@ -1591,6 +1591,11 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU84) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu84/see3camcu84.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200) {
+        }
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU31) {
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu31/seecamcu31.qml").createObject(root)
+        }
         else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
@@ -1660,6 +1665,7 @@ Rectangle {
         case CommonEnums.ECAM_512USB:    //Added by Sushanth.S
         case CommonEnums.SEE3CAM_50CUG:  //Added by Sushanth.S
         case CommonEnums.SEE3CAM_CU84:   //Added by Sushanth.S
+        case CommonEnums.SEE3CAM_CU31:   //Added By Sushanth.S
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
             break;
@@ -2135,7 +2141,7 @@ Rectangle {
     function getExposureOnResolnCheck()
     {
         checkForResoln()
-        vidstreamproperty.setResoultion(JS.videoCaptureResolution)
+        vidstreamproperty.setResolution(JS.videoCaptureResolution)
         getExposure()
     }
     // Added by Navya -31 July 2019 --Updating Preview display area when Application window is resized.

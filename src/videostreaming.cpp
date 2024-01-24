@@ -960,7 +960,14 @@ void FrameRenderer::changeShader(){
             drawRGBBUffer(); // To fix white color corruption drawing initially
             break;
         case V4L2_PIX_FMT_UYVY:
-            shaderUYVY();
+            if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU31)
+            {
+                shaderUYVYBT709();
+            }
+            else
+            {
+                shaderUYVY();
+            }
             drawUYVYBUffer(); // To fix white color corruption drawing initially
             break;
         case V4L2_PIX_FMT_GREY:
@@ -1196,6 +1203,7 @@ void FrameRenderer::shaderY8(){
         updateStop = true;
     }
 }
+
 /**
  * @brief FrameRenderer::shaderUYVY - shader to draw UYVY buffer
  */
@@ -1281,6 +1289,84 @@ void FrameRenderer::shaderUYVY(){
         updateStop = true;
     }
 }
+
+/**
+ * @brief FrameRenderer::shaderUYVYBT709 - shader to draw UYVY buffer following BT.709 standard
+ */
+void FrameRenderer::shaderUYVYBT709(){
+    if(!m_shaderProgram){
+        initializeOpenGLFunctions();
+        m_shaderProgram = new QOpenGLShaderProgram();
+
+        m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Vertex,
+                                                 "attribute vec4 a_position;\n"
+                                                 "attribute vec2 a_texCoord;\n"
+                                                 "varying vec2 v_texCoord;\n"
+                                                 "void main()\n"
+                                                 "{\n"
+                                                 "gl_Position = a_position;\n"
+                                                 "v_texCoord = a_texCoord;\n"
+                                                 "}\n");
+        m_shaderProgram->addShaderFromSourceCode(QOpenGLShader::Fragment,
+                                                 "#ifdef GL_ES\n"
+                                                 "precision highp float;\n"
+                                                 "#endif\n"
+
+                                                 "varying vec2 v_texCoord;\n"
+                                                 "uniform sampler2D uyvy_texture;\n"
+
+                                                 "uniform float texel_width;"
+                                                 "uniform float texture_width;"
+                                                 "uniform float texture_height;"
+
+                                                 "void main()\n"
+                                                 "{\n"
+                                                 "float r, g, b, y, u, v;\n"
+                                                 "vec4 luma_chroma;\n"
+                                                 "float xcoord = floor(v_texCoord.x * texture_width);\n"
+                                                 "float ycoord = floor(v_texCoord.y * texture_height);\n"
+
+                                                 "if (mod(xcoord, 2.0) == 0.0) {\n"
+                                                 "   luma_chroma = texture2D(uyvy_texture, v_texCoord);\n"
+                                                 "   y = luma_chroma.g;\n"
+                                                 "} else {\n"
+                                                 "   luma_chroma = texture2D(uyvy_texture, vec2(v_texCoord.x - texel_width, v_texCoord.y));\n"
+                                                 "   y = luma_chroma.a;\n"
+                                                 "}\n"
+
+                                                 //Following BT.709 Standard to convert UYVY to RGB
+                                                 "u = luma_chroma.r - 0.5;\n"
+                                                 "v = luma_chroma.b - 0.5;\n"
+
+                                                 "r = y + 1.5748*v;\n"
+                                                 "g = y - 0.1873*u - 0.4681*v;\n"
+                                                 "b = y + 1.8556*u;\n"
+
+                                                 "gl_FragColor = vec4(r, g, b, 1.0);\n"
+                                                 "}\n"
+                                             );
+
+        m_shaderProgram->bindAttributeLocation("a_position", 0);
+        m_shaderProgram->bindAttributeLocation("a_texCoord", 1);
+        m_shaderProgram->link();
+
+        mPositionLoc = m_shaderProgram->attributeLocation("a_position");
+        mTexCoordLoc = m_shaderProgram->attributeLocation("a_texCoord");
+
+        glEnable(GL_TEXTURE_2D);
+        // Get the sampler location
+        samplerLocUYVY = m_shaderProgram->uniformLocation("uyvy_texture");
+        GLuint uyvyTextureId;
+        // Generate a texture object
+        glGenTextures (1, &uyvyTextureId);
+        glActiveTexture (GL_TEXTURE1);
+        // Bind the texture object
+        glBindTexture (GL_TEXTURE_2D, uyvyTextureId);
+        updateStop = true;
+    }
+}
+
+
 /**
 * paint in Quick painted item (qml)
 */
@@ -1456,7 +1542,7 @@ bool Videostreaming::saveRawFile(void *inputBuffer, int buffersize){
     }
     bool ret = false;
     QFile file(filename);
-    if(file.open(QIODevice::WriteOnly)) {
+    if(file.open(QIODevice::WriteOnly)){
         int tmpRet = file.write((const char*)inputBuffer, buffersize);
         if(tmpRet != -1) {
             ret = true;
@@ -1467,6 +1553,63 @@ bool Videostreaming::saveRawFile(void *inputBuffer, int buffersize){
     }
     return ret;
 }
+
+/**
+* Added By Sushanth
+* convertUYVYToRGB - To Convert UYVY to RGB following BT.709 standards
+* @param: inputBuffer - UYVY data to convert.
+* @param: inputSize   - input buffer size.
+* @param: outputBuffer - output buffer.
+* return true/false
+*/
+bool Videostreaming::convertUYVYToRGB(unsigned char *inputBuffer, int inputSize, unsigned char *outputBuffer)
+{
+    int R1, G1, B1, R2, G2, B2, iter, iter2 = 0;
+    uint8_t Y1, Y2, U, V;
+
+    if(outputBuffer != NULL)
+    {
+        for(iter = 0; iter < inputSize; iter++)
+        {
+            //get luminance and chrominance file
+            U = *(inputBuffer + iter);
+            iter++;
+            Y1 = *(inputBuffer + iter);
+            iter++;
+            V = *(inputBuffer + iter);
+            iter++;
+            Y2 = *(inputBuffer + iter);
+
+            R1 = Y1 + ((403 * (V - 128)) >> 8);
+            G1 = Y1 - ((48 * (U - 128) + 120 * (V - 128)) >> 8);
+            B1 = Y1 + ((475 * (U - 128)) >> 8);
+
+            R2 = Y2 + ((403 * (V - 128)) >> 8);
+            G2 = Y2 - ((48 * (U - 128) + 120 * (V - 128)) >> 8);
+            B2 = Y2 + ((475 * (U - 128)) >> 8);
+
+            R1 = R1 > 255 ? 255: ((R1 < 0) ? 0 : R1);
+            G1 = G1 > 255 ? 255: ((G1 < 0) ? 0 : G1);
+            B1 = B1 > 255 ? 255: ((B1 < 0) ? 0 : B1);
+
+            R2 = R2 > 255 ? 255: ((R2 < 0) ? 0 : R2);
+            G2 = G2 > 255 ? 255: ((G2 < 0) ? 0 : G2);
+            B2 = B2 > 255 ? 255: ((B2 < 0) ? 0 : B2);
+
+            //store 2 pixel values in the RGB buffer
+            outputBuffer[iter2++] = R1;
+            outputBuffer[iter2++] = G1;
+            outputBuffer[iter2++] = B1;
+
+            outputBuffer[iter2++] = R2;
+            outputBuffer[iter2++] = G2;
+            outputBuffer[iter2++] = B2;
+        }
+    }
+    return true;
+}
+
+
 
 /**
 * SaveIRImage
@@ -2083,7 +2226,25 @@ void Videostreaming::capFrame()
                 }
                 else
                 {//This is common to all other cameras
+
+                    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU31)
+                    {
+                        int inputSize = buf.bytesused;
+                        int outputSize = (inputSize / 2) * 3;
+
+                        unsigned char* outputBuffer = NULL;
+                        outputBuffer = (unsigned char*) malloc (outputSize);
+
+                        unsigned char* inputBuffer = reinterpret_cast<unsigned char*>(m_buffers[buf.index].start[0]);
+
+                        //To Convert UYVY to RGB following BT.709 standards
+                        convertUYVYToRGB(inputBuffer, inputSize, m_capImage->bits());
+
+                        bufferToSave = m_capImage->bits();
+                    }
+
                     QImage qImage3(bufferToSave, width, height, QImage::Format_RGB888);
+
                     QImageWriter writer(filename);
 
                     if(m_saveImage){
@@ -3562,7 +3723,7 @@ void Videostreaming::doAfterChangeFPSAndShot(){
     if(fpsChangedForStill){
         stopCapture();
         vidCapFormatChanged(lastFormat);
-        setResoultion(lastPreviewSize);
+        setResolution(lastPreviewSize);
         frameIntervalChanged(lastFPSValue.toUInt(),FPS_DEFAULT);
         startAgain();
     }
@@ -3615,7 +3776,7 @@ void Videostreaming::allocBuffers()
     m_renderer->videoResolutionHeight = m_height;
 
     int buffLength = m_width * m_height;
-     int buffHalfLength = (m_width * m_height)/ 2;
+    int buffHalfLength = (m_width * m_height)/ 2;
 
     m_renderer->yBuffer = (uint8_t*)realloc(m_renderer->yBuffer,buffLength);
     m_renderer->uBuffer = (uint8_t*)realloc(m_renderer->uBuffer,buffHalfLength);
@@ -3732,7 +3893,6 @@ bool Videostreaming::startCapture()
         perror("VIDIOC_STREAMON");
         return false;
     }
-
 
     //To Create window for IR preview & also avoid to create IR window when capturing still
     if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)&&(createWindow))
@@ -3873,7 +4033,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
 
         stopCapture();
         vidCapFormatChanged(stillOutFormat);
-        setResoultion(stillSize);
+        setResolution(stillSize);
 
         if(currentlySelectedCameraEnum == CommonEnums::ECAM22_USB)
         {
@@ -3925,7 +4085,7 @@ void  Videostreaming::changeFPSandTakeShot(QString filePath,QString imgFormatTyp
         emit stillSkipCountWhenFPSChange(true);
         stopCapture();
         vidCapFormatChanged(stillOutFormat);
-        setResoultion(stillSize);
+        setResolution(stillSize);
         frameIntervalChanged(fpsIndex,FPS_DEFAULT);
         startAgain();
         fpsChangedForStill = true;
@@ -4116,7 +4276,7 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
         m_renderer->updateStop = true;
         stopCapture();
         vidCapFormatChanged(stillOutFormat);
-        setResoultion(stillSize);
+        setResolution(stillSize);
         startAgain();
 
         if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
@@ -4269,7 +4429,7 @@ void Videostreaming::doStartFrameTimeOut()
     }
 
     vidCapFormatChanged(lastFormat);
-    setResoultion(lastPreviewSize);
+    setResolution(lastPreviewSize);
     startAgain();
 }
 
@@ -4489,7 +4649,7 @@ void Videostreaming::lastFPS(QString fps) {
     lastFPSValue = fps;
 }
 
-void Videostreaming::setResoultion(QString resolution)
+void Videostreaming::setResolution(QString resolution)
 {
     emit logDebugHandle("Resolution set at::"+resolution);
     v4l2_format fmt;
@@ -5181,7 +5341,6 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
         {
             emit setCrossStillProperties(true);
         }
-
         resolnSwitch();   //Replaced stopCapture() with resolnSwitch() inorder to get preview in higher resolns while using Retrieve button.
 
         if(stillSettings){
@@ -5189,13 +5348,13 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
             retrieveShot =true;
             m_renderer->updateStop = true;
             vidCapFormatChanged(stillOutFormat);
-            setResoultion(stillSize);
+            setResolution(stillSize);
             m_renderer->renderBufferFormat = CommonEnums::NO_RENDER;
         }
         else{
             retrieveShot = false;
             vidCapFormatChanged(lastFormat);
-            setResoultion(lastPreviewSize);
+            setResolution(lastPreviewSize);
 
             //To disable clearBuffer after crossResolution still capture to start the paint - Added by Sushanth
             clearBuffer = false;

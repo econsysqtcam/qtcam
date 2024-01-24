@@ -134,6 +134,8 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c189"),CommonEnums::SEE3CAM_CU84);
     //Added By Sushanth 28th September 2023
     cameraEnumMap.insert(econVid + (",c540"),CommonEnums::SEE3CAM_CU200);
+    //Added By Sushanth 17th January 2024
+    cameraEnumMap.insert(econVid + (",c137"),CommonEnums::SEE3CAM_CU31);
 }
 
 unsigned int uvccamera::getTickCount()
@@ -305,6 +307,7 @@ int uvccamera::findEconDevice(QString parameter)
             QString serialNumber = udev_device_get_sysattr_value(pdev,"serial");
             QString vidValue = udev_device_get_sysattr_value(pdev,"idVendor");
             QString pidValue = udev_device_get_sysattr_value(pdev,"idProduct");
+
             if(parameter!="video4linux")
             {
                 emit logHandle(QtDebugMsg, "HID Device found: "+productName + ": Available in: "+hid_device);

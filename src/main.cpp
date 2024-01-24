@@ -85,6 +85,7 @@
 #include "see3cam_50cug.h"
 #include "see3cam_cu84.h"
 #include "see3cam_cu200.h"
+#include "see3cam_cu31.h"
 
 
 //*! \mainpage Qtcam - A econ's camera product
@@ -193,6 +194,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<SEE3CAM_50CUG>("econ.camera.see3cam50cug", 1, 0, "SEE3CAM_50CUG");
     qmlRegisterType<SEE3CAM_CU84>("econ.camera.see3camcu84", 1, 0, "SEE3CAM_CU84");
     qmlRegisterType<SEE3CAM_CU200>("econ.camera.see3camcu200", 1, 0, "SEE3CAM_CU200");
+    qmlRegisterType<SEE3CAM_CU31>("econ.camera.see3camcu31", 1, 0, "SEE3CAM_CU31");
 
     //For IR Window
     qmlRegisterType<ImageItem>("econ.camera.qimagerenderer", 1, 0, "ImageItem");

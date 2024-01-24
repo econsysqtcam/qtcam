@@ -94,7 +94,8 @@ SOURCES += main.cpp \
     see3cam_16cug_m.cpp \
     see3cam_50cug.cpp \
     see3cam_cu512_m.cpp \
-    see3cam_cu84.cpp
+    see3cam_cu84.cpp \
+    see3cam_cu31.cpp
 
 # Installation path
 # target.path =
@@ -169,7 +170,8 @@ HEADERS += \
     see3cam_16cug_m.h \
     see3cam_50cug.h \
     see3cam_cu84.h \
-    see3cam_cu512_m.h
+    see3cam_cu512_m.h \
+    see3cam_cu31.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
@@ -292,6 +294,7 @@ contains(DEFINES, UBUNTU_22_04) {
         ub22_qml/qtcam/UVCSettings/see3camcu55_MH/see3camcu55_mh.qml \
         ub22_qml/qtcam/UVCSettings/see3camcu83/see3camcu83.qml \
         ub22_qml/qtcam/UVCSettings/see3camcu84/see3camcu84.qml \
+        ub22_qml/qtcam/UVCSettings/see3camcu31/seecamcu31.qml \
         ub22_qml/qtcam/UVCSettings/others/others.qml \
 }
 else:{
@@ -348,5 +351,6 @@ else:{
         qml/qtcam/UVCSettings/see3camcu55_MH/see3camcu55_mh.qml \
         qml/qtcam/UVCSettings/see3camcu83/see3camcu83.qml \
         qml/qtcam/UVCSettings/see3camcu84/see3camcu84.qml \
+        qml/qtcam/UVCSettings/see3camcu31/seecamcu31.qml \
         qml/qtcam/UVCSettings/others/others.qml \
 }
