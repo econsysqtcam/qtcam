@@ -1325,8 +1325,6 @@ Item {
         onDisableUVCSettings:{
             white_balance_Slider.enabled = false
             white_balance_Slider.opacity = 0.1
-            powerLineCombo.enabled = false
-            exposureCombo.enabled = false
         }
     }
 
