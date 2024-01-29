@@ -1,5 +1,5 @@
 qtcam (26.0.4-0ubuntu1) bionic; urgency=medium
- *Added Support for See3CAM_CU31.
+ *Added Support for See3CAM_CU31 & Enabled Exposure, Powerline Frequency.
  *Fix for supporting manual White balance (UVC) alone and seperated USB & MIPI device nodes.
  *Set Gain, Exposure, Brightness while capturing still in cross resolution using HID control for See3CAM_CU135M_H01R1.
  *Added new HID controls (Stream & Flip Modes) for See3CAM_CU512_M.
@@ -134,5 +134,5 @@ qtcam (26.0.4-0ubuntu1) bionic; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Wed 24 Jan 2024 16:35:00 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Mon 29 Jan 2024 20:13:00 +0530
 
