@@ -68,6 +68,8 @@
 #define Y16_NEW_WIDTH     3120
 #define Y16_NEW_HEIGHT    1080
 
+#define ZERO_FPS      0
+
 #include <QTimer>
 #include <QDateTime>
 #include <QSocketNotifier>
@@ -860,6 +862,7 @@ signals:
     void startEnumerateMenulist();
     void deviceUnplugged(QString _title,QString _text);
     void averageFPS(unsigned fps);
+    void updateFpsZero(int fps);
     void defaultStillFrameSize(unsigned int outputIndexValue);
     void defaultFrameSize(unsigned int outputIndexValue, unsigned int  defaultWidth, unsigned int defaultHeight);
     void defaultOutputFormat(unsigned int formatIndexValue);

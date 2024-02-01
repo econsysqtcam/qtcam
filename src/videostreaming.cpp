@@ -5227,6 +5227,7 @@ void Videostreaming::doEncodeAudio(){
 
 void Videostreaming::stopUpdatePreview() {
     m_renderer->updateStop = true;
+    emit updateFpsZero(ZERO_FPS);
 }
 
 void Videostreaming::triggerModeSkipframes() {

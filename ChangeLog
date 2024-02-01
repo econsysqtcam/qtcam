@@ -1,3 +1,8 @@
+Qtcam Application - 26.0.5
+---------------------------
+*Set Fps 0, when See3CAM_CU31 device is in trigger mode.
+*Modification in UI for See3CAM_CU31.
+
 Qtcam Application - 26.0.4
 ---------------------------
 *Added support for See3CAM_CU31.

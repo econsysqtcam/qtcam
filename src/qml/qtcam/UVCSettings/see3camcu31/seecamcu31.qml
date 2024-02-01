@@ -24,6 +24,15 @@ Item {
         }
     }
 
+    Timer {
+        id: updateFpsOnTriggerMode
+        interval: 200
+        onTriggered: {
+            root.setFpsZeroOnTriggerMode()
+            stop()
+        }
+    }
+
     Action {
         id: setDefault
         onTriggered:
@@ -53,6 +62,9 @@ Item {
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
+        onUpdateZeroFpsInTriggerMode:{
+            updateFpsOnTriggerMode.start()
+        }
     }
     ScrollView{
         id: scrollview
@@ -63,7 +75,7 @@ Item {
         style: econscrollViewStyle
 
         Item {
-            height: 850
+            height: 750
             ColumnLayout{
                 x:2
                 y:5
@@ -80,7 +92,8 @@ Item {
                     opacity: 0.50196078431373
                 }
                 Row{
-                    spacing: 40
+                    spacing: 45
+                    Layout.alignment: Qt.AlignCenter
                     CheckBox {
                         id: flipCtrlHorizotal
                         activeFocusOnPress : true
@@ -111,7 +124,7 @@ Item {
                     Layout.alignment: Qt.AlignCenter
                     Text {
                         id: rnrModeTitle
-                        text: "--- Raw Noise Detection ---"
+                        text: "--- Raw Noise Reduction ---"
                         font.pixelSize: 14
                         font.family: "Ubuntu"
                         color: "#ffffff"
@@ -119,10 +132,10 @@ Item {
                         opacity: 0.50196078431373
                     }
                 }
-                ColumnLayout {
-                    x: 23
-                    y: 235
-                    spacing: 15
+                Row{
+                    spacing: 45
+                    Layout.alignment: Qt.AlignCenter
+
                     ExclusiveGroup { id: rnrModeGroup }
                     RadioButton {
                         id: disableRNR
@@ -164,28 +177,16 @@ Item {
                         opacity: 0.50196078431373
                     }
                 }
-                ColumnLayout {
-                    x: 23
-                    y: 235
-                    spacing: 15
+                Row{
+                    spacing: 45
+                    Layout.alignment: Qt.AlignCenter
+
                     ExclusiveGroup { id: triggerModeGroup }
-                    RadioButton {
-                        id: triggerDisable
-                        style:  econRadioButtonStyle
-                        text:   qsTr("Disable")
-                        exclusiveGroup: triggerModeGroup
-                        activeFocusOnPress: true
-                        onClicked: {
-                            disableTriggerMode()
-                        }
-                        Keys.onReturnPressed:{
-                            disableTriggerMode()
-                        }
-                    }
+
                     RadioButton {
                         id: triggerReadOut
                         style:  econRadioButtonStyle
-                        text: qsTr("ReadOut")
+                        text: qsTr("Readout")
                         exclusiveGroup: triggerModeGroup
                         activeFocusOnPress: true
                         onClicked: {
@@ -209,6 +210,23 @@ Item {
                         }
                     }
                 }
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    RadioButton {
+                        id: triggerDisable
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Disable")
+                        exclusiveGroup: triggerModeGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            disableTriggerMode()
+                        }
+                        Keys.onReturnPressed:{
+                            disableTriggerMode()
+                        }
+                    }
+                }
+
                 Text
                 {
                     id: convergenceSpeedTitle
@@ -224,6 +242,7 @@ Item {
                 Row
                 {
                     spacing: 35
+                    Layout.alignment: Qt.AlignCenter
                     Slider
                     {
                         id: convergenceSpeedSlider
@@ -277,15 +296,15 @@ Item {
                         opacity: 0.50196078431373
                     }
                 }
-                ColumnLayout {
-                    x: 23
-                    y: 235
-                    spacing: 15
+                Row{
+                    spacing: 45
+                    Layout.alignment: Qt.AlignCenter
+
                     ExclusiveGroup { id: autoExpStatusGroup }
                     RadioButton {
                         id: autoExpRelease
                         style:  econRadioButtonStyle
-                        text:   qsTr("Release")
+                        text:   qsTr("Auto")
                         exclusiveGroup: autoExpStatusGroup
                         activeFocusOnPress: true
                         onClicked: {
@@ -322,15 +341,15 @@ Item {
                         opacity: 0.50196078431373
                     }
                 }
-                ColumnLayout {
-                    x: 23
-                    y: 235
-                    spacing: 15
+                Row{
+                    spacing: 45
+                    Layout.alignment: Qt.AlignCenter
+
                     ExclusiveGroup { id: awbStatusGroup }
                     RadioButton {
                         id: awbRelease
                         style:  econRadioButtonStyle
-                        text:   qsTr("Release")
+                        text:   qsTr("Auto")
                         exclusiveGroup: awbStatusGroup
                         activeFocusOnPress: true
                         onClicked: {
