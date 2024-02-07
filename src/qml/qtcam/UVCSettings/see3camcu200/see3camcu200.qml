@@ -135,6 +135,9 @@ Item{
     property real adjustedBrightness: 0.0
     property real adjustedSaturation: 0.0
     property real adjustedGammaCorrection: 0.0
+    property real spinBoxMin: -3.99
+    property real spinBoxMax: 3.99
+    property real spinBoxStepSize: 0.005
 
     property int expMin: 100
     property int expMax: 1000000
@@ -166,25 +169,71 @@ Item{
         height: 500
         style: econscrollViewStyle
         Item{
-            height: 1500
+            height: 1600
 
             ColumnLayout{
                 x:2
                 y:5
                 spacing:18
 
+//                Text {
+//                    id: gainModeTitle
+//                    text: "--- Gain Mode ---"
+//                    font.pixelSize: 14
+//                    font.family: "Ubuntu"
+//                    color: "#ffffff"
+//                    smooth: true
+//                    Layout.alignment: Qt.AlignCenter
+//                    opacity: 0.50196078431373
+//                }
+//                Row{
+//                    spacing: 30
+//                    Layout.alignment: Qt.AlignCenter
+//                    ExclusiveGroup { id: gainModeGroup }
+//                    RadioButton {
+//                        id: autoGain
+//                        exclusiveGroup: gainModeGroup
+//                        checked: false
+//                        text: "Auto"
+//                        activeFocusOnPress: true
+//                        style: econRadioButtonStyle
+//                        onClicked: {
+//                            see3camcu200.setGainMode(SEE3CAM_CU200.AUTO_MODE, 0)
+//                        }
+//                        Keys.onReturnPressed: {
+//                            see3camcu200.setGainMode(SEE3CAM_CU200.AUTO_MODE, 0)
+//                        }
+//                    }
+
+//                    RadioButton {
+//                        id: manualGain
+//                        exclusiveGroup: gainModeGroup
+//                        checked: false
+//                        text: "Manual"
+//                        activeFocusOnPress: true
+//                        style: econRadioButtonStyle
+//                        onClicked: {
+//                            see3camcu200.setGainMode(SEE3CAM_CU200.MANUAL_MODE, gainSlider.value)
+//                        }
+//                        Keys.onReturnPressed: {
+//                            see3camcu200.setGainMode(SEE3CAM_CU200.MANUAL_MODE, gainSlider.value)
+//                        }
+//                    }
+//                }
+
+
                Text{
                     id: manualGainSlider
-                    text: "--- Gain ---"
+                    text: "--- Manual Gain ---"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
                     smooth: true
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
+
                     ToolButton{
-                        tooltip: "Gain:
-Used for modifying Digital Gain of B channel in steps of 0.04"
+                        tooltip: "It is used to modify the gain value of the sensor."
                         width: 200
                         opacity: 0
                     }
@@ -199,6 +248,8 @@ Used for modifying Digital Gain of B channel in steps of 0.04"
                         updateValueWhileDragging: false
                         width: 150
                         style:econSliderStyle
+//                        opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
+//                        enabled: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
                         onValueChanged:  {
                             //Sending HID value to UVC
                             root.getGainValueFromHID(gainSlider.value)
@@ -218,6 +269,8 @@ Used for modifying Digital Gain of B channel in steps of 0.04"
                         font.family: "Ubuntu"
                         smooth: true
                         horizontalAlignment: TextInput.AlignHCenter
+//                        opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
+//                        enabled: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
                         style: econTextFieldStyle
                         validator: IntValidator {bottom: gainSlider.minimumValue; top: gainSlider.maximumValue}
                         onTextChanged: {
@@ -239,8 +292,7 @@ Used for modifying Digital Gain of B channel in steps of 0.04"
                         opacity: 0.50196078431373
 
                         ToolButton{
-                            tooltip: "R Gain :
-Used for modifying Digital Gain of R channel in steps of 0.04"
+                            tooltip: "Modifies the digital gain of R channel in steps of 0.005."
                             width: 200
                             opacity: 0
                         }
@@ -268,6 +320,7 @@ Used for modifying Digital Gain of R channel in steps of 0.04"
                         TextField
                         {
                             id: gainRTextField
+                            text:gainRSlider.value
                             font.pixelSize: 10
                             font.family: "Ubuntu"
                             smooth: true
@@ -293,8 +346,7 @@ Used for modifying Digital Gain of R channel in steps of 0.04"
                         opacity: 0.50196078431373
 
                         ToolButton{
-                            tooltip: "B Gain :
-Used for modifying Digital Gain of B channel in steps of 0.04"
+                            tooltip: "Modifies the digital gain of B channel in steps of 0.005."
                             width: 200
                             opacity: 0
                         }
@@ -323,6 +375,7 @@ Used for modifying Digital Gain of B channel in steps of 0.04"
                         TextField
                         {
                             id: gainBTextField
+                            text:gainBSlider.value
                             font.pixelSize: 10
                             font.family: "Ubuntu"
                             smooth: true
@@ -350,20 +403,8 @@ Used for modifying Digital Gain of B channel in steps of 0.04"
                    opacity: 0.50196078431373
 
                    ToolButton{
-                       tooltip: "Color Correction :
-Used for applying manual 3×3 matrix to RGB channel in steps of +0.04 or -0.04
-
-Matrix format :
-Rr Rg Rb
-Gr Gg Gb
-Br Bg Bb
-
-Application to RGB channel:
-R_new = R_old*Rr + G_old*Rg + B_old*Rb
-G_new = R_old*Gr + G_old*Gg + B_old*Gb
-B_new = R_old*Br + G_old*Bg + B_old*Bb
-
-For manual color temperature the CCM is predefined and it can be overwritten by using this control."
+                       tooltip: "It is used for applying manual 3x3 matrix to RGB channel in steps of 0.005.
+For Manual Color Temperature, the Color Correction Matrix is predefined and it can overwritten by using this control."
                        width: 200
                        opacity: 0
                    }
@@ -453,12 +494,8 @@ For manual color temperature the CCM is predefined and it can be overwritten by 
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
                    ToolButton{
-                       tooltip: "Blacklevel Adjustment:
-The blacklevel (also called baseline) is the value which is subtracted from the image signal to compensated thermally generated noise.
-
-Note: Changing the value will affect the image quality . Please use this after evaluating and checking enough.
-
-Recommended value is : 240"
+                       tooltip: "Black level is the value which is subtracted from the image signal to compensate the thermally generated noise.
+Note: Changing the value will affect image quality."
                        opacity: 0
                        width: 200
                    }
@@ -511,8 +548,7 @@ Recommended value is : 240"
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
                    ToolButton{
-                       tooltip: "Brightness :
-Used for changing brightness by modifying Y channel gain in steps of 0.04"
+                       tooltip: "Modifies the Y channel gain in steps of 0.005 by changing the brightness of the frame."
                        width: 200
                        opacity: 0
                    }
@@ -526,7 +562,6 @@ Used for changing brightness by modifying Y channel gain in steps of 0.04"
                        width: 150
                        style:econSliderStyle
                        onValueChanged:  {
-
                            brightnessTextField.text = brightnessSlider.value
                            if(skipUpdateBrightness){
                                // Round the slider and TextField to three decimal places
@@ -569,8 +604,7 @@ Used for changing brightness by modifying Y channel gain in steps of 0.04"
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
                    ToolButton{
-                       tooltip: "Contrast :
-Used for changing contrast by modifying the strengths of S curve applied to Y channel "
+                       tooltip: "Modifies the strengths of S curve applied to Y channel by changing the contrast of the frame."
                        width: 200
                        opacity: 0
                    }
@@ -622,8 +656,7 @@ Used for changing contrast by modifying the strengths of S curve applied to Y ch
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
                    ToolButton{
-                       tooltip: "Saturation :
-Used for changing saturation by modifying the gain of Z curve applied to UV channel in steps of 0.04"
+                       tooltip: "Modifies the gain of Z curve applied to UV channel in steps of 0.005 by changing the saturation of the frame."
                        width: 200
                        opacity: 0
                    }
@@ -636,6 +669,7 @@ Used for changing saturation by modifying the gain of Z curve applied to UV chan
                        updateValueWhileDragging: false
                        width: 150
                        style:econSliderStyle
+
                        onValueChanged:  {
                            saturationTextField.text = saturationSlider.value
                            if(skipUpdateSaturation){
@@ -679,9 +713,9 @@ Used for changing saturation by modifying the gain of Z curve applied to UV chan
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
                    ToolButton{
-                       tooltip: "Color temperature :
-Used for white balancing the scene based on the temperature set by applying predefined R and B digital gain.
-Note:  For temperature other than the possible values(2300, 2800, 3000,4000, 6000, 6500) individual R and B digital gain can be manually adjusted."
+                       tooltip: "It is used for white balancing the scene based on the temperature set by applying predefined R and B digital gain.
+Note:
+For temperature other than the possible values (2300, 2800, 3000, 4000, 6000, 6500), individual R and B digital gain can be manually adjusted."
                        width: 200
                        opacity: 0
                    }
@@ -775,8 +809,7 @@ Note:  For temperature other than the possible values(2300, 2800, 3000,4000, 600
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
                    ToolButton{
-                       tooltip: "Gamma Correction:
-Used for changing gamma by modifying strengths of gamma correction curve applied to Y channel in steps of 0.1"
+                       tooltip: "Modifies the strength of gamma correction curve applied to Y channel in steps of 0.1 by changing the gamma of the frame."
                        width: 200
                        opacity: 0
                    }
@@ -832,8 +865,7 @@ Used for changing gamma by modifying strengths of gamma correction curve applied
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
                    ToolButton{
-                       tooltip: "Exposure:
-This feature controls the integration time of the sensor. Values are expressed in micro seconds."
+                       tooltip: "It controls the integration time of the sensor. It changes in the range of 100µs to 1s. It is expressed in microseconds(µs)."
                        opacity: 0
                        width: 200
                    }
@@ -883,11 +915,20 @@ This feature controls the integration time of the sensor. Values are expressed i
                            exposureSetBtn.enabled = false
                            setButtonClicked = true
 
+                           see3camcu200.setExposure(SEE3CAM_CU200.MANUAL_EXPOSURE, manualExpTextField.text);
+
                            //Sending HID value to UVC
-                           root.sendExposureToUVC(manualExpTextField.text)
+                           exposureText = manualExpTextField.text
+                           if(manualExpTextField.text <= 1000000)
+                           {
+                               exposureInt = manualExpTextField.text / 100
+                               root.sendExposureToUVC(exposureInt)
+                           }
+                           else{
+                               root.sendExposureToUVC(100000)
+                           }
                            manualExpTextField.text = exposureText
 
-                           see3camcu200.setExposure(SEE3CAM_CU200.MANUAL_EXPOSURE, manualExpTextField.text);
                            exposureSetBtn.enabled = true
                        }
                        Keys.onReturnPressed:
@@ -917,18 +958,18 @@ This feature controls the integration time of the sensor. Values are expressed i
                    opacity: 0.50196078431373
 
                }
-               ColumnLayout{
-                  ExclusiveGroup { id: cameraModeGroup }
+               Row{
                   spacing: 25
+                  Layout.alignment: Qt.AlignCenter
+                  ExclusiveGroup { id: cameraModeGroup }
+
                   RadioButton {
                       id: masterMode
                       style:  econRadioButtonStyle
                       text: qsTr("Master")
                       exclusiveGroup: cameraModeGroup
                       activeFocusOnPress: true
-                      tooltip: " Master Mode :
-After choosing master mode, the application starts steaming.
-This is a simple mode of operation for the camera without any external trigger capability."
+                      tooltip: " After choosing master mode, the application starts video streaming. This is a simple mode of operation for the camera without any external trigger capability."
                       onClicked: {
                           setMasterMode()
                       }
@@ -942,7 +983,7 @@ This is a simple mode of operation for the camera without any external trigger c
                       text: qsTr("Trigger")
                       exclusiveGroup: cameraModeGroup
                       activeFocusOnPress: true
-
+                      tooltip: "In Trigger mode, Frames will be out only when external hardware pulses are given to PIN1 of CN4."
                       onClicked: {
                           setTriggerMode()
                       }
@@ -961,14 +1002,6 @@ This is a simple mode of operation for the camera without any external trigger c
                    smooth: true
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
-
-                   ToolButton{
-                       tooltip: "Strobe Mode :
-The transition from low to high and high to low of strobe pulses will directly indicate the start and stop of the sensor exposure.
-This feature is supported in Acquisition trigger."
-                       width: 200
-                       opacity: 0
-                   }
                }
                Row{
                    spacing: 30
@@ -979,6 +1012,7 @@ This feature is supported in Acquisition trigger."
                        exclusiveGroup: strobesGrp
                        checked: false
                        text: "On"
+                       tooltip: "When this control is enabled, the LED is ON for each frame’s exposure time while Video Streaming."
                        activeFocusOnPress: true
                        style: econRadioButtonStyle
                        onClicked: {
@@ -994,6 +1028,7 @@ This feature is supported in Acquisition trigger."
                        exclusiveGroup: strobesGrp
                        checked: false
                        text: "Off"
+                       tooltip: "It disables strobe control."
                        activeFocusOnPress: true
                        style: econRadioButtonStyle
                        onClicked: {
@@ -1005,21 +1040,114 @@ This feature is supported in Acquisition trigger."
                    }
                }
 
-               Row{
+               Text {
+                   id: flipMode
+                   text: "--- Orientation Mode ---"
+                   font.pixelSize: 14
+                   font.family: "Ubuntu"
+                   color: "#ffffff"
+                   smooth: true
                    Layout.alignment: Qt.AlignCenter
-                   Button {
-                       id: defaultValue
-                       opacity: 1
+                   opacity: 0.50196078431373
+               }
+               Row{
+                   spacing: 40
+                   CheckBox {
+                       id: flipCtrlHorizotal
                        activeFocusOnPress : true
-                       text: "Default"
-                       tooltip: "Click to set default values in extension controls"
-                       style: econButtonStyle
-                       action: setDefault
+                       text: "Horizontal"
+                       style: econCheckBoxStyle
+                       tooltip: "Flips the preview left/right."
                        onClicked:{
-                           setToDefaultValues()
+                           see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                        }
                        Keys.onReturnPressed: {
-                           setToDefaultValues()
+                           see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                       }
+                   }
+                   CheckBox {
+                       id: flipCtrlVertical
+                       activeFocusOnPress : true
+                       text: "Vertical"
+                       style: econCheckBoxStyle
+                       tooltip: "Flips the preview vertically up/down."
+                       onClicked:{
+                           see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                       }
+                       Keys.onReturnPressed: {
+                           see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                       }
+                   }
+               }
+
+               Text {
+                   id: userDefinedTitle
+                   text: "--- User Defined Configuration ---"
+                   font.pixelSize: 14
+                   font.family: "Ubuntu"
+                   color: "#ffffff"
+                   smooth: true
+                   Layout.alignment: Qt.AlignCenter
+                   opacity: 0.50196078431373
+                   ToolButton{
+                       tooltip: "This control provides the functionality to securely store all currently configured settings in the device's memory.
+Following the configuration save, it is recommended to initiate a device reset to seamlessly load the saved configuration as the default."
+                       width: 200
+                       opacity: 0
+                   }
+               }
+
+               Row{
+                   Layout.alignment: Qt.AlignCenter
+                   spacing: 8
+
+                   Button {
+                       id: userDefinedConfig
+                       opacity: 1
+                       activeFocusOnPress : true
+                       text: "Save Configuration"
+                       style: econButtonStyle
+                       onClicked:{
+                           setButtonClicked = true
+                           see3camcu200.saveConfiguration(SEE3CAM_CU200.USER_DEFINED)
+                       }
+                       Keys.onReturnPressed: {
+                           setButtonClicked = true
+                           see3camcu200.saveConfiguration(SEE3CAM_CU200.USER_DEFINED)
+                       }
+                   }
+                   Button {
+                       id: resetDevice
+                       opacity: 1
+                       activeFocusOnPress : true
+                       text: "Device Reset"
+                       style: econButtonStyle
+                       onClicked:{
+                           see3camcu200.resetDevice()
+                       }
+                       Keys.onReturnPressed: {
+                           see3camcu200.resetDevice()
+                       }
+                   }
+               }
+
+               ColumnLayout{
+                   Layout.alignment: Qt.AlignCenter
+                   Button {
+                       id: defaultConfig
+                       opacity: 1
+                       activeFocusOnPress : true
+                       text: "Default Configuration"
+                       tooltip: "This control is designed to restore the factory-provided default configuration.
+Upon activation, the device will undergo an automatic reset to seamlessly load and apply the default configuration settings."
+                       style: econButtonStyle
+                       onClicked:{
+                           setButtonClicked = true
+                           see3camcu200.saveConfiguration(SEE3CAM_CU200.DEFAULT)
+                       }
+                       Keys.onReturnPressed: {
+                           setButtonClicked = true
+                           see3camcu200.saveConfiguration(SEE3CAM_CU200.DEFAULT)
                        }
                    }
                }
@@ -1030,7 +1158,8 @@ This feature is supported in Acquisition trigger."
                        opacity: 1
                        activeFocusOnPress : true
                        action: firmwareVersion
-                       tooltip: "Click to view the firmware version of the camera"
+                       tooltip: "To get the Unique ID that has been assigned to the See3CAM range of cameras, the user has to press the F/W Version button available in the Extension Unit dialog.
+The camera serial number will be displayed along with the F/W version."
                        style: ButtonStyle {
                            background: Rectangle {
                                border.width: control.activeFocus ? 3 :0
@@ -1078,21 +1207,21 @@ This feature is supported in Acquisition trigger."
                Row{
                    Layout.alignment: Qt.AlignCenter
                    Button {
-                       id: saveConfig
+                       id: defaultValue
                        opacity: 1
                        activeFocusOnPress : true
-                       text: "Save Configuration"
+                       text: "Default"
+                       tooltip: "Default button is used to set all the extension unit controls to their default values."
                        style: econButtonStyle
-                       tooltip: "This feature will save the current configurations and are retained after the following power cycles."
+                       action: setDefault
                        onClicked:{
-                           saveConfigurations()
+                           setToDefaultValues()
                        }
                        Keys.onReturnPressed: {
-                           saveConfigurations()
+                           setToDefaultValues()
                        }
                    }
                }
-
             }
         }
     }
@@ -1238,56 +1367,50 @@ This feature is supported in Acquisition trigger."
     SEE3CAM_CU200{
         id:see3camcu200
 
-        onCurrentGainReceived: {
+        onGainModeReceived: {
+//            if(mode == SEE3CAM_CU200.AUTO_MODE)
+//            {
+//                autoGain.checked = true
+//            }
+//            else if(mode == SEE3CAM_CU200.MANUAL_MODE)
+//            {
+//                manualGain.checked = true
+//            }
+        }
+
+        onGainPropertiesReceived:{
             skipUpdateGainMode = false
-            gainSlider.value = gainValue
+            gainSlider.minimumValue = min
+            gainSlider.value        = current
+            gainSlider.stepSize     = stepValue
+            gainSlider.maximumValue = max
             skipUpdateGainMode = true
         }
-        onMinGainReceived:{
-            gainSlider.minimumValue = minGain
-        }
-        onMaxGainReceived:{
-            gainSlider.maximumValue = maxGain
-        }
-        onGainStepValueReceived:{
-            gainSlider.stepSize = gainStep
-        }
 
-
-        onCurrentRGainReceived: {
+        onRGainPropertiesReceived: {
             skipUpdateRGainMode = false
-            currentRGain = parseFloat((currentRGain).toFixed(3));
+            gainRSlider.minimumValue = minRGain
+            gainRSlider.maximumValue = maxRGain
+            gainRSlider.stepSize = rGainStepValue
 
+            currentRGain = parseFloat((currentRGain).toFixed(3));
             gainRSlider.value   = currentRGain
             gainRTextField.text = currentRGain
+
             skipUpdateRGainMode = true
         }
-        onMinRGainReceived:{
-            gainRSlider.minimumValue = minRGain
-        }
-        onMaxRGainReceived:{
-            gainRSlider.maximumValue = maxRGain
-        }
-        onRGainStepValueReceived:{
-            gainRSlider.stepSize = rGainStepValue
-        }
 
-
-        onCurrentBGainReceived: {
+        onBGainPropertiesReceived: {
             skipUpdateBGainMode = false
+            gainBSlider.minimumValue = minBGain
+            gainBSlider.maximumValue = maxBGain
+            gainBSlider.stepSize = bGainStepValue
+
             currentBGain = parseFloat((currentBGain).toFixed(3));
             gainBSlider.value   = currentBGain
             gainBTextField.text = currentBGain
+
             skipUpdateBGainMode = true
-        }
-        onMinBGainReceived:{
-            gainBSlider.minimumValue = minBGain
-        }
-        onMaxBGainReceived:{
-            gainBSlider.maximumValue = maxBGain
-        }
-        onBGainStepValueReceived:{
-            gainBSlider.stepSize = bGainStepValue
         }
 
 
@@ -1304,40 +1427,45 @@ This feature is supported in Acquisition trigger."
             blackLevelSlider.stepSize = blackLevelStepValue
         }
 
-        onCurrentBrightnessReceived: {
+        onBrightnessPropertiesReceived: {
             skipUpdateBrightness = false
+
+            brightnessSlider.minimumValue = minBrightness
+            brightnessSlider.maximumValue = maxBrightness
+            brightnessSlider.stepSize = stepValue
+
             currentBrightness = parseFloat((currentBrightness).toFixed(3));
             brightnessSlider.value = currentBrightness
             brightnessTextField.text = currentBrightness
             skipUpdateBrightness = true
         }
-        onMinBrightnessReceived:{
-           brightnessSlider.minimumValue = minBrightness
-        }
-        onMaxBrightnessReceived: {
-            brightnessSlider.maximumValue = maxBrightness
-        }
-        onBrightnessStepValueReceived: {
-            brightnessSlider.stepSize = stepValue
-        }
 
-
-        onCurrentSaturationReceived: {
+        onSaturationPropertiesReceived: {
             skipUpdateSaturation = false
+            saturationSlider.minimumValue = minSaturation
+            saturationSlider.maximumValue = maxSaturation
+            saturationSlider.stepSize = stepValue
+
             currentSaturation = parseFloat((currentSaturation).toFixed(3));
             saturationSlider.value = currentSaturation
             saturationTextField.text = currentSaturation
             skipUpdateSaturation = true
         }
-        onMinSaturationReceived: {
-            saturationSlider.minimumValue = minSaturation
+
+
+        onGammaPropertiesReceived: {
+            skipUpdateGammaCorrection = false
+
+            gammaCorrectionSlider.minimumValue = minGamma
+            gammaCorrectionSlider.maximumValue = maxGamma
+            gammaCorrectionSlider.stepSize = stepValue
+
+            currentGamma = parseFloat((currentGamma).toFixed(1));
+            gammaCorrectionSlider.value = currentGamma
+            gammaCorrectionTextField.text = currentGamma
+            skipUpdateGammaCorrection = true
         }
-        onMaxSaturationReceived: {
-            saturationSlider.maximumValue = maxSaturation
-        }
-        onSaturationStepValueReceived: {
-            saturationSlider.stepSize = stepValue
-        }
+
 
         onCurrentContrastReceived: {
             skipUpdateContrast = false
@@ -1386,45 +1514,12 @@ This feature is supported in Acquisition trigger."
             skipUpdateColorTemperature = true
         }
 
-        onCurrentGammaCorrectionReceived: {
-            skipUpdateGammaCorrection = false
-            currentGamma = parseFloat((currentGamma).toFixed(1));
-            gammaCorrectionSlider.value = currentGamma
-            gammaCorrectionTextField.text = currentGamma
-            skipUpdateGammaCorrection = true
-        }
-        onMinGammaCorrectionReceived: {
-            gammaCorrectionSlider.minimumValue = minGamma
-        }
-        onMaxGammaCorrectionReceived: {
-            gammaCorrectionSlider.maximumValue = maxGamma
-        }
-        onGammaCorrectionStepValueReceived: {
-            gammaCorrectionSlider.stepSize = stepValue
-        }
-
         onCameraModeReceived:{
             getCameraModeReceived(cameraMode)
         }
 
         onStrobeModeReceived: {
             currentStrobeMode(strobeMode)
-
-            //To Disable/Enable the strobe mode to the respective camera mode
-            if(masterMode.checked == true)
-            {
-                strobeOn.enabled    = false
-                strobeOn.opacity    = 0.1
-                strobeOff.enabled   = false
-                strobeOff.opacity   = 0.1
-            }
-            else
-            {
-                strobeOn.enabled    = true
-                strobeOn.opacity    = 1
-                strobeOff.enabled   = true
-                strobeOff.opacity   = 1
-            }
         }
 
         onExposureValueReceived: {
@@ -1433,62 +1528,68 @@ This feature is supported in Acquisition trigger."
 
 
         onCurrentRrValuesReceived: {
-            spinBoxRr.value        = current
-            spinBoxRr.minimumValue = min
-            spinBoxRr.maximumValue = max
-            spinBoxRr.stepSize     = stepSize
+
+            spinBoxRr.minimumValue = spinBoxMin
+            spinBoxRr.maximumValue = spinBoxMax
+            spinBoxRr.stepSize     = spinBoxStepSize
+            spinBoxRr.value        = currentRr
         }
         onCurrentRgValuesReceived: {
-            spinBoxRg.value        = current
-            spinBoxRg.minimumValue = min
-            spinBoxRg.maximumValue = max
-            spinBoxRg.stepSize     = stepSize
+            spinBoxRg.minimumValue = spinBoxMin
+            spinBoxRg.maximumValue = spinBoxMax
+            spinBoxRg.stepSize     = spinBoxStepSize
+            spinBoxRg.value        = currentRg
         }
         onCurrentRbValuesReceived: {
-            spinBoxRb.value        = current
-            spinBoxRb.minimumValue = min
-            spinBoxRb.maximumValue = max
-            spinBoxRb.stepSize     = stepSize
+            spinBoxRb.minimumValue = spinBoxMin
+            spinBoxRb.maximumValue = spinBoxMax
+            spinBoxRb.stepSize     = spinBoxStepSize
+            spinBoxRb.value        = currentRb
         }
 
 
         onCurrentGrValuesReceived:{
-            spinBoxGr.value        = current
-            spinBoxGr.minimumValue = min
-            spinBoxGr.maximumValue = max
-            spinBoxGr.stepSize     = stepSize
+            spinBoxGr.minimumValue = spinBoxMin
+            spinBoxGr.maximumValue = spinBoxMax
+            spinBoxGr.stepSize     = spinBoxStepSize
+            spinBoxGr.value        = currentGr
         }
         onCurrentGgValuesReceived:{
-            spinBoxGg.value        = current
-            spinBoxGg.minimumValue = min
-            spinBoxGg.maximumValue = max
-            spinBoxGg.stepSize     = stepSize
+            spinBoxGg.minimumValue = spinBoxMin
+            spinBoxGg.maximumValue = spinBoxMax
+            spinBoxGg.stepSize     = spinBoxStepSize
+            spinBoxGg.value        = currentGg
         }
         onCurrentGbValuesReceived:{
-            spinBoxGb.value        = current
-            spinBoxGb.minimumValue = min
-            spinBoxGb.maximumValue = max
-            spinBoxGb.stepSize     = stepSize
+            spinBoxGb.minimumValue = spinBoxMin
+            spinBoxGb.maximumValue = spinBoxMax
+            spinBoxGb.stepSize     = spinBoxStepSize
+            spinBoxGb.value        = currentGb
         }
 
 
         onCurrentBrValuesReceived:{
-            spinBoxBr.value        = current
-            spinBoxBr.minimumValue = min
-            spinBoxBr.maximumValue = max
-            spinBoxBr.stepSize     = stepSize
+            spinBoxBr.minimumValue = spinBoxMin
+            spinBoxBr.maximumValue = spinBoxMax
+            spinBoxBr.stepSize     = spinBoxStepSize
+            spinBoxBr.value        = currentBr
         }
         onCurrentBgValuesReceived:{
-            spinBoxBg.value        = current
-            spinBoxBg.minimumValue = min
-            spinBoxBg.maximumValue = max
-            spinBoxBg.stepSize     = stepSize
+            spinBoxBg.minimumValue = spinBoxMin
+            spinBoxBg.maximumValue = spinBoxMax
+            spinBoxBg.stepSize     = spinBoxStepSize
+            spinBoxBg.value        = currentBg
         }
         onCurrentBbValuesReceived:{
-            spinBoxBb.value        = current
-            spinBoxBb.minimumValue = min
-            spinBoxBb.maximumValue = max
-            spinBoxBb.stepSize     = stepSize
+            spinBoxBb.minimumValue = spinBoxMin
+            spinBoxBb.maximumValue = spinBoxMax
+            spinBoxBb.stepSize     = spinBoxStepSize
+            spinBoxBb.value        = currentBb
+        }
+
+        onFlipMirrorModeChanged:
+        {
+            currentFlipMirrorMode(flipMirrorModeValues)
         }
 
         onIndicateCommandStatus:{
@@ -1507,16 +1608,34 @@ This feature is supported in Acquisition trigger."
         }
     }
 
+    function currentFlipMirrorMode(mode)
+    {
+        switch(mode)
+        {
+            case SEE3CAM_CU200.NORMAL:
+                flipCtrlVertical.checked  = false
+                flipCtrlHorizotal.checked = false
+                break;
+            case SEE3CAM_CU200.VERTICAL:
+                flipCtrlVertical.checked  = true
+                flipCtrlHorizotal.checked = false
+                break;
+            case SEE3CAM_CU200.HORIZONTAL:
+                flipCtrlVertical.checked  = false
+                flipCtrlHorizotal.checked = true
+                break;
+            case SEE3CAM_CU200.ROTATE_180:
+                flipCtrlVertical.checked  = true
+                flipCtrlHorizotal.checked = true
+                break;
+        }
+    }
+
+
     function getCameraModeReceived(mode)
     {
         if(mode == SEE3CAM_CU200.MASTER_MODE)
         {
-            //Disable strobe mode when the camera is in Master mode
-            strobeOn.enabled    = false
-            strobeOn.opacity    = 0.1
-            strobeOff.enabled   = false
-            strobeOff.opacity   = 0.1
-
             masterMode.checked = true
 
             root.checkForTriggerMode(false)
@@ -1525,12 +1644,6 @@ This feature is supported in Acquisition trigger."
         }
         else if(mode = SEE3CAM_CU200.TRIGGER_MODE)
         {
-            //Enable strobe mode when the camera is in Trigger mode
-            strobeOn.enabled    = true
-            strobeOn.opacity    = 1
-            strobeOff.enabled   = true
-            strobeOff.opacity   = 1
-
             triggerMode.checked = true
 
             root.checkForTriggerMode(true)
@@ -1541,12 +1654,6 @@ This feature is supported in Acquisition trigger."
 
     function setMasterMode()
     {
-        //disable strobe mode when the camera is in Master mode
-        strobeOn.enabled    = false
-        strobeOn.opacity    = 0.1
-        strobeOff.enabled   = false
-        strobeOff.opacity   = 0.1
-
         see3camcu200.setCameraMode(SEE3CAM_CU200.MASTER_MODE)
 
         root.startUpdatePreviewInMasterMode()
@@ -1557,12 +1664,6 @@ This feature is supported in Acquisition trigger."
 
     function setTriggerMode()
     {
-        //Enable strobe mode when the camera is in Trigger mode
-        strobeOn.enabled    = true
-        strobeOn.opacity    = 1
-        strobeOff.enabled   = true
-        strobeOff.opacity   = 1
-
         see3camcu200.setCameraMode(SEE3CAM_CU200.TRIGGER_MODE)
 
         root.stopUpdatePreviewInTriggerMode()
@@ -1587,11 +1688,6 @@ This feature is supported in Acquisition trigger."
     function getSerialNumber() {
         uvccamera.getSerialNumber()
         messageDialog.open()
-    }
-
-    function saveConfigurations()
-    {
-        see3camcu200.saveConfiguration()
     }
 
     function displayMessageBox(title, text){
@@ -1631,6 +1727,7 @@ This feature is supported in Acquisition trigger."
         see3camcu200.getExposure()
         see3camcu200.getCameraMode()
         see3camcu200.getStrobeMode()
+        see3camcu200.getOrientation()
     }
     Component.onCompleted: {
         getCurrentValuesFromCamera()

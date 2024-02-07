@@ -55,9 +55,9 @@ int skipFrameForTrigger = 0;
 #define B(x, y, w)	y16BayerDestBuffer[2 + 3 * ((x) + (w) * (y))]
 
 #define Bay(x, y, w) bayerIRBuffer[(x) + (w) * (y)]
+#define Bay(x, y, w) rawY10Buffer[(x) + (w) * (y)]
 
-
-#define CLIP(x) (((x) >= 255)? 255 : (x))
+#define CLIP(x) (((x) >= 255) ? 255 : (x))
 
 /* Jpeg-decode */
 #define HEADERFRAME1 0xaf
@@ -165,6 +165,7 @@ Videostreaming::Videostreaming() : m_t(0)
 
     //Still Capture Buffer
     stillBuffer = NULL;
+    rawY10Buffer = NULL;
     startFrame = true;
     _bytesUsed = 0;
 
@@ -335,6 +336,7 @@ FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
     m_shaderProgram = NULL;
     m_programYUYV = NULL;
     y16BayerFormat = false;
+    rawY10Format = false;
     skipH264Frames = 20;
 
     uyvyBuffer    = NULL;
@@ -950,62 +952,63 @@ void FrameRenderer::changeShader(){
         m_programYUYV = NULL;
     }
 
-    if(y16BayerFormat){
+    if(y16BayerFormat || rawY10Format){
         shaderYUYV();
-        drawYUYVBUffer(); // To fix white color corruption drawing initially
-    }else{
+        drawYUYVBUffer();
+    }
+    else{
         switch(m_pixelformat){
-        case V4L2_PIX_FMT_MJPEG:
-            shaderRGB();
-            drawRGBBUffer(); // To fix white color corruption drawing initially
-            break;
-        case V4L2_PIX_FMT_UYVY:
-            if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU31)
-            {
-                shaderUYVYBT709();
-            }
-            else
-            {
-                shaderUYVY();
-            }
-            drawUYVYBUffer(); // To fix white color corruption drawing initially
-            break;
-        case V4L2_PIX_FMT_GREY:
-            shaderY8();
-            drawY8BUffer();  // To fix white color corruption drawing initially
-            break;
-        case V4L2_PIX_FMT_YUYV:
-        case V4L2_PIX_FMT_Y16:
-        case V4L2_PIX_FMT_Y12:
-        case V4L2_PIX_FMT_SGRBG8:
-        case V4L2_PIX_FMT_SBGGR8: //Added by M Vishnu Murali: See3CAM_10CUG_CH uses respective pixel format
-            if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83)
-            {
-                if(shaderType == CommonEnums::UYVY_BUFFER_RENDER)
+            case V4L2_PIX_FMT_MJPEG:
+                shaderRGB();
+                drawRGBBUffer(); // To fix white color corruption drawing initially
+                break;
+            case V4L2_PIX_FMT_UYVY:
+                if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU31)
+                {
+                    shaderUYVYBT709();
+                }
+                else
                 {
                     shaderUYVY();
-                    drawUYVYBUffer();
                 }
-                else if(shaderType == CommonEnums::GREY_BUFFER_RENDER)
+                drawUYVYBUffer(); // To fix white color corruption drawing initially
+                break;
+            case V4L2_PIX_FMT_GREY:
+                shaderY8();
+                drawY8BUffer();  // To fix white color corruption drawing initially
+                break;
+            case V4L2_PIX_FMT_YUYV:
+            case V4L2_PIX_FMT_Y16:
+            case V4L2_PIX_FMT_Y12:
+            case V4L2_PIX_FMT_SGRBG8:
+            case V4L2_PIX_FMT_SBGGR8: //Added by M Vishnu Murali: See3CAM_10CUG_CH uses respective pixel format
+                if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83)
                 {
-                    shaderY8();
-                    drawY8BUffer();
+                    if(shaderType == CommonEnums::UYVY_BUFFER_RENDER)
+                    {
+                        shaderUYVY();
+                        drawUYVYBUffer();
+                    }
+                    else if(shaderType == CommonEnums::GREY_BUFFER_RENDER)
+                    {
+                        shaderY8();
+                        drawY8BUffer();
+                    }
+                    else
+                    {
+                        shaderYUYV();
+                        drawYUYVBUffer();  // To fix white color corruption drawing intially
+                    }
                 }
                 else
                 {
                     shaderYUYV();
                     drawYUYVBUffer();  // To fix white color corruption drawing intially
                 }
-            }
-            else
-            {
-                shaderYUYV();
-                drawYUYVBUffer();  // To fix white color corruption drawing intially
-            }
-            break;
-        case V4L2_PIX_FMT_H264:
-            drawBufferForYUV420();
-            break;
+                break;
+            case V4L2_PIX_FMT_H264:
+                drawBufferForYUV420();
+                break;
         }
     }
 }
@@ -1711,6 +1714,7 @@ void Videostreaming::capFrame()
         return;
     }
 
+
     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode) //Added by M.VishnuMurali: For capturing trigger mode images.
     {
         m_renderer->gotFrame = false;
@@ -1755,47 +1759,46 @@ void Videostreaming::capFrame()
     }
 
     switch(m_capSrcFormat.fmt.pix.pixelformat) {
-    case V4L2_PIX_FMT_YUYV:
-    case V4L2_PIX_FMT_UYVY:{
-        if((width*height*2) == buf.bytesused){
-            validFrame = true;
+        case V4L2_PIX_FMT_YUYV:
+        case V4L2_PIX_FMT_UYVY:{
+            if((width*height*2) == buf.bytesused){
+                validFrame = true;
+            }
         }
-    }
-        break;
-        //Added by Navya - 22 July 2019 --To avoid invalidFrames for rendering in case of See3CAM_CU55_MH camera
-    case V4L2_PIX_FMT_Y12:{
-        if((width*height*1.5) == buf.bytesused){
-            validFrame =true;
+            break;
+            //Added by Navya - 22 July 2019 --To avoid invalidFrames for rendering in case of See3CAM_CU55_MH camera
+        case V4L2_PIX_FMT_Y12:{
+            if((width*height*1.5) == buf.bytesused){
+                validFrame =true;
+            }
         }
-    }
-        break;
-    case V4L2_PIX_FMT_GREY:{
-        if((width*height*1) == buf.bytesused){
-            validFrame =true;
+            break;
+        case V4L2_PIX_FMT_GREY:{
+            if((width*height*1) == buf.bytesused){
+                validFrame =true;
+            }
         }
-    }
-        break;
-    case V4L2_PIX_FMT_Y16:{
-        if((width*height*2) == buf.bytesused){
-            validFrame =true;
+            break;
+        case V4L2_PIX_FMT_Y16:{
+            if((width*height*2) == buf.bytesused){
+                validFrame =true;
+            }
         }
-    }
-        break;
-    case V4L2_PIX_FMT_MJPEG:
-    {
-        validFrame = true;
-        _bytesUsed = buf.bytesused;
-        if(startFrame)
+            break;
+        case V4L2_PIX_FMT_MJPEG:
         {
-            allocBuffers();
-            startFrame = false;
-        }
-    }break;
-    default:
-        validFrame = true;
-        // To do: for other color spaces
-        break;
-
+            validFrame = true;
+            _bytesUsed = buf.bytesused;
+            if(startFrame)
+            {
+                allocBuffers();
+                startFrame = false;
+            }
+        }break;
+        default:
+            validFrame = true;
+            // To do: for other color spaces
+            break;
     }
 
     if (validFrame != true){
@@ -1863,13 +1866,11 @@ void Videostreaming::capFrame()
     if(m_snapShot || m_burstShot)
     {
         int err = -1;
-        //  y16 bayer format means these conversions are not needed. Calculations are done in "prepareBuffer" function itself.
-        //  Ex: cu40 camera
-        if(!m_renderer->y16BayerFormat)
+
+        if(!m_renderer->y16BayerFormat && !m_renderer->rawY10Format) //  Ex: cu40 camera -  y16 bayer format means these conversions are not needed. Calculations are done in "prepareBuffer" function itself.
         {
             if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)
-            { // y16
-                onY16Format = true;
+            {
                 if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
                 {
                     if((width == Y16_2160p_WIDTH) && (height == Y16_2160p_HEIGHT))
@@ -2069,8 +2070,14 @@ void Videostreaming::capFrame()
 
             }
         }
+
         if(formatType == "raw"){// save incoming buffer directly
-            if(onY12Format){  // To save Y12 image in See3CAM_CU55_MHL
+            if(m_renderer->rawY10Format)
+            {
+                saveRawFile((void*)rawY10Buffer, (width*height*2));
+                imgSaveSuccessCount++;
+            }
+            else if(onY12Format){  // To save Y12 image in See3CAM_CU55_MHL
                 if(saveRawFile(m_renderer->yuvBuffer,width*height*2)){
                     imgSaveSuccessCount++;
                     onY12Format = false;
@@ -2088,13 +2095,28 @@ void Videostreaming::capFrame()
         else{
             unsigned char *bufferToSave = NULL;
 
-            // y16 format - ex: cu40 camera
-            if(m_renderer->y16BayerFormat){
+            //For See3CAM_CU40 & See3CAM_CU200 - Saving RGB frame after debayering
+            if(m_renderer->y16BayerFormat || m_renderer->rawY10Format){
                 bufferToSave = y16BayerDestBuffer;
+
+                QImage qImage3(bufferToSave, width, height, QImage::Format_RGB888);
+                QImageWriter writer(filename);
+
+                if(m_saveImage){
+                    if((OnMouseClick || !SkipIfPreviewFrame)){   //Saving Image after Checking for Preview or Still
+                        if(!writer.write(qImage3))
+                        {
+                            emit logCriticalHandle("Error while saving an image:"+writer.errorString());
+                        }
+                        else
+                        {
+                            imgSaveSuccessCount++;
+                        }
+                    }
+                }
             }
             else if(validFilePath){//Capturing image only when the given filepath is valid - Added by Sushanth
                 bufferToSave = m_capImage->bits(); // image data converted using v4l2convert
-
                 if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
                 {
                     if((width == Y16_2160p_WIDTH) && (height == Y16_2160p_HEIGHT))//4440x2160
@@ -2226,7 +2248,6 @@ void Videostreaming::capFrame()
                 }
                 else
                 {//This is common to all other cameras
-
                     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU31)
                     {
                         int inputSize = buf.bytesused;
@@ -2384,6 +2405,12 @@ void Videostreaming::capFrame()
     if(stillBuffer){
         free(stillBuffer);
         stillBuffer = NULL;
+    }
+
+    if(rawY10Buffer)
+    {
+        free(rawY10Buffer);
+        rawY10Buffer = NULL;
     }
 
     if(y16BayerDestBuffer){
@@ -3014,25 +3041,25 @@ void bayer_to_rgbbgr24(uint8_t *bayer,
     convert_border_bayer_line_to_bgr24(bayer + width, bayer, bgr, width,
                                        !start_with_green, !blue_line);
 }
-
 //To do: need to move in a separate file
 void rgb2yuyv(uint8_t *prgb, uint8_t *pyuv, int width, int height)
 {
+    for (int i = 0; i < width * height * 3; i += 6) {
+            int y0, u, y1, v;
+            y0 = CLIP(0.299 * (prgb[i] - 128) + 0.587 * (prgb[i + 1] - 128) + 0.114 * (prgb[i + 2] - 128) + 128);
+            u = CLIP((-0.147 * (prgb[i] - 128) - 0.289 * (prgb[i + 1] - 128) + 0.436 * (prgb[i + 2] - 128) + 128 +
+                      (-0.147 * (prgb[i + 3] - 128) - 0.289 * (prgb[i + 4] - 128) + 0.436 * (prgb[i + 5] - 128) + 128)) /
+                     2);
+            y1 = CLIP(0.299 * (prgb[i + 3] - 128) + 0.587 * (prgb[i + 4] - 128) + 0.114 * (prgb[i + 5] - 128) + 128);
+            v = CLIP((0.615 * (prgb[i] - 128) - 0.515 * (prgb[i + 1] - 128) - 0.100 * (prgb[i + 2] - 128) + 128 +
+                      (0.615 * (prgb[i + 3] - 128) - 0.515 * (prgb[i + 4] - 128) - 0.100 * (prgb[i + 5] - 128) + 128)) /
+                     2);
 
-    int i=0;
-    for(i=0;i<(width*height*3);i=i+6)
-    {  // use integer conversion
-        /* y */
-        *pyuv++ =CLIP(0.299 * (prgb[i] - 128) + 0.587 * (prgb[i+1] - 128) + 0.114 * (prgb[i+2] - 128) + 128);
-        /* u */
-        *pyuv++ =CLIP(((- 0.147 * (prgb[i] - 128) - 0.289 * (prgb[i+1] - 128) + 0.436 * (prgb[i+2] - 128) + 128) +
-                (- 0.147 * (prgb[i+3] - 128) - 0.289 * (prgb[i+4] - 128) + 0.436 * (prgb[i+5] - 128) + 128))/2);
-        /* y1 */
-        *pyuv++ =CLIP(0.299 * (prgb[i+3] - 128) + 0.587 * (prgb[i+4] - 128) + 0.114 * (prgb[i+5] - 128) + 128);
-        /* v*/
-        *pyuv++ =CLIP(((0.615 * (prgb[i] - 128) - 0.515 * (prgb[i+1] - 128) - 0.100 * (prgb[i+2] - 128) + 128) +
-                (0.615 * (prgb[i+3] - 128) - 0.515 * (prgb[i+4] - 128) - 0.100 * (prgb[i+5] - 128) + 128))/2);
-    }
+            *pyuv++ = y0;
+            *pyuv++ = u;
+            *pyuv++ = y1;
+            *pyuv++ = v;
+        }
 }
 
 //Added by Sushanth.S - Storing IR & RGB buffer Seperately to still capture in See3CAM_27CUG
@@ -3235,6 +3262,37 @@ bool Videostreaming::prepareStillBuffer(uint8_t *inputBuffer)
 }
 
 
+/** Added by Sushanth : 1st Feb 2024
+  * API to convert Raw Y10 data to Y16 data
+  * @param inputBuffer  - A pointer to the 8-bit input buffer
+  * @param outputBuffer - A pointer to the 16-bit output buffer where the converted Y16 data will be stored.
+  * @param inputSize    - The size of the input buffer.
+  * */
+bool Videostreaming::convertRawY10ToY16(void *inputBuffer, uint16_t *outputBuffer, int inputSize)
+{
+    uint8_t* raw10Buffer = (uint8_t*)inputBuffer;
+
+    int iterator = 0;
+
+    /*
+     * For Every 5 bytes from the inputBuffer, Need to process 4 pixels.
+     * For each pixel, copy the 8 bits from the input buffer to the first pixel of the output buffer and perform right shift operation by 2.
+     * Then Every 2 bits of the fifth byte is combined to the each pixels of output buffer.
+     */
+    for (int byte = 0; byte < inputSize; byte += 5)
+    {
+        for (int pixel = 0; pixel < 4; ++pixel)
+        {
+            outputBuffer[iterator + pixel] = (raw10Buffer[byte + pixel] << 2) | ((raw10Buffer[byte + 4] & (0x30 >> (2 * pixel))) >> (4 - 2 * pixel));
+        }
+
+        // Increment iterator for the next iteration
+        iterator += 4;
+    }
+    return true;
+}
+
+
 //Splitting of UYVY & Y8 Buffer from Y16 for See3CAM_CU83
 bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 {
@@ -3266,6 +3324,8 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 
         while (frameSize > 0)
         {
+            if (((inputbuffer[bufferCount] & 0x80) == 0) && ((inputbuffer[bufferCount + 1] & 0x80) == 0))
+
             //if the first bit of the first byte of the input buffer is 0, its UYVY data
             if(((inputbuffer[bufferCount]) & (0x01))  == 0)
             {
@@ -3457,7 +3517,6 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
 
 // Added by Sankari: Nov 8 2017 . prepare yuv buffer and give to shader.
 bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 bytesUsed){
-
     if(pixformat == V4L2_PIX_FMT_MJPEG){
         frameMjpeg = true;
         m_renderer->renderBufferFormat = CommonEnums::RGB_BUFFER_RENDER;
@@ -3466,6 +3525,10 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
             {
                 if(!frameSkip){
                     getFrameRates();
+                    if(m_renderer->updateStop)
+                    {
+                        emit averageFPS(0);
+                    }
                     frameSkip = true;
                     memcpy(tempSrcBuffer, (unsigned char *)inputbuffer, bytesUsed);
                     if(m_renderer && m_renderer->rgbaDestBuffer){
@@ -3486,6 +3549,10 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         uint8_t *destBuffer = NULL;
         frameMjpeg = false;
         getFrameRates();
+        if(m_renderer->updateStop)
+        {
+            emit averageFPS(0);
+        }
         m_renderer->renderyuyvMutex.lock();
         if(!m_renderer->yuvBuffer){
             m_renderer->renderyuyvMutex.unlock();
@@ -3505,6 +3572,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 return false;
             }
             memcpy(bayerIRBuffer, inputbuffer, (width*height*2));
+
             __u32 x, y;
             for(x = 0; x < width; x += 2)  /* Nearest neighbour interpolation algorithm - y16 to RGB24 conversion */
             {
@@ -3518,7 +3586,42 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
             rgb2yuyv(y16BayerDestBuffer, yuyvBuffer, width, height);
             memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
 
-        }else if(y16FormatFor20CUG){
+        }
+        else if(m_renderer->rawY10Format)
+        {
+            m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
+
+            int inputBufSize;
+            inputBufSize = width*height*1.25;
+
+            rawY10Buffer = (uint16_t*) malloc(width*height*2);
+
+            memset(rawY10Buffer, 0, (width*height*2));
+
+            if(!convertRawY10ToY16(((void*)inputbuffer),rawY10Buffer, inputBufSize))
+            {
+                return false;
+            }
+
+            /* Applying Nearest neighbour interpolation algorithm - y16 to RGB24 conversion */
+            y16BayerDestBuffer = (unsigned char *)malloc(width * height * 3);
+
+            for (__u32 y = 0; y < height; y += 2) {
+                for (__u32 x = 0; x < width; x += 2) {
+                    uint8_t b = CLIP(Bay(x, y, width));
+                    uint8_t g = CLIP(Bay(x + 1, y, width));
+                    uint8_t r = CLIP(Bay(x + 1, y + 1, width));
+
+                    B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
+                    G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = g;
+                    R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
+                }
+            }
+
+            rgb2yuyv(y16BayerDestBuffer, yuyvBuffer, width, height);
+            memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+        }
+        else if(y16FormatFor20CUG){
             m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
             sourceBuf20CUG = (uint16_t *)malloc(width * height * 2);
             uint8_t *pfmb = yuyvBuffer;
@@ -3531,155 +3634,156 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
             memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
             freeBuffer((uint8_t *)sourceBuf20CUG);
         }else{
+
             switch(pixformat){
-            case V4L2_PIX_FMT_YUYV:{
-                if(width == 640 && height == 480){
-                    m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
-                }else
+                case V4L2_PIX_FMT_YUYV:{
+                    if(width == 640 && height == 480){
+                        m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
+                    }else
+                        m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
+                    memcpy(m_renderer->yuvBuffer, (uint8_t *)inputbuffer, width*height*2);/* directly giving yuyv to render */
+                }
+                    break;
+                case V4L2_PIX_FMT_SBGGR8:   //Added by M Vishnu Murali(02/06/2020): For Proper rendering of See3CAM_10CUG_CH cam
+                case V4L2_PIX_FMT_SGRBG8:{  // BA8 to yuyv conversion
                     m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
-                memcpy(m_renderer->yuvBuffer, (uint8_t *)inputbuffer, width*height*2);/* directly giving yuyv to render */
-            }
-                break;
-            case V4L2_PIX_FMT_SBGGR8:   //Added by M Vishnu Murali(02/06/2020): For Proper rendering of See3CAM_10CUG_CH cam
-            case V4L2_PIX_FMT_SGRBG8:{  // BA8 to yuyv conversion
-                m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
-                destBuffer = (uint8_t *)malloc(width * height * 3);
-                bayer_to_rgbbgr24((uint8_t *)inputbuffer, destBuffer, width, height, 1, 1);
-                rgb2yuyv(destBuffer, yuyvBuffer, width, height);
-                memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
-                freeBuffer(destBuffer);
-            }
-                break;
-
-            case V4L2_PIX_FMT_GREY:{  // directly giving y8 data for rendering
-                m_renderer->renderBufferFormat = CommonEnums::GREY_BUFFER_RENDER;
-
-                //Added By Sushanth - To enable wakeonMotion in GREY format
-                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
-                {
-                    emit wakeOnMotion(false);
+                    destBuffer = (uint8_t *)malloc(width * height * 3);
+                    bayer_to_rgbbgr24((uint8_t *)inputbuffer, destBuffer, width, height, 1, 1);
+                    rgb2yuyv(destBuffer, yuyvBuffer, width, height);
+                    memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+                    freeBuffer(destBuffer);
                 }
+                    break;
 
-                memcpy(m_renderer->greyBuffer, (uint8_t*)inputbuffer, width*height);
-            }
-                break;
+                case V4L2_PIX_FMT_GREY:{  // directly giving y8 data for rendering
+                    m_renderer->renderBufferFormat = CommonEnums::GREY_BUFFER_RENDER;
 
-            case V4L2_PIX_FMT_UYVY:{   // directly giving uyvy data for rendering
-                //Added By Sushanth - To disable wakeonMotion in UVVY format
-                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
-                {
-                    emit wakeOnMotion(true);
-                }
-
-                if(width == 640 && (height == 480 | height == 360 | height == 482))
-                {
-                    m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
-
-                    //For rendering in 640x482 resolution for See3CAM_27CUG
-                    // cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
-                    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG) && (cameraMode == 1))
+                    //Added By Sushanth - To enable wakeonMotion in GREY format
+                    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
                     {
-                        uint8_t *ptmp = (uint8_t *)m_renderer->rgbBuffer; //rgb buffer contains UYVY data for See3Cam_27CUG
-                        uint8_t *pfmb = yuyvBuffer;
-                        for(int h=0;h<height;h++)             /* uyvy to yuyv conversion */
+                        emit wakeOnMotion(false);
+                    }
+
+                    memcpy(m_renderer->greyBuffer, (uint8_t*)inputbuffer, width*height);
+                }
+                    break;
+
+                case V4L2_PIX_FMT_UYVY:{   // directly giving uyvy data for rendering
+                    //Added By Sushanth - To disable wakeonMotion in UVVY format
+                    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
+                    {
+                        emit wakeOnMotion(true);
+                    }
+
+                    if(width == 640 && (height == 480 | height == 360 | height == 482))
+                    {
+                        m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
+
+                        //For rendering in 640x482 resolution for See3CAM_27CUG
+                        // cameraMode 1 (IR-RGB Mode in See3CAM_27CUG)
+                        if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG) && (cameraMode == 1))
                         {
-                            int w=0;
-                            for(w=0;w<(width*2);w+=4)
+                            uint8_t *ptmp = (uint8_t *)m_renderer->rgbBuffer; //rgb buffer contains UYVY data for See3Cam_27CUG
+                            uint8_t *pfmb = yuyvBuffer;
+                            for(int h=0;h<height;h++)             /* uyvy to yuyv conversion */
                             {
-                                pfmb[0] = ptmp[1]; /* Y0 */
-                                pfmb[1] = ptmp[0]; /* U */
-                                pfmb[2] = ptmp[3]; /* Y1 */
-                                pfmb[3] = ptmp[2]; /* V */
-                                ptmp += 4;
-                                pfmb += 4;
+                                int w=0;
+                                for(w=0;w<(width*2);w+=4)
+                                {
+                                    pfmb[0] = ptmp[1]; /* Y0 */
+                                    pfmb[1] = ptmp[0]; /* U */
+                                    pfmb[2] = ptmp[3]; /* Y1 */
+                                    pfmb[3] = ptmp[2]; /* V */
+                                    ptmp += 4;
+                                    pfmb += 4;
+                                }
                             }
+                            memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
                         }
-                        memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
-                    }
-                    else
-                    {
-                        uint8_t *ptmp = (uint8_t *)inputbuffer;
-                        uint8_t *pfmb = yuyvBuffer;
-                        for(int h=0;h<height;h++)             /* uyvy to yuyv conversion */
+                        else
                         {
-                            int w=0;
-                            for(w=0;w<(width*2);w+=4)
+                            uint8_t *ptmp = (uint8_t *)inputbuffer;
+                            uint8_t *pfmb = yuyvBuffer;
+                            for(int h=0;h<height;h++)             /* uyvy to yuyv conversion */
                             {
-                                pfmb[0] = ptmp[1]; /* Y0 */
-                                pfmb[1] = ptmp[0]; /* U */
-                                pfmb[2] = ptmp[3]; /* Y1 */
-                                pfmb[3] = ptmp[2]; /* V */
-                                ptmp += 4;
-                                pfmb += 4;
+                                int w=0;
+                                for(w=0;w<(width*2);w+=4)
+                                {
+                                    pfmb[0] = ptmp[1]; /* Y0 */
+                                    pfmb[1] = ptmp[0]; /* U */
+                                    pfmb[2] = ptmp[3]; /* Y1 */
+                                    pfmb[3] = ptmp[2]; /* V */
+                                    ptmp += 4;
+                                    pfmb += 4;
+                                }
                             }
+                            memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
                         }
-                        memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+                    }
+                    else{
+                        m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
+                        memcpy(m_renderer->yuvBuffer, (uint8_t *)inputbuffer, width*height*2);/* directly giving uyvy to render */
                     }
                 }
-                else{
-                    m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
-                    memcpy(m_renderer->yuvBuffer, (uint8_t *)inputbuffer, width*height*2);/* directly giving uyvy to render */
-                }
-            }
-                break;
-            case V4L2_PIX_FMT_H264:{
-                m_renderer->renderBufferFormat = CommonEnums::YUV420_BUFFER_RENDER;
-                // check - decode h264 to yuyv available
-                h264DecodeRet = h264Decode->decodeH264(yuv420pdestBuffer, (uint8_t *) inputbuffer, bytesUsed); /* decode h264 to yuv420p */
-                if(m_renderer->skipH264Frames>=0)
-                {
-                    m_renderer->skipH264Frames--;
-                }
-                if(h264DecodeRet>=0  && m_renderer->skipH264Frames<0)
-                {
-                    memcpy(m_renderer->yuvBuffer, yuv420pdestBuffer, width*height*1.5);
-                }
-            }
-                break;
-
-            case V4L2_PIX_FMT_Y16:{
-                m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
-                srcBuffer = (uint8_t *)malloc(width * height * 2);
-
-                uint8_t *pfmb = yuyvBuffer;
-                memcpy(srcBuffer, inputbuffer, (width * height * 2));
-                for(__u32 l=0; l<(width * height*2); l=l+2) /* Y16 to YUYV conversion */
-                {
-                    *pfmb++ = (((srcBuffer[l] & 0xF0) >> 4) | (srcBuffer[l+1] & 0x0F) << 4);
-                    *pfmb++ = 0x80;
-                }
-                memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
-                freeBuffer(srcBuffer);
-
-                //Splitting of UYVY & Y8 buffer for See3Cam_CU83
-                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
-                {
-                    //Added By Sushanth - To enable wakeonMotion in Y16 format
-                    emit wakeOnMotion(false);
-
-                    if(!prepareCu83Buffer((uint8_t*)inputbuffer))
+                    break;
+                case V4L2_PIX_FMT_H264:{
+                    m_renderer->renderBufferFormat = CommonEnums::YUV420_BUFFER_RENDER;
+                    // check - decode h264 to yuyv available
+                    h264DecodeRet = h264Decode->decodeH264(yuv420pdestBuffer, (uint8_t *) inputbuffer, bytesUsed); /* decode h264 to yuv420p */
+                    if(m_renderer->skipH264Frames>=0)
                     {
-                        return false;
+                        m_renderer->skipH264Frames--;
+                    }
+                    if(h264DecodeRet>=0  && m_renderer->skipH264Frames<0)
+                    {
+                        memcpy(m_renderer->yuvBuffer, yuv420pdestBuffer, width*height*1.5);
                     }
                 }
-            }
-                break;
-            case V4L2_PIX_FMT_Y12:{
-                m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
-                srcBuffer = (uint8_t *)malloc((width * height *3)/2);
-                uint8_t *pfmb = yuyvBuffer;
-                memcpy(srcBuffer, inputbuffer, ((width * height *3)/2));
-                for( __u32 l=0; l<(width* height * 3)/2; l=l+3) /* Y12 to YUYV conversion */
-                {
-                    *pfmb++ = (((uint8_t *)srcBuffer)[l]);
-                    *pfmb++ = 0x80;
-                    *pfmb++ = (((uint8_t *)srcBuffer)[l+1]);
-                    *pfmb++ = 0x80;
+                    break;
+
+                case V4L2_PIX_FMT_Y16:{
+                    m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
+                    srcBuffer = (uint8_t *)malloc(width * height * 2);
+
+                    uint8_t *pfmb = yuyvBuffer;
+                    memcpy(srcBuffer, inputbuffer, (width * height * 2));
+                    for(__u32 l=0; l<(width * height*2); l=l+2) /* Y16 to YUYV conversion */
+                    {
+                        *pfmb++ = (((srcBuffer[l] & 0xF0) >> 4) | (srcBuffer[l+1] & 0x0F) << 4);
+                        *pfmb++ = 0x80;
+                    }
+                    memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+                    freeBuffer(srcBuffer);
+
+                    //Splitting of UYVY & Y8 buffer for See3Cam_CU83
+                    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
+                    {
+                        //Added By Sushanth - To enable wakeonMotion in Y16 format
+                        emit wakeOnMotion(false);
+
+                        if(!prepareCu83Buffer((uint8_t*)inputbuffer))
+                        {
+                            return false;
+                        }
+                    }
                 }
-                memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
-                freeBuffer(srcBuffer);
-            }
-                break;
+                    break;
+                case V4L2_PIX_FMT_Y12:{
+                    m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
+                    srcBuffer = (uint8_t *)malloc((width * height *3)/2);
+                    uint8_t *pfmb = yuyvBuffer;
+                    memcpy(srcBuffer, inputbuffer, ((width * height *3)/2));
+                    for( __u32 l=0; l<(width* height * 3)/2; l=l+3) /* Y12 to YUYV conversion */
+                    {
+                        *pfmb++ = (((uint8_t *)srcBuffer)[l]);
+                        *pfmb++ = 0x80;
+                        *pfmb++ = (((uint8_t *)srcBuffer)[l+1]);
+                        *pfmb++ = 0x80;
+                    }
+                    memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+                    freeBuffer(srcBuffer);
+                }
+                    break;
             }
         }
         if(m_renderer->renderBufferFormat == CommonEnums::YUYV_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::UYVY_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::GREY_BUFFER_RENDER || m_renderer->renderBufferFormat== CommonEnums::BUFFER_RENDER_360P || m_renderer->renderBufferFormat==CommonEnums::YUV420_BUFFER_RENDER ||m_renderer->renderBufferFormat == CommonEnums::NV12_BUFFER_RENDER){
@@ -3996,8 +4100,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     m_burstLength = 1; // for single shot
     m_saveImage = true;
 
-    /* cu40 - IR image in bmp format */
-    if(imgFormatType == "IR data(8bit BMP)"){
+    if(imgFormatType == "IR data(8bit BMP)"){    /* cu40 - IR image in bmp format */
         formatType = imgFormatType;
         imgFormatType = "bmp";
     }else{ // other image formats or other cameras
@@ -4395,6 +4498,15 @@ void Videostreaming::displayFrame() {
         m_renderer->y16BayerFormat = true;
     }
 
+    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200) && (m_capSrcFormat.fmt.pix.pixelformat != V4L2_PIX_FMT_UYVY))
+    {
+        m_renderer->rawY10Format = true;
+    }
+    else
+    {
+        m_renderer->rawY10Format = false;
+    }
+
     if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_16CUGM ||currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedCameraEnum == CommonEnums::SEE3CAM_135M || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU136M) && (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)) {
         y16FormatFor20CUG = true;
     }
@@ -4493,6 +4605,8 @@ void Videostreaming::stopCapture() {
     m_renderer->updateStop = true;
     m_renderer->y16BayerFormat = false; // BY default this will be false, If cu40 [ y16 bayer format ] is selected ,
     //this will be enabled.
+
+    m_renderer->rawY10Format = false;
     y16FormatFor20CUG = false;
     if (fd() >= 0) {
         emit logDebugHandle("Stop Previewing...");
@@ -4832,12 +4946,10 @@ void Videostreaming::updateFrameInterval(QString pixelFormat, QString frameSize)
     height = tempResList.value(1).toInt();
     QStringList tempPixFmt = pixelFormat.split(' ');
     QString pixFmtValue = tempPixFmt.value(0);
-
     /* Actual Format of "Y16" is "Y16 " [Y16 with space]. So append space char */
-    if ((0 == QString::compare(pixFmtValue, "Y16"))|| (0 == QString::compare(pixFmtValue, "Y12"))){
+    if ((0 == QString::compare(pixFmtValue, "Y16"))|| (0 == QString::compare(pixFmtValue, "Y12")) || (0 == QString::compare(pixFmtValue, "Y10"))){
         pixFmtValue.append(" ");
     }
-
     ok = enum_frameintervals(frmival,pixFormat.value(pixFmtValue).toInt(), width, height);
     m_has_interval = ok && frmival.type == V4L2_FRMIVAL_TYPE_DISCRETE;
     availableFPS.clear();
@@ -5227,7 +5339,6 @@ void Videostreaming::doEncodeAudio(){
 
 void Videostreaming::stopUpdatePreview() {
     m_renderer->updateStop = true;
-    emit updateFpsZero(ZERO_FPS);
 }
 
 void Videostreaming::triggerModeSkipframes() {
@@ -5274,6 +5385,7 @@ void Videostreaming::triggerModeEnabled() {
         m_renderer->triggermodeFlag = true;
     }
     trigger_mode = true;
+
     stopUpdatePreview();
 }
 
@@ -5392,7 +5504,7 @@ void Videostreaming::enableDisableExpCompensation(bool isEnable)
   if(isEnable)
   {
     autoExposureMode = true;
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG ||currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG)
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG)
     {
         //To set exposure after cross resolution still capture in manual mode (when switched to auto mode)
         emit setExpAfterCrossStill();

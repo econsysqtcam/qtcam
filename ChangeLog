@@ -1,3 +1,9 @@
+Qtcam Application - 26.0.6
+---------------------------
+*Added Support for See3CAM_CU200.
+*Fix for 1 Fps issue for See3CAM_24CUG.
+*Reverted first phase controls for See3CAM_50CUG_M.
+
 Qtcam Application - 26.0.5
 ---------------------------
 *Set Fps 0, when See3CAM_CU31 device is in trigger mode.

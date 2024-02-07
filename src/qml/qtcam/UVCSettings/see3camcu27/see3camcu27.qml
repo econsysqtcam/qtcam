@@ -95,7 +95,7 @@ Item {
         height: 500
         style: econscrollViewStyle
         Item {
-            height:1300
+            height:900
             ColumnLayout {
                 x:2
                 y:5

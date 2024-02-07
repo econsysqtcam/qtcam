@@ -64,10 +64,8 @@ bool SEE3CAM_CU200::getGainMode()
             g_in_packet_buf[2] == GET_GAIN_MODE_SEE3CAM_CU200 &&
             g_in_packet_buf[8] == GET_SUCCESS) {
 
-            emit minGainReceived(g_in_packet_buf[5]);
-            emit maxGainReceived(g_in_packet_buf[6]);
-            emit currentGainReceived(g_in_packet_buf[4]);
-            emit gainStepValueReceived(g_in_packet_buf[7]);
+            emit gainPropertiesReceived(g_in_packet_buf[5], g_in_packet_buf[6], g_in_packet_buf[7], g_in_packet_buf[4]);
+//            emit gainModeReceived(g_in_packet_buf[3]);
 
             return true;
         }
@@ -78,7 +76,8 @@ bool SEE3CAM_CU200::getGainMode()
 
 /**
  * @brief SEE3CAM_CU200::setGainMode - Setting gain mode to the camera
- * @param gainMode - mode selected in UI
+ * @param gainMode  - Auto / Manual gain mode
+ * @param gainValue - manual gain value
  * @return true/false
  */
 bool SEE3CAM_CU200::setGainMode(GAIN_MODE gainMode, uint gainValue)
@@ -94,9 +93,9 @@ bool SEE3CAM_CU200::setGainMode(GAIN_MODE gainMode, uint gainValue)
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200;
     g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200;
-    g_out_packet_buf[3] = SET_GAIN_MODE_SEE3CAM_CU200 ; /* set gain mode code */
-    g_out_packet_buf[4] = gainMode; /* actual gain mode */
-    g_out_packet_buf[5] = gainValue; /* Gain Slider Value */
+    g_out_packet_buf[3] = SET_GAIN_MODE_SEE3CAM_CU200 ;
+    g_out_packet_buf[4] = gainMode;
+    g_out_packet_buf[5] = gainValue;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -116,7 +115,7 @@ bool SEE3CAM_CU200::setGainMode(GAIN_MODE gainMode, uint gainValue)
 
 
 /**
- * @brief SEE3CAM_CU200::getRGBGain - Getting RGB Gain Value from the camera
+ * @brief SEE3CAM_CU200::getRBGain - Getting RB Gain Value from the camera
  * @return true/false
  */
 bool SEE3CAM_CU200::getRBGain()
@@ -147,35 +146,29 @@ bool SEE3CAM_CU200::getRBGain()
             g_in_packet_buf[2]  == GET_RB_GAIN_SEE3CAM_CU200 &&
             g_in_packet_buf[35] == GET_SUCCESS) {
 
-            fCurrentRGain.u   = (g_in_packet_buf[3] << 24) | (g_in_packet_buf[4] << 16) | (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
-            fRGainMin.u       = (g_in_packet_buf[7] << 24) | (g_in_packet_buf[8] << 16) | (g_in_packet_buf[9] << 8) | (g_in_packet_buf[10] << 0);
-            fRGainMax.u       = (g_in_packet_buf[11] << 24) | (g_in_packet_buf[12] << 16) | (g_in_packet_buf[13] << 8) | (g_in_packet_buf[14] << 0);
-            fRGainStepValue.u = (g_in_packet_buf[15] << 24) | (g_in_packet_buf[16] << 16) | (g_in_packet_buf[17] << 8) | (g_in_packet_buf[18] << 0);
+                fCurrentRGain.u   = (g_in_packet_buf[3] << 24) | (g_in_packet_buf[4] << 16) | (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
+                fRGainMin.u       = (g_in_packet_buf[7] << 24) | (g_in_packet_buf[8] << 16) | (g_in_packet_buf[9] << 8) | (g_in_packet_buf[10] << 0);
+                fRGainMax.u       = (g_in_packet_buf[11] << 24) | (g_in_packet_buf[12] << 16) | (g_in_packet_buf[13] << 8) | (g_in_packet_buf[14] << 0);
+                fRGainStepValue.u = (g_in_packet_buf[15] << 24) | (g_in_packet_buf[16] << 16) | (g_in_packet_buf[17] << 8) | (g_in_packet_buf[18] << 0);
 
-            fCurrentBGain.u   = (g_in_packet_buf[19] << 24) | (g_in_packet_buf[20] << 16) | (g_in_packet_buf[21] << 8) | (g_in_packet_buf[22] << 0);
-            fBGainMin.u       = (g_in_packet_buf[23] << 24) | (g_in_packet_buf[24] << 16) | (g_in_packet_buf[25] << 8) | (g_in_packet_buf[26] << 0);
-            fBGainMax.u       = (g_in_packet_buf[27] << 24) | (g_in_packet_buf[28] << 16) | (g_in_packet_buf[29] << 8) | (g_in_packet_buf[30] << 0);
-            fBGainStepValue.u = (g_in_packet_buf[31] << 24) | (g_in_packet_buf[32] << 16) | (g_in_packet_buf[33] << 8) | (g_in_packet_buf[34] << 0);
+                fCurrentBGain.u   = (g_in_packet_buf[19] << 24) | (g_in_packet_buf[20] << 16) | (g_in_packet_buf[21] << 8) | (g_in_packet_buf[22] << 0);
+                fBGainMin.u       = (g_in_packet_buf[23] << 24) | (g_in_packet_buf[24] << 16) | (g_in_packet_buf[25] << 8) | (g_in_packet_buf[26] << 0);
+                fBGainMax.u       = (g_in_packet_buf[27] << 24) | (g_in_packet_buf[28] << 16) | (g_in_packet_buf[29] << 8) | (g_in_packet_buf[30] << 0);
+                fBGainStepValue.u = (g_in_packet_buf[31] << 24) | (g_in_packet_buf[32] << 16) | (g_in_packet_buf[33] << 8) | (g_in_packet_buf[34] << 0);
 
-            currentRGain   = fCurrentRGain.f;
-            minRGain       = fRGainMin.f;
-            maxRGain       = fRGainMax.f;
-            RGainStepValue = fRGainStepValue.f;
+                currentRGain   = fCurrentRGain.f;
+                minRGain       = fRGainMin.f;
+                maxRGain       = fRGainMax.f;
+                RGainStepValue = fRGainStepValue.f;
 
-            currentBGain   = fCurrentBGain.f;
-            minBGain       = fBGainMin.f;
-            maxBGain       = fBGainMax.f;
-            BGainStepValue = fBGainStepValue.f;
+                currentBGain   = fCurrentBGain.f;
+                minBGain       = fBGainMin.f;
+                maxBGain       = fBGainMax.f;
+                BGainStepValue = fBGainStepValue.f;
 
-            emit minRGainReceived(minRGain);
-            emit maxRGainReceived(maxRGain);
-            emit currentRGainReceived(currentRGain);
-            emit rGainStepValueReceived(RGainStepValue);
+                emit rGainPropertiesReceived(minRGain, maxRGain, RGainStepValue, currentRGain);
+                emit bGainPropertiesReceived(minBGain, maxBGain, BGainStepValue, currentBGain);
 
-            emit minBGainReceived(minBGain);
-            emit maxBGainReceived(maxBGain);
-            emit currentBGainReceived(currentBGain);
-            emit bGainStepValueReceived(BGainStepValue);
           }
 
             return true;
@@ -184,7 +177,7 @@ bool SEE3CAM_CU200::getRBGain()
 
 
 /**
- * @brief SEE3CAM_CU200::setRGBGain - Setting RGBGain Value to the camera
+ * @brief SEE3CAM_CU200::setRGBGain - Setting RBGain Value to the camera
  * RGBGain - RGBGain value from the UI
  * @return true/false
  */
@@ -224,6 +217,7 @@ bool SEE3CAM_CU200::setRBGain(float RGain, float BGain)
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2_SEE3CAM_CU200 &&
             g_in_packet_buf[2] == SET_RB_GAIN_SEE3CAM_CU200 &&
             g_in_packet_buf[11] == GET_SUCCESS) {
+
             return true;
         }
     }
@@ -243,17 +237,9 @@ bool SEE3CAM_CU200::getColorCorrectionMatrix()
         return false;
     }
 
-    float currentRr, minRr, maxRr, stepRr;
-    float currentRg, minRg, maxRg, stepRg;
-    float currentRb, minRb, maxRb, stepRb;
-
-    float currentGr, minGr, maxGr, stepGr;
-    float currentGg, minGg, maxGg, stepGg;
-    float currentGb, minGb, maxGb, stepGb;
-
-    float currentBr, minBr, maxBr, stepBr;
-    float currentBg, minBg, maxBg, stepBg;
-    float currentBb, minBb, maxBb, stepBb;
+    float currentRr, currentRg, currentRb;
+    float currentGr, currentGg, currentGb;
+    float currentBr, currentBg, currentBb;
 
     //Initializing buffers
     initializeBuffers();
@@ -265,127 +251,49 @@ bool SEE3CAM_CU200::getColorCorrectionMatrix()
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[147] == GET_FAIL) {
+        if (g_in_packet_buf[39] == GET_FAIL) {
             return false;
         }else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200 &&
             g_in_packet_buf[1]  == CAMERA_CONTROL_ID_2_SEE3CAM_CU200 &&
             g_in_packet_buf[2]  == GET_CC_MATRIX_SEE3CAM_CU200 &&
-            g_in_packet_buf[147] == GET_SUCCESS) {
+            g_in_packet_buf[39] == GET_SUCCESS) {
 
             fCurrentRr.u = (g_in_packet_buf[3] << 24) | (g_in_packet_buf[4] << 16) | (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
-            fMinRr.u     = (g_in_packet_buf[7] << 24) | (g_in_packet_buf[8] << 16) | (g_in_packet_buf[9] << 8) | (g_in_packet_buf[10] << 0);
-            fMaxRr.u     = (g_in_packet_buf[11] << 24) | (g_in_packet_buf[12] << 16) | (g_in_packet_buf[13] << 8) | (g_in_packet_buf[14] << 0);
-            fStepRr.u    = (g_in_packet_buf[15] << 24) | (g_in_packet_buf[16] << 16) | (g_in_packet_buf[17] << 8) | (g_in_packet_buf[18] << 0);
+            fCurrentRg.u = (g_in_packet_buf[7] << 24) | (g_in_packet_buf[8] << 16) | (g_in_packet_buf[9] << 8) | (g_in_packet_buf[10] << 0);
+            fCurrentRb.u = (g_in_packet_buf[11] << 24) | (g_in_packet_buf[12] << 16) | (g_in_packet_buf[13] << 8) | (g_in_packet_buf[14] << 0);
+
+            fCurrentGr.u = (g_in_packet_buf[15] << 24) | (g_in_packet_buf[16] << 16) | (g_in_packet_buf[17] << 8) | (g_in_packet_buf[18] << 0);
+            fCurrentGg.u = (g_in_packet_buf[19] << 24) | (g_in_packet_buf[20] << 16) | (g_in_packet_buf[21] << 8) | (g_in_packet_buf[22] << 0);
+            fCurrentGb.u = (g_in_packet_buf[23] << 24) | (g_in_packet_buf[24] << 16) | (g_in_packet_buf[25] << 8) | (g_in_packet_buf[26] << 0);
+
+            fCurrentBr.u  = (g_in_packet_buf[27] << 24) | (g_in_packet_buf[28] << 16) | (g_in_packet_buf[29] << 8) | (g_in_packet_buf[30] << 0);
+            fCurrentBg.u  = (g_in_packet_buf[31] << 24) | (g_in_packet_buf[32] << 16) | (g_in_packet_buf[33] << 8) | (g_in_packet_buf[34] << 0);
+            fCurrentBb.u  = (g_in_packet_buf[35] << 24) | (g_in_packet_buf[36] << 16) | (g_in_packet_buf[37] << 8) | (g_in_packet_buf[38] << 0);
 
             currentRr = fCurrentRr.f;
-            minRr     = fMinRr.f;
-            maxRr     = fMaxRr.f;
-            stepRr    = fStepRr.f;
-
-
-            fCurrentRg.u = (g_in_packet_buf[19] << 24) | (g_in_packet_buf[20] << 16) | (g_in_packet_buf[21] << 8) | (g_in_packet_buf[22] << 0);
-            fMinRg.u     = (g_in_packet_buf[23] << 24) | (g_in_packet_buf[24] << 16) | (g_in_packet_buf[25] << 8) | (g_in_packet_buf[26] << 0);
-            fMaxRg.u     = (g_in_packet_buf[27] << 24) | (g_in_packet_buf[28] << 16) | (g_in_packet_buf[29] << 8) | (g_in_packet_buf[30] << 0);
-            fStepRg.u    = (g_in_packet_buf[31] << 24) | (g_in_packet_buf[32] << 16) | (g_in_packet_buf[33] << 8) | (g_in_packet_buf[34] << 0);
-
             currentRg = fCurrentRg.f;
-            minRg     = fMinRg.f;
-            maxRg     = fMaxRg.f;
-            stepRg    = fStepRg.f;
-
-
-            fCurrentRb.u = (g_in_packet_buf[35] << 24) | (g_in_packet_buf[36] << 16) | (g_in_packet_buf[37] << 8) | (g_in_packet_buf[38] << 0);
-            fMinRb.u     = (g_in_packet_buf[39] << 24) | (g_in_packet_buf[40] << 16) | (g_in_packet_buf[41] << 8) | (g_in_packet_buf[42] << 0);
-            fMaxRb.u     = (g_in_packet_buf[43] << 24) | (g_in_packet_buf[44] << 16) | (g_in_packet_buf[45] << 8) | (g_in_packet_buf[46] << 0);
-            fStepRb.u    = (g_in_packet_buf[47] << 24) | (g_in_packet_buf[48] << 16) | (g_in_packet_buf[49] << 8) | (g_in_packet_buf[50] << 0);
-
             currentRb = fCurrentRb.f;
-            minRb     = fMinRb.f;
-            maxRb     = fMaxRb.f;
-            stepRb    = fStepRb.f;
-
-            //-------------------------------------------------------
-
-
-            fCurrentGr.u = (g_in_packet_buf[51] << 24) | (g_in_packet_buf[52] << 16) | (g_in_packet_buf[53] << 8) | (g_in_packet_buf[54] << 0);
-            fMinGr.u     = (g_in_packet_buf[55] << 24) | (g_in_packet_buf[56] << 16) | (g_in_packet_buf[57] << 8) | (g_in_packet_buf[58] << 0);
-            fMaxGr.u     = (g_in_packet_buf[59] << 24) | (g_in_packet_buf[60] << 16) | (g_in_packet_buf[61] << 8) | (g_in_packet_buf[62] << 0);
-            fStepGr.u    = (g_in_packet_buf[63] << 24) | (g_in_packet_buf[64] << 16) | (g_in_packet_buf[65] << 8) | (g_in_packet_buf[66] << 0);
 
             currentGr = fCurrentGr.f;
-            minGr     = fMinGr.f;
-            maxGr     = fMaxGr.f;
-            stepGr    = fStepGr.f;
-
-
-            fCurrentGg.u = (g_in_packet_buf[67] << 24) | (g_in_packet_buf[68] << 16) | (g_in_packet_buf[69] << 8) | (g_in_packet_buf[70] << 0);
-            fMinGg.u     = (g_in_packet_buf[71] << 24) | (g_in_packet_buf[72] << 16) | (g_in_packet_buf[73] << 8) | (g_in_packet_buf[74] << 0);
-            fMaxGg.u     = (g_in_packet_buf[75] << 24) | (g_in_packet_buf[76] << 16) | (g_in_packet_buf[77] << 8) | (g_in_packet_buf[78] << 0);
-            fStepGg.u    = (g_in_packet_buf[79] << 24) | (g_in_packet_buf[80] << 16) | (g_in_packet_buf[81] << 8) | (g_in_packet_buf[82] << 0);
-
             currentGg = fCurrentGg.f;
-            minGg     = fMinGg.f;
-            maxGg     = fMaxGg.f;
-            stepGg    = fStepGg.f;
-
-
-            fCurrentGb.u = (g_in_packet_buf[83] << 24) | (g_in_packet_buf[84] << 16) | (g_in_packet_buf[85] << 8) | (g_in_packet_buf[86] << 0);
-            fMinGb.u     = (g_in_packet_buf[87] << 24) | (g_in_packet_buf[88] << 16) | (g_in_packet_buf[89] << 8) | (g_in_packet_buf[90] << 0);
-            fMaxGb.u     = (g_in_packet_buf[91] << 24) | (g_in_packet_buf[92] << 16) | (g_in_packet_buf[93] << 8) | (g_in_packet_buf[94] << 0);
-            fStepGb.u    = (g_in_packet_buf[95] << 24) | (g_in_packet_buf[96] << 16) | (g_in_packet_buf[97] << 8) | (g_in_packet_buf[98] << 0);
-
             currentGb = fCurrentGb.f;
-            minGb     = fMinGb.f;
-            maxGb     = fMaxGb.f;
-            stepGb    = fStepGb.f;
-
-
-            //-------------------------------------------
-
-
-            fCurrentBr.u = (g_in_packet_buf[99] << 24) | (g_in_packet_buf[100] << 16) | (g_in_packet_buf[101] << 8) | (g_in_packet_buf[102] << 0);
-            fMinBr.u     = (g_in_packet_buf[103] << 24) | (g_in_packet_buf[104] << 16) | (g_in_packet_buf[105] << 8) | (g_in_packet_buf[106] << 0);
-            fMaxBr.u     = (g_in_packet_buf[107] << 24) | (g_in_packet_buf[108] << 16) | (g_in_packet_buf[109] << 8) | (g_in_packet_buf[110] << 0);
-            fStepBr.u     = (g_in_packet_buf[111] << 24) | (g_in_packet_buf[112] << 16) | (g_in_packet_buf[113] << 8) | (g_in_packet_buf[114] << 0);
 
             currentBr = fCurrentBr.f;
-            minBr     = fMinBr.f;
-            maxBr     = fMaxBr.f;
-            stepBr    = fStepBr.f;
-
-
-            fCurrentBg.u = (g_in_packet_buf[115] << 24) | (g_in_packet_buf[116] << 16) | (g_in_packet_buf[117] << 8) | (g_in_packet_buf[118] << 0);
-            fMinBg.u     = (g_in_packet_buf[119] << 24) | (g_in_packet_buf[120] << 16) | (g_in_packet_buf[121] << 8) | (g_in_packet_buf[122] << 0);
-            fMaxBg.u     = (g_in_packet_buf[123] << 24) | (g_in_packet_buf[124] << 16) | (g_in_packet_buf[125] << 8) | (g_in_packet_buf[126] << 0);
-            fStepBg.u     = (g_in_packet_buf[127] << 24) | (g_in_packet_buf[128] << 16) | (g_in_packet_buf[129] << 8) | (g_in_packet_buf[130] << 0);
-
             currentBg = fCurrentBg.f;
-            minBg     = fMinBg.f;
-            maxBg     = fMaxBg.f;
-            stepBg    = fStepBg.f;
-
-
-            fCurrentBb.u = (g_in_packet_buf[131] << 24) | (g_in_packet_buf[132] << 16) | (g_in_packet_buf[133] << 8) | (g_in_packet_buf[134] << 0);
-            fMinBb.u     = (g_in_packet_buf[134] << 24) | (g_in_packet_buf[136] << 16) | (g_in_packet_buf[137] << 8) | (g_in_packet_buf[138] << 0);
-            fMaxBb.u     = (g_in_packet_buf[139] << 24) | (g_in_packet_buf[140] << 16) | (g_in_packet_buf[141] << 8) | (g_in_packet_buf[142] << 0);
-            fStepBb.u     = (g_in_packet_buf[143] << 24) | (g_in_packet_buf[144] << 16) | (g_in_packet_buf[145] << 8) | (g_in_packet_buf[146] << 0);
-
             currentBb = fCurrentBb.f;
-            minBb     = fMinBb.f;
-            maxBb     = fMaxBb.f;
-            stepBb    = fStepBb.f;
 
-            emit currentRrValuesReceived(currentRr, minRr, maxRr, stepRr);
-            emit currentRgValuesReceived(currentRg, minRg, maxRg, stepRg);
-            emit currentRbValuesReceived(currentRb, minRb, maxRb, stepRb);
 
-            emit currentGrValuesReceived(currentGr, minGr, maxGr, stepGr);
-            emit currentGgValuesReceived(currentGg, minGg, maxGg, stepGg);
-            emit currentGbValuesReceived(currentGb, minGb, maxGb, stepGb);
+            emit currentRrValuesReceived(currentRr);
+            emit currentRgValuesReceived(currentRg);
+            emit currentRbValuesReceived(currentRb);
 
-            emit currentBrValuesReceived(currentBr, minBr, maxBr, stepBr);
-            emit currentBgValuesReceived(currentBg, minBg, maxBg, stepBg);
-            emit currentBbValuesReceived(currentBb, minBb, maxBb, stepBb);
+            emit currentGrValuesReceived(currentGr);
+            emit currentGgValuesReceived(currentGg);
+            emit currentGbValuesReceived(currentGb);
+
+            emit currentBrValuesReceived(currentBr);
+            emit currentBgValuesReceived(currentBg);
+            emit currentBbValuesReceived(currentBb);
 
             return true;
         }
@@ -521,9 +429,11 @@ bool SEE3CAM_CU200::getBlackLevel()
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2_SEE3CAM_CU200 &&
             g_in_packet_buf[2] == GET_BLACK_LEVEL_SEE3CAM_CU200 &&
             g_in_packet_buf[10] == GET_SUCCESS) {
+
             current  = (g_in_packet_buf[3] << 8) | (g_in_packet_buf[4] << 0);
             minValue = (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
             maxValue = (g_in_packet_buf[7] << 8) | (g_in_packet_buf[8] << 0);
+
 
             emit minBlackLevelReceived(minValue);
             emit maxBlackLevelReceived(maxValue);
@@ -565,6 +475,7 @@ bool SEE3CAM_CU200::setBlackLevel(uint blackLevel)
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2_SEE3CAM_CU200 &&
             g_in_packet_buf[2] == SET_BLACK_LEVEL_SEE3CAM_CU200 &&
             g_in_packet_buf[6] == GET_SUCCESS) {
+
             return true;
         }
     }
@@ -612,10 +523,7 @@ bool SEE3CAM_CU200::getBrightness()
             max       = fMaxBrightness.f;
             stepValue = fBrightnessStepValue.f;
 
-            emit minBrightnessReceived(min);
-            emit maxBrightnessReceived(max);
-            emit currentBrightnessReceived(current);
-            emit brightnessStepValueReceived(stepValue);
+            emit brightnessPropertiesReceived(min, max, stepValue, current);
 
             return true;
         }
@@ -649,7 +557,6 @@ bool SEE3CAM_CU200::setBrightness(float brightness)
     g_out_packet_buf[6] = ((fCurrentBrightness.u & 0x0000FF00) >> 8);
     g_out_packet_buf[7] = ((fCurrentBrightness.u & 0x000000FF) >> 0);
 
-
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[7] == GET_FAIL) {
@@ -658,6 +565,7 @@ bool SEE3CAM_CU200::setBrightness(float brightness)
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2_SEE3CAM_CU200 &&
             g_in_packet_buf[2] == SET_BRIGHTNESS_SEE3CAM_CU200 &&
             g_in_packet_buf[7] == GET_SUCCESS) {
+
             return true;
         }
     }
@@ -778,10 +686,7 @@ bool SEE3CAM_CU200::getSaturation()
             max       = fMaxSaturation.f;
             stepValue = fSaturationStepValue.f;
 
-            emit minSaturationReceived(min);
-            emit maxSaturationReceived(max);
-            emit currentSaturationReceived(current);
-            emit saturationStepValueReceived(stepValue);
+            emit saturationPropertiesReceived(min, max, stepValue, current);
 
             return true;
         }
@@ -861,7 +766,6 @@ bool SEE3CAM_CU200::getColorTemperature()
             g_in_packet_buf[6] == GET_SUCCESS) {
 
             colorTemp = (g_in_packet_buf[3] << 8) | (g_in_packet_buf[4] << 0);
-
             emit colorTemperatureReceived(colorTemp);
             return true;
         }
@@ -947,10 +851,7 @@ bool SEE3CAM_CU200::getGammaCorrection()
             max       = fMaxGamma.f;
             stepValue = fGammaStepValue.f;
 
-            emit minGammaCorrectionReceived(min);
-            emit maxGammaCorrectionReceived(max);
-            emit currentGammaCorrectionReceived(current);
-            emit gammaCorrectionStepValueReceived(stepValue);
+            emit gammaPropertiesReceived(min, max, stepValue, current);
 
             return true;
         }
@@ -1012,7 +913,7 @@ bool SEE3CAM_CU200::getExposure()
         return false;
     }
 
-//    uint exposureMode;
+    uint exposureMode;
     uint manualExposure;
 
     //Initializing buffers
@@ -1033,9 +934,10 @@ bool SEE3CAM_CU200::getExposure()
             g_in_packet_buf[2] == GET_EXPOSURE_SEE3CAM_CU200 &&
             g_in_packet_buf[8] == GET_SUCCESS) {
 
-//            exposureMode = g_in_packet_buf[3]; //As of now Auto exposure is not supported
+            exposureMode = g_in_packet_buf[3];
             manualExposure  = (g_in_packet_buf[4] << 24) | (g_in_packet_buf[5] << 16) | (g_in_packet_buf[6] << 8) | (g_in_packet_buf[7] << 0);
 
+            emit exposureModeReceived(exposureMode);
             emit exposureValueReceived(manualExposure);
 
             return true;
@@ -1063,8 +965,6 @@ bool SEE3CAM_CU200::setExposure(EXPOSURE_MODE expMode, uint32_t manualExposure)
 
     //Initializing buffers
     initializeBuffers();
-
-    uint manualExposureVal;
 
     //Filling the buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200;
@@ -1117,14 +1017,12 @@ bool SEE3CAM_CU200::getCameraMode()
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-
         if (g_in_packet_buf[6] == GET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2_SEE3CAM_CU200 &&
             g_in_packet_buf[2] == GET_CAMERA_MODE_SEE3CAM_CU200 &&
             g_in_packet_buf[6] == GET_SUCCESS) {
-
             emit cameraModeReceived(g_in_packet_buf[3]);
             return true;
         }
@@ -1188,7 +1086,6 @@ bool SEE3CAM_CU200::getStrobeMode()
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-
         if (g_in_packet_buf[6] == GET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200 &&
@@ -1237,12 +1134,165 @@ bool SEE3CAM_CU200::setStrobeMode(STROBE_MODE strobeMode)
 }
 
 
+
+/*
+ * @brief SEE3CAM_CU200::setOrientation - Setting orientation - set Normal/horizontal/vertical/Rotate180
+ * @param - horizontal flip selection
+ * @param - vertical flip selection
+ * return true/false
+*/
+bool SEE3CAM_CU200::setOrientation(bool horzModeSel, bool vertiModeSel)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200; /* camera id_1 */
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200; /* camera id_2 */
+    g_out_packet_buf[3] = SET_ORIENTATION_MODE_SEE3CAM_CU200; /* set orientation command  */
+
+    if(horzModeSel && vertiModeSel){
+        g_out_packet_buf[4] = ROTATE_180; /* both flip enable */
+    }else if(horzModeSel && !vertiModeSel){
+        g_out_packet_buf[4] = HORIZONTAL; /* horizontal flip only mode */
+    }else if(!horzModeSel && vertiModeSel){
+        g_out_packet_buf[4] = VERTICAL; /* vertical flip only mode */
+    }else
+        g_out_packet_buf[4] = NORMAL; /* both flip disable */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2_SEE3CAM_CU200 &&
+            g_in_packet_buf[2] == SET_ORIENTATION_MODE_SEE3CAM_CU200 &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/*
+ * @brief SEE3CAM_CU200::getOrientation - getting flip mode from the camera
+ * return true - success /false - failure
+*/
+bool SEE3CAM_CU200::getOrientation()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200; /* camera id_1 */
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200; /* camera id_2 */
+    g_out_packet_buf[3] = GET_ORIENTATION_MODE_SEE3CAM_CU200; /* get orientation command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2_SEE3CAM_CU200 &&
+            g_in_packet_buf[2] == GET_ORIENTATION_MODE_SEE3CAM_CU200 &&
+            g_in_packet_buf[6] == GET_SUCCESS) {
+            emit flipMirrorModeChanged(g_in_packet_buf[3]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU200::saveConfiguration
+ * @param configMode - To set default / User defined configuration
+ * @return true/false
+ */
+bool SEE3CAM_CU200::saveConfiguration(SAVECONFIGURATION configMode)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = SAVE_CONFIGURATION_SEE3CAM_CU200; /* camera id */
+    g_out_packet_buf[2] = configMode;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH))
+    {
+        if (g_in_packet_buf[6] == SET_FAIL)
+        {
+            emit indicateCommandStatus("Failure", "Saving Configurations Failed");
+            return false;
+        }
+        else if(g_in_packet_buf[0] == SAVE_CONFIGURATION_SEE3CAM_CU200  &&
+            g_in_packet_buf[6] == SET_SUCCESS){
+            emit indicateCommandStatus("Success", "Configurations Saved Successfully");
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief SEE3CAM_CU200::resetDevice - To Reset the device
+ * @return true/false
+ */
+bool SEE3CAM_CU200::resetDevice()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    //Filling the buffer values
+    g_out_packet_buf[1] = RESET_COMMAND_1;
+    g_out_packet_buf[2] = RESET_COMMAND_2;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == RESET_COMMAND_1 &&
+            g_in_packet_buf[1] == RESET_COMMAND_2 &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
 /**
  * @brief SEE3CAM_CU200::setToDefault - set all the values to default in camera
  * @return true/false
  */
 bool SEE3CAM_CU200::setToDefault(){
-
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -1272,45 +1322,6 @@ bool SEE3CAM_CU200::setToDefault(){
 }
 
 
-/**
- * @brief SEE3CAM_CU200::saveConfiguration
- * @return true/false
- */
-bool SEE3CAM_CU200::saveConfiguration()
-{
-    // hid validation
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    //Initialize buffers
-    initializeBuffers();
-
-    // fill buffer values
-    g_out_packet_buf[1] = SAVE_CONFIGURATION_SEE3CAM_CU200; /* camera id */
-    g_out_packet_buf[2] = SAVE_SEE3CAM_CU200; /* set to default command */
-
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH))
-    {
-        if (g_in_packet_buf[6] == SET_FAIL)
-        {
-            emit indicateCommandStatus("Failure", "Saving Configurations Failed");
-            return false;
-        }
-        else if(g_in_packet_buf[0] == SAVE_CONFIGURATION_SEE3CAM_CU200  &&
-            g_in_packet_buf[1] == SAVE_SEE3CAM_CU200 &&
-            g_in_packet_buf[6] == SET_SUCCESS){
-            emit indicateCommandStatus("Success", "Configurations saved successfully");
-            return true;
-        }
-    }
-    return false;
-}
-
-
 /*
  * @brief SEE3CAM_CU200::initializeBuffers - Initialize input and output buffers
  */
@@ -1319,6 +1330,3 @@ void SEE3CAM_CU200::initializeBuffers(){
     memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
     memset(g_in_packet_buf, 0x00, sizeof(g_in_packet_buf));
 }
-
-
-

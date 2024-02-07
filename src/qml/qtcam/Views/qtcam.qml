@@ -300,7 +300,7 @@ Rectangle {
     signal getColorTempFromHID(int colorTempFromHID);
     signal getExposureFromHID(int exposureFromHID);
     signal getExposureStatusFromHID(bool isAutoEnable, int exposure);
-    signal updateZeroFpsInTriggerMode(int zero);
+    signal setFpsZeroOnTriggerMode();
 
     width:Screen.width
     height:Screen.height
@@ -557,10 +557,6 @@ Rectangle {
             {
                 statusText = "Current FPS: " + fps + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
             }
-        }
-
-        onUpdateFpsZero:{
-            updateZeroFpsInTriggerMode(fps)
         }
 
         onDefaultFrameSize: {
@@ -1866,12 +1862,6 @@ Rectangle {
     {
         cameraMode = Mode
         vidstreamproperty.cameraModeEnabled(cameraMode)
-    }
-
-    //To set FPS to 0, when device is in trigger mode
-    function setFpsZeroOnTriggerMode()
-    {
-        statusText = "Current FPS: " + 0 + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
     }
 
     //Added by Sushanth
