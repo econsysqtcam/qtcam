@@ -150,7 +150,7 @@ Rectangle {
     property bool stillCaptureChildVisible: false
     property bool audioCaptureChildVisible: false
     property bool videoSettingsChildVisible: false
-
+    property bool isTriggerMode: false
 
     property bool disableAudio: false
 
@@ -301,6 +301,7 @@ Rectangle {
     signal getExposureFromHID(int exposureFromHID);
     signal getExposureStatusFromHID(bool isAutoEnable, int exposure);
     signal setFpsZeroOnTriggerMode();
+    signal getFlipMode();
 
     width:Screen.width
     height:Screen.height
@@ -552,6 +553,10 @@ Rectangle {
                 if(!(vidstreamproperty.width == 320 && vidstreamproperty.height ==240)){
                     statusText = "Recording..." + " " + "Current FPS: " + fps + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
                 }
+            }
+            else if(isTriggerMode)
+            {
+                statusText = " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
             }
             else
             {
@@ -935,6 +940,10 @@ Rectangle {
                         vidstreamproperty.masterModeEnabled()
                         // Moved by Sankari: Mar 20, 2019. For storage camera, before start preview, we need to set ondemand mode.
                         createExtensionUnitQml(selectedDeviceEnumValue) //setting ondemand mode in fscamcu135 qml oncompleted.
+                        if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200) {
+                            getFlipMode()
+                        }
+
                         if(ecam83USBstate !=2)     //If PIN2 is streaming, PIN1(H264) should not stream.
                         {
                         vidstreamproperty.startAgain() // Then start preview
@@ -1341,10 +1350,13 @@ Rectangle {
 
 
     function stopUpdatePreviewInTriggerMode(){
+        isTriggerMode = true
+        statusText = " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
         vidstreamproperty.triggerModeEnabled()
     }
 
     function startUpdatePreviewInMasterMode(){
+        isTriggerMode = false
         vidstreamproperty.masterModeEnabled()
     }
 
@@ -1367,6 +1379,7 @@ Rectangle {
             vidstreamproperty.enabled = true
             keyEventFiltering = false
         }
+        isTriggerMode = false
         vidstreamproperty.masterModeEnabled()
         if(JS.videoCaptureFormat !== JS.stillCaptureFormat  || JS.stillCaptureResolution !== JS.videoCaptureResolution)
         {
@@ -1541,7 +1554,7 @@ Rectangle {
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_24CUG) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam24cug/see3cam_24cug.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU81) {
-                    see3cam = Qt.createComponent("../UVCSettings/see3cam_cu81/see3cam_cu81.qml").createObject(root)
+            see3cam = Qt.createComponent("../UVCSettings/see3cam_cu81/see3cam_cu81.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.ECAM51A_USB || selectedDeviceEnumValue == CommonEnums.ECAM51B_USB ) {
             see3cam = Qt.createComponent("../UVCSettings/ecam51_USB/ecam51_usb.qml").createObject(root)
             see3cam.selectedDeviceEnumVal(selectedDeviceEnumValue)
@@ -1862,6 +1875,11 @@ Rectangle {
     {
         cameraMode = Mode
         vidstreamproperty.cameraModeEnabled(cameraMode)
+    }
+
+    function getFlipStatus(isHorizontal, isVertical)
+    {
+        vidstreamproperty.sendFlipStatus(isHorizontal, isVertical)
     }
 
     //Added by Sushanth

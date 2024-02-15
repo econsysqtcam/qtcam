@@ -110,13 +110,17 @@ Item{
             {
                 colorTempSlider.value = 3
             }
-            else if(colorTempFromUVC == "6000")
+            else if(colorTempFromUVC == "4100")
             {
                 colorTempSlider.value = 4
             }
-            else if(colorTempFromUVC == "6500")
+            else if(colorTempFromUVC == "6000")
             {
                 colorTempSlider.value = 5
+            }
+            else if(colorTempFromUVC == "6500")
+            {
+                colorTempSlider.value = 6
             }
 
             skipUpdateColorTemperature = true
@@ -127,6 +131,9 @@ Item{
         }
         onGetExposureFromUVC:{
             manualExpTextField.text = exposureFromUVC
+        }
+        onGetFlipMode:{ //To get the Flip status when 2 or more cameras are connected
+            sendFlipStatus()
         }
     }
 
@@ -176,55 +183,693 @@ Item{
                 y:5
                 spacing:18
 
-//                Text {
-//                    id: gainModeTitle
-//                    text: "--- Gain Mode ---"
-//                    font.pixelSize: 14
-//                    font.family: "Ubuntu"
-//                    color: "#ffffff"
-//                    smooth: true
-//                    Layout.alignment: Qt.AlignCenter
-//                    opacity: 0.50196078431373
-//                }
-//                Row{
-//                    spacing: 30
-//                    Layout.alignment: Qt.AlignCenter
-//                    ExclusiveGroup { id: gainModeGroup }
-//                    RadioButton {
-//                        id: autoGain
-//                        exclusiveGroup: gainModeGroup
-//                        checked: false
-//                        text: "Auto"
-//                        activeFocusOnPress: true
-//                        style: econRadioButtonStyle
-//                        onClicked: {
-//                            see3camcu200.setGainMode(SEE3CAM_CU200.AUTO_MODE, 0)
-//                        }
-//                        Keys.onReturnPressed: {
-//                            see3camcu200.setGainMode(SEE3CAM_CU200.AUTO_MODE, 0)
-//                        }
-//                    }
+                Text
+                {
+                    id: brightnessText
+                    text: "--- Brightness ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                    ToolButton{
+                        tooltip: "Modifies the Y channel gain in steps of 0.005 by changing the brightness of the frame."
+                        width: 200
+                        opacity: 0
+                    }
+                }
+                Row{
+                    spacing: 35
+                    Slider {
+                        id: brightnessSlider
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        width: 150
+                        style:econSliderStyle
+                        onValueChanged:  {
+                            brightnessTextField.text = brightnessSlider.value
+                            if(skipUpdateBrightness){
+                                // Round the slider and TextField to three decimal places
+                                adjustedBrightness = parseFloat((brightnessSlider.value).toFixed(3));
 
-//                    RadioButton {
-//                        id: manualGain
-//                        exclusiveGroup: gainModeGroup
-//                        checked: false
-//                        text: "Manual"
-//                        activeFocusOnPress: true
-//                        style: econRadioButtonStyle
-//                        onClicked: {
-//                            see3camcu200.setGainMode(SEE3CAM_CU200.MANUAL_MODE, gainSlider.value)
-//                        }
-//                        Keys.onReturnPressed: {
-//                            see3camcu200.setGainMode(SEE3CAM_CU200.MANUAL_MODE, gainSlider.value)
-//                        }
-//                    }
-//                }
+                                //Sending HID value to UVC
+                                brightnessInt = adjustedBrightness * 200;
+                                root.sendBrightnessToUVC(brightnessInt)
+
+                                brightnessTextField.text = adjustedBrightness
+                                see3camcu200.setBrightness(adjustedBrightness)
+                            }
+                            skipUpdateBrightness = true
+                        }
+                    }
+                    TextField {
+                        id: brightnessTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        validator: IntValidator {bottom: brightnessSlider.minimumValue; top: brightnessSlider.maximumValue}
+                        onTextChanged: {
+                            if(text.length > 0){
+                                brightnessSlider.value = brightnessTextField.text
+                            }
+                        }
+                    }
+                }
+
+                Text
+                {
+                    id: contrastTitle
+                    text: "--- Contrast ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                    ToolButton{
+                        tooltip: "Modifies the strengths of S curve applied to Y channel by changing the contrast of the frame."
+                        width: 200
+                        opacity: 0
+                    }
+                }
+                Row{
+                    spacing: 35
+                    Slider {
+                        id: contrastSlider
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        width: 150
+                        style:econSliderStyle
+                        onValueChanged:  {
+                            contrastTextField.text = contrastSlider.value
+                            if(skipUpdateContrast){
+                                //Sending HID value to UVC
+                                root.sendContrastToUVC(contrastSlider.value)
+
+                                see3camcu200.setContrast(contrastSlider.value)
+                            }
+                            skipUpdateContrast = true
+                        }
+                    }
+                    TextField {
+                        id: contrastTextField
+                        text: contrastSlider.value
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        validator: IntValidator {bottom: contrastSlider.minimumValue; top: contrastSlider.maximumValue}
+                        onTextChanged: {
+                            if(text.length > 0){
+                                contrastSlider.value = contrastTextField.text
+                            }
+                        }
+                    }
+                }
+
+                Text {
+                    id: blackLevelAdj
+                    text: "--- Black Level ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                    ToolButton{
+                        tooltip: "Black level is the value which is subtracted from the image signal to compensate the thermally generated noise.
+ Note: Changing the value will affect image quality."
+                        opacity: 0
+                        width: 200
+                    }
+                }
+                Row
+                {
+                    spacing: 35
+                    Slider
+                    {
+                        id: blackLevelSlider
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        width: 150
+                        style:econSliderStyle
+                        onValueChanged:  {
+                            blackLevelTextField.text = blackLevelSlider.value
+                            if(skipUpdateBlackLevelMode){
+                                see3camcu200.setBlackLevel(blackLevelSlider.value)
+                            }
+                            skipUpdateBlackLevelMode = true
+                        }
+                    }
+
+                    TextField
+                    {
+                        id: blackLevelTextField
+                        text: blackLevelSlider.value
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        validator: IntValidator {bottom: blackLevelSlider.minimumValue; top: blackLevelSlider.maximumValue}
+                        onTextChanged: {
+                            if(text.length > 0){
+                                blackLevelSlider.value = blackLevelTextField.text
+                            }
+                        }
+                    }
+                }
+
+                Text
+                {
+                    id: gammaCorrectionText
+                    text: "--- Gamma Correction ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                    ToolButton{
+                        tooltip: "Modifies the strength of gamma correction curve applied to Y channel in steps of 0.1 by changing the gamma of the frame."
+                        width: 200
+                        opacity: 0
+                    }
+                }
+                Row{
+                    spacing: 35
+                    Slider {
+                        id: gammaCorrectionSlider
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        width: 150
+                        style:econSliderStyle
+                        onValueChanged:  {
+                            if(skipUpdateGammaCorrection){
+                                gammaCorrectionTextField.text = gammaCorrectionSlider.value
+                                // Round the slider and TextField to three decimal places
+                                adjustedGammaCorrection = parseFloat((gammaCorrectionSlider.value).toFixed(1));
+
+                                //Sending HID value to UVC
+                                gammaInt = adjustedGammaCorrection * 10
+                                root.sendGammaToUVC(gammaInt)
+
+                                gammaCorrectionTextField.text = adjustedGammaCorrection
+                                see3camcu200.setGammaCorrection(adjustedGammaCorrection)
+                            }
+                            skipUpdateGammaCorrection = true
+                        }
+                    }
+                    TextField {
+                        id: gammaCorrectionTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        readOnly:true
+                        validator: IntValidator {bottom: gammaCorrectionSlider.minimumValue; top: gammaCorrectionSlider.maximumValue}
+                        onTextChanged: {
+                            if(text.length > 0){
+                                gammaCorrectionSlider.value = gammaCorrectionTextField.text
+                            }
+                        }
+                    }
+                }
+
+                Text {
+                    id: exposureMode
+                    text: "--- Exposure ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                    ToolButton{
+                        tooltip: "It controls the integration time of the sensor. It changes in the range of 100µs to 1s. It is expressed in microseconds(µs)."
+                        opacity: 0
+                        width: 200
+                    }
+                }
+
+                Row
+                {
+                    spacing: 9
+                    Text
+                    {
+                        id: manualExpTitle
+                        text: "value(µs)[100 - 1000000]"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        width: 80
+                        wrapMode: Text.WordWrap
+                        opacity: 1
+                    }
+                    TextField
+                    {
+                        id: manualExpTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        opacity: 1
+                        style: econTextFieldStyle
+                        implicitHeight: 25
+                        implicitWidth: 80
+                        validator: IntValidator {bottom: expMin; top: expMax}
+                    }
+                    Button
+                    {
+                        id: exposureSetBtn
+                        activeFocusOnPress : true
+                        text: "Set"
+                        tooltip: "You can set the required exposure compensation value by changing the value in the text box and click the Set button"
+                        style: econButtonStyle
+                        enabled: true
+                        opacity: 1
+                        implicitHeight: 25
+                        implicitWidth: 60
+                        onClicked:
+                        {
+                            exposureSetBtn.enabled = false
+                            setButtonClicked = true
+
+                            see3camcu200.setExposure(SEE3CAM_CU200.MANUAL_EXPOSURE, manualExpTextField.text);
+
+                            //Sending HID value to UVC
+                            exposureText = manualExpTextField.text
+                            if(manualExpTextField.text <= 1000000)
+                            {
+                                exposureInt = manualExpTextField.text / 100
+                                root.sendExposureToUVC(exposureInt)
+                            }
+                            else{
+                                root.sendExposureToUVC(100000)
+                            }
+                            manualExpTextField.text = exposureText
+
+                            exposureSetBtn.enabled = true
+                        }
+                        Keys.onReturnPressed:
+                        {
+                            exposureSetBtn.enabled = false
+                            setButtonClicked = true
+
+                            //Sending HID value to UVC
+                            root.sendExposureToUVC(manualExpTextField.text)
+
+                            manualExpTextField.text = exposureText
+
+                            see3camcu200.setExposure(SEE3CAM_CU200.MANUAL_EXPOSURE, manualExpTextField.text);
+                            exposureSetBtn.enabled = true
+                        }
+                    }
+                }
+
+                //                Text {
+                //                    id: gainModeTitle
+                //                    text: "--- Gain Mode ---"
+                //                    font.pixelSize: 14
+                //                    font.family: "Ubuntu"
+                //                    color: "#ffffff"
+                //                    smooth: true
+                //                    Layout.alignment: Qt.AlignCenter
+                //                    opacity: 0.50196078431373
+                //                }
+                //                Row{
+                //                    spacing: 30
+                //                    Layout.alignment: Qt.AlignCenter
+                //                    ExclusiveGroup { id: gainModeGroup }
+                //                    RadioButton {
+                //                        id: autoGain
+                //                        exclusiveGroup: gainModeGroup
+                //                        checked: false
+                //                        text: "Auto"
+                //                        activeFocusOnPress: true
+                //                        style: econRadioButtonStyle
+                //                        onClicked: {
+                //                            see3camcu200.setGainMode(SEE3CAM_CU200.AUTO_MODE, 0)
+                //                        }
+                //                        Keys.onReturnPressed: {
+                //                            see3camcu200.setGainMode(SEE3CAM_CU200.AUTO_MODE, 0)
+                //                        }
+                //                    }
+
+                //                    RadioButton {
+                //                        id: manualGain
+                //                        exclusiveGroup: gainModeGroup
+                //                        checked: false
+                //                        text: "Manual"
+                //                        activeFocusOnPress: true
+                //                        style: econRadioButtonStyle
+                //                        onClicked: {
+                //                            see3camcu200.setGainMode(SEE3CAM_CU200.MANUAL_MODE, gainSlider.value)
+                //                        }
+                //                        Keys.onReturnPressed: {
+                //                            see3camcu200.setGainMode(SEE3CAM_CU200.MANUAL_MODE, gainSlider.value)
+                //                        }
+                //                    }
+                //                }
 
 
-               Text{
-                    id: manualGainSlider
-                    text: "--- Manual Gain ---"
+                Text{
+                     id: manualGainSlider
+                     text: "--- Gain ---"
+                     font.pixelSize: 14
+                     font.family: "Ubuntu"
+                     color: "#ffffff"
+                     smooth: true
+                     Layout.alignment: Qt.AlignCenter
+                     opacity: 0.50196078431373
+
+                     ToolButton{
+                         tooltip: "It is used to modify the gain value of the sensor."
+                         width: 200
+                         opacity: 0
+                     }
+                }
+                Row
+                {
+                     spacing: 35
+                     Slider
+                     {
+                         id: gainSlider
+                         activeFocusOnPress: true
+                         updateValueWhileDragging: false
+                         width: 150
+                         style:econSliderStyle
+ //                        opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
+ //                        enabled: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
+                         onValueChanged:  {
+                             //Sending HID value to UVC
+                             root.getGainValueFromHID(gainSlider.value)
+
+                             gainTextField.text = gainSlider.value
+                             if(skipUpdateGainMode){
+                                 see3camcu200.setGainMode(SEE3CAM_CU200.MANUAL_MODE, gainSlider.value)
+                             }
+                             skipUpdateGainMode = true
+                         }
+                     }
+                     TextField
+                     {
+                         id: gainTextField
+                         text: gainSlider.value
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+ //                        opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
+ //                        enabled: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
+                         style: econTextFieldStyle
+                         validator: IntValidator {bottom: gainSlider.minimumValue; top: gainSlider.maximumValue}
+                         onTextChanged: {
+                             if(text.length > 0){
+                                 gainSlider.value = gainTextField.text
+                             }
+                         }
+                     }
+                 }
+
+                Text{
+                     id: gainRTitle
+                     text: "--- Red Gain ---"
+                     font.pixelSize: 14
+                     font.family: "Ubuntu"
+                     color: "#ffffff"
+                     smooth: true
+                     Layout.alignment: Qt.AlignCenter
+                     opacity: 0.50196078431373
+
+                     ToolButton{
+                         tooltip: "Modifies the digital gain of R channel in steps of 0.005."
+                         width: 200
+                         opacity: 0
+                     }
+                }
+                Row
+                {
+                     spacing: 35
+                     Slider
+                     {
+                         id: gainRSlider
+                         activeFocusOnPress: true
+                         updateValueWhileDragging: false
+                         width: 150
+                         style:econSliderStyle
+                         onValueChanged:  {
+                             gainRTextField.text = gainRSlider.value
+                             if(skipUpdateRGainMode){
+                                 adjustedRGain = parseFloat((gainRSlider.value).toFixed(3));
+                                 gainRTextField.text = adjustedRGain
+                                 see3camcu200.setRBGain(adjustedRGain, gainBSlider.value)
+                             }
+                             skipUpdateRGainMode = true
+                         }
+                     }
+                     TextField
+                     {
+                         id: gainRTextField
+                         text:gainRSlider.value
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                         validator: IntValidator {bottom: gainRSlider.minimumValue; top: gainRSlider.maximumValue}
+                         onTextChanged: {
+                             if(text.length > 0){
+                                 gainRSlider.value = gainRTextField.text
+                             }
+                         }
+                     }
+                 }
+
+                Text{
+                     id: gainBTitle
+                     text: "--- Blue Gain ---"
+                     font.pixelSize: 14
+                     font.family: "Ubuntu"
+                     color: "#ffffff"
+                     smooth: true
+                     Layout.alignment: Qt.AlignCenter
+                     opacity: 0.50196078431373
+
+                     ToolButton{
+                         tooltip: "Modifies the digital gain of B channel in steps of 0.005."
+                         width: 200
+                         opacity: 0
+                     }
+                }
+
+                Row
+                {
+                     spacing: 35
+                     Slider
+                     {
+                         id: gainBSlider
+                         activeFocusOnPress: true
+                         updateValueWhileDragging: false
+                         width: 150
+                         style:econSliderStyle
+                         onValueChanged:  {
+                             gainBTextField.text = gainBSlider.value
+                             if(skipUpdateBGainMode){
+                                 adjustedBGain = parseFloat((gainBSlider.value).toFixed(3));
+                                 gainBTextField.text = adjustedBGain
+                                 see3camcu200.setRBGain(gainRSlider.value, adjustedBGain)
+                             }
+                             skipUpdateBGainMode = true
+                         }
+                     }
+                     TextField
+                     {
+                         id: gainBTextField
+                         text:gainBSlider.value
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                         validator: IntValidator {bottom: gainBSlider.minimumValue; top: gainBSlider.maximumValue}
+                         onTextChanged: {
+                             if(text.length > 0){
+                                 gainBSlider.value = gainBTextField.text
+                             }
+                         }
+
+                     }
+                 }
+
+                Text
+                {
+                    id: saturationTitle
+                    text: "--- Saturation ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                    ToolButton{
+                        tooltip: "Modifies the gain of Z curve applied to UV channel in steps of 0.005 by changing the saturation of the frame."
+                        width: 200
+                        opacity: 0
+                    }
+                }
+                Row{
+                    spacing: 35
+                    Slider {
+                        id: saturationSlider
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        width: 150
+                        style:econSliderStyle
+
+                        onValueChanged:  {
+                            saturationTextField.text = saturationSlider.value
+                            if(skipUpdateSaturation){
+                                // Round the slider and TextField to three decimal places
+                                adjustedSaturation = parseFloat((saturationSlider.value).toFixed(3));
+
+                                //Sending HID value to UVC
+                                saturationInt = adjustedSaturation * 200
+                                root.sendSaturationToUVC(saturationInt)
+
+                                saturationTextField.text = adjustedSaturation
+                                see3camcu200.setSaturation(adjustedSaturation)
+                            }
+                            skipUpdateSaturation = true
+                        }
+                    }
+                    TextField {
+                        id: saturationTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        validator: IntValidator {bottom: saturationSlider.minimumValue; top: saturationSlider.maximumValue}
+                        onTextChanged: {
+                            if(text.length > 0){
+                                saturationSlider.value = saturationTextField.text
+                            }
+                        }
+                    }
+                }
+
+                Text
+                {
+                    id: colorTempTitle
+                    text: "--- Colour Temperature ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                    ToolButton{
+                        tooltip: "It is used for white balancing the scene based on the temperature set by applying predefined R and B digital gain.
+ Note:
+ For temperature other than the possible values (2300, 2800, 3000, 4000, 4100, 6000, 6500), individual R and B digital gain can be manually adjusted."
+                        width: 200
+                        opacity: 0
+                    }
+                }
+
+                Row{
+                    spacing: 35
+                    Slider {
+                        id: colorTempSlider
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        width: 150
+                        style:econSliderStyle
+
+                        minimumValue: 0
+                        maximumValue: 6
+                        stepSize: 1
+
+                        onValueChanged:  {
+
+                            if(skipUpdateColorTemperature){
+
+                                switch (value) {
+                                    case 0:
+                                        root.sendColorTemperatureToUVC(1)
+                                        colorTempTextField.text = "2300"
+                                        see3camcu200.setColorTemperature(2300)
+
+                                        break;
+                                    case 1:
+                                        root.sendColorTemperatureToUVC(2)
+                                        colorTempTextField.text = "2800"
+                                        see3camcu200.setColorTemperature(2800)
+
+                                        break;
+                                    case 2:
+                                        root.sendColorTemperatureToUVC(3)
+                                        colorTempTextField.text = "3000"
+                                        see3camcu200.setColorTemperature(3000)
+
+                                        break;
+                                    case 3:
+                                        root.sendColorTemperatureToUVC(4)
+                                        colorTempTextField.text = "4000"
+                                        see3camcu200.setColorTemperature(4000)
+
+                                        break;
+                                    case 4:
+                                        root.sendColorTemperatureToUVC(5)
+                                        colorTempTextField.text = "4100"
+                                        see3camcu200.setColorTemperature(4100)
+
+                                        break;
+                                    case 5:
+                                        root.sendColorTemperatureToUVC(6)
+                                        colorTempTextField.text = "6000"
+                                        see3camcu200.setColorTemperature(6000)
+
+                                        break;
+                                    case 6:
+                                        root.sendColorTemperatureToUVC(7)
+                                        colorTempTextField.text = "6500"
+                                        see3camcu200.setColorTemperature(6500)
+
+                                        break;
+                                }
+
+                                //To get color correction matrix and RB gain after color temperature is set
+                                see3camcu200.getColorCorrectionMatrix()
+                                see3camcu200.getRBGain()
+                            }
+
+                            skipUpdateColorTemperature = true
+                        }
+                    }
+                    TextField {
+                        id: colorTempTextField
+                        text: colorTempSlider.value
+                        readOnly: true
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+
+                    }
+                }
+
+                Text {
+                    id: colorCorrectionMaxTitle
+                    text: "--- Colour Correction Matrix ---"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -233,719 +878,131 @@ Item{
                     opacity: 0.50196078431373
 
                     ToolButton{
-                        tooltip: "It is used to modify the gain value of the sensor."
+                        tooltip: "It is used for applying manual 3x3 matrix to RGB channel in steps of 0.005.
+ For Manual Color Temperature, the Color Correction Matrix is predefined and it can overwritten by using this control."
                         width: 200
                         opacity: 0
                     }
-               }
-               Row
-               {
-                    spacing: 35
-                    Slider
-                    {
-                        id: gainSlider
-                        activeFocusOnPress: true
-                        updateValueWhileDragging: false
-                        width: 150
-                        style:econSliderStyle
-//                        opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
-//                        enabled: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
-                        onValueChanged:  {
-                            //Sending HID value to UVC
-                            root.getGainValueFromHID(gainSlider.value)
+                }
 
-                            gainTextField.text = gainSlider.value
-                            if(skipUpdateGainMode){
-                                see3camcu200.setGainMode(SEE3CAM_CU200.MANUAL_MODE, gainSlider.value)
-                            }
-                            skipUpdateGainMode = true
-                        }
+
+                Row{
+                    spacing: 10
+                    Layout.alignment: Qt.AlignCenter
+                    SpinBox{
+                        id:spinBoxRr
+                        decimals: 3
                     }
-                    TextField
-                    {
-                        id: gainTextField
-                        text: gainSlider.value
-                        font.pixelSize: 10
-                        font.family: "Ubuntu"
-                        smooth: true
-                        horizontalAlignment: TextInput.AlignHCenter
-//                        opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
-//                        enabled: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
-                        style: econTextFieldStyle
-                        validator: IntValidator {bottom: gainSlider.minimumValue; top: gainSlider.maximumValue}
-                        onTextChanged: {
-                            if(text.length > 0){
-                                gainSlider.value = gainTextField.text
-                            }
-                        }
+                    SpinBox{
+                        id:spinBoxRg
+                        decimals: 3
+                    }
+                    SpinBox{
+                        id:spinBoxRb
+                        decimals: 3
                     }
                 }
 
-                   Text{
-                        id: gainRTitle
-                        text: "--- R Gain ---"
-                        font.pixelSize: 14
-                        font.family: "Ubuntu"
-                        color: "#ffffff"
-                        smooth: true
-                        Layout.alignment: Qt.AlignCenter
-                        opacity: 0.50196078431373
+                Row{
+                    spacing: 10
+                    Layout.alignment: Qt.AlignCenter
+                    SpinBox{
+                        id:spinBoxGr
+                        decimals: 3
+                    }
+                    SpinBox{
+                        id:spinBoxGg
+                        decimals: 3
+                    }
+                    SpinBox{
+                        id:spinBoxGb
+                        decimals: 3
+                    }
+                }
 
-                        ToolButton{
-                            tooltip: "Modifies the digital gain of R channel in steps of 0.005."
-                            width: 200
-                            opacity: 0
+                Row{
+                    spacing: 10
+                    Layout.alignment: Qt.AlignCenter
+                    SpinBox{
+                        id:spinBoxBr
+                        decimals: 3
+                    }
+                    SpinBox{
+                        id:spinBoxBg
+                        decimals: 3
+                    }
+                    SpinBox{
+                        id:spinBoxBb
+                        decimals: 3
+                    }
+                }
+
+                Button
+                {
+                    id: colorMatrixSetBtn
+                    activeFocusOnPress : true
+                    Layout.alignment: Qt.AlignCenter
+                    text: "Set"
+                    tooltip: "You can set the required color correction matrix elements by changing the value in the SpinBox and click the Set button"
+                    style: econButtonStyle
+                    enabled: true
+                    opacity: 1
+                    implicitHeight: 25
+                    implicitWidth: 60
+                    onClicked:
+                    {
+                        see3camcu200.setColorCorrectionMatrix(spinBoxRr.value, spinBoxRg.value, spinBoxRb.value, spinBoxGr.value, spinBoxGg.value, spinBoxGb.value, spinBoxBr.value, spinBoxBg.value, spinBoxBb.value)
+                    }
+                    Keys.onReturnPressed:
+                    {
+                        see3camcu200.setColorCorrectionMatrix(spinBoxRr.value, spinBoxRg.value, spinBoxRb.value, spinBoxGr.value, spinBoxGg.value, spinBoxGb.value, spinBoxBr.value, spinBoxBg.value, spinBoxBb.value)
+                    }
+                }
+
+
+                Text {
+                    id: flipMode
+                    text: "--- Orientation Mode ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                Row{
+                    spacing: 40
+                    CheckBox {
+                        id: flipCtrlHorizotal
+                        activeFocusOnPress : true
+                        text: "Horizontal"
+                        style: econCheckBoxStyle
+                        tooltip: "Flips the preview left/right."
+                        onClicked:{
+                            see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                            sendFlipStatus()
                         }
-                   }
-                   Row
-                   {
-                        spacing: 35
-                        Slider
-                        {
-                            id: gainRSlider
-                            activeFocusOnPress: true
-                            updateValueWhileDragging: false
-                            width: 150
-                            style:econSliderStyle
-                            onValueChanged:  {
-                                gainRTextField.text = gainRSlider.value
-                                if(skipUpdateRGainMode){
-                                    adjustedRGain = parseFloat((gainRSlider.value).toFixed(3));
-                                    gainRTextField.text = adjustedRGain
-                                    see3camcu200.setRBGain(adjustedRGain, gainBSlider.value)
-                                }
-                                skipUpdateRGainMode = true
-                            }
-                        }
-                        TextField
-                        {
-                            id: gainRTextField
-                            text:gainRSlider.value
-                            font.pixelSize: 10
-                            font.family: "Ubuntu"
-                            smooth: true
-                            horizontalAlignment: TextInput.AlignHCenter
-                            style: econTextFieldStyle
-                            validator: IntValidator {bottom: gainRSlider.minimumValue; top: gainRSlider.maximumValue}
-                            onTextChanged: {
-                                if(text.length > 0){
-                                    gainRSlider.value = gainRTextField.text
-                                }
-                            }
+                        Keys.onReturnPressed: {
+                            see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                            sendFlipStatus()
                         }
                     }
-
-                   Text{
-                        id: gainBTitle
-                        text: "--- B Gain ---"
-                        font.pixelSize: 14
-                        font.family: "Ubuntu"
-                        color: "#ffffff"
-                        smooth: true
-                        Layout.alignment: Qt.AlignCenter
-                        opacity: 0.50196078431373
-
-                        ToolButton{
-                            tooltip: "Modifies the digital gain of B channel in steps of 0.005."
-                            width: 200
-                            opacity: 0
+                    CheckBox {
+                        id: flipCtrlVertical
+                        activeFocusOnPress : true
+                        text: "Vertical"
+                        style: econCheckBoxStyle
+                        tooltip: "Flips the preview vertically up/down."
+                        onClicked:{
+                            see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                            sendFlipStatus()
                         }
-                   }
-
-                   Row
-                   {
-                        spacing: 35
-                        Slider
-                        {
-                            id: gainBSlider
-                            activeFocusOnPress: true
-                            updateValueWhileDragging: false
-                            width: 150
-                            style:econSliderStyle
-                            onValueChanged:  {
-                                gainBTextField.text = gainBSlider.value
-                                if(skipUpdateBGainMode){
-                                    adjustedBGain = parseFloat((gainBSlider.value).toFixed(3));
-                                    gainBTextField.text = adjustedBGain
-                                    see3camcu200.setRBGain(gainRSlider.value, adjustedBGain)
-                                }
-                                skipUpdateBGainMode = true
-                            }
-                        }
-                        TextField
-                        {
-                            id: gainBTextField
-                            text:gainBSlider.value
-                            font.pixelSize: 10
-                            font.family: "Ubuntu"
-                            smooth: true
-                            horizontalAlignment: TextInput.AlignHCenter
-                            style: econTextFieldStyle
-                            validator: IntValidator {bottom: gainBSlider.minimumValue; top: gainBSlider.maximumValue}
-                            onTextChanged: {
-                                if(text.length > 0){
-                                    gainBSlider.value = gainBTextField.text
-                                }
-                            }
-
+                        Keys.onReturnPressed: {
+                            see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                            sendFlipStatus()
                         }
                     }
-
-
-               Text {
-                   id: colorCorrectionMaxTitle
-                   text: "--- Color Correction Matrix ---"
-                   font.pixelSize: 14
-                   font.family: "Ubuntu"
-                   color: "#ffffff"
-                   smooth: true
-                   Layout.alignment: Qt.AlignCenter
-                   opacity: 0.50196078431373
-
-                   ToolButton{
-                       tooltip: "It is used for applying manual 3x3 matrix to RGB channel in steps of 0.005.
-For Manual Color Temperature, the Color Correction Matrix is predefined and it can overwritten by using this control."
-                       width: 200
-                       opacity: 0
-                   }
-               }
-
-
-               Row{
-                   spacing: 10
-                   Layout.alignment: Qt.AlignCenter
-                   SpinBox{
-                       id:spinBoxRr
-                       decimals: 3
-                   }
-                   SpinBox{
-                       id:spinBoxRg
-                       decimals: 3
-                   }
-                   SpinBox{
-                       id:spinBoxRb
-                       decimals: 3
-                   }
-               }
-
-               Row{
-                   spacing: 10
-                   Layout.alignment: Qt.AlignCenter
-                   SpinBox{
-                       id:spinBoxGr
-                       decimals: 3
-                   }
-                   SpinBox{
-                       id:spinBoxGg
-                       decimals: 3
-                   }
-                   SpinBox{
-                       id:spinBoxGb
-                       decimals: 3
-                   }
-               }
-
-               Row{
-                   spacing: 10
-                   Layout.alignment: Qt.AlignCenter
-                   SpinBox{
-                       id:spinBoxBr
-                       decimals: 3
-                   }
-                   SpinBox{
-                       id:spinBoxBg
-                       decimals: 3
-                   }
-                   SpinBox{
-                       id:spinBoxBb
-                       decimals: 3
-                   }
-               }
-
-               Button
-               {
-                   id: colorMatrixSetBtn
-                   activeFocusOnPress : true
-                   Layout.alignment: Qt.AlignCenter
-                   text: "Set"
-                   tooltip: "You can set the required color correction matrix elements by changing the value in the SpinBox and click the Set button"
-                   style: econButtonStyle
-                   enabled: true
-                   opacity: 1
-                   implicitHeight: 25
-                   implicitWidth: 60
-                   onClicked:
-                   {
-                       see3camcu200.setColorCorrectionMatrix(spinBoxRr.value, spinBoxRg.value, spinBoxRb.value, spinBoxGr.value, spinBoxGg.value, spinBoxGb.value, spinBoxBr.value, spinBoxBg.value, spinBoxBb.value)
-                   }
-                   Keys.onReturnPressed:
-                   {
-                       see3camcu200.setColorCorrectionMatrix(spinBoxRr.value, spinBoxRg.value, spinBoxRb.value, spinBoxGr.value, spinBoxGg.value, spinBoxGb.value, spinBoxBr.value, spinBoxBg.value, spinBoxBb.value)
-                   }
-               }
-
-               Text {
-                   id: blackLevelAdj
-                   text: "--- Black Level ---"
-                   font.pixelSize: 14
-                   font.family: "Ubuntu"
-                   color: "#ffffff"
-                   smooth: true
-                   Layout.alignment: Qt.AlignCenter
-                   opacity: 0.50196078431373
-                   ToolButton{
-                       tooltip: "Black level is the value which is subtracted from the image signal to compensate the thermally generated noise.
-Note: Changing the value will affect image quality."
-                       opacity: 0
-                       width: 200
-                   }
-               }
-               Row
-               {
-                   spacing: 35
-                   Slider
-                   {
-                       id: blackLevelSlider
-                       activeFocusOnPress: true
-                       updateValueWhileDragging: false
-                       width: 150
-                       style:econSliderStyle
-                       onValueChanged:  {
-                           blackLevelTextField.text = blackLevelSlider.value
-                           if(skipUpdateBlackLevelMode){
-                               see3camcu200.setBlackLevel(blackLevelSlider.value)
-                           }
-                           skipUpdateBlackLevelMode = true
-                       }
-                   }
-
-                   TextField
-                   {
-                       id: blackLevelTextField
-                       text: blackLevelSlider.value
-                       font.pixelSize: 10
-                       font.family: "Ubuntu"
-                       smooth: true
-                       horizontalAlignment: TextInput.AlignHCenter
-                       style: econTextFieldStyle
-                       validator: IntValidator {bottom: blackLevelSlider.minimumValue; top: blackLevelSlider.maximumValue}
-                       onTextChanged: {
-                           if(text.length > 0){
-                               blackLevelSlider.value = blackLevelTextField.text
-                           }
-                       }
-                   }
-               }
-
-               Text
-               {
-                   id: brightnessText
-                   text: "--- Brightness ---"
-                   font.pixelSize: 14
-                   font.family: "Ubuntu"
-                   color: "#ffffff"
-                   smooth: true
-                   Layout.alignment: Qt.AlignCenter
-                   opacity: 0.50196078431373
-                   ToolButton{
-                       tooltip: "Modifies the Y channel gain in steps of 0.005 by changing the brightness of the frame."
-                       width: 200
-                       opacity: 0
-                   }
-               }
-               Row{
-                   spacing: 35
-                   Slider {
-                       id: brightnessSlider
-                       activeFocusOnPress: true
-                       updateValueWhileDragging: false
-                       width: 150
-                       style:econSliderStyle
-                       onValueChanged:  {
-                           brightnessTextField.text = brightnessSlider.value
-                           if(skipUpdateBrightness){
-                               // Round the slider and TextField to three decimal places
-                               adjustedBrightness = parseFloat((brightnessSlider.value).toFixed(3));
-
-                               //Sending HID value to UVC
-                               brightnessInt = adjustedBrightness * 200;
-                               root.sendBrightnessToUVC(brightnessInt)
-
-                               brightnessTextField.text = adjustedBrightness
-                               see3camcu200.setBrightness(adjustedBrightness)
-                           }
-                           skipUpdateBrightness = true
-                       }
-                   }
-                   TextField {
-                       id: brightnessTextField
-                       font.pixelSize: 10
-                       font.family: "Ubuntu"
-                       smooth: true
-                       horizontalAlignment: TextInput.AlignHCenter
-                       style: econTextFieldStyle
-                       validator: IntValidator {bottom: brightnessSlider.minimumValue; top: brightnessSlider.maximumValue}
-                       onTextChanged: {
-                           if(text.length > 0){
-                               brightnessSlider.value = brightnessTextField.text
-                           }
-                       }
-                   }
-               }
-
-               Text
-               {
-                   id: contrastTitle
-                   text: "--- Contrast ---"
-                   font.pixelSize: 14
-                   font.family: "Ubuntu"
-                   color: "#ffffff"
-                   smooth: true
-                   Layout.alignment: Qt.AlignCenter
-                   opacity: 0.50196078431373
-                   ToolButton{
-                       tooltip: "Modifies the strengths of S curve applied to Y channel by changing the contrast of the frame."
-                       width: 200
-                       opacity: 0
-                   }
-               }
-               Row{
-                   spacing: 35
-                   Slider {
-                       id: contrastSlider
-                       activeFocusOnPress: true
-                       updateValueWhileDragging: false
-                       width: 150
-                       style:econSliderStyle
-                       onValueChanged:  {
-                           contrastTextField.text = contrastSlider.value
-                           if(skipUpdateContrast){
-                               //Sending HID value to UVC
-                               root.sendContrastToUVC(contrastSlider.value)
-
-                               see3camcu200.setContrast(contrastSlider.value)
-                           }
-                           skipUpdateContrast = true
-                       }
-                   }
-                   TextField {
-                       id: contrastTextField
-                       text: contrastSlider.value
-                       font.pixelSize: 10
-                       font.family: "Ubuntu"
-                       smooth: true
-                       horizontalAlignment: TextInput.AlignHCenter
-                       style: econTextFieldStyle
-                       validator: IntValidator {bottom: contrastSlider.minimumValue; top: contrastSlider.maximumValue}
-                       onTextChanged: {
-                           if(text.length > 0){
-                               contrastSlider.value = contrastTextField.text
-                           }
-                       }
-                   }
-               }
-
-               Text
-               {
-                   id: saturationTitle
-                   text: "--- Saturation ---"
-                   font.pixelSize: 14
-                   font.family: "Ubuntu"
-                   color: "#ffffff"
-                   smooth: true
-                   Layout.alignment: Qt.AlignCenter
-                   opacity: 0.50196078431373
-                   ToolButton{
-                       tooltip: "Modifies the gain of Z curve applied to UV channel in steps of 0.005 by changing the saturation of the frame."
-                       width: 200
-                       opacity: 0
-                   }
-               }
-               Row{
-                   spacing: 35
-                   Slider {
-                       id: saturationSlider
-                       activeFocusOnPress: true
-                       updateValueWhileDragging: false
-                       width: 150
-                       style:econSliderStyle
-
-                       onValueChanged:  {
-                           saturationTextField.text = saturationSlider.value
-                           if(skipUpdateSaturation){
-                               // Round the slider and TextField to three decimal places
-                               adjustedSaturation = parseFloat((saturationSlider.value).toFixed(3));
-
-                               //Sending HID value to UVC
-                               saturationInt = adjustedSaturation * 200
-                               root.sendSaturationToUVC(saturationInt)
-
-                               saturationTextField.text = adjustedSaturation
-                               see3camcu200.setSaturation(adjustedSaturation)
-                           }
-                           skipUpdateSaturation = true
-                       }
-                   }
-                   TextField {
-                       id: saturationTextField
-                       font.pixelSize: 10
-                       font.family: "Ubuntu"
-                       smooth: true
-                       horizontalAlignment: TextInput.AlignHCenter
-                       style: econTextFieldStyle
-                       validator: IntValidator {bottom: saturationSlider.minimumValue; top: saturationSlider.maximumValue}
-                       onTextChanged: {
-                           if(text.length > 0){
-                               saturationSlider.value = saturationTextField.text
-                           }
-                       }
-                   }
-               }
-
-               Text
-               {
-                   id: colorTempTitle
-                   text: "--- Color Temperature ---"
-                   font.pixelSize: 14
-                   font.family: "Ubuntu"
-                   color: "#ffffff"
-                   smooth: true
-                   Layout.alignment: Qt.AlignCenter
-                   opacity: 0.50196078431373
-                   ToolButton{
-                       tooltip: "It is used for white balancing the scene based on the temperature set by applying predefined R and B digital gain.
-Note:
-For temperature other than the possible values (2300, 2800, 3000, 4000, 6000, 6500), individual R and B digital gain can be manually adjusted."
-                       width: 200
-                       opacity: 0
-                   }
-               }
-
-               Row{
-                   spacing: 35
-                   Slider {
-                       id: colorTempSlider
-                       activeFocusOnPress: true
-                       updateValueWhileDragging: false
-                       width: 150
-                       style:econSliderStyle
-
-                       minimumValue: 0
-                       maximumValue: 5
-                       stepSize: 1
-
-                       onValueChanged:  {
-
-                           if(skipUpdateColorTemperature){
-
-                               switch (value) {
-                                   case 0:
-                                       root.sendColorTemperatureToUVC(1)
-                                       colorTempTextField.text = "2300"
-                                       see3camcu200.setColorTemperature(2300)
-
-                                       break;
-                                   case 1:
-                                       root.sendColorTemperatureToUVC(2)
-                                       colorTempTextField.text = "2800"
-                                       see3camcu200.setColorTemperature(2800)
-
-                                       break;
-                                   case 2:
-                                       root.sendColorTemperatureToUVC(3)
-                                       colorTempTextField.text = "3000"
-                                       see3camcu200.setColorTemperature(3000)
-
-                                       break;
-                                   case 3:
-                                       root.sendColorTemperatureToUVC(4)
-                                       colorTempTextField.text = "4000"
-                                       see3camcu200.setColorTemperature(4000)
-
-                                       break;
-                                   case 4:
-                                       root.sendColorTemperatureToUVC(5)
-                                       colorTempTextField.text = "6000"
-                                       see3camcu200.setColorTemperature(6000)
-
-                                       break;
-                                   case 5:
-                                       root.sendColorTemperatureToUVC(6)
-                                       colorTempTextField.text = "6500"
-                                       see3camcu200.setColorTemperature(6500)
-
-                                       break;
-                               }
-
-                               //To get color correction matrix and RB gain after color temperature is set
-                               see3camcu200.getColorCorrectionMatrix()
-                               see3camcu200.getRBGain()
-                           }
-
-                           skipUpdateColorTemperature = true
-                       }
-                   }
-                   TextField {
-                       id: colorTempTextField
-                       text: colorTempSlider.value
-                       readOnly: true
-                       font.pixelSize: 10
-                       font.family: "Ubuntu"
-                       smooth: true
-                       horizontalAlignment: TextInput.AlignHCenter
-                       style: econTextFieldStyle
-
-                   }
-               }
-
-               Text
-               {
-                   id: gammaCorrectionText
-                   text: "--- Gamma Correction ---"
-                   font.pixelSize: 14
-                   font.family: "Ubuntu"
-                   color: "#ffffff"
-                   smooth: true
-                   Layout.alignment: Qt.AlignCenter
-                   opacity: 0.50196078431373
-                   ToolButton{
-                       tooltip: "Modifies the strength of gamma correction curve applied to Y channel in steps of 0.1 by changing the gamma of the frame."
-                       width: 200
-                       opacity: 0
-                   }
-               }
-               Row{
-                   spacing: 35
-                   Slider {
-                       id: gammaCorrectionSlider
-                       activeFocusOnPress: true
-                       updateValueWhileDragging: false
-                       width: 150
-                       style:econSliderStyle
-                       onValueChanged:  {
-                           if(skipUpdateGammaCorrection){
-                               gammaCorrectionTextField.text = gammaCorrectionSlider.value
-                               // Round the slider and TextField to three decimal places
-                               adjustedGammaCorrection = parseFloat((gammaCorrectionSlider.value).toFixed(1));
-
-                               //Sending HID value to UVC
-                               gammaInt = adjustedGammaCorrection * 10
-                               root.sendGammaToUVC(gammaInt)
-
-                               gammaCorrectionTextField.text = adjustedGammaCorrection
-                               see3camcu200.setGammaCorrection(adjustedGammaCorrection)
-                           }
-                           skipUpdateGammaCorrection = true
-                       }
-                   }
-                   TextField {
-                       id: gammaCorrectionTextField
-                       font.pixelSize: 10
-                       font.family: "Ubuntu"
-                       smooth: true
-                       horizontalAlignment: TextInput.AlignHCenter
-                       style: econTextFieldStyle
-                       readOnly:true
-                       validator: IntValidator {bottom: gammaCorrectionSlider.minimumValue; top: gammaCorrectionSlider.maximumValue}
-                       onTextChanged: {
-                           if(text.length > 0){
-                               gammaCorrectionSlider.value = gammaCorrectionTextField.text
-                           }
-                       }
-                   }
-               }
-
-               Text {
-                   id: exposureMode
-                   text: "--- Exposure ---"
-                   font.pixelSize: 14
-                   font.family: "Ubuntu"
-                   color: "#ffffff"
-                   smooth: true
-                   Layout.alignment: Qt.AlignCenter
-                   opacity: 0.50196078431373
-                   ToolButton{
-                       tooltip: "It controls the integration time of the sensor. It changes in the range of 100µs to 1s. It is expressed in microseconds(µs)."
-                       opacity: 0
-                       width: 200
-                   }
-               }
-
-               Row
-               {
-                   spacing: 9
-                   Text
-                   {
-                       id: manualExpTitle
-                       text: "value(µs)[100 - 1000000]"
-                       font.pixelSize: 14
-                       font.family: "Ubuntu"
-                       color: "#ffffff"
-                       smooth: true
-                       width: 80
-                       wrapMode: Text.WordWrap
-                       opacity: 1
-                   }
-                   TextField
-                   {
-                       id: manualExpTextField
-                       font.pixelSize: 10
-                       font.family: "Ubuntu"
-                       smooth: true
-                       horizontalAlignment: TextInput.AlignHCenter
-                       opacity: 1
-                       style: econTextFieldStyle
-                       implicitHeight: 25
-                       implicitWidth: 80
-                       validator: IntValidator {bottom: expMin; top: expMax}
-                   }
-                   Button
-                   {
-                       id: exposureSetBtn
-                       activeFocusOnPress : true
-                       text: "Set"
-                       tooltip: "You can set the required exposure compensation value by changing the value in the text box and click the Set button"
-                       style: econButtonStyle
-                       enabled: true
-                       opacity: 1
-                       implicitHeight: 25
-                       implicitWidth: 60
-                       onClicked:
-                       {
-                           exposureSetBtn.enabled = false
-                           setButtonClicked = true
-
-                           see3camcu200.setExposure(SEE3CAM_CU200.MANUAL_EXPOSURE, manualExpTextField.text);
-
-                           //Sending HID value to UVC
-                           exposureText = manualExpTextField.text
-                           if(manualExpTextField.text <= 1000000)
-                           {
-                               exposureInt = manualExpTextField.text / 100
-                               root.sendExposureToUVC(exposureInt)
-                           }
-                           else{
-                               root.sendExposureToUVC(100000)
-                           }
-                           manualExpTextField.text = exposureText
-
-                           exposureSetBtn.enabled = true
-                       }
-                       Keys.onReturnPressed:
-                       {
-                           exposureSetBtn.enabled = false
-                           setButtonClicked = true
-
-                           //Sending HID value to UVC
-                           root.sendExposureToUVC(manualExpTextField.text)
-
-                           manualExpTextField.text = exposureText
-
-                           see3camcu200.setExposure(SEE3CAM_CU200.MANUAL_EXPOSURE, manualExpTextField.text);
-                           exposureSetBtn.enabled = true
-                       }
-                   }
-               }
+                }
 
                Text {
                    id: cameraMode
@@ -995,7 +1052,7 @@ For temperature other than the possible values (2300, 2800, 3000, 4000, 6000, 65
 
                Text {
                    id: strobe
-                   text: "--- Strobe Mode ---"
+                   text: "--- Strobe ---"
                    font.pixelSize: 14
                    font.family: "Ubuntu"
                    color: "#ffffff"
@@ -1036,46 +1093,6 @@ For temperature other than the possible values (2300, 2800, 3000, 4000, 6000, 65
                        }
                        Keys.onReturnPressed: {
                            see3camcu200.setStrobeMode(SEE3CAM_CU200.STROBE_OFF)
-                       }
-                   }
-               }
-
-               Text {
-                   id: flipMode
-                   text: "--- Orientation Mode ---"
-                   font.pixelSize: 14
-                   font.family: "Ubuntu"
-                   color: "#ffffff"
-                   smooth: true
-                   Layout.alignment: Qt.AlignCenter
-                   opacity: 0.50196078431373
-               }
-               Row{
-                   spacing: 40
-                   CheckBox {
-                       id: flipCtrlHorizotal
-                       activeFocusOnPress : true
-                       text: "Horizontal"
-                       style: econCheckBoxStyle
-                       tooltip: "Flips the preview left/right."
-                       onClicked:{
-                           see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
-                       }
-                       Keys.onReturnPressed: {
-                           see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
-                       }
-                   }
-                   CheckBox {
-                       id: flipCtrlVertical
-                       activeFocusOnPress : true
-                       text: "Vertical"
-                       style: econCheckBoxStyle
-                       tooltip: "Flips the preview vertically up/down."
-                       onClicked:{
-                           see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
-                       }
-                       Keys.onReturnPressed: {
-                           see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                        }
                    }
                }
@@ -1437,6 +1454,13 @@ The camera serial number will be displayed along with the F/W version."
             currentBrightness = parseFloat((currentBrightness).toFixed(3));
             brightnessSlider.value = currentBrightness
             brightnessTextField.text = currentBrightness
+
+            adjustedBrightness = parseFloat((brightnessSlider.value).toFixed(3));
+
+            //Sending HID value to UVC
+            brightnessInt = adjustedBrightness * 200;
+            root.sendBrightnessToUVC(brightnessInt)
+
             skipUpdateBrightness = true
         }
 
@@ -1449,6 +1473,13 @@ The camera serial number will be displayed along with the F/W version."
             currentSaturation = parseFloat((currentSaturation).toFixed(3));
             saturationSlider.value = currentSaturation
             saturationTextField.text = currentSaturation
+
+            adjustedSaturation = parseFloat((saturationSlider.value).toFixed(3));
+
+            //Sending HID value to UVC
+            saturationInt = adjustedSaturation * 200
+            root.sendSaturationToUVC(saturationInt)
+
             skipUpdateSaturation = true
         }
 
@@ -1463,6 +1494,13 @@ The camera serial number will be displayed along with the F/W version."
             currentGamma = parseFloat((currentGamma).toFixed(1));
             gammaCorrectionSlider.value = currentGamma
             gammaCorrectionTextField.text = currentGamma
+
+            adjustedGammaCorrection = parseFloat((gammaCorrectionSlider.value).toFixed(1));
+
+            //Sending HID value to UVC
+            gammaInt = adjustedGammaCorrection * 10
+            root.sendGammaToUVC(gammaInt)
+
             skipUpdateGammaCorrection = true
         }
 
@@ -1470,6 +1508,7 @@ The camera serial number will be displayed along with the F/W version."
         onCurrentContrastReceived: {
             skipUpdateContrast = false
             contrastSlider.value = currentContrast
+            root.sendContrastToUVC(contrastSlider.value)
             skipUpdateContrast = true
         }
         onMinContrastReceived: {
@@ -1489,26 +1528,37 @@ The camera serial number will be displayed along with the F/W version."
             if(colorTemp == "2300")
             {
                colorTempSlider.value = 0
+               root.sendColorTemperatureToUVC(1)
             }
             else if(colorTemp == "2800")
             {
                 colorTempSlider.value = 1
+                root.sendColorTemperatureToUVC(2)
             }
             else if(colorTemp == "3000")
             {
                 colorTempSlider.value = 2
+                root.sendColorTemperatureToUVC(3)
             }
             else if(colorTemp == "4000")
             {
                 colorTempSlider.value = 3
+                root.sendColorTemperatureToUVC(4)
+            }
+            else if(colorTemp == "4100")
+            {
+                colorTempSlider.value = 4
+                root.sendColorTemperatureToUVC(5)
             }
             else if(colorTemp == "6000")
             {
-                colorTempSlider.value = 4
+                colorTempSlider.value = 5
+                root.sendColorTemperatureToUVC(6)
             }
             else if(colorTemp == "6500")
             {
-                colorTempSlider.value = 5
+                colorTempSlider.value = 6
+                root.sendColorTemperatureToUVC(7)
             }
 
             skipUpdateColorTemperature = true
@@ -1524,6 +1574,15 @@ The camera serial number will be displayed along with the F/W version."
 
         onExposureValueReceived: {
             manualExpTextField.text = exposure
+
+            if(manualExpTextField.text <= 1000000)
+            {
+                exposureInt = manualExpTextField.text / 100
+                root.sendExposureToUVC(exposureInt)
+            }
+            else{
+                root.sendExposureToUVC(100000)
+            }
         }
 
 
@@ -1615,19 +1674,43 @@ The camera serial number will be displayed along with the F/W version."
             case SEE3CAM_CU200.NORMAL:
                 flipCtrlVertical.checked  = false
                 flipCtrlHorizotal.checked = false
+                root.getFlipStatus(false, false)
                 break;
             case SEE3CAM_CU200.VERTICAL:
                 flipCtrlVertical.checked  = true
                 flipCtrlHorizotal.checked = false
+                root.getFlipStatus(false, true)
                 break;
             case SEE3CAM_CU200.HORIZONTAL:
                 flipCtrlVertical.checked  = false
                 flipCtrlHorizotal.checked = true
+                root.getFlipStatus(true, false)
                 break;
             case SEE3CAM_CU200.ROTATE_180:
                 flipCtrlVertical.checked  = true
                 flipCtrlHorizotal.checked = true
+                root.getFlipStatus(false, false)
                 break;
+        }
+    }
+
+    function sendFlipStatus()
+    {
+        if((flipCtrlVertical.checked) && (flipCtrlHorizotal.checked))
+        {
+            root.getFlipStatus(true, true)
+        }
+        else if(!(flipCtrlVertical.checked) && (flipCtrlHorizotal.checked))
+        {
+            root.getFlipStatus(true, false)
+        }
+        else if((flipCtrlVertical.checked) && !(flipCtrlHorizotal.checked))
+        {
+            root.getFlipStatus(false, true)
+        }
+        else if(!(flipCtrlVertical.checked) && !(flipCtrlHorizotal.checked))
+        {
+            root.getFlipStatus(false, false)
         }
     }
 
@@ -1638,6 +1721,7 @@ The camera serial number will be displayed along with the F/W version."
         {
             masterMode.checked = true
 
+            root.startUpdatePreviewInMasterMode()
             root.checkForTriggerMode(false)
             root.videoRecordBtnEnable(true)
             root.captureBtnEnable(true)
@@ -1646,11 +1730,13 @@ The camera serial number will be displayed along with the F/W version."
         {
             triggerMode.checked = true
 
+            root.stopUpdatePreviewInTriggerMode()
             root.checkForTriggerMode(true)
             root.videoRecordBtnEnable(false)
             root.captureBtnEnable(false)
         }
     }
+
 
     function setMasterMode()
     {

@@ -491,7 +491,7 @@ Item {
                             if(wbValueChangeProperty) {
                                 if(!autoSelect_wb.checked) {
                                     //Sending UVC value to HID
-                                    updateHIDIn50CUG(white_balance_Slider.value)
+                                    convertWhiteBalanceToColorTemperature(white_balance_Slider.value)
 
                                     root.logInfo("White Balance changed to: "+ value.toString())
                                     root.changeCameraSettings(whiteBalanceControlId,value.toString())
@@ -1496,7 +1496,7 @@ Item {
 
     }
 
-    function updateHIDIn50CUG(whiteBalance)
+    function convertWhiteBalanceToColorTemperature(whiteBalance)
     {
         switch(whiteBalance)
         {
@@ -1513,10 +1513,30 @@ Item {
                  root.getColorTemperature(4000)
                  break
              case 5:
-                 root.getColorTemperature(6000)
+                 if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200)
+                 {
+                     root.getColorTemperature(4100)
+                 }
+                 else
+                 {
+                     root.getColorTemperature(6000)
+                 }
                  break
              case 6:
-                 root.getColorTemperature(6500)
+                 if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200)
+                 {
+                     root.getColorTemperature(6000)
+                 }
+                 else
+                 {
+                     root.getColorTemperature(6500)
+                 }
+                 break
+             case 7:
+                 if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200)
+                 {
+                     root.getColorTemperature(6500)
+                 }
                  break
         }
 

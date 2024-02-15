@@ -195,7 +195,7 @@ public:
     int glViewPortHeight;
     __u32 m_pixelformat;
     bool y16BayerFormat;
-    bool rawY10Format;
+    bool rawY16Format;
 
 signals:
      void ybufferchanged(uint8_t);
@@ -277,7 +277,7 @@ public:
     //Buffer to stillCapture for See3CAM_27CUG => Added By Sushanth.S
     unsigned char *stillBuffer;
 
-    uint16_t *rawY10Buffer;
+    uint16_t *rawY16Buffer;
 
     // prepare target buffer for rendering from input buffer.
     bool prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 bytesUsed);
@@ -435,6 +435,9 @@ private:
     bool trigger_mode;
     int triggermode_skipframes;
     int skipImageCapture;
+
+    bool horizontalFlip;
+    bool verticalFlip;
 
     int skipFrame           = 0;
     int skipPreviewChange   = 0;
@@ -744,6 +747,9 @@ public slots:
      * @brief To get the camera mode
      */
     void cameraModeEnabled(int cameraModeValue);
+
+
+    void sendFlipStatus(bool isHorizontal, bool isVertical);
 
     /**
      * @brief To get the trigger key from CamKeyEventReceive Class

@@ -55,7 +55,7 @@ int skipFrameForTrigger = 0;
 #define B(x, y, w)	y16BayerDestBuffer[2 + 3 * ((x) + (w) * (y))]
 
 #define Bay(x, y, w) bayerIRBuffer[(x) + (w) * (y)]
-#define Bay(x, y, w) rawY10Buffer[(x) + (w) * (y)]
+#define Bay(x, y, w) rawY16Buffer[(x) + (w) * (y)]
 
 #define CLIP(x) (((x) >= 255) ? 255 : (x))
 
@@ -165,7 +165,7 @@ Videostreaming::Videostreaming() : m_t(0)
 
     //Still Capture Buffer
     stillBuffer = NULL;
-    rawY10Buffer = NULL;
+    rawY16Buffer = NULL;
     startFrame = true;
     _bytesUsed = 0;
 
@@ -175,6 +175,8 @@ Videostreaming::Videostreaming() : m_t(0)
     videoEncoder=new VideoEncoder();
     m_convertData = NULL;
     trigger_mode = false;
+    horizontalFlip = false;
+    verticalFlip = false;
     gotTriggerKey = false;
     triggermode_skipframes = 0;
     skipImageCapture = 0;
@@ -336,7 +338,7 @@ FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
     m_shaderProgram = NULL;
     m_programYUYV = NULL;
     y16BayerFormat = false;
-    rawY10Format = false;
+    rawY16Format = false;
     skipH264Frames = 20;
 
     uyvyBuffer    = NULL;
@@ -769,7 +771,15 @@ void FrameRenderer::drawYUYVBUffer(){
         renderyuyvMutex.unlock();
     }
     else{
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200))
+        {
+          skipFrames = frame;
+        }
+
+        if(skipFrames >3)
+        {
+          glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+        }
     }
 skip:
     m_shaderProgram->disableAttributeArray(0);
@@ -952,7 +962,7 @@ void FrameRenderer::changeShader(){
         m_programYUYV = NULL;
     }
 
-    if(y16BayerFormat || rawY10Format){
+    if(y16BayerFormat || rawY16Format){
         shaderYUYV();
         drawYUYVBUffer();
     }
@@ -1380,6 +1390,7 @@ void FrameRenderer::paint()
     {
         gotFrame = false;
     }
+
     if(gotFrame && !triggermodeFlag){               //Added by Nivedha : 12 Mar 2021 -- To avoid getting preview in trigger mode.
         if(m_formatChange | m_videoResolnChange){  // Call to change Shader on format and Resolution change
             m_formatChange = false;
@@ -1757,7 +1768,6 @@ void Videostreaming::capFrame()
         qbuf(buf);
         return;
     }
-
     switch(m_capSrcFormat.fmt.pix.pixelformat) {
         case V4L2_PIX_FMT_YUYV:
         case V4L2_PIX_FMT_UYVY:{
@@ -1867,7 +1877,7 @@ void Videostreaming::capFrame()
     {
         int err = -1;
 
-        if(!m_renderer->y16BayerFormat && !m_renderer->rawY10Format) //  Ex: cu40 camera -  y16 bayer format means these conversions are not needed. Calculations are done in "prepareBuffer" function itself.
+        if(!m_renderer->y16BayerFormat && !m_renderer->rawY16Format) //  Ex: cu40 camera -  y16 bayer format means these conversions are not needed. Calculations are done in "prepareBuffer" function itself.
         {
             if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)
             {
@@ -2072,9 +2082,9 @@ void Videostreaming::capFrame()
         }
 
         if(formatType == "raw"){// save incoming buffer directly
-            if(m_renderer->rawY10Format)
+            if(m_renderer->rawY16Format)
             {
-                saveRawFile((void*)rawY10Buffer, (width*height*2));
+                saveRawFile((void*)rawY16Buffer, (width*height*2));
                 imgSaveSuccessCount++;
             }
             else if(onY12Format){  // To save Y12 image in See3CAM_CU55_MHL
@@ -2096,7 +2106,7 @@ void Videostreaming::capFrame()
             unsigned char *bufferToSave = NULL;
 
             //For See3CAM_CU40 & See3CAM_CU200 - Saving RGB frame after debayering
-            if(m_renderer->y16BayerFormat || m_renderer->rawY10Format){
+            if(m_renderer->y16BayerFormat || m_renderer->rawY16Format){
                 bufferToSave = y16BayerDestBuffer;
 
                 QImage qImage3(bufferToSave, width, height, QImage::Format_RGB888);
@@ -2407,10 +2417,10 @@ void Videostreaming::capFrame()
         stillBuffer = NULL;
     }
 
-    if(rawY10Buffer)
+    if(rawY16Buffer)
     {
-        free(rawY10Buffer);
-        rawY10Buffer = NULL;
+        free(rawY16Buffer);
+        rawY16Buffer = NULL;
     }
 
     if(y16BayerDestBuffer){
@@ -3324,8 +3334,6 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 
         while (frameSize > 0)
         {
-            if (((inputbuffer[bufferCount] & 0x80) == 0) && ((inputbuffer[bufferCount + 1] & 0x80) == 0))
-
             //if the first bit of the first byte of the input buffer is 0, its UYVY data
             if(((inputbuffer[bufferCount]) & (0x01))  == 0)
             {
@@ -3525,10 +3533,6 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
             {
                 if(!frameSkip){
                     getFrameRates();
-                    if(m_renderer->updateStop)
-                    {
-                        emit averageFPS(0);
-                    }
                     frameSkip = true;
                     memcpy(tempSrcBuffer, (unsigned char *)inputbuffer, bytesUsed);
                     if(m_renderer && m_renderer->rgbaDestBuffer){
@@ -3549,10 +3553,6 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         uint8_t *destBuffer = NULL;
         frameMjpeg = false;
         getFrameRates();
-        if(m_renderer->updateStop)
-        {
-            emit averageFPS(0);
-        }
         m_renderer->renderyuyvMutex.lock();
         if(!m_renderer->yuvBuffer){
             m_renderer->renderyuyvMutex.unlock();
@@ -3587,37 +3587,86 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
             memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
 
         }
-        else if(m_renderer->rawY10Format)
+        else if(m_renderer->rawY16Format)
         {
             m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
 
             int inputBufSize;
             inputBufSize = width*height*1.25;
 
-            rawY10Buffer = (uint16_t*) malloc(width*height*2);
+            rawY16Buffer = (uint16_t*) malloc(width*height*2);
 
-            memset(rawY10Buffer, 0, (width*height*2));
+            memset(rawY16Buffer, 0, (width*height*2));
 
-            if(!convertRawY10ToY16(((void*)inputbuffer),rawY10Buffer, inputBufSize))
+            if(!convertRawY10ToY16(((void*)inputbuffer),rawY16Buffer, inputBufSize))
             {
                 return false;
             }
 
             /* Applying Nearest neighbour interpolation algorithm - y16 to RGB24 conversion */
             y16BayerDestBuffer = (unsigned char *)malloc(width * height * 3);
+            if(!horizontalFlip && !verticalFlip)
+            {
+                for (__u32 y = 0; y < height; y += 2) {
+                    for (__u32 x = 0; x < width; x += 2) {
+                        uint8_t g1 = CLIP(Bay(x, y, width));
+                        uint8_t b = CLIP(Bay(x + 1, y, width));
+                        uint8_t r = CLIP(Bay(x, y + 1, width));
+                        uint8_t g2 = CLIP(Bay(x + 1, y + 1, width));
 
-            for (__u32 y = 0; y < height; y += 2) {
-                for (__u32 x = 0; x < width; x += 2) {
-                    uint8_t b = CLIP(Bay(x, y, width));
-                    uint8_t g = CLIP(Bay(x + 1, y, width));
-                    uint8_t r = CLIP(Bay(x + 1, y + 1, width));
-
-                    B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
-                    G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = g;
-                    R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
+                        G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = (g1 + g2) / 2;
+                        R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
+                        B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
+                    }
                 }
             }
+            else if(horizontalFlip && verticalFlip)
+            {
+                //GRBG Pattern
+                for (__u32 y = 0; y < height; y += 2) {
+                    for (__u32 x = 0; x < width; x += 2) {
+                        uint8_t g1 = CLIP(Bay(x, y, width));
+                        uint8_t r = CLIP(Bay(x + 1, y, width));
+                        uint8_t b = CLIP(Bay(x, y + 1, width));
+                        uint8_t g2 = CLIP(Bay(x + 1, y + 1, width));
 
+                        G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = (g1 + g2) / 2;
+                        R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
+                        B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
+                    }
+                }
+            }
+            else if(horizontalFlip)
+            {
+                //BGGR Pattern
+                for (__u32 y = 0; y < height; y += 2) {
+                    for (__u32 x = 0; x < width; x += 2) {
+                        uint8_t b = CLIP(Bay(x, y, width));
+                        uint8_t g = CLIP(Bay(x + 1, y, width));
+                        uint8_t r = CLIP(Bay(x + 1, y + 1, width));
+
+                        B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
+                        G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = g;
+                        R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
+                    }
+                }
+            }
+            else if(verticalFlip)
+            {
+                //RGGB Pattern
+                for (__u32 y = 0; y < height; y += 2) {
+                    for (__u32 x = 0; x < width; x += 2) {
+                        uint8_t r = CLIP(Bay(x, y, width));
+                        uint8_t g1 = CLIP(Bay(x + 1, y, width));
+                        uint8_t g2 = CLIP(Bay(x, y + 1, width));
+                        uint8_t b = CLIP(Bay(x + 1, y + 1, width));
+
+                        G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = (g1 + g2) / 2;
+                        R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
+                        B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
+                    }
+                }
+            }
             rgb2yuyv(y16BayerDestBuffer, yuyvBuffer, width, height);
             memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
         }
@@ -4500,11 +4549,11 @@ void Videostreaming::displayFrame() {
 
     if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200) && (m_capSrcFormat.fmt.pix.pixelformat != V4L2_PIX_FMT_UYVY))
     {
-        m_renderer->rawY10Format = true;
+        m_renderer->rawY16Format = true;
     }
     else
     {
-        m_renderer->rawY10Format = false;
+        m_renderer->rawY16Format = false;
     }
 
     if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_20CUG || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_16CUGM ||currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedCameraEnum == CommonEnums::SEE3CAM_135M || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU136M) && (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)) {
@@ -4606,7 +4655,7 @@ void Videostreaming::stopCapture() {
     m_renderer->y16BayerFormat = false; // BY default this will be false, If cu40 [ y16 bayer format ] is selected ,
     //this will be enabled.
 
-    m_renderer->rawY10Format = false;
+    m_renderer->rawY16Format = false;
     y16FormatFor20CUG = false;
     if (fd() >= 0) {
         emit logDebugHandle("Stop Previewing...");
@@ -5364,6 +5413,13 @@ void Videostreaming::cameraModeEnabled(int cameraModeValue)
     }
     //To send cameraMode to qml
     emit sendCameraMode(cameraMode);
+}
+
+//Added By Sushanth - To get flip mode status from HID
+void Videostreaming::sendFlipStatus(bool isHorizontal, bool isVertical)
+{
+    horizontalFlip = isHorizontal;
+    verticalFlip   = isVertical;
 }
 
 

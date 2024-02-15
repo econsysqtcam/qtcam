@@ -1,3 +1,8 @@
+Qtcam Application - 26.0.7
+---------------------------
+*Y10 Format - Debayered the converted Y16 frames and Handled flip modes based on the required CPA patterns.
+*Removed current fps in status bar for trigger mode (As of now.)
+
 Qtcam Application - 26.0.6
 ---------------------------
 *Added Support for See3CAM_CU200.
