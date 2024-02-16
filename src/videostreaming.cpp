@@ -751,7 +751,7 @@ void FrameRenderer::drawYUYVBUffer(){
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200 || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
             skipFrames = frame;
         }
         else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
