@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.8
+---------------------------
+*Added new features and modifications for See3CAM_CU81.
+
 Qtcam Application - 26.0.7
 ---------------------------
 *Y10 Format - Debayered the converted Y16 frames and Handled flip modes based on the required CPA patterns.

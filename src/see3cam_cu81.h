@@ -30,7 +30,26 @@
 #define SET_FRAMERATE_CU81          0x13
 #define GET_ANTIFLICKER_CU81        0x16
 #define SET_ANTIFLICKER_CU81        0x17
+#define GET_WHITE_BALANCE_CU81      0x1C
+#define GET_AUTO_EXPOSURE_CU81      0x1D
+#define GET_FACE_DETECT_RECT        0x1A
+#define SET_FACE_DETECT_RECT        0x1B
+#define SAVE_CONFIGURATION_CU81     0x42
+#define SAVE_CU81                   0x01
 #define SET_DEFAULTS_CU81           0xFF
+
+
+//Face Detection
+#define ENABLE_FACE_RECT            0x01
+#define DISABLE_FACE_RECT           0x00
+
+#define ENABLE_EMBED_DATA           0x01
+#define DISABLE_EMBED_DATA          0x00
+
+#define ENABLE_OVERLAY_RECT         0x01
+#define DISABLE_OVERLAY_RECT        0x00
+
+
 class See3CAM_CU81 : public QObject
 {
     Q_OBJECT
@@ -45,9 +64,8 @@ public:
 
         enum cameraModes
         {
-            DAY_HDR_MODE = 0x00,
-            NIGHT_HDR_MODE = 0x01,
-            LINEAR_MODE =0x02
+            HDR_MODE    = 0x01,
+            LINEAR_MODE = 0x02
         };
         Q_ENUMS(cameraModes)
 
@@ -84,6 +102,24 @@ public:
         };
         Q_ENUMS(camAntiFlickerMode)
 
+        enum camFaceRectMode {
+            FaceRectDisable = 0x00,
+            FaceRectEnable  = 0x01
+        };
+        Q_ENUMS(camFaceRectMode)
+
+        enum camFaceDetectEmbedDataMode {
+            FaceDetectEmbedDataEnable  = 0x01,
+            FaceDetectEmbedDataDisable = 0x00
+        };
+        Q_ENUMS(camFaceDetectEmbedDataMode)
+
+        enum camFaceDetectOverlayRect {
+            FaceDetectOverlayRectEnable = 0x01,
+            FaceDetectOverlayRectDisable = 0x00
+        };
+        Q_ENUMS(camFaceDetectOverlayRect)
+
 signals:
         void sendCameraModeValue(uint cameraMode);
         void sentEffectMode(uint effectMode);
@@ -94,6 +130,9 @@ signals:
         void flipMirrorModeChanged(uint flipMirrorMode);
         void frameRateCtrlValueReceived(uint frameRateCtrlValue);
         void antiFlickerModeChanged(uint flickerMode);
+        void autoExposureValueReceived(uint exposure);
+        void autoWhiteBalanceValueReceived(uint whiteBalance);
+        void faceDetectModeValueReceived(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
 
         void indicateCommandStatus(QString title, QString text);
         void indicateExposureValueRangeFailure(QString title, QString text);
@@ -129,6 +168,15 @@ public slots:
 
         bool getAntiFlickerMode();
         bool setAntiFlickerMode(camAntiFlickerMode antiFlickerMode);
+
+        bool getFaceDetectMode();
+        bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
+
+        bool getAutoExposure();
+
+        bool getAutoWhiteBalance();
+
+        bool saveConfiguration();
 
         bool setToDefault();
 };

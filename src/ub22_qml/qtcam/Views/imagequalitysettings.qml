@@ -1,6 +1,6 @@
 /*
  * imagequalitysettings.qml -- display camera settings
- * Copyright © 2015  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
  *
@@ -490,13 +490,20 @@ Item {
                             if(wbValueChangeProperty) {
                                 if(!autoSelect_wb.checked) {
                                     //Sending UVC value to HID
-                                    updateHIDIn50CUG(white_balance_Slider.value)
+                                    convertWhiteBalanceToColorTemperature(white_balance_Slider.value)
 
                                     root.logInfo("White Balance changed to: "+ value.toString())
                                     root.changeCameraSettings(whiteBalanceControlId,value.toString())
                                     root.manualWbSliderValueChanged()
                                 } else {
-                                    white_balance_Slider.enabled = false
+                                    if(white_balance.opacity == 1)
+                                    {
+                                        white_balance_Slider.enabled = true
+                                    }
+                                    else{
+                                        white_balance_Slider.enabled = false
+                                    }
+
                                 }
                             }
                         }
@@ -1268,19 +1275,6 @@ Item {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     Connections
     {
         target: root
@@ -1512,29 +1506,33 @@ Item {
                  root.getColorTemperature(4000)
                  break
              case 5:
-                 root.getColorTemperature(6000)
+                 if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200)
+                 {
+                     root.getColorTemperature(4100)
+                 }
+                 else
+                 {
+                     root.getColorTemperature(6000)
+                 }
                  break
              case 6:
-                 root.getColorTemperature(6500)
+                 if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200)
+                 {
+                     root.getColorTemperature(6000)
+                 }
+                 else
+                 {
+                     root.getColorTemperature(6500)
+                 }
+                 break
+             case 7:
+                 if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200)
+                 {
+                     root.getColorTemperature(6500)
+                 }
                  break
         }
 
-    }
-
-    function updateUIifHdrModeSelected()
-    {
-        root.selectMenuIndex(exposureAutoControlId,0)
-        root.autoExposureSelected(true)
-        JS.autoExposureSelected = true
-        exposure_absolute.opacity = 0.1
-        exposure_Slider.opacity = 0.1
-        exposure_Slider.enabled = false
-        exposure_value.opacity = 0
-        exposure_value.enabled = false
-        exposureCombo.currentIndex = 0              //forcing to auto mode since manual mode is not supported in hdr
-        exposure_auto.opacity = 0.1
-        exposureCombo.opacity = 0.1
-//        exposureCombo.enabled = false
     }
 
     function setCameraControls(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID)
@@ -1735,15 +1733,49 @@ Item {
         ledModeCombo.opacity = 1
         ledModeCombo.currentIndex = controlDefaultValue
     }
+
+    //Manual White Balance
     function whiteBalanceUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         white_balance.opacity = 1
+
+        //Added by Sushanth - To enable manual white balance when the firmware exclusively supports manual white balance alone.
+        if(((autoSelect_wb.enabled == false) || ((autoSelect_wb.checked == false) && (autoSelect_wb.enabled == true ))) && (root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM))
+        {
+            JS.autoWhiteBalSelected = false             // manual white balance selected
+            white_balance_Slider.enabled = true
+            white_balance_Slider.opacity = 1
+        }
+        else{
+            JS.autoWhiteBalSelected = true              // auto white balance selected
+            white_balance_Slider.enabled = false
+            white_balance_Slider.opacity = 0.1
+        }
+
         whiteBalanceControlId = controlID
         white_balance_Slider.minimumValue = controlMinValue
         white_balance_Slider.maximumValue = controlMaxValue
         white_balance_Slider.value = controlDefaultValue
         white_balance_Slider.stepSize = controlStepSize
     }
+
+    //Auto White Balance
+    function whiteBalAutoUIUpdate(controlID,controlDefaultValue)
+    {
+        white_balance.opacity = 1
+        autoSelect_wb.opacity = 1
+        autoSelect_wb.enabled = true
+        autoSelect_wb.checked = controlDefaultValue
+        whiteBalanceControl_auto_Id = controlID
+
+        if(!autoSelect_wb.checked && root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM) {
+            white_balance_Slider.enabled = true
+            JS.autoWhiteBalSelected = false             // manual white balance selected
+        }else{
+            JS.autoWhiteBalSelected = true              // auto white balance selected
+        }
+    }
+
     function gammaUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
     {
         gamma.opacity = 1
@@ -1866,20 +1898,7 @@ Item {
         focusLogitechControlId = controlID
         focusLogitechSlider.stepSize = controlStepSize
     }
-    function whiteBalAutoUIUpdate(controlID,controlDefaultValue)
-    {
-        white_balance.opacity = 1
-        autoSelect_wb.opacity = 1
-        autoSelect_wb.enabled = true
-        autoSelect_wb.checked = controlDefaultValue
-        whiteBalanceControl_auto_Id = controlID
-        if(!autoSelect_wb.checked && root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM) {
-            white_balance_Slider.enabled = true
-            JS.autoWhiteBalSelected = false             // manual white balance selected
-        }else{
-            JS.autoWhiteBalSelected = true              // auto white balance selected
-        }
-    }
+
     function autoFocusUIUpdate(controlID,controlDefaultValue)
     {
         autoSelect_focus.opacity = 1
@@ -1960,6 +1979,7 @@ Item {
             while(menuitems.pop()){}
             exposureAutoControlId = controlID
             exposureCombo.currentIndex = controlDefaultValue
+
             //getting auto or manual exposure mode
             if(exposureCombo.currentText.toString()=="Manual Mode" || exposureCombo.currentText.toString()=="Shutter Priority Mode")
             {

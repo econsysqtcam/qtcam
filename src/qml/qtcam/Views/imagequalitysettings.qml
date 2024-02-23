@@ -766,29 +766,24 @@ Item {
                         onCurrentIndexChanged: {
                             // Skip doing things when exposure combo index changed calls when no selection of any camera
                             if(exposureComboEnable){
-                                if(hdrModeSelected && root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU81){
-                                    updateUIifHdrModeSelected()
-                                }
-                                else{
-                                    root.selectMenuIndex(exposureAutoControlId,currentIndex)
-                                    //To set Auto/Manual exposure mode
-                                    if(currentText.toString() != "Auto Mode" && currentText.toString() != "Aperture Priority Mode") {
-                                        root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())
-                                        root.autoExposureSelected(false)
-                                        JS.autoExposureSelected = false
-                                        exposure_absolute.opacity = 1
-                                        exposure_Slider.opacity = 1
-                                        exposure_Slider.enabled = true
-                                        exposure_value.opacity = 1
-                                    } else {
-                                        root.autoExposureSelected(true)
-                                        JS.autoExposureSelected = true
-                                        exposure_absolute.opacity = 0.1
-                                        exposure_Slider.opacity = 0.1
-                                        exposure_Slider.enabled = false
-                                        exposure_value.opacity = 0
-                                        exposure_value.enabled = false
-                                    }
+                                root.selectMenuIndex(exposureAutoControlId,currentIndex)
+                                //To set Auto/Manual exposure mode
+                                if(currentText.toString() != "Auto Mode" && currentText.toString() != "Aperture Priority Mode") {
+                                    root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())
+                                    root.autoExposureSelected(false)
+                                    JS.autoExposureSelected = false
+                                    exposure_absolute.opacity = 1
+                                    exposure_Slider.opacity = 1
+                                    exposure_Slider.enabled = true
+                                    exposure_value.opacity = 1
+                                } else {
+                                    root.autoExposureSelected(true)
+                                    JS.autoExposureSelected = true
+                                    exposure_absolute.opacity = 0.1
+                                    exposure_Slider.opacity = 0.1
+                                    exposure_Slider.enabled = false
+                                    exposure_value.opacity = 0
+                                    exposure_value.enabled = false
                                 }
                             }
                         }
@@ -1192,7 +1187,7 @@ Item {
                                         root.changeCameraSettings(focusControlId,focus_Slider.value)
                                     }
                                 }
-				focusAutoChangeProperty = true
+                focusAutoChangeProperty = true
                             }
                         }
                     }
@@ -1335,19 +1330,6 @@ Item {
         {
             videoFilter.visible = status;
         }
-        onDisableManualExpifHdrSelected:
-        {
-            hdrModeSelected = isHdrModeSelected;
-            if(hdrModeSelected ){
-                updateUIifHdrModeSelected()
-            }
-            else
-            {
-                exposure_auto.opacity = 1
-                exposureCombo.opacity = 1
-                exposureCombo.enabled = true
-            }
-        }
 
         onDisableManualExp:
         {
@@ -1471,7 +1453,7 @@ Item {
             focusValueChangeProperty = false
             focusAutoChangeProperty = false
             powerLineComboEnable = false
-	    // Skip doing things when exposure combo index changed calls when no selection of any camera
+        // Skip doing things when exposure combo index changed calls when no selection of any camera
             exposureComboEnable = false
             ledModeComboEnable = false
         }
@@ -1540,22 +1522,6 @@ Item {
                  break
         }
 
-    }
-
-    function updateUIifHdrModeSelected()
-    {
-        root.selectMenuIndex(exposureAutoControlId,0)
-        root.autoExposureSelected(true)
-        JS.autoExposureSelected = true
-        exposure_absolute.opacity = 0.1
-        exposure_Slider.opacity = 0.1
-        exposure_Slider.enabled = false
-        exposure_value.opacity = 0
-        exposure_value.enabled = false
-        exposureCombo.currentIndex = 0              //forcing to auto mode since manual mode is not supported in hdr
-        exposure_auto.opacity = 0.1
-        exposureCombo.opacity = 0.1
-//        exposureCombo.enabled = false
     }
 
     function setCameraControls(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID)
@@ -2027,9 +1993,6 @@ Item {
                 exposure_Slider.opacity = 0.1
                 exposure_value.opacity = 0
             }
-            if(hdrModeSelected && root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU81){
-                updateUIifHdrModeSelected()
-            }
         }
     }
 
@@ -2189,10 +2152,10 @@ Item {
             focusValueChangeProperty = true
             focusAutoChangeProperty = true
             video_capture_filter_Child.visible = true
-	    // To avoid setting exposure when get the control values
-	    exposureComboEnable = false
+        // To avoid setting exposure when get the control values
+        exposureComboEnable = false
             root.enableCameraControls();
-	    exposureComboEnable = true
+        exposureComboEnable = true
         } else {
             video_capture_filter_Child.visible = false
             video_capture_filter_Child.focus = false

@@ -19,7 +19,7 @@ bool See3CAM_CU81::getCameraMode()
 
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU81; /* set camera control code */
-    g_out_packet_buf[2] = GET_CAMERA_MODE_CU81; /* get special effect code */
+    g_out_packet_buf[2] = GET_CAMERA_MODE_CU81; /* get camera mode ID */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -29,7 +29,7 @@ bool See3CAM_CU81::getCameraMode()
             g_in_packet_buf[1]==GET_CAMERA_MODE_CU81 &&
             g_in_packet_buf[6]==GET_SUCCESS) {
             emit sendCameraModeValue(g_in_packet_buf[2]);
-                return true;
+            return true;
         }
     }
     return false;
@@ -48,8 +48,8 @@ bool See3CAM_CU81::setCameraMode(const cameraModes &cameraMode)
 
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_CU81; /* Camera control id */
-    g_out_packet_buf[2] = SET_CAMERA_MODE_CU81; /* Set effect mode command */
-    g_out_packet_buf[3] = cameraMode; /* Scene mode to set */
+    g_out_packet_buf[2] = SET_CAMERA_MODE_CU81; /* Set camera mode ID */
+    g_out_packet_buf[3] = cameraMode; /* Camera mode to set */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -627,6 +627,199 @@ bool See3CAM_CU81::setAntiFlickerMode(See3CAM_CU81::camAntiFlickerMode antiFlick
     }
     return false;
 }
+
+/**
+ * @brief See3CAM_CU81::setFaceDetectionRect - setting face detection rectangle
+ * @param enableFaceDetectRect  - enable / disable face detect rectangle
+ * @param embedData   - Enable / Disable embed data
+ * @param overlayRect - Enable / Disable overlay Rectangle
+ * @return true/false
+ */
+bool See3CAM_CU81::setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect){
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU81; /* camera id */
+    g_out_packet_buf[2] = SET_FACE_DETECT_RECT; /* set face detect Rect command */
+
+    if(enableFaceDetectRect)
+        g_out_packet_buf[3] = ENABLE_FACE_RECT; /* enable face Rect */
+    else
+        g_out_packet_buf[3] = DISABLE_FACE_RECT; /* disable face Rect*/
+
+    if(embedData)
+        g_out_packet_buf[4] = ENABLE_EMBED_DATA; /* enable embed data */
+    else
+        g_out_packet_buf[4] = DISABLE_EMBED_DATA; /* disable embed data */
+
+    if(overlayRect)
+        g_out_packet_buf[5] = ENABLE_OVERLAY_RECT; /* enable overlay rect */
+    else
+        g_out_packet_buf[5] = DISABLE_OVERLAY_RECT; /* disable overlay rect */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU81 &&
+            g_in_packet_buf[1] == SET_FACE_DETECT_RECT &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+/**
+ * @brief See3CAM_CU81::getFactDetectMode - get face detect mode[ disable/enable ] from camera
+ * return true - success /false - failure
+ */
+bool See3CAM_CU81::getFaceDetectMode()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU81; /* camera id */
+    g_out_packet_buf[2] = GET_FACE_DETECT_RECT; /* get face detect mode command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU81 &&
+            g_in_packet_buf[1] == GET_FACE_DETECT_RECT &&
+            g_in_packet_buf[6] == GET_SUCCESS) {
+            emit faceDetectModeValueReceived(g_in_packet_buf[2], g_in_packet_buf[3], g_in_packet_buf[4]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief See3CAM_CU81::getAutoExposure
+ * @return true/false
+ */
+bool See3CAM_CU81::getAutoExposure()
+{
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU81;
+    g_out_packet_buf[2] = GET_AUTO_EXPOSURE_CU81;
+
+    uint exposure;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if((g_in_packet_buf[0] == CAMERA_CONTROL_CU81) &&
+            (g_in_packet_buf[1]==GET_AUTO_EXPOSURE_CU81) &&
+            (g_in_packet_buf[6]==GET_SUCCESS)) {
+            exposure = (g_in_packet_buf[2] << 24) | (g_in_packet_buf[3] << 16) | (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
+            emit autoExposureValueReceived(exposure);
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_CU81::getAutoWhiteBalance
+ * @return true/false
+ */
+bool See3CAM_CU81::getAutoWhiteBalance()
+{
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    uint whiteBalance;
+
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_CU81;
+    g_out_packet_buf[2] = GET_WHITE_BALANCE_CU81;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_CU81 &&
+            g_in_packet_buf[1]==GET_WHITE_BALANCE_CU81 &&
+            g_in_packet_buf[6]==GET_SUCCESS) {
+            whiteBalance = (g_in_packet_buf[2] << 8) | (g_in_packet_buf[3] << 0);
+            emit autoWhiteBalanceValueReceived(whiteBalance);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+/**
+ * @brief See3CAM_CU81::saveConfiguration
+ * @return true/false
+ */
+bool See3CAM_CU81::saveConfiguration()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = SAVE_CONFIGURATION_CU81;
+    g_out_packet_buf[2] = SAVE_CU81;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH))
+    {
+        if (g_in_packet_buf[6] == SET_FAIL)
+        {
+            emit indicateCommandStatus("Failure", "Saving Configurations Failed");
+            return false;
+        }
+        else if(g_in_packet_buf[0] == SAVE_CONFIGURATION_CU81  &&
+            g_in_packet_buf[1]==SAVE_CU81 &&
+            g_in_packet_buf[6]==SET_SUCCESS){
+            emit indicateCommandStatus("Success", "Configurations saved successfully");
+            return true;
+        }
+    }
+    return false;
+}
+
 
 bool See3CAM_CU81::setToDefault()
 {

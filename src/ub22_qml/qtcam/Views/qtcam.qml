@@ -267,8 +267,6 @@ Rectangle {
 
     signal cameraSelected();
 
-    signal disableManualExpifHdrSelected(bool isHdrModeSelected);
-
     signal disableManualExp(bool isAutoExpSelected);
 
     signal disableAutoFocus(bool isAutoFocusSelected);
