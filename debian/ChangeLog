@@ -1,4 +1,5 @@
-qtcam (26.0.7-0ubuntu1) xenial; urgency=medium
+qtcam (26.0.8-0ubuntu1) xenial; urgency=medium
+ *Added new features and modifications for See3CAM_CU81.
  *Added Debayering algorithm for Y10 format, Removed Current FPS in status bar for Trigger mode.
  *Added support for See3CAM_CU200 & Revert back first phase HID controls for See3CAM_50CUG_M.
  *Set Fps 0, when See3CAM_CU31 device is in trigger mode & UI Modifications.
@@ -174,4 +175,4 @@ qtcam (26.0.7-0ubuntu1) xenial; urgency=medium
   * Added ARM support.
   * Initial release.  
 
- -- econsysqtcam <qtcam@e-consystems.com> Thu 15 Feb 2024 21:39:00 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Fri 23 Feb 2024 23:49:00 +0530
