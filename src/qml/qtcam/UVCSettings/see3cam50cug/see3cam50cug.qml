@@ -1013,6 +1013,23 @@ This feature controls the integration time of the sensor. Values are expressed i
                    Layout.alignment: Qt.AlignCenter
                    opacity: 0.50196078431373
 
+                   ToolButton{
+                       tooltip: "Master Mode :
+After choosing master mode, the application starts steaming.
+This is a simple mode of operation for the camera without any external trigger capability.
+
+Trigger Mode:
+1.Exposure trigger:
+    In this mode, the sensor integration time is decided by the pulse width input (low level) to the trigger pin.
+    For example :
+    If the width of the low level trigger pulse is 15.6 ms then the exposure configured in the sensor is 15.6 ms.
+    In this mode strobe function is not supported.
+
+2.Acquisition trigger:
+    High to low transition of the trigger pulse will initiate the capture of the image with the exposure configured in the exposure slider."
+                       width: 200
+                       opacity: 0
+                   }
                }
                ColumnLayout{
                   ExclusiveGroup { id: cameraModeGroup }
@@ -1023,9 +1040,6 @@ This feature controls the integration time of the sensor. Values are expressed i
                       text: qsTr("Master")
                       exclusiveGroup: cameraModeGroup
                       activeFocusOnPress: true
-                      tooltip: " Master Mode :
-After choosing master mode, the application starts steaming.
-This is a simple mode of operation for the camera without any external trigger capability."
                       onClicked: {
                           setMasterMode()
                       }
@@ -1039,16 +1053,6 @@ This is a simple mode of operation for the camera without any external trigger c
                       text: qsTr("Trigger")
                       exclusiveGroup: cameraModeGroup
                       activeFocusOnPress: true
-                      tooltip: "Trigger Mode:
-1.Exposure trigger:
-    In this mode, the sensor integration time is decided by the pulse width input (low level) to the trigger pin.
-    For example :
-    If the width of the low level trigger pulse is 15.6 ms then the exposure configured in the sensor is 15.6 ms.
-    In this mode strobe function is not supported.
-
-2.Acquisition trigger:
-    High to low transition of the trigger pulse will initiate the capture of the image with the exposure configured in the exposure slider."
-
                       onClicked: {
                           //enable trigger combobox
                           triggerCombo.enabled = true

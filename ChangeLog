@@ -1,3 +1,8 @@
+Qtcam Application - 26.0.10
+---------------------------
+*Fix for recording video in VGA format using H264 encoder for See3CAM_50CUG.
+*Fixed streaming issue in Ubuntu 16.04
+
 Qtcam Application - 26.0.9
 ---------------------------
 *Stable Streaming for Y10 format in See3CAM_CU200.

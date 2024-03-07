@@ -879,7 +879,7 @@ Item{
 
                     ToolButton{
                         tooltip: "It is used for applying manual 3x3 matrix to RGB channel in steps of 0.005.
- For Manual Color Temperature, the Color Correction Matrix is predefined and it can overwritten by using this control."
+ For Manual Colour Temperature, the Colour Correction Matrix is predefined and it can overwritten by using this control."
                         width: 200
                         opacity: 0
                     }
@@ -943,7 +943,7 @@ Item{
                     activeFocusOnPress : true
                     Layout.alignment: Qt.AlignCenter
                     text: "Set"
-                    tooltip: "You can set the required color correction matrix elements by changing the value in the SpinBox and click the Set button"
+                    tooltip: "You can set the required colour correction matrix elements by changing the value in the SpinBox and click the Set button"
                     style: econButtonStyle
                     enabled: true
                     opacity: 1
@@ -1175,8 +1175,7 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
                        opacity: 1
                        activeFocusOnPress : true
                        action: firmwareVersion
-                       tooltip: "To get the Unique ID that has been assigned to the See3CAM range of cameras, the user has to press the F/W Version button available in the Extension Unit dialog.
-The camera serial number will be displayed along with the F/W version."
+                       tooltip: "Click to view the firmware version of the camera"
                        style: ButtonStyle {
                            background: Rectangle {
                                border.width: control.activeFocus ? 3 :0

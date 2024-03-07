@@ -159,7 +159,7 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
         // Edited by Navya : Jan 28, 2020
         // If fps is >=112 means, bitrate is very low. So "avcodec_open2" is failed in H264 encoder. So make it as 60.
         unsigned supportedFpsDen;
-        if(fpsDenominator == 120 || fpsDenominator == 112 || fpsDenominator == 180){
+        if(fpsDenominator == 120 || fpsDenominator == 112 || fpsDenominator == 180 || fpsDenominator == 145){
             supportedFpsDen = 60;
         }else{
             supportedFpsDen = fpsDenominator;
