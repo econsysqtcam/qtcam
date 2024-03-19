@@ -1217,14 +1217,15 @@ This feature is supported in Acquisition trigger."
                        style: econButtonStyle
                        tooltip: "This feature will save the current configurations and are retained after the following power cycles."
                        onClicked:{
+                           setButtonClicked = true
                            saveConfigurations()
                        }
                        Keys.onReturnPressed: {
+                           setButtonClicked = true
                            saveConfigurations()
                        }
                    }
                }
-
             }
         }
     }
