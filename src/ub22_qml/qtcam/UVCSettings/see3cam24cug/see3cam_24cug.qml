@@ -1316,24 +1316,24 @@ value in the text box and click the Set button"
     }
     Connections{
         target: root
-        onMouseRightClicked:{
+        function onMouseRightClicked(x, y, width, height){
             if(autoexpManual.enabled && autoexpManual.checked){
                 see3cam24cug.setROIAutoExposure(See3Cam24CUG.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
             }
         }
-        onAutoExposureSelected:{
+        function onAutoExposureSelected(autoExposureSelect){
             enableDisableAutoExposureControls(autoExposureSelect)
         }
-        onVideoResolutionChanged:{
+        function onVideoResolutionChanged(){
             getexposureCompFrameRateCtrlTimer.start()
         }
-        onPreviewFPSChanged:{
+        function onPreviewFPSChanged(){
             getexposureCompFrameRateCtrlTimer.start()
         }
-        onVideoColorSpaceChanged:{
+        function onVideoColorSpaceChanged(){
             getexposureCompFrameRateCtrlTimer.start()
         }
-        onAfterRecordVideo:{
+        function onAfterRecordVideo(){
             root.keyEventFiltering = true
         }
     }

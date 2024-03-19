@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.11
+---------------------------
+*Fixed frame corruption issue for See3CAM_50CUG.
+
 Qtcam Application - 26.0.10
 ---------------------------
 *Fix for recording video in VGA format using H264 encoder for See3CAM_50CUG.

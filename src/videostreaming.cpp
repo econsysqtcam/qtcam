@@ -815,7 +815,7 @@ void FrameRenderer::drawUYVYBUffer(){
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG) | (currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M))
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_50CUG) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG) | (currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M))
         {
             skipFrames = frame;
         }
@@ -1024,7 +1024,10 @@ void FrameRenderer::changeShader(){
             case RAW_Y10_PIX_FMT:
                 shaderUYVY();
                 drawUYVYBUffer();
-                renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
+                if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200)
+                {
+                    renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
+                }
                 break;
         }
     }

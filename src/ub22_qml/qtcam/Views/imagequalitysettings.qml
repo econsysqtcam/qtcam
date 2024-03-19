@@ -1328,19 +1328,6 @@ Item {
         {
             videoFilter.visible = status;
         }
-        function onDisableManualExpifHdrSelected(isHdrModeSelected)
-        {
-            hdrModeSelected = isHdrModeSelected;
-            if(hdrModeSelected ){
-                updateUIifHdrModeSelected()
-            }
-            else
-            {
-                exposure_auto.opacity = 1
-                exposureCombo.opacity = 1
-                exposureCombo.enabled = true
-            }
-        }
 
         function onDisableManualExp(isAutoExpSelected)
         {
