@@ -1,4 +1,5 @@
-qtcam (26.0.10-0ubuntu1) bionic; urgency=medium
+qtcam (26.0.11-0ubuntu1) bionic; urgency=medium
+ *Fixed frame corruption issue for See3CAM_50CUG.
  *Bug fix for See3CAM_50CUG.
  *Stable streaming for Y10 format in See3CAM_CU200.
  *Added new features and modifications for See3CAM_CU81.
@@ -140,5 +141,5 @@ qtcam (26.0.10-0ubuntu1) bionic; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Thu 07 Mar 2024 19:42:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Tue 19 Mar 2024 18:40:01 +0530
 
