@@ -4223,7 +4223,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
         m_renderer->updateStop = true;
 
         //Added By Sushanth - To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
-        if(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1)
+        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU31))
         {
             emit setCrossStillProperties(false);
         }

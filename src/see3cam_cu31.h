@@ -5,33 +5,41 @@
 #include <QString>
 #include "uvccamera.h"
 
-#define CAMERA_CONTROL_ID_1_SEE3CAM_CU31        0xC0
-#define CAMERA_CONTROL_ID_2_SEE3CAM_CU31        0x0A
+#define CAMERA_CONTROL_ID_1        0xC0
+#define CAMERA_CONTROL_ID_2        0x0A
 
-#define GET_ORIENTATION_SEE3CAM_CU31            0x01
-#define SET_ORIENTATION_SEE3CAM_CU31            0x02
+#define GET_ORIENTATION            0x01
+#define SET_ORIENTATION            0x02
 
-#define GET_RNR_STATUS_SEE3CAM_CU31             0x03
-#define SET_RNR_STATUS_SEE3CAM_CU31             0x04
+#define GET_RNR_STATUS             0x03
+#define SET_RNR_STATUS             0x04
 
-#define GET_TRIGGER_MODE_SEE3CAM_CU31           0x05
-#define SET_TRIGGER_MODE_SEE3CAM_CU31           0x06
+#define GET_TRIGGER_MODE           0x05
+#define SET_TRIGGER_MODE           0x06
 
-#define GET_AE_CONVERGENCE_SPEED_SEE3CAM_CU31   0x07
-#define SET_AE_CONVERGENCE_SPEED_SEE3CAM_CU31   0x08
+#define GET_AE_CONVERGENCE_SPEED   0x07
+#define SET_AE_CONVERGENCE_SPEED   0x08
 
-#define GET_AE_HOLD_SEE3CAM_CU31                0x09
-#define SET_AE_HOLD_SEE3CAM_CU31                0x0A
+#define GET_AE_HOLD                0x09
+#define SET_AE_HOLD                0x0A
 
-#define GET_AWB_STATUS_SEE3CAM_CU31             0x0B
-#define SET_AWB_STATUS_SEE3CAM_CU31             0x0C
+#define GET_AWB_STATUS             0x0B
+#define SET_AWB_STATUS             0x0C
 
-#define READ_TEMPERATURE_SEE3CAM_CU31           0x0D
+#define READ_TEMPERATURE           0x0D
 
-#define SET_DEFAULT_SEE3CAM_CU31                0xFF
+#define SET_DEFAULT                0xFF
 
-#define GET_64BIT_UNIQUE_ID_1                   0x41
-#define GET_64BIT_UNIQUE_ID_2                   0x01
+#define GET_64BIT_UNIQUE_ID_1      0x41
+#define GET_64BIT_UNIQUE_ID_2      0x01
+
+#define GET_ANTI_FLICKER_MODE      0x0E
+#define SET_ANTI_FLICKER_MODE      0x0F
+
+#define GET_CAMERA_MODE      0x10
+#define SET_CAMERA_MODE      0x11
+
+#define SET_CROSS_STILL_PROPERTIES     0x42
 
 class SEE3CAM_CU31 : public QObject
 {
@@ -84,6 +92,20 @@ public:
     };
     Q_ENUMS(AUTO_WHITE_BALANCE)
 
+    enum ANTI_FLICKER_DETECTION{
+        MODE_AUTO    = 0x00,
+        MODE_50Hz    = 0x01,
+        MODE_60Hz    = 0x02,
+        MODE_DISABLE = 0x03
+    };
+    Q_ENUMS(ANTI_FLICKER_DETECTION)
+
+    enum CAMERA_MODE{
+        AUTO      = 0x00,
+        LOW_LIGHT = 0x01,
+        LED       = 0x02
+    };Q_ENUMS(CAMERA_MODE)
+
 signals:
     void flipMirrorModeChanged(uint flipMirrorModeValues);
     void currentRawNoiseDeductionStatus(uint status);
@@ -92,6 +114,8 @@ signals:
     void currentAutoExposureStatus(uint status);
     void currentAutoWhiteBalanceStatus(uint status);
     void currentTemperature(float temperature);
+    void currentAntiFlickerModeRecieved(uint mode);
+    void currentCameraModeReceived(uint mode);
     void titleTextChanged(QString _title,QString _text);
 
 public slots:
@@ -113,7 +137,15 @@ public slots:
     bool getAWBStatus();
     bool setAWBStatus(AUTO_WHITE_BALANCE whileBalanceStatus);
 
+    bool setAntiFlickerMode(ANTI_FLICKER_DETECTION antiFlickerMode);
+    bool getAntiFlickerMode();
+
+    bool setCameraMode(CAMERA_MODE cameraMode);
+    bool getCameraMode();
+
     bool readTemperature();
+
+    bool setPropertiesForCrossStill();
 
     bool setToDefaultValues();
 

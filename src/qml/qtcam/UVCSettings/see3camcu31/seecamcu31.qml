@@ -15,6 +15,7 @@ Item {
     property int convergenceSpeedMax: 255
 
     property bool skipUpdateUIAutoExposure: false
+    property bool skipUpdateUIOnAntiFlickerMode:false
 
     Action {
         id: firmwareVersion
@@ -53,6 +54,9 @@ Item {
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
+        onUpdateCrossStillCaptureProperty:{
+            see3camcu31.setPropertiesForCrossStill()
+        }
     }
     ScrollView{
         id: scrollview
@@ -63,7 +67,7 @@ Item {
         style: econscrollViewStyle
 
         Item {
-            height: 850
+            height: 1200
             ColumnLayout{
                 x:2
                 y:5
@@ -402,6 +406,95 @@ Item {
                     }
                 }
 
+                Text
+                {
+                    id: antiFlickerMode
+                    text: "--- Anti Flicker Mode ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+
+                ComboBox
+                {
+                    id: antiFlickerCombo
+                    model: ListModel
+                           {
+                                ListElement { text: "AUTO" }
+                                ListElement { text: "50 Hz" }
+                                ListElement { text: "60 Hz" }
+                                ListElement { text: "DISABLE" }
+                           }
+                    activeFocusOnPress: true
+                    style: econComboBoxStyle
+                    onCurrentIndexChanged: {
+                        if(skipUpdateUIOnAntiFlickerMode){
+                            setFlickerControl()
+                        }
+                        skipUpdateUIOnAntiFlickerMode = true
+                    }
+                }
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: cameraModeText
+                        text: "--- Camera Mode ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+                ColumnLayout {
+                    x: 23
+                    y: 235
+                    spacing: 15
+                    ExclusiveGroup { id: cameraModeGroup }
+                    RadioButton {
+                        id: autoCameraMode
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Auto")
+                        exclusiveGroup: cameraModeGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            see3camcu31.setCameraMode(SEE3CAM_CU31.AUTO)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setCameraMode(SEE3CAM_CU31.AUTO)
+                        }
+                    }
+                    RadioButton {
+                        id: lowLightMode
+                        style:  econRadioButtonStyle
+                        text: qsTr("Low Light")
+                        exclusiveGroup: cameraModeGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            see3camcu31.setCameraMode(SEE3CAM_CU31.LOW_LIGHT)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setCameraMode(SEE3CAM_CU31.LOW_LIGHT)
+                        }
+                    }
+                    RadioButton {
+                        id: ledMode
+                        style:  econRadioButtonStyle
+                        text: qsTr("LED")
+                        exclusiveGroup: cameraModeGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            see3camcu31.setCameraMode(SEE3CAM_CU31.LED)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setCameraMode(SEE3CAM_CU31.LED)
+                        }
+                    }
+                }
 
                 Row{
                     Layout.alignment: Qt.AlignCenter
@@ -543,6 +636,15 @@ Item {
             awbHold.checked = true
          }
      }
+
+     onCurrentAntiFlickerModeRecieved: {
+        currentAntiFlickerMode(mode)
+     }
+
+     onCurrentCameraModeReceived: {
+        currentCameraMode(mode)
+     }
+
      onCurrentTemperature: {
         temperature = parseFloat((temperature).toFixed(2));
         readTempTextField.text = temperature
@@ -554,6 +656,52 @@ Item {
      }
    }
 
+   function currentCameraMode(mode){
+       if(mode === SEE3CAM_CU31.AUTO){
+          autoCameraMode.checked = true
+       }else if(mode === SEE3CAM_CU31.LOW_LIGHT){
+          lowLightMode.checked = true
+       }else if(mode === SEE3CAM_CU31.LED){
+          ledMode.checked = true
+       }
+   }
+
+   function currentAntiFlickerMode(mode){
+       switch(mode)
+       {
+           case SEE3CAM_CU31.MODE_AUTO:
+               skipUpdateUIOnAntiFlickerMode = false
+               antiFlickerCombo.currentIndex = 0
+               skipUpdateUIOnAntiFlickerMode = true
+               break
+           case SEE3CAM_CU31.MODE_50Hz:
+               skipUpdateUIOnAntiFlickerMode = false
+               antiFlickerCombo.currentIndex = 1
+               skipUpdateUIOnAntiFlickerMode = true
+               break
+           case SEE3CAM_CU31.MODE_60Hz:
+               skipUpdateUIOnAntiFlickerMode = false
+               antiFlickerCombo.currentIndex = 2
+               skipUpdateUIOnAntiFlickerMode = true
+               break
+           case SEE3CAM_CU31.MODE_DISABLE:
+               skipUpdateUIOnAntiFlickerMode = false
+               antiFlickerCombo.currentIndex = 3
+               skipUpdateUIOnAntiFlickerMode = true
+               break
+        }
+   }
+
+   function setFlickerControl(){
+       if(antiFlickerCombo.currentIndex === 0)
+           see3camcu31.setAntiFlickerMode(SEE3CAM_CU31.MODE_AUTO)
+       else if(antiFlickerCombo.currentIndex === 1)
+           see3camcu31.setAntiFlickerMode(SEE3CAM_CU31.MODE_50Hz)
+       else if(antiFlickerCombo.currentIndex === 2)
+           see3camcu31.setAntiFlickerMode(SEE3CAM_CU31.MODE_60Hz)
+       else if(antiFlickerCombo.currentIndex === 3)
+           see3camcu31.setAntiFlickerMode(SEE3CAM_CU31.MODE_DISABLE)
+   }
 
    function disableTriggerMode(){
        see3camcu31.setTriggerMode(SEE3CAM_CU31.DISABLE_TRIGGER)
@@ -580,6 +728,18 @@ Item {
        root.checkForTriggerMode(true)
        root.captureBtnEnable(false)
        root.videoRecordBtnEnable(false)
+   }
+
+   function setAntiFlicker()
+   {
+       if(antiFlickerCombo.currentIndex === 0)
+           see3camcu31.setAntiFlickerMode(SEE3CAM_CU31.MODE_AUTO)
+       else if(antiFlickerCombo.currentIndex === 1)
+           see3camcu31.setAntiFlickerMode(SEE3CAM_CU31.MODE_50Hz)
+       else if(antiFlickerCombo.currentIndex === 2)
+           see3camcu31.setAntiFlickerMode(SEE3CAM_CU31.MODE_60Hz)
+       else if(antiFlickerCombo.currentIndex === 3)
+           see3camcu31.setAntiFlickerMode(SEE3CAM_CU31.MODE_DISABLE)
    }
 
    function currentFlipMirrorMode(mode)
@@ -711,6 +871,34 @@ Item {
         }
     }
 
+    Component {
+        id: econComboBoxStyle
+        ComboBoxStyle {
+            background: Image {
+                id: combo_bkgrnd
+                source: "../../Views/images/device_box.png"
+                Rectangle {
+                    width: combo_bkgrnd.sourceSize.width  - 28
+                    height: combo_bkgrnd.sourceSize.height
+                    color: "#222021"
+                    border.color: "white"
+                    border.width: control.activeFocus ? 3 : 1
+                    radius: control.activeFocus ? 5 : 0
+                }
+            }
+            label:  Text{
+                anchors.fill: parent
+                color: "#ffffff"
+                elide: Text.ElideRight
+                text: control.currentText
+                verticalAlignment: Text.AlignVCenter
+                maximumLineCount: 1
+                font.family: "Ubuntu"
+                font.pixelSize: 14
+            }
+        }
+    }
+
     function setToDefaultValues(){
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
@@ -737,6 +925,8 @@ Item {
         see3camcu31.getAutoExpStatus()
         see3camcu31.getAWBStatus()
         see3camcu31.readTemperature()
+        see3camcu31.getCameraMode()
+        see3camcu31.getAntiFlickerMode()
     }
 
     Component.onCompleted: {
