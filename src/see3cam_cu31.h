@@ -39,7 +39,7 @@
 #define GET_CAMERA_MODE      0x10
 #define SET_CAMERA_MODE      0x11
 
-#define SET_CROSS_STILL_PROPERTIES     0x42
+#define SET_CROSS_STILL_PROPERTIES     0x44
 
 class SEE3CAM_CU31 : public QObject
 {

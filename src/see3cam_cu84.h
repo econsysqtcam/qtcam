@@ -33,7 +33,29 @@
 #define GET_ANTI_FLICKER_DETECTION_SEE3CAM_CU84 0x17
 #define SET_ANTI_FLICKER_DETECTION_SEE3CAM_CU84 0x18
 
-#define SET_DEFAULT_SEE3CAM_CU84                0xFF
+#define GET_STREAM_MODE       0x1F
+#define SET_STREAM_MODE       0x20
+
+#define GET_FLASH_CONTROL     0x21
+#define SET_FLASH_CONTROL     0x22
+
+#define GET_FACE_DETECTION    0x23
+#define SET_FACE_DETECTION    0x24
+
+#define GET_Q_FACTOR          0x25
+#define SET_Q_FACTOR          0x26
+
+#define SET_DEFAULT_SEE3CAM_CU84        0xFF
+
+//Face Detection
+#define ENABLE_FACE_RECT                0x01
+#define DISABLE_FACE_RECT               0x00
+
+#define ENABLE_EMBED_DATA               0x01
+#define DISABLE_EMBED_DATA              0x00
+
+#define ENABLE_OVERLAY_RECT             0x01
+#define DISABLE_OVERLAY_RECT            0x00
 
 #define GET_FAIL		0x00
 #define GET_SUCCESS		0x01
@@ -86,6 +108,34 @@ public:
     };
     Q_ENUMS(antiFlickerDetection)
 
+    enum STREAM_MODE{
+        MASTER_MODE  = 0x00,
+        TRIGGER_MODE = 0x01
+    };Q_ENUMS(STREAM_MODE)
+
+    enum FLASH_MODE{
+        STROBE_ON  = 0x01,
+        STROBE_OFF = 0x00
+    };Q_ENUMS(FLASH_MODE)
+
+    enum camFaceRectMode {
+        FaceRectDisable = 0x00,
+        FaceRectEnable  = 0x01
+    };
+    Q_ENUMS(camFaceRectMode)
+
+    enum camFaceDetectEmbedDataMode {
+        FaceDetectEmbedDataEnable  = 0x01,
+        FaceDetectEmbedDataDisable = 0x00
+    };
+    Q_ENUMS(camFaceDetectEmbedDataMode)
+
+    enum camFaceDetectOverlayRect {
+        FaceDetectOverlayRectEnable = 0x01,
+        FaceDetectOverlayRectDisable = 0x00
+    };
+    Q_ENUMS(camFaceDetectOverlayRect)
+
 signals:
     void specialModeReceived(uint specialMode);
     void denoiseValueReceived(uint denoiseValue);
@@ -97,6 +147,10 @@ signals:
     void antiFlickerModeRecieved(uint antiFlickerVal);
     void minimumFramesReceived(uint minimumFps);
     void maximumFramesReceived(uint maximumFps);
+    void faceDetectModeValueReceived(uint faceDetectMode, uint faceDetectOverlayRect, uint faceDetectEmbedDataValue);
+    void streamModeReceived(uint streamMode);
+    void flashModeReceived(uint flashMode);
+    void qFactorReceived(uint qFactor);
 
     void indicateExposureValueRangeFailure(QString title, QString text);
     void indicateCommandStatus(QString title, QString text);
@@ -126,6 +180,18 @@ public slots:
 
     bool setAntiFlickerMode(antiFlickerDetection antiFlickerMode);
     bool getAntiFlickerMode();
+
+    bool setStreamMode(STREAM_MODE mode);
+    bool getStreamMode();
+
+    bool setFlashMode(FLASH_MODE mode);
+    bool getFlashMode();
+
+    bool setQFactor(uint qFactor);
+    bool getQFactor();
+
+    bool getFaceDetectMode();
+    bool setFaceDetection(bool enableFaceDetectRect, bool overlayRect, bool embedData);
 
     bool setToDefaultValues();
 };

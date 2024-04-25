@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.13
+---------------------------
+*Added new HID controls for See3CAM_CU83 and See3CAM_CU84.
+
 Qtcam Application - 26.0.12
 ---------------------------
 *Added new HID controls for See3CAM_CU31 - Anti-flicker mode, Camera mode and Still capture request.

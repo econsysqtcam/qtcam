@@ -36,6 +36,11 @@ Item{
     property int expoCompMin: 50
     property int expoCompMax: 1000000
 
+    property int qFactorMin: 10
+    property int qFactorMax: 96
+
+    property bool skipUpdateUIQFactor           : false
+
     property bool skipUpdateUIDenoise: false
     property bool skipUpdateUIOnExpWindowSize: false
     property bool skipUpdateUIFrameRate: false
@@ -129,7 +134,7 @@ Item{
         style: econscrollViewStyle
 
     Item{
-        height: 1050
+        height: 1400
         ColumnLayout
         {
             x:2
@@ -599,6 +604,227 @@ Item{
                 }
             }
 
+            Text {
+                id: streamMode
+                text: "--- Stream Mode ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                spacing: 50
+                ExclusiveGroup { id: streamModeGroup }
+                Layout.alignment: Qt.AlignCenter
+
+                RadioButton {
+                    id: masterMode
+                    style:  econRadioButtonStyle
+                    text:   qsTr("Master")
+                    exclusiveGroup: streamModeGroup
+                    activeFocusOnPress: true
+                    onClicked: {
+                        setMasterMode()
+                    }
+                    Keys.onReturnPressed: {
+                        setMasterMode()
+                    }
+                }
+
+                RadioButton {
+                    id: triggerMode
+                    style:  econRadioButtonStyle
+                    text: qsTr("Trigger")
+                    exclusiveGroup: streamModeGroup
+                    activeFocusOnPress: true
+                    onClicked: {
+                        setTriggerMode()
+                    }
+                    Keys.onReturnPressed: {
+                        setTriggerMode()
+                    }
+                }
+            }
+
+
+            Row{
+                Layout.alignment: Qt.AlignCenter
+                Text {
+                    id: flash_modes
+                    text: "--- Flash Mode ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    opacity: 0.50196078431373
+                }
+            }
+            Grid {
+                x: 23
+                y: 235
+                columns: 2
+                spacing: 15
+                ExclusiveGroup { id: flashModeGroup }
+                Layout.alignment: Qt.AlignCenter
+                RadioButton {
+                    id: strobeOff
+                    style:  econRadioButtonStyle
+                    text:   qsTr("Strobe Off")
+                    exclusiveGroup: flashModeGroup
+                    activeFocusOnPress: true
+                    onClicked: {
+                        see3camcu84.setFlashMode(SEE3CAM_CU84.STROBE_OFF)
+                    }
+                    Keys.onReturnPressed:  {
+                        see3camcu84.setFlashMode(SEE3CAM_CU84.STROBE_OFF)
+                    }
+                }
+                RadioButton {
+                    id: strobeOn
+                    style:  econRadioButtonStyle
+                    text: qsTr("Strobe On")
+                    exclusiveGroup: flashModeGroup
+                    activeFocusOnPress: true
+                    onClicked: {
+                        see3camcu84.setFlashMode(SEE3CAM_CU84.STROBE_ON)
+                    }
+                    Keys.onReturnPressed: {
+                        see3camcu84.setFlashMode(SEE3CAM_CU84.STROBE_ON)
+                    }
+                }
+            }
+
+            Text
+            {
+                id: qFactorSliderTitle
+                text: "--- QFactor Slider ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+
+            Row
+            {
+                spacing: 35
+                Slider
+                {
+                    id: qFactorSlider
+                    activeFocusOnPress: true
+                    updateValueWhileDragging: false
+                    width: 150
+                    stepSize: 1
+                    style:econSliderStyle
+                    minimumValue: qFactorMin
+                    maximumValue: qFactorMax
+                    onValueChanged:
+                    {
+                        qFactorTextField.text = qFactorSlider.value
+                        if(skipUpdateUIQFactor)
+                        {
+                            see3camcu84.setQFactor(qFactorSlider.value)
+                        }
+                        skipUpdateUIQFactor = true
+                    }
+                }
+                TextField
+                {
+                    id: qFactorTextField
+                    text: qFactorSlider.value
+                    font.pixelSize: 10
+                    font.family: "Ubuntu"
+                    smooth: true
+                    horizontalAlignment: TextInput.AlignHCenter
+                    style: econTextFieldStyle
+                    validator: IntValidator {bottom: qFactorSlider.minimumValue; top: qFactorSlider.maximumValue}
+                    onTextChanged:
+                    {
+                        if(text.length > 0)
+                        {
+                            qFactorSlider.value = qFactorTextField.text
+                        }
+                    }
+                }
+            }
+
+
+            Text {
+                id: faceDetectionText
+                text: "--- Face Detection ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+
+            Row{
+                spacing: 62
+                ExclusiveGroup { id: faceRectGroup }
+                RadioButton {
+                    exclusiveGroup: faceRectGroup
+                    id: faceRectEnable
+                    text: "Enable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked:{
+                        setFaceDetectionMode()
+                    }
+                    Keys.onReturnPressed: {
+                        setFaceDetectionMode()
+                    }
+                }
+                RadioButton {
+                    exclusiveGroup: faceRectGroup
+                    id:faceRectDisable
+                    text: "Disable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked: {
+                        setFaceDetectionMode()
+                    }
+                    Keys.onReturnPressed: {
+                        setFaceDetectionMode()
+                    }
+                }
+            }
+            Row{
+                spacing: 5
+                CheckBox {
+                    id: faceDetectEmbedData
+                    activeFocusOnPress : true
+                    text: "Embed \nData"
+                    style: econCheckBoxTextWrapModeStyle
+                    enabled: faceRectEnable.checked ? true : false
+                    opacity: enabled ? 1 : 0.1
+                    onClicked:{
+                        enableFaceDetectEmbedData()
+                    }
+                    Keys.onReturnPressed: {
+                        enableFaceDetectEmbedData()
+                    }
+                }
+                CheckBox {
+                    id: overlayRect
+                    activeFocusOnPress : true
+                    text: "Overlay Rectangle"
+                    style: econCheckBoxTextWrapModeStyle
+                    enabled: faceRectEnable.checked ? true : false
+                    opacity: enabled ? 1 : 0.1
+                    onClicked:{
+                        setFaceDetectionMode()
+                    }
+                    Keys.onReturnPressed: {
+                        setFaceDetectionMode()
+                    }
+                }
+            }
+
             Row{
                 Layout.alignment: Qt.AlignCenter
                 Button {
@@ -669,6 +895,25 @@ Item{
         }
           }
             }
+    Component {
+        id: econCheckBoxTextWrapModeStyle
+        CheckBoxStyle {
+            label: Text {
+                text: control.text
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                opacity: 1
+                width: 100
+                wrapMode: Text.WordWrap
+            }
+            background: Rectangle {
+                color: "#222021"
+                border.color: control.activeFocus ? "#ffffff" : "#222021"
+            }
+        }
+    }
     Component {
         id: econRadioButtonStyle
         RadioButtonStyle {
@@ -895,6 +1140,24 @@ Item{
              }
         }
 
+        onStreamModeReceived: {
+            currentStreamModeReceived(streamMode)
+        }
+
+        onFlashModeReceived: {
+            currentFlashModeReceived(flashMode)
+        }
+
+        onFaceDetectModeValueReceived: {
+            currentFaceDetectionModeReceived(faceDetectMode, faceDetectOverlayRect, faceDetectEmbedDataValue)
+        }
+
+        onQFactorReceived: {
+            skipUpdateUIQFactor = false
+            qFactorSlider.value = qFactor
+            skipUpdateUIQFactor = true
+        }
+
         //Signal for command Prompt
         onIndicateCommandStatus:{
             if(setButtonClicked){
@@ -907,6 +1170,74 @@ Item{
                 displayMessageBox(title, text)
                 setButtonClicked = false
                 see3camcu84.getExposureCompensation()
+            }
+        }
+    }
+
+    function currentStreamModeReceived(streamMode){
+        if(streamMode == SEE3CAM_CU84.MASTER_MODE){
+            masterMode.checked = true
+        }
+        else if(streamMode == SEE3CAM_CU84.TRIGGER_MODE){
+            triggerMode.checked = true
+        }
+    }
+
+    function currentFlashModeReceived(flashMode){
+        if(flashMode == SEE3CAM_CU84.STROBE_ON){
+            strobeOn.checked = true
+        }
+        else if(flashMode == SEE3CAM_CU84.STROBE_OFF){
+            strobeOff.checked = true
+        }
+    }
+
+    function currentFaceDetectionModeReceived(faceDetectMode, faceDetectOverlayRect, faceDetectEmbedDataValue){
+        if(faceDetectMode === SEE3CAM_CU84.FaceRectEnable){
+            faceRectEnable.checked = true
+            if(faceDetectEmbedDataValue === SEE3CAM_CU84.FaceDetectEmbedDataEnable){
+                faceDetectEmbedData.checked = true
+            }
+            if(faceDetectOverlayRect === SEE3CAM_CU84.FaceDetectOverlayRectEnable){
+                overlayRect.checked = true
+            }
+        }else if(faceDetectMode === SEE3CAM_CU84.FaceRectDisable){
+            faceRectDisable.checked = true
+            if(faceDetectEmbedDataValue === SEE3CAM_CU84.FaceDetectEmbedDataEnable){
+                faceDetectEmbedData.checked = true
+            }else{
+                faceDetectEmbedData.checked = false
+            }
+            if(faceDetectOverlayRect === SEE3CAM_CU84.FaceDetectOverlayRectEnable){
+                overlayRect.checked = true
+            }else{
+                overlayRect.checked = false
+            }
+        }
+    }
+
+    function setFaceDetectionMode()
+    {
+        if(faceRectEnable.checked == true)
+        {
+            if((faceDetectEmbedData.checked == true) && (overlayRect.checked == true)){
+                see3camcu84.setFaceDetection(true, true, true)
+            }else if((faceDetectEmbedData.checked == true) && (overlayRect.checked == false)){
+                see3camcu84.setFaceDetection(true, false, true)
+            }else if((faceDetectEmbedData.checked == false) && (overlayRect.checked == true)){
+                see3camcu84.setFaceDetection(true, true, false)
+            }else{
+                see3camcu84.setFaceDetection(true, false, false)
+            }
+        }else if(faceRectDisable.checked == true){
+            if((faceDetectEmbedData.checked == true) && (overlayRect.checked == true)){
+                see3camcu84.setFaceDetection(false, true, true)
+            }else if((faceDetectEmbedData.checked == true) && (overlayRect.checked == false)){
+                see3camcu84.setFaceDetection(false, false, true)
+            }else if((faceDetectEmbedData.checked == false) && (overlayRect.checked == true)){
+                see3camcu84.setFaceDetection(false, true, false)
+            }else{
+                see3camcu84.setFaceDetection(false, false, false)
             }
         }
     }
@@ -1019,6 +1350,30 @@ Item{
         getAutoExpsoureControlValues.start()
     }
 
+    function enableFaceDetectEmbedData(){
+        if(see3camcu84.setFaceDetection(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){
+            if(faceDetectEmbedData.checked){
+                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_CU84_Face_and_Smile_Detection for more details"))
+            }
+        }
+    }
+
+    function setMasterMode(){
+        see3camcu84.setStreamMode(SEE3CAM_CU84.MASTER_MODE)
+        root.startUpdatePreviewInMasterMode()
+        root.checkForTriggerMode(false)
+        root.videoRecordBtnEnable(true)
+        root.captureBtnEnable(true)
+    }
+
+    function setTriggerMode(){
+        see3camcu84.setStreamMode(SEE3CAM_CU84.TRIGGER_MODE)
+        root.stopUpdatePreviewInTriggerMode()
+        root.checkForTriggerMode(true)
+        root.captureBtnEnable(false)
+        root.videoRecordBtnEnable(false)
+    }
+
     function displayMessageBox(title, text){
         messageDialog.title = qsTr(title)
         messageDialog.text = qsTr(text)
@@ -1056,6 +1411,10 @@ Item{
         see3camcu84.getBurstLength()
         see3camcu84.getOrientation()
         see3camcu84.getAntiFlickerMode()
+        see3camcu84.getStreamMode()
+        see3camcu84.getFlashMode()
+        see3camcu84.getQFactor()
+        see3camcu84.getFaceDetectMode()
     }
 
     Component.onCompleted: {

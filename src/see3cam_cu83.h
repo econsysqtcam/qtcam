@@ -31,10 +31,29 @@
 #define GET_BURST_LENGTH_SEE3CAM_CU83           0x19
 #define SET_BURST_LENGTH_SEE3CAM_CU83           0x1A
 
-#define GET_WAKEON_MOTION_SEE3CAM_CU83         0x1F
-#define SET_WAKEON_MOTION_SEE3CAM_CU83         0x20
+#define GET_WAKEON_MOTION_SEE3CAM_CU83          0x1F
+#define SET_WAKEON_MOTION_SEE3CAM_CU83          0x20
 
-#define SET_DEFAULT_SEE3CAM_CU83                0xff
+#define GET_FACE_DETECTION    0x22
+#define SET_FACE_DETECTION    0x23
+
+#define GET_STREAM_MODE       0x24
+#define SET_STREAM_MODE       0x25
+
+#define GET_FLASH_CONTROL     0x26
+#define SET_FLASH_CONTROL     0x27
+
+#define SET_DEFAULT_SEE3CAM_CU83        0xff
+
+//Face Detection
+#define ENABLE_FACE_RECT                0x01
+#define DISABLE_FACE_RECT               0x00
+
+#define ENABLE_EMBED_DATA               0x01
+#define DISABLE_EMBED_DATA              0x00
+
+#define ENABLE_OVERLAY_RECT             0x01
+#define DISABLE_OVERLAY_RECT            0x00
 
 #define SET_FAIL		0x00
 #define SET_SUCCESS		0x01
@@ -96,6 +115,34 @@ public:
     };
     Q_ENUMS(wakeOnMode)
 
+    enum STREAM_MODE{
+        MASTER_MODE  = 0x00,
+        TRIGGER_MODE = 0x01
+    };Q_ENUMS(STREAM_MODE)
+
+    enum FLASH_MODE{
+        STROBE_ON  = 0x01,
+        STROBE_OFF = 0x00
+    };Q_ENUMS(FLASH_MODE)
+
+    enum camFaceRectMode {
+        FaceRectDisable = 0x00,
+        FaceRectEnable  = 0x01
+    };
+    Q_ENUMS(camFaceRectMode)
+
+    enum camFaceDetectEmbedDataMode {
+        FaceDetectEmbedDataEnable  = 0x01,
+        FaceDetectEmbedDataDisable = 0x00
+    };
+    Q_ENUMS(camFaceDetectEmbedDataMode)
+
+    enum camFaceDetectOverlayRect {
+        FaceDetectOverlayRectEnable = 0x01,
+        FaceDetectOverlayRectDisable = 0x00
+    };
+    Q_ENUMS(camFaceDetectOverlayRect)
+
 signals:
     void specialModeReceived(uint specialMode);
     void denoiseValueReceived(uint denoiseValue);
@@ -108,6 +155,10 @@ signals:
     void burstLengthValueRecieved(uint burstLenVal);
     void antiFlickerModeRecieved(uint antiFlickerVal);
     void wakeonModeReceived(uint wakeOn);
+
+    void faceDetectModeValueReceived(uint faceDetectMode, uint faceDetectOverlayRect, uint faceDetectEmbedDataValue);
+    void streamModeReceived(uint streamMode);
+    void flashModeReceived(uint flashMode);
 
     void indicateExposureValueRangeFailure(QString title, QString text);
     void indicateCommandStatus(QString title, QString text);
@@ -140,6 +191,15 @@ public slots:
 
     bool setWakeOnMotion(wakeOnMode wakeOn);
     bool getWakeOnMotion();
+
+    bool setStreamMode(STREAM_MODE mode);
+    bool getStreamMode();
+
+    bool setFlashMode(FLASH_MODE mode);
+    bool getFlashMode();
+
+    bool getFaceDetectMode();
+    bool setFaceDetection(bool enableFaceDetectRect, bool embedData, bool overlayRect);
 
     bool setToDefaultValues();
 };

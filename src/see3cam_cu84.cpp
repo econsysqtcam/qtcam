@@ -627,7 +627,7 @@ bool SEE3CAM_CU84::getAntiFlickerMode()
 
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84; /* camera_control_id_msb */
-    g_out_packet_buf[2] = CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84; /* camera_control_id_msb */
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84; /* camera_control_id_lsb */
     g_out_packet_buf[3] = GET_ANTI_FLICKER_DETECTION_SEE3CAM_CU84; /* get anti flicker command  */
 
     // send request and get reply from camera
@@ -646,7 +646,309 @@ bool SEE3CAM_CU84::getAntiFlickerMode()
 }
 
 
+/**
+ * @brief SEE3CAM_CU84::setStreamMode - To set stream mode in the camera
+ * @param streamMode - stream mode need to set
+ * @return true/false
+ */
+bool SEE3CAM_CU84::setStreamMode(STREAM_MODE  streamMode)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
 
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84;
+    g_out_packet_buf[3] = SET_STREAM_MODE; /* set stream mode command */
+    g_out_packet_buf[4] = streamMode; /* Assigning stream mode value */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84 &&
+            g_in_packet_buf[2] == SET_STREAM_MODE &&
+            g_in_packet_buf[7] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief SEE3CAM_CU84::getStreamMode - To get stream mode from the camera
+ * @return true/false
+ */
+bool SEE3CAM_CU84::getStreamMode()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84;
+    g_out_packet_buf[3] = GET_STREAM_MODE; /* get stream mode command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == GET_FAIL){
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84) &&
+                (g_in_packet_buf[1] == CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84) &&
+                (g_in_packet_buf[2] == GET_STREAM_MODE) &&
+                (g_in_packet_buf[7] == GET_SUCCESS)){
+                emit streamModeReceived(g_in_packet_buf[3]);
+                return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU84::setFlashMode - To set flash mode in the camera
+ * @param flashMode - flash mode need to set
+ * @return true/false
+ */
+bool SEE3CAM_CU84::setFlashMode(FLASH_MODE flashMode){
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84;
+    g_out_packet_buf[3] = SET_FLASH_CONTROL; /* set flash mode command */
+    g_out_packet_buf[4] = flashMode; /* Assigning flash mode value */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84 &&
+            g_in_packet_buf[2] == SET_FLASH_CONTROL &&
+            g_in_packet_buf[7] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU84::getFlashMode - To get flash mode from the camera
+ * @return true/false
+ */
+bool SEE3CAM_CU84::getFlashMode()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84;
+    g_out_packet_buf[3] = GET_FLASH_CONTROL; /* get flash control command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == GET_FAIL){
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84) &&
+                (g_in_packet_buf[1] == CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84) &&
+                (g_in_packet_buf[2] == GET_FLASH_CONTROL) &&
+                (g_in_packet_buf[7] == GET_SUCCESS)){
+                emit flashModeReceived(g_in_packet_buf[3]);
+                return true;
+        }
+    }
+    return false;
+}
+
+
+
+/**
+ * @brief SEE3CAM_CU84::setFaceDetection - setting face detection rectangle
+ * @param isEnableFaceDetect - enable / disable face detect rectangle
+ * @param embedData - Enable / Disable embed data
+ * @param overlayRect - Enable / Disable overlay Rectangle
+ * @return true/false
+ */
+bool SEE3CAM_CU84::setFaceDetection(bool isEnableFaceDetect, bool overlayRect, bool embedData){
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84;
+    g_out_packet_buf[3] = SET_FACE_DETECTION; /* set face detect Rect command */
+
+    if(isEnableFaceDetect)
+        g_out_packet_buf[4] = ENABLE_FACE_RECT; /* enable face Rect */
+    else
+        g_out_packet_buf[4] = DISABLE_FACE_RECT; /* disable face Rect*/
+
+    if(overlayRect)
+        g_out_packet_buf[5] = ENABLE_OVERLAY_RECT; /* enable overlay rect */
+    else
+        g_out_packet_buf[5] = DISABLE_OVERLAY_RECT; /* disable overlay rect */
+
+    if(embedData)
+        g_out_packet_buf[6] = ENABLE_EMBED_DATA; /* enable embed data */
+    else
+        g_out_packet_buf[6] = DISABLE_EMBED_DATA; /* disable embed data */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84 &&
+            g_in_packet_buf[2] == SET_FACE_DETECTION &&
+            g_in_packet_buf[7] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU84::getFactDetectMode - Get face detect mode[ disable/enable ] from camera
+ * return true - success /false - failure
+ */
+bool SEE3CAM_CU84::getFaceDetectMode()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84;
+    g_out_packet_buf[3] = GET_FACE_DETECTION;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84 &&
+            g_in_packet_buf[2] == GET_FACE_DETECTION &&
+            g_in_packet_buf[7] == GET_SUCCESS) {
+            emit faceDetectModeValueReceived(g_in_packet_buf[3], g_in_packet_buf[4], g_in_packet_buf[5]);
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief SEE3CAM_CU84::setQFactor - To set QFactor value in the camera
+ * @param qFactor - QFactor value need to be set
+ * @return true/false
+ */
+bool SEE3CAM_CU84::setQFactor(uint qFactor){
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84;
+    g_out_packet_buf[3] = SET_Q_FACTOR; /* set Q Factor command */
+    g_out_packet_buf[4] = qFactor; /* Assigning Q Factor value */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84 &&
+            g_in_packet_buf[2] == SET_Q_FACTOR &&
+            g_in_packet_buf[7] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief SEE3CAM_CU84::getQFactor - To get QFactor from the camera
+ * @return true/false
+ */
+bool SEE3CAM_CU84::getQFactor()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0){
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84;
+    g_out_packet_buf[3] = GET_Q_FACTOR; /* get QFactor value command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == GET_FAIL){
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84) &&
+                (g_in_packet_buf[1] == CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84) &&
+                (g_in_packet_buf[2] == GET_Q_FACTOR) &&
+                (g_in_packet_buf[7] == GET_SUCCESS)){
+                emit qFactorReceived(g_in_packet_buf[3]);
+                return true;
+        }
+    }
+    return false;
+}
 
 /**
  * @brief SEE3CAM_CU84::setToDefaultValues - set all the values to default in camera
@@ -669,10 +971,8 @@ bool SEE3CAM_CU84::setToDefaultValues()
     g_out_packet_buf[3] = SET_DEFAULT_SEE3CAM_CU84; /* set to default command */
 
     // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH))
-    {
-        if (g_in_packet_buf[7]==SET_FAIL)
-        {
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == SET_FAIL){
             return false;
         }
         else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84 &&

@@ -785,16 +785,12 @@ skip:
  * @brief FrameRenderer::drawUYVYBUffer - draw uyvy buffer
  */
 void FrameRenderer::drawUYVYBUffer(){
-
     int skipFrames = 4;
-
     m_shaderProgram->bind();
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
     glVertexAttribPointer(mTexCoordLoc, 2, GL_FLOAT, false, 8, mVerticesDataTextCord);
-
     m_shaderProgram->enableAttributeArray(0);
     m_shaderProgram->enableAttributeArray(1);
-
     // set active texture and give input y buffer
     glActiveTexture(GL_TEXTURE1);
     glUniform1i(samplerLocUYVY, 1);
@@ -802,11 +798,8 @@ void FrameRenderer::drawUYVYBUffer(){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
-
     if(renderyuyvMutex.tryLock()){
-
         if((flipModeChanged) && (currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200))
         {
             frame = 0;
@@ -974,12 +967,9 @@ void FrameRenderer::changeShader(){
                 drawRGBBUffer(); // To fix white color corruption drawing initially
                 break;
             case V4L2_PIX_FMT_UYVY:
-                if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU31)
-                {
+                if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU31){
                     shaderUYVYBT709();
-                }
-                else
-                {
+                }else{
                     shaderUYVY();
                 }
                 drawUYVYBUffer(); // To fix white color corruption drawing initially
@@ -994,26 +984,15 @@ void FrameRenderer::changeShader(){
             case V4L2_PIX_FMT_Y12:
             case V4L2_PIX_FMT_SGRBG8:
             case V4L2_PIX_FMT_SBGGR8: //Added by M Vishnu Murali: See3CAM_10CUG_CH uses respective pixel format
-                if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83)
-                {
-                    if(shaderType == CommonEnums::UYVY_BUFFER_RENDER)
-                    {
+                if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83){
+                    if(shaderType == CommonEnums::UYVY_BUFFER_RENDER){
                         shaderUYVY();
                         drawUYVYBUffer();
-                    }
-                    else if(shaderType == CommonEnums::GREY_BUFFER_RENDER)
-                    {
+                    }else if(shaderType == CommonEnums::GREY_BUFFER_RENDER){
                         shaderY8();
                         drawY8BUffer();
                     }
-                    else
-                    {
-                        shaderYUYV();
-                        drawYUYVBUffer();  // To fix white color corruption drawing intially
-                    }
-                }
-                else
-                {
+                }else{
                     shaderYUYV();
                     drawYUYVBUffer();  // To fix white color corruption drawing intially
                 }
@@ -1756,7 +1735,7 @@ void Videostreaming::capFrame()
     }
     else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode && gotTriggerKey) //Added By Sushanth : For Capturing master mode images using external trigger board
     {
-            emit triggerShotCap();
+        emit triggerShotCap();
     }
     else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode)
     {
@@ -3373,25 +3352,24 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
 
         frameSize  = width*height*BYTES_PER_PIXEL_Y16; // for the resolution 4440x1080=19180800
-
         while (frameSize > 0)
         {
-            //if the first bit of the first byte of the input buffer is 0, its UYVY data
-            if(((inputbuffer[bufferCount]) & (0x01))  == 0)
-            {
+            if(((inputbuffer[bufferCount]) & (0x03))  == 0x00){
                 memcpy((m_renderer->uyvyBuffer)+(uyvySize),(inputbuffer+bufferCount),uyvyBytesToRead - 1);
                 bufferCount += uyvyBytesToRead;
                 uyvySize    += uyvyBytesToRead;
                 frameSize   -= uyvyBytesToRead;
                 RGBCounter ++;
             }
-            else if(((inputbuffer[bufferCount]) & (0x01))  == 1)
-            {//if the first bit of the first byte of the input buffer is 1, its Y8 data
+            else if(((inputbuffer[bufferCount]) & (0x03))  == 0x03){
                 memcpy((m_renderer->inputIrBuffer)+(irSize),(inputbuffer+bufferCount),y8BytesToRead - 1);
                 bufferCount += y8BytesToRead;
                 irSize      += y8BytesToRead;
                 frameSize   -= y8BytesToRead;
                 IRCounter++;
+            }else{
+                m_renderer->render27CugMutex.unlock();
+                return false;
             }
         }
 
@@ -3412,7 +3390,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         }
 
         //Copying buffer to QImage to render in another window
-        memcpy(cu83IRWindow->bits(),(m_renderer->outputIrBuffer),1920*1080);
+        memcpy(cu83IRWindow->bits(),(m_renderer->outputIrBuffer),Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
 
         //passing QImage to the setImage() defined in renderer class
         helperObj.setImage(*cu83IRWindow);
@@ -3436,22 +3414,22 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 
         while (frameSize > 0)
         {
-            //if the first bit of the first byte of the input buffer is 0, its UYVY data
-            if(((inputbuffer[bufferCount]) & (0x01))  == 0)
-            {
+            if(((inputbuffer[bufferCount]) & (0x03))  == 0x00){
                 memcpy((m_renderer->rgbFromY16Buffer)+(uyvySize),(inputbuffer+bufferCount),RgbLinesToRead - 1);
                 bufferCount += RgbLinesToRead;
                 uyvySize    += RgbLinesToRead;
                 frameSize   -= RgbLinesToRead;
                 RGBCounter++;
             }
-            else if(((inputbuffer[bufferCount]) & (0x01))  == 1)
-            {//if the first bit of the first byte of the input buffer is 1, its Y8 data
+            else if(((inputbuffer[bufferCount]) & (0x03))  == 0x03){
                 memcpy((m_renderer->inputIrBuffer)+(irSize),(inputbuffer+bufferCount),IrLinesToRead - 1);
                 bufferCount += IrLinesToRead;
                 irSize      += IrLinesToRead;
                 frameSize   -= IrLinesToRead;
                 IRCounter++;
+            }else{
+                m_renderer->render27CugMutex.unlock();
+                return false;
             }
         }
 
@@ -3460,10 +3438,8 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         bufferCount = 0;
         irSize = 0;
 
-        if((RGBCounter == RGB_LINES_1080p) && (IRCounter == IR_LINES_1080p))
-        {
-              while (IRsize > 0)
-              {
+        if((RGBCounter == RGB_LINES_1080p) && (IRCounter == IR_LINES_1080p)){
+              while (IRsize > 0){
                   memcpy((m_renderer->outputIrBuffer) + (irSize), (m_renderer->inputIrBuffer) + bufferCount, 4);
                   irSize      += 4;
                   bufferCount += 5;
@@ -3728,7 +3704,6 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
             memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
             freeBuffer((uint8_t *)sourceBuf20CUG);
         }else{
-
             switch(pixformat){
                 case V4L2_PIX_FMT_YUYV:{
                     if(width == 640 && height == 480){
@@ -3857,6 +3832,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
 
                         if(!prepareCu83Buffer((uint8_t*)inputbuffer))
                         {
+                            m_renderer->renderyuyvMutex.unlock();
                             return false;
                         }
                     }
@@ -3880,7 +3856,9 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                     break;
             }
         }
-        if(m_renderer->renderBufferFormat == CommonEnums::YUYV_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::UYVY_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::GREY_BUFFER_RENDER || m_renderer->renderBufferFormat== CommonEnums::BUFFER_RENDER_360P || m_renderer->renderBufferFormat==CommonEnums::YUV420_BUFFER_RENDER ||m_renderer->renderBufferFormat == CommonEnums::NV12_BUFFER_RENDER){
+
+        if(m_renderer->renderBufferFormat == CommonEnums::YUYV_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::UYVY_BUFFER_RENDER || m_renderer->renderBufferFormat == CommonEnums::GREY_BUFFER_RENDER || m_renderer->renderBufferFormat== CommonEnums::BUFFER_RENDER_360P || m_renderer->renderBufferFormat==CommonEnums::YUV420_BUFFER_RENDER ||m_renderer->renderBufferFormat == CommonEnums::NV12_BUFFER_RENDER)
+        {
             if(m_VideoRecord){
                 if(videoEncoder!=NULL) {
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
@@ -4223,7 +4201,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
         m_renderer->updateStop = true;
 
         //Added By Sushanth - To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
-        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU31))
+        if(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1)
         {
             emit setCrossStillProperties(false);
         }
@@ -5486,7 +5464,9 @@ void Videostreaming::masterModeEnabled() {
     trigger_mode = false;
     m_renderer->triggermodeFlag = false;
      m_snapShot = false;
-     m_renderer->gotFrame = true;        // Added by Nivedha : 09 Mar 2021 -- To get preview when changed from trigger mode to master mode.
+     if(!(currentlySelectedCameraEnum = CommonEnums::SEE3CAM_CU83)){ //To avoid executing mismatched shader function when switched from trigger mode to master mode
+         m_renderer->gotFrame = true;        // Added by Nivedha : 09 Mar 2021 -- To get preview when changed from trigger mode to master mode.
+     }
      m_renderer->updateStop = false;
 }
 //Added by Dhurka - 13th Oct 2016
