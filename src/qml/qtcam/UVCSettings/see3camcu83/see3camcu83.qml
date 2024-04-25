@@ -413,7 +413,7 @@ Item{
         {
             id: autoExpoWinSizeCombo
             enabled: (expRoiManual.checked && expRoiManual.enabled) ? true : false
-            opacity: (expRoiManual.checked && expRoiManual.enabled) ? true : false
+            opacity: (expRoiManual.checked && expRoiManual.enabled) ? 1 : 0.1
             model: ListModel
                    {
                         ListElement { text: "1" }
