@@ -142,5 +142,5 @@ qtcam (26.0.13-0ubuntu1) focal; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Thu 25 Apr 2024 19:06:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Thu 25 Apr 2024 19:10:01 +0530
 
