@@ -1,4 +1,5 @@
-qtcam (26.0.12-0ubuntu1) xenial; urgency=medium
+qtcam (26.0.13-0ubuntu1) xenial; urgency=medium
+ *Added new HID controls for See3CAM_CU83 and See3CAM_CU84.
  *Added new HID controls for See3CAM_CU31.
  *Fixed frame corruption issue for See3CAM_50CUG.
  *Bug fix for See3CAM_50CUG.
@@ -179,4 +180,4 @@ qtcam (26.0.12-0ubuntu1) xenial; urgency=medium
   * Added ARM support.
   * Initial release.  
 
- -- econsysqtcam <qtcam@e-consystems.com> Wed 24 Apr 2024 15:10:00 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Thu 25 Apr 2024 19:08:00 +0530
