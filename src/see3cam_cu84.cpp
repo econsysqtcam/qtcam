@@ -179,7 +179,7 @@ bool SEE3CAM_CU84::getDenoiseValue()
  * @param winSize - ROI window size
  * return true - success /false - failure
  */
-bool SEE3CAM_CU84::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize)
+bool SEE3CAM_CU84::setROIAutoExposure(autoExpRoiModes see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize)
 {
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -209,15 +209,13 @@ bool SEE3CAM_CU84::setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, u
     g_out_packet_buf[3] = SET_AUTOEXP_ROI_MODE_SEE3CAM_CU84; /* set Auto exposure ROI mode command  */
     g_out_packet_buf[4] = see3camAutoexpROIMode; /* ROI mode which is need to set */
 
-    if(see3camAutoexpROIMode == MANUAL_ROI){
-        g_out_packet_buf[5] = outputXCord;
-        g_out_packet_buf[6] = outputYCord;
-        g_out_packet_buf[7] = winSize.toUInt();
-    }
+    g_out_packet_buf[5] = outputXCord;
+    g_out_packet_buf[6] = outputYCord;
+    g_out_packet_buf[7] = winSize.toUInt();
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[7] == SET_FAIL) {
+        if (g_in_packet_buf[7]==SET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_MSB_SEE3CAM_CU84 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84 &&
@@ -258,7 +256,7 @@ bool SEE3CAM_CU84::getAutoExpROIModeAndWindowSize(){
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84 &&
             g_in_packet_buf[2] == GET_AUTOEXP_ROI_MODE_SEE3CAM_CU84 &&
             g_in_packet_buf[7] == GET_SUCCESS) {
-            emit roiAutoExpMode(g_in_packet_buf[3], g_in_packet_buf[6]);
+            emit roiAutoExpModeRecieved(g_in_packet_buf[3], g_in_packet_buf[6]);
             return true;
         }
     }
@@ -566,6 +564,7 @@ bool SEE3CAM_CU84::getFrameRateCtrlValue()
            g_in_packet_buf[1] == CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84 &&
            g_in_packet_buf[2] == GET_FRAMERATE_CONTROL_SEE3CAM_CU84 &&
            g_in_packet_buf[7] == GET_SUCCESS) {
+
            emit minimumFramesReceived(g_in_packet_buf[4]); /*To get minimum frame rate supported*/
            emit maximumFramesReceived(g_in_packet_buf[5]); /*To get maximum frame rate supported*/
            emit frameRateCtrlValueRecieved(g_in_packet_buf[3]); /*To get current frame rate*/

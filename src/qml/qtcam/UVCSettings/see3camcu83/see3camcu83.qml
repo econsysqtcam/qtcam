@@ -98,6 +98,9 @@ Item{
         {
             enableDisableAutoExposureControls(autoExposureSelect)
         }
+        onSetHIDControls:{
+            see3camcu84.setFrameRateCtrlValue(frameRateSlider.value)
+        }
         onCreateIrWindow:{
             //To enable CheckBox when IR window is created by resolution switch
             irWindowCheckBox.checked = true
@@ -1344,7 +1347,7 @@ Item{
     function enableFaceDetectEmbedData(){
         if(see3camcu83.setFaceDetection(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){
             if(faceDetectEmbedData.checked){
-                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_CU83_Face_and_Smile_Detection for more details"))
+                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_CU83_Face_Detection for more details"))
             }
         }
     }

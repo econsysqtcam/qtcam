@@ -78,6 +78,8 @@ Rectangle {
     //To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
     signal updateCrossStillCaptureProperty(bool isEnable);
 
+    signal setHIDControls()
+
     //signal close IR window after unplugging the device
     signal windowCloseAfterUnplug()
 
@@ -699,6 +701,10 @@ Rectangle {
             {
                 updateCrossStillCaptureProperty(false)
             }
+        }
+
+        onSetHIDControlsAfterStillCapture: {
+            setHIDControls()
         }
 
         /*

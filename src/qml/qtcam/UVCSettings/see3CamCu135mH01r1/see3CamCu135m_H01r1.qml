@@ -723,7 +723,7 @@ Item {
                     }
                     TextField {
                         id: gainUpperLimitTextField
-                        text: gainLowerLimitSlider.value
+                        text: gainUpperLimitSlider.value
                         font.pixelSize: 10
                         font.family: "Ubuntu"
                         smooth: true

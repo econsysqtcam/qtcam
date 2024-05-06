@@ -306,6 +306,7 @@ FrameRenderer::~FrameRenderer()
     if(yuvBuffer){free(yuvBuffer); yuvBuffer = NULL;}
     if(rgbBuffer){free(rgbBuffer); rgbBuffer = NULL;}
     if(greyBuffer){free(greyBuffer); greyBuffer = NULL;}
+    if(recordingBuffer){free(recordingBuffer); recordingBuffer = NULL;}
     if(rgbaDestBuffer){free(rgbaDestBuffer); rgbaDestBuffer = NULL;}
 
 
@@ -328,6 +329,7 @@ FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
     yuvBuffer = NULL;
     rgbBuffer = NULL;
     greyBuffer = NULL;
+    recordingBuffer = NULL;
     rgbaDestBuffer = NULL;
     gotFrame = false;
     flipModeChanged = false;
@@ -1557,6 +1559,7 @@ bool Videostreaming::saveRawFile(void *inputBuffer, int buffersize){
     return ret;
 }
 
+
 /**
 * Added By Sushanth
 * convertUYVYToRGB - To Convert UYVY to RGB following BT.709 standards
@@ -1714,31 +1717,22 @@ void Videostreaming::capFrame()
         return;
     }
 
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200 && m_capSrcFormat.fmt.pix.pixelformat == RAW_Y10_PIX_FMT)
-    {
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200 && m_capSrcFormat.fmt.pix.pixelformat == RAW_Y10_PIX_FMT){
         m_renderer->rawY10Format = true;
-    }
-    else
-    {
+    }else{
         m_renderer->rawY10Format = false;
     }
 
-
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode) //Added by M.VishnuMurali: For capturing trigger mode images.
-    {
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode){ //Added by M.VishnuMurali: For capturing trigger mode images.
         m_renderer->gotFrame = false;
         m_renderer->updateStop = true;
         if(triggermode_skipframes)
                     triggermode_skipframes--;
         else
             emit triggerShotCap();
-    }
-    else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode && gotTriggerKey) //Added By Sushanth : For Capturing master mode images using external trigger board
-    {
+    } else if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG) && !trigger_mode && gotTriggerKey){ //Added By Sushanth : For Capturing master mode images using external trigger board
         emit triggerShotCap();
-    }
-    else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode)
-    {
+    } else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode){
         m_renderer->gotFrame = true;
     }
     if (again) {
@@ -3958,6 +3952,7 @@ void Videostreaming::allocBuffers()
     m_renderer->uBuffer = (uint8_t*)realloc(m_renderer->uBuffer,buffHalfLength);
     m_renderer->vBuffer = (uint8_t*)realloc(m_renderer->vBuffer,buffHalfLength);
     m_renderer->yuvBuffer = (uint8_t*)realloc(m_renderer->yuvBuffer,buffLength*2);
+    m_renderer->recordingBuffer = (uint8_t*)realloc(m_renderer->recordingBuffer,buffLength*3);
     m_renderer->rgbBuffer = (uint8_t*)realloc(m_renderer->rgbBuffer,buffLength*2);
     m_renderer->rgbaDestBuffer = (unsigned char *)realloc(m_renderer->rgbaDestBuffer,m_renderer->videoResolutionwidth * (m_renderer->videoResolutionHeight) * 4);
 
@@ -4185,7 +4180,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     changeFpsAndShot = false;
     m_displayCaptureDialog = true;
 
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && (trigger_mode  || (!trigger_mode && gotTriggerKey)))
+    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG) && (trigger_mode  || (!trigger_mode && gotTriggerKey)))
         return;
 
     //Added by Sushanth - Capturing frame only if the filePath is valid
@@ -4201,7 +4196,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
         m_renderer->updateStop = true;
 
         //Added By Sushanth - To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
-        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU31))
+        if(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1)
         {
             emit setCrossStillProperties(false);
         }
@@ -4458,6 +4453,7 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
         {
             clearBuffer = true; // to clear buffer in IR preview while cross resolution stillCapture
         }
+
         //Added by Sushanth - autoExposureMode in UVC settings
         if(autoExposureMode)
         {
@@ -4733,6 +4729,11 @@ void Videostreaming::stopCapture() {
     if(m_renderer->greyBuffer != NULL){
         free(m_renderer->greyBuffer);
         m_renderer->greyBuffer = NULL;
+    }
+
+    if(m_renderer->recordingBuffer != NULL){
+        free(m_renderer->recordingBuffer);
+        m_renderer->recordingBuffer = NULL;
     }
 
     if(m_renderer->uyvyBuffer != NULL){
@@ -5236,41 +5237,14 @@ void Videostreaming::setSampleRate(uint index){
 }
 
 void Videostreaming::recordVideo(){  // Added by Navya : 25 Nov 2019 -- To configure the source format accordingly.
-
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
-    {//See3CAM_CU83 - VideoRecording for Y16 format
-        if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)
-        {
-            if((width == Y16_1350p_WIDTH)&&(height == Y16_1350p_HEIGHT))
-            {
-                if(m_renderer->ir1350pBuffer != NULL)
-                {
-                    videoEncoder->encodeImage(m_renderer->ir1350pBuffer,videoEncoder->Y8_BUFFER);
-                }
-            }
-            else if((width == Y16_675p_WIDTH)&&(height == Y16_675p_HEIGHT))
-            {
-                if(m_renderer->ir675pBuffer != NULL)
-                {
-                    videoEncoder->encodeImage(m_renderer->ir675pBuffer,videoEncoder->Y8_BUFFER);
-                }
-            }
-        }//For other formats like UYVY, Y8, YUYV
-        else if(width !=320 && height != 240 ){   //Stop recording video in 320x240 resolution for See3CAM_20CUG camera.
-            if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY && (width != 640 && (height !=480 | height != 360))){    // Added by Navya :  16 March 2020 -passing yuyv data for uyvy format in 640x480 reolution alone to avoid aliasing effect in preview.
+     if(width !=320 && height != 240){   //Stop recording video in 320x240 resolution for See3CAM_20CUG camera.
+        if((m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY) && (width != 640 && (height !=480 | height != 360))){    // Added by Navya :  16 March 2020 -passing yuyv data for uyvy format in 640x480 reolution alone to avoid aliasing effect in preview.
+            if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU31){//To convert UYVY to RGB which follows BT.706 conversion standards
+                convertUYVYToRGB(m_renderer->yuvBuffer, (width*height*2), m_renderer->recordingBuffer);
+                videoEncoder->encodeImage(m_renderer->recordingBuffer, videoEncoder->RGB_BT709_BUFFER);
+            }else{
                 videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->UYVY_BUFFER);
             }
-            else if(m_capSrcFormat.fmt.pix.pixelformat==V4L2_PIX_FMT_GREY){
-                videoEncoder->encodeImage(m_renderer->greyBuffer,videoEncoder->Y8_BUFFER);
-            }
-            else{
-                videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->YUYV_BUFFER);
-            }
-        }
-    }//VideoRecording for other cameras
-    else if(width !=320 && height != 240 ){   //Stop recording video in 320x240 resolution for See3CAM_20CUG camera.
-        if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY && (width != 640 && (height !=480 | height != 360))){    // Added by Navya :  16 March 2020 -passing yuyv data for uyvy format in 640x480 reolution alone to avoid aliasing effect in preview.
-            videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->UYVY_BUFFER);
         }
         else if(m_capSrcFormat.fmt.pix.pixelformat==V4L2_PIX_FMT_GREY){
             videoEncoder->encodeImage(m_renderer->greyBuffer,videoEncoder->Y8_BUFFER);
@@ -5464,7 +5438,7 @@ void Videostreaming::masterModeEnabled() {
     trigger_mode = false;
     m_renderer->triggermodeFlag = false;
      m_snapShot = false;
-     if(!(currentlySelectedCameraEnum = CommonEnums::SEE3CAM_CU83)){ //To avoid executing mismatched shader function when switched from trigger mode to master mode
+     if(!(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)){ //To avoid executing mismatched shader function when switched from trigger mode to master mode
          m_renderer->gotFrame = true;        // Added by Nivedha : 09 Mar 2021 -- To get preview when changed from trigger mode to master mode.
      }
      m_renderer->updateStop = false;
@@ -5523,7 +5497,7 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
     if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {
         //Added By Sushanth - To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
-        if(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1)
+        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU31))
         {
             emit setCrossStillProperties(true);
         }
@@ -5561,6 +5535,12 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
         {
              //to set exposure compensation after capturing still in cross resolution.
              emit setExpAfterCrossStill();
+        }
+
+        //To set frame rate after capturing still in cross resolution
+        if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU84))
+        {
+            emit setHIDControlsAfterStillCapture();
         }
     }
 }

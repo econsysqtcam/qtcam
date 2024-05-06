@@ -116,6 +116,7 @@ signals:
     void currentTemperature(float temperature);
     void currentAntiFlickerModeRecieved(uint mode);
     void currentCameraModeReceived(uint mode);
+    void indicateFailureStatus(QString title, QString text);
     void titleTextChanged(QString _title,QString _text);
 
 public slots:

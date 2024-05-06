@@ -87,11 +87,12 @@ public:
     };
     Q_ENUMS(specialModes)
 
-    enum camROIAutoExpMode {
-        FULL_ROI   = 0x01,
-        MANUAL_ROI = 0x02,
+    enum autoExpRoiModes{
+        FULL_ROI    = 0x01,
+        MANUAL_ROI  = 0x02,
+        AE_DISABLED = 0x03
     };
-    Q_ENUMS(camROIAutoExpMode)
+    Q_ENUMS(autoExpRoiModes)
 
     enum Orientation{
         HORIZONTAL = 0x01,
@@ -139,7 +140,7 @@ public:
 signals:
     void specialModeReceived(uint specialMode);
     void denoiseValueReceived(uint denoiseValue);
-    void roiAutoExpMode(uint roiMode, uint winSize);
+    void roiAutoExpModeRecieved(uint roiMode, uint winSize);
     void burstLengthValueRecieved(uint burstLenVal);
     void flipMirrorModeReceived(uint flipMode);
     void exposureCompValueRecieved(uint exposureCompVal);
@@ -163,7 +164,7 @@ public slots:
     bool setDenoiseValue(uint deNoiseVal);
     bool getDenoiseValue();
 
-    bool setROIAutoExposure(camROIAutoExpMode see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
+    bool setROIAutoExposure(autoExpRoiModes autoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
     bool getAutoExpROIModeAndWindowSize();
 
     bool setBurstLength(uint burstLength);

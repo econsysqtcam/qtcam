@@ -66,6 +66,7 @@ bool SEE3CAM_CU31::setOrientation(bool horzModeSel, bool vertiModeSel)
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Orientation Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
@@ -101,6 +102,7 @@ bool SEE3CAM_CU31::getOrientation()
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == GET_FAIL) {
+            emit indicateFailureStatus("Failure","Get Orientation Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
@@ -140,6 +142,7 @@ bool SEE3CAM_CU31::setRawNoiseReductionStatus(RNR_STATUS  status)
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Raw Noise Reduction Status Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
@@ -174,8 +177,8 @@ bool SEE3CAM_CU31::getRawNoiseReductionStatus()
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6] == GET_FAIL)
-        {
+        if (g_in_packet_buf[6] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get Raw Noise Reduction Status Failed. Retry!");
             return false;
         }
         else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
@@ -216,6 +219,7 @@ bool SEE3CAM_CU31::setTriggerMode(TRIGGER_MODE  mode)
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Trigger Mode Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
@@ -250,8 +254,8 @@ bool SEE3CAM_CU31::getTriggerMode()
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6] == GET_FAIL)
-        {
+        if (g_in_packet_buf[6] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get Trigger Mode Failed. Retry!");
             return false;
         }
         else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
@@ -292,6 +296,7 @@ bool SEE3CAM_CU31::setAEConvergenceSpeed(uint convergenceSpeed)
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Auto Exposure Convergence Speed Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
@@ -326,8 +331,8 @@ bool SEE3CAM_CU31::getAEConvergenceSpeed()
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6] == GET_FAIL)
-        {
+        if (g_in_packet_buf[6] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get Auto Exposure Convergence Speed Failed. Retry!");
             return false;
         }
         else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
@@ -368,6 +373,7 @@ bool SEE3CAM_CU31::setAutoExposureStatus(AUTO_EXPOSURE exposureStatus)
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Auto Exposure Status Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
@@ -403,6 +409,7 @@ bool SEE3CAM_CU31::getAutoExpStatus()
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == GET_FAIL) {
+            emit indicateFailureStatus("Failure","Get Auto Exposure Status Failed. Retry!");
             return false;
         }else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
             (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
@@ -443,6 +450,7 @@ bool SEE3CAM_CU31::setAWBStatus(AUTO_WHITE_BALANCE status)
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Auto White Balance Status Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
@@ -478,6 +486,7 @@ bool SEE3CAM_CU31::getAWBStatus()
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get Auto White Balance Status Failed. Retry!");
             return false;
         }else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
             (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
@@ -515,8 +524,8 @@ bool SEE3CAM_CU31::readTemperature(){
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-
         if (g_in_packet_buf[15] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Read Temperature Failed. Retry!");
             return false;
         } else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
             (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
@@ -561,6 +570,7 @@ bool SEE3CAM_CU31::setAntiFlickerMode(ANTI_FLICKER_DETECTION antiFlickerMode){
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Anti-Flicker Mode Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
@@ -595,6 +605,7 @@ bool SEE3CAM_CU31::getAntiFlickerMode()
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == GET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Anti-Flicker Mode Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
@@ -633,6 +644,7 @@ bool SEE3CAM_CU31::setCameraMode(CAMERA_MODE cameraMode){
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Camera Mode Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
@@ -667,6 +679,7 @@ bool SEE3CAM_CU31::getCameraMode()
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == GET_FAIL) {
+            emit indicateFailureStatus("Failure","Get Camera Mode Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
@@ -685,7 +698,6 @@ bool SEE3CAM_CU31::getCameraMode()
  * @return True if successful, false otherwise.
  */
 bool SEE3CAM_CU31::setPropertiesForCrossStill(){
-
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -700,15 +712,15 @@ bool SEE3CAM_CU31::setPropertiesForCrossStill(){
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if(g_in_packet_buf[0] == SET_CROSS_STILL_PROPERTIES){
-            return true;
-        }else{
+        if(g_in_packet_buf[6] == FAILURE){
+            emit indicateFailureStatus("Failure","Setting Still Properties Failed. Retry!");
             return false;
+        }else if((g_in_packet_buf[0] == SET_CROSS_STILL_PROPERTIES) && (g_in_packet_buf[6] == SUCCESS)){
+            return true;
         }
     }
     return false;
 }
-
 
 
 /**
@@ -735,6 +747,7 @@ bool SEE3CAM_CU31::setToDefaultValues()
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH))
     {
         if (g_in_packet_buf[6] == SET_FAIL){
+            emit indicateFailureStatus("Failure","Set Default Failed. Retry!");
             return false;
         }else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&

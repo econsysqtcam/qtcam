@@ -610,6 +610,8 @@ bool VideoEncoder::convertImage_sws(uint8_t *buffer,uint8_t bufferType)
 #else
         img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),AV_PIX_FMT_RGBA,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
 #endif
+    }else if(bufferType == RGB_BT709_BUFFER){
+        img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),AV_PIX_FMT_RGB24,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
     }else if(bufferType == YUYV_BUFFER){
 #if !LIBAVCODEC_VER_AT_LEAST(54, 25)
         img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(), PIX_FMT_YUYV422,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
@@ -648,6 +650,8 @@ bool VideoEncoder::convertImage_sws(uint8_t *buffer,uint8_t bufferType)
     int srcstride[3];
     if(bufferType == RGB_BUFFER){
         srcstride[0]=getWidth()*4; // RGBA  - 32 bit.  so  4 is used
+    }else if(bufferType == RGB_BT709_BUFFER){
+        srcstride[0]=getWidth()*3; // RGB  - 24 bit.  so  3 is used
     }
     /** Added by Navya -29 Nov 2019
         * Giving 8 bit data directly for Video Record,hence making the srcStride as "getwidth()*1"

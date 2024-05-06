@@ -98,7 +98,8 @@ public:
        YUYV_BUFFER = 1,
        UYVY_BUFFER,
        Y8_BUFFER,
-       Y16_BUFFER
+       Y16_BUFFER,
+       RGB_BT709_BUFFER
    }bufferType;
 
    Q_ENUMS(bufferType)

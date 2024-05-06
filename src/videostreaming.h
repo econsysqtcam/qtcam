@@ -154,7 +154,7 @@ public:
     uint8_t *yBuffer;
     uint8_t *uBuffer;
     uint8_t *vBuffer;
-    uint8_t *yuvBuffer,*greyBuffer;
+    uint8_t *yuvBuffer,*greyBuffer, *recordingBuffer;
     uint8_t *rgbBuffer;
 
     //Buffers for See3CAM_CU83
@@ -853,6 +853,12 @@ signals:
      * To enable/disable HID control for setting Gain, Brightness, Exposure while capturing still in cross resolution
      */
     void setCrossStillProperties(bool isEnable);
+
+    /*
+     * Added by Sushanth S
+     * To Set HID control after capturing still in cross resolution
+     */
+    void setHIDControlsAfterStillCapture();
 
     /*
      * Added by Sushanth S
