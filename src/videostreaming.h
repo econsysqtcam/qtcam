@@ -411,7 +411,7 @@ private:
     unsigned m_frame;
     unsigned m_lastFrame;
 
-    unsigned m_fps;
+    float m_fps;
     struct timeval m_tv;
 
     char header[50];
@@ -880,6 +880,7 @@ signals:
     void startEnumerateMenulist();
     void deviceUnplugged(QString _title,QString _text);
     void averageFPS(unsigned fps);
+    void sendFps(float fps);
     void defaultStillFrameSize(unsigned int outputIndexValue);
     void defaultFrameSize(unsigned int outputIndexValue, unsigned int  defaultWidth, unsigned int defaultHeight);
     void defaultOutputFormat(unsigned int formatIndexValue);

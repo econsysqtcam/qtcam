@@ -94,28 +94,17 @@ Item{
             skipUpdateColorTemperature = false
             colorTempTextField.text = colorTempFromUVC
 
-            if(colorTempFromUVC == "2300")
-            {
+            if(colorTempFromUVC == "2300"){
                colorTempSlider.value = 0
-            }
-            else if(colorTempFromUVC == "2800")
-            {
+            }else if(colorTempFromUVC == "2800"){
                 colorTempSlider.value = 1
-            }
-            else if(colorTempFromUVC == "3000")
-            {
+            }else if(colorTempFromUVC == "3000"){
                 colorTempSlider.value = 2
-            }
-            else if(colorTempFromUVC == "4000")
-            {
+            }else if(colorTempFromUVC == "4000"){
                 colorTempSlider.value = 3
-            }
-            else if(colorTempFromUVC == "6000")
-            {
+            }else if(colorTempFromUVC == "6000"){
                 colorTempSlider.value = 4
-            }
-            else if(colorTempFromUVC == "6500")
-            {
+            }else if(colorTempFromUVC == "6500"){
                 colorTempSlider.value = 5
             }
 

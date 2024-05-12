@@ -1,6 +1,6 @@
 /*
  * keyEventReceive.cpp -- Getting key event using /dev/input driver files
- * Copyright © 2018  e-con Systems India Pvt. Limited
+ * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
  *
@@ -24,7 +24,6 @@
 CamKeyEventReceive::CamKeyEventReceive()
 {
     m_capKeyNotifier = NULL;
-
 }
 
 /**

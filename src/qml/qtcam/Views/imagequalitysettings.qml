@@ -1317,9 +1317,17 @@ Item {
         onGetExposureFromHID:{
             exposure_Slider.value = exposureFromHID
         }
+
         onDisableUVCSettings:{
             white_balance_Slider.enabled = false
             white_balance_Slider.opacity = 0.1
+        }
+        onGetWhiteBalanceModeFromHID:{
+            if(isAutoEnabled){
+                autoSelect_wb.checked = true
+            }else {
+                autoSelect_wb.checked = false
+            }
         }
     }
 
@@ -1478,50 +1486,32 @@ Item {
 
     }
 
-    function convertWhiteBalanceToColorTemperature(whiteBalance)
-    {
-        switch(whiteBalance)
-        {
-             case 1:
-                 root.getColorTemperature(2300)
-                 break
-             case 2:
-                 root.getColorTemperature(2800)
-                 break
-             case 3:
-                 root.getColorTemperature(3000)
-                 break
-             case 4:
-                 root.getColorTemperature(4000)
-                 break
-             case 5:
-                 if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200)
-                 {
-                     root.getColorTemperature(4100)
-                 }
-                 else
-                 {
+    function convertWhiteBalanceToColorTemperature(whiteBalance){
+        if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200){
+            root.getColorTemperature(whiteBalance)
+        }else if (root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_50CUG){
+            switch(whiteBalance)
+            {
+                 case 1:
+                     root.getColorTemperature(2300)
+                     break
+                 case 2:
+                     root.getColorTemperature(2800)
+                     break
+                 case 3:
+                     root.getColorTemperature(3000)
+                     break
+                 case 4:
+                     root.getColorTemperature(4000)
+                     break
+                 case 5:
                      root.getColorTemperature(6000)
-                 }
-                 break
-             case 6:
-                 if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200)
-                 {
-                     root.getColorTemperature(6000)
-                 }
-                 else
-                 {
+                     break
+                 case 6:
                      root.getColorTemperature(6500)
-                 }
-                 break
-             case 7:
-                 if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200)
-                 {
-                     root.getColorTemperature(6500)
-                 }
-                 break
+                     break
+            }
         }
-
     }
 
     function setCameraControls(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID)

@@ -3992,14 +3992,19 @@ void Videostreaming::getFrameRates(){
         gettimeofday(&tv, NULL);
             timersub(&tv, &m_tv, &res);
             if (res.tv_sec) {
-                m_fps = (100 * (m_frame - m_lastFrame)) / (res.tv_sec * 100 + res.tv_usec / 10000);
+                m_fps = (100.0f * (m_frame - m_lastFrame)) / (res.tv_sec * 100 + res.tv_usec / 10000);
                 m_lastFrame = m_frame;
                 m_tv = tv;
             }
             ++m_frame;
             ++m_renderer->frame;
             m_renderer->fps = m_fps;
-            emit averageFPS(m_fps);
+
+            if(m_fps == 0.5){
+                emit sendFps(m_fps);
+            }else{
+                emit averageFPS(m_fps);
+            }
 }
 
 bool Videostreaming::startCapture()
@@ -4195,8 +4200,8 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     {
         m_renderer->updateStop = true;
 
-        //Added By Sushanth - To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
-        if(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1)
+        //Added By Sushanth - To Enable/Disable HID to set still properties for capturing still in cross resolution
+        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU31) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200))
         {
             emit setCrossStillProperties(false);
         }
@@ -5245,6 +5250,8 @@ void Videostreaming::recordVideo(){  // Added by Navya : 25 Nov 2019 -- To confi
             }else{
                 videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->UYVY_BUFFER);
             }
+        } else if (m_renderer->rawY10Format){
+            videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->UYVY_BUFFER);
         }
         else if(m_capSrcFormat.fmt.pix.pixelformat==V4L2_PIX_FMT_GREY){
             videoEncoder->encodeImage(m_renderer->greyBuffer,videoEncoder->Y8_BUFFER);
@@ -5497,7 +5504,7 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
     if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {
         //Added By Sushanth - To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
-        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU31))
+        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200))
         {
             emit setCrossStillProperties(true);
         }

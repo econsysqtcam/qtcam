@@ -6,62 +6,93 @@
 #include <QString>
 #include "uvccamera.h"
 
-#define CAMERA_CONTROL_ID_1_SEE3CAM_CU200      0xC0
-#define CAMERA_CONTROL_ID_2_SEE3CAM_CU200      0x02
+#define CAMERA_CONTROL_ID_1      0xC0
+#define CAMERA_CONTROL_ID_2      0x02
 
-#define GET_GAIN_MODE_SEE3CAM_CU200            0x01
-#define SET_GAIN_MODE_SEE3CAM_CU200            0x02
+#define GET_GAIN_MODE            0x01
+#define SET_GAIN_MODE            0x02
 
-#define GET_RB_GAIN_SEE3CAM_CU200              0x03
-#define SET_RB_GAIN_SEE3CAM_CU200              0x04
+#define GET_RB_GAIN              0x03
+#define SET_RB_GAIN              0x04
 
-#define GET_CC_MATRIX_SEE3CAM_CU200            0x05
-#define SET_CC_MATRIX_SEE3CAM_CU200            0x06
+#define GET_COLOR_CORRECTION_MATRIX            0x05
+#define SET_COLOR_CORRECTION_MATRIX            0x06
 
-#define GET_BLACK_LEVEL_SEE3CAM_CU200          0x07
-#define SET_BLACK_LEVEL_SEE3CAM_CU200          0x08
+#define GET_BLACK_LEVEL          0x07
+#define SET_BLACK_LEVEL          0x08
 
-#define GET_BRIGHTNESS_SEE3CAM_CU200           0x09
-#define SET_BRIGHTNESS_SEE3CAM_CU200           0x0A
+#define GET_BRIGHTNESS           0x09
+#define SET_BRIGHTNESS           0x0A
 
-#define GET_CONTRAST_SEE3CAM_CU200             0x0B
-#define SET_CONTRAST_SEE3CAM_CU200             0x0C
+#define GET_CONTRAST             0x0B
+#define SET_CONTRAST             0x0C
 
-#define GET_SATURATION_SEE3CAM_CU200           0x0D
-#define SET_SATURATION_SEE3CAM_CU200           0x0E
+#define GET_SATURATION           0x0D
+#define SET_SATURATION           0x0E
 
-#define GET_COLOR_TEMPERATURE_SEE3CAM_CU200    0x0F
-#define SET_COLOR_TEMPERATURE_SEE3CAM_CU200    0x10
+#define GET_COLOR_TEMPERATURE    0x0F
+#define SET_COLOR_TEMPERATURE    0x10
 
-#define GET_GAMMA_SEE3CAM_CU200                0x11
-#define SET_GAMMA_SEE3CAM_CU200                0x12
+#define GET_GAMMA                0x11
+#define SET_GAMMA                0x12
 
-#define GET_EXPOSURE_SEE3CAM_CU200             0x13
-#define SET_EXPOSURE_SEE3CAM_CU200             0x14
+#define GET_EXPOSURE             0x13
+#define SET_EXPOSURE             0x14
 
-#define GET_CAMERA_MODE_SEE3CAM_CU200          0x15
-#define SET_CAMERA_MODE_SEE3CAM_CU200          0x16
+#define GET_CAMERA_MODE          0x15
+#define SET_CAMERA_MODE          0x16
 
-#define GET_STROBE_MODE_SEE3CAM_CU200          0x17
-#define SET_STROBE_MODE_SEE3CAM_CU200          0x18
+#define GET_STROBE               0x17
+#define SET_STROBE               0x18
 
-#define GET_ORIENTATION_MODE_SEE3CAM_CU200     0x19
-#define SET_ORIENTATION_MODE_SEE3CAM_CU200     0x1A
+#define GET_ORIENTATION          0x19
+#define SET_ORIENTATION          0x1A
 
-#define SAVE_CONFIGURATION_SEE3CAM_CU200       0x42
-#define DEFAULT_CONFIGURATION                  0x00
-#define USER_DEFINED_CONFIGURATION             0x01
+#define GET_AUTO_GAIN_LIMIT           0x1B
+#define SET_AUTO_GAIN_LIMIT           0x1C
 
-#define SET_TO_DEFAULT_SEE3CAM_CU200           0xFF
+#define GET_AUTO_EXPOSURE_LIMIT       0x1D
+#define SET_AUTO_EXPOSURE_LIMIT       0x1E
 
-#define RESET_COMMAND_1                        0x32
-#define RESET_COMMAND_2                        0x04
+#define GET_AUTO_EXPOSURE_ROI         0x1F
+#define SET_AUTO_EXPOSURE_ROI         0x20
+
+#define GET_TARGET_BRIGHTNESS         0x21
+#define SET_TARGET_BRIGHTNESS         0x22
+
+#define GET_ANTI_FLICKER_DETECTION    0x23
+#define SET_ANTI_FLICKER_DETECTION    0x24
+
+#define GET_WHITE_BALANCE             0x25
+#define SET_WHITE_BALANCE             0x26
+
+#define GET_WHITE_BALANCE_PRESET      0x27
+#define SET_WHITE_BALANCE_PRESET      0x28
+
+#define SET_CROSS_STILL_PROPERTIES    0x2A
+
+#define READ_STATISTICS               0x29
+
+#define SAVE_CONFIGURATION            0x42
+
+#define DEFAULT_CONFIGURATION         0x00
+#define USER_DEFINED_CONFIGURATION    0x01
+
+#define SET_TO_DEFAULT                0xFF
+
+#define RESET_COMMAND_1               0x32
+#define RESET_COMMAND_2               0x04
+
+#define READ_ISP_FIRMWARE_VERSION     0x2B
 
 #define GET_FAIL		0x00
 #define GET_SUCCESS		0x01
 
 #define EXPOSURE_MIN 100
 #define EXPOSURE_MAX 1000000
+
+#define EXPOSURE_LIMIT_MIN     100
+#define EXPOSURE_LIMIT_MAX     1000000
 
 union
 {
@@ -85,11 +116,24 @@ public:
     SEE3CAM_CU200();
     ~SEE3CAM_CU200();
 
+    QString _title;
+    QString _text;
+    QString message;
+
+    uint exposureLowerLimit;
+    uint exposureUpperLimit;
+
     enum GAIN_MODE{
-        AUTO_MODE   = 0x00,
-        MANUAL_MODE = 0x01
+        AUTO_GAIN   = 0x00,
+        MANUAL_GAIN = 0x01
     };
     Q_ENUMS(GAIN_MODE)
+
+    enum AUTO_GAIN_FEATURES{
+        GAIN_CONTINIOUS  = 0x00,
+        GAIN_SINGLE_SHOT = 0x01
+    };
+    Q_ENUMS(AUTO_GAIN_FEATURES)
 
     enum CAMERA_MODE {
         MASTER_MODE  = 0x00,
@@ -102,6 +146,12 @@ public:
         MANUAL_EXPOSURE  = 0x01
     };
     Q_ENUMS(EXPOSURE_MODE)
+
+    enum AUTO_EXPOSURE_FEATURE{
+        CONTINIOUS_EXPOSURE  = 0x00,
+        SINGLE_SHOT_EXPOUSRE = 0x01
+    };
+    Q_ENUMS(AUTO_EXPOSURE_FEATURE)
 
     enum STROBE_MODE{
         STROBE_OFF  = 0x00,
@@ -123,18 +173,59 @@ public:
     };
     Q_ENUMS(SAVECONFIGURATION)
 
+    enum WHITE_BALANCE_MODE{
+        AUTO_WB   = 0x00,
+        MANUAL_WB = 0x01
+    };
+    Q_ENUMS(WHITE_BALANCE_MODE)
+
+    enum AUTO_WB_FEATURES{
+        WB_CONTINIOUS  = 0x00,
+        WB_SINGLE_SHOT = 0x01
+    };
+    Q_ENUMS(AUTO_WB_FEATURES)
+
+    enum MANUAL_WB_MODES{ 
+        COLOR_TEMPERATURE  = 0x00,
+        PRESET = 0x01,
+        PRO_MODE = 0x02
+    };
+    Q_ENUMS(MANUAL_WB_MODES)
+
+    enum WB_PRESET{
+        HZ_2300K   = 0x00,
+        A_2800K    = 0x01,
+        U30_3000K  = 0x02,
+        TL84_4000K = 0x03,
+        CWF_4100K  = 0x04,
+        D50_5000K  = 0x05,
+        D60_6000K  = 0x06,
+        D65_6500K  = 0x07
+    };
+    Q_ENUMS(WB_PRESET)
+
+    enum autoExpRoiModes{
+        FULL_ROI    = 0x00,
+        MANUAL_ROI  = 0x01,
+    };
+    Q_ENUMS(autoExpRoiModes)
+
+
+    enum ANTI_FLICKER_DETECTION{
+        MODE_50Hz    = 0x00,
+        MODE_60Hz    = 0x01,
+        MODE_DISABLE = 0x02,
+    };
+    Q_ENUMS(ANTI_FLICKER_DETECTION)
+
 signals:
 
-    void gainPropertiesReceived(uint min, uint max, uint stepValue, uint current);
-    void gainModeReceived(uint mode);
+    void gainModeReceived(uint mode, uint min, uint max, uint stepValue, uint autoFeature, uint manualValue);
+    void currentGainProperties(uint autoGain, float rGain, float bGain);
+    void currentAutoGainLimitValuesReceived(uint min, uint max, uint stepValue, uint lowerLimit, uint upperLimit);
 
     void rGainPropertiesReceived(float minRGain, float maxRGain, float rGainStepValue, float currentRGain);
     void bGainPropertiesReceived(float minBGain, float maxBGain, float bGainStepValue, float currentBGain);
-
-    void currentBGainReceived(float currentBGain);
-    void minBGainReceived(float minBGain);
-    void maxBGainReceived(float maxBGain);
-    void bGainStepValueReceived(float bGainStepValue);
 
     void currentRrValuesReceived(float currentRr);
     void currentRgValuesReceived(float currentRg);
@@ -162,10 +253,9 @@ signals:
     void maxContrastReceived(float maxContrast);
     void contrastStepValueReceived(float stepValue);
 
-    void colorTemperatureReceived(uint colorTemp);
+    void colorTemperatureReceived(uint min, uint max, uint stepValue, uint colorTemp);
 
-    void exposureModeReceived(uint mode);
-    void exposureValueReceived(uint exposure);
+    void exposurePropertiesReceived(uint mode, uint autoFeature, uint manualValue);
 
     void cameraModeReceived(uint cameraMode);
 
@@ -173,24 +263,47 @@ signals:
 
     void flipMirrorModeChanged(uint flipMirrorModeValues);
 
+    void whiteBalancePropertiesReceived(uint mode, uint autoFeature, uint manualFeature);
+
+    void whiteBalancePresetModeReceived(uint presetMode);
+
+    void currentAutoExposure(uint exposure);
+
+    void currentRMatrixElements(float Rr, float Rg, float Rb);
+    void currentGMatrixElements(float Gr, float Gg, float Gb);
+    void currentBMatrixElements(float Br, float Bg, float Bb);
+
+    void currentAutoExposureLimitReceived(uint lowerLimit, uint upperLimit);
+    void roiAutoExpModeReceived(uint roiMode, uint winSize);
+
+    void targetBrightnessPropertiesReceived(float min, float max, float stepValue, float current);
+
+    void antiFlickerModeReceived(uint antiFlicker);
+
     void indicateExposureValueRangeFailure(QString title, QString text);
     void indicateCommandStatus(QString title, QString text);
     void titleTextChanged(QString _title,QString _text);
-
+    void indicateGainValueRangeFailure();
 
 public slots:
 
     bool getGainMode();
-    bool setGainMode(GAIN_MODE gainMode, uint gainValue);
+    bool setGainMode(GAIN_MODE gainMode, AUTO_GAIN_FEATURES autoGain, uint manualGainValue);
 
     bool getRBGain();
     bool setRBGain(float RGain, float BGain);
+
+    bool getAutoGainLimit();
+    bool setAutoGainLimit(uint lowerLimit, uint upperLimit);
 
     bool getColorCorrectionMatrix();
     bool setColorCorrectionMatrix(float Rr, float Rg, float Rb, float Gr, float Gg, float Gb, float Br, float Bg, float Bb);
 
     bool getBlackLevel();
     bool setBlackLevel(uint blackLevel);
+
+    bool getTargetBrightness();
+    bool setTargetBrightness(uint targetBrightness);
 
     bool getBrightness();
     bool setBrightness(float brightness);
@@ -208,7 +321,13 @@ public slots:
     bool setGammaCorrection(float gamma);
 
     bool getExposure();
-    bool setExposure(EXPOSURE_MODE expMode, uint manualExposure);
+    bool setExposure(EXPOSURE_MODE expMode, AUTO_EXPOSURE_FEATURE autoFeature, uint manualExposure);
+
+    bool getAutoExposureLimit();
+    bool setAutoExposureLimit(uint lowerLimit, uint upperLimit);
+
+    bool getAutoExpROIModeAndWindowSize();
+    bool setROIAutoExposure(autoExpRoiModes see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
 
     bool getCameraMode();
     bool setCameraMode(CAMERA_MODE camMode);
@@ -216,14 +335,27 @@ public slots:
     bool getStrobeMode();
     bool setStrobeMode(STROBE_MODE strobeMode);
 
-    bool setOrientation(bool horzModeSel, bool vertiModeSel);
     bool getOrientation();
+    bool setOrientation(bool horzModeSel, bool vertiModeSel);
+
+    bool getWhiteBalanceMode();
+    bool setWhiteBalanceMode(WHITE_BALANCE_MODE mode, AUTO_WB_FEATURES autoFeature, MANUAL_WB_MODES manualFeature, WB_PRESET presetMode);
+
+    bool setAntiFlickerMode(ANTI_FLICKER_DETECTION antiFlickerMode);
+    bool getAntiFlickerMode();
+
+    bool setPropertiesForCrossStill(bool isEnable);
+
+    bool readStatistics();
 
     bool saveConfiguration(SAVECONFIGURATION configType);
 
     bool resetDevice();
 
+    bool readISPFirmwareVersion();
+
     bool setToDefault();
 };
 
 #endif // SEE3CAM_CU200_H
+

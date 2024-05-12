@@ -58,18 +58,6 @@ Item {
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
-//        onAutoExposureSelected:{
-//            enableDisableAutoExposureControls(autoExposureSelect)
-//        }
-//        onVideoResolutionChanged:{
-//            getCameraSettingsTimer.start()
-//        }
-//        onPreviewFPSChanged:{
-//            getCameraSettingsTimer.start()
-//        }
-//        onVideoColorSpaceChanged:{
-//            getCameraSettingsTimer.start()
-//        }
     }
     ScrollView{
         id: scrollview

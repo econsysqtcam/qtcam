@@ -1379,7 +1379,6 @@ Item {
                 exposureCompSet.opacity = 0.1
                 exposureCompText.opacity = 0.1
             }
-            //getAutoExpsoureControlValues.start()
             fscamcu135.getAutoExpROIModeAndWindowSize()
         }
 

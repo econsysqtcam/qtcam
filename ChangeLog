@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.15
+---------------------------
+*Added new HID controls for See3CAM_CU200.
+
 Qtcam Application - 26.0.14
 ---------------------------
 *Added video recording support following BT709 Standards and UI modifications for See3CAM_CU31.

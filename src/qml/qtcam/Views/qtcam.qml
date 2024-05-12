@@ -97,6 +97,8 @@ Rectangle {
     //To disable manual white balance when the device is closed
     signal disableUVCSettings()
 
+    signal getWhiteBalanceModeFromHID(bool isAutoEnabled)
+
     property int burstLength;
     property int cameraMode;
     property bool vidFormatChanged: false
@@ -547,19 +549,18 @@ Rectangle {
             camproperty.logCriticalWriter(_text.toString())
         }
 
+        onSendFps: {
+            statusText = "Current FPS: " + 1 + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
+        }
+
         onAverageFPS: {
-            if(device_box.opacity === 0.5)
-            {
+            if(device_box.opacity === 0.5){
                 if(!(vidstreamproperty.width == 320 && vidstreamproperty.height ==240)){
                     statusText = "Recording..." + " " + "Current FPS: " + fps + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
                 }
-            }
-            else if(isTriggerMode)
-            {
+            }else if(isTriggerMode){
                 statusText = " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
-            }
-            else
-            {
+            }else{
                 statusText = "Current FPS: " + fps + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
             }
         }
@@ -1175,7 +1176,7 @@ Rectangle {
             m_Snap = false
 
             //Only for See3CAM_24CUG - Sending trigger key when device is in Master mode
-            if((selectedDeviceEnumValue == CommonEnums.SEE3CAM_24CUG) && !disableCaptureImage && !getTriggerMode)
+            if(((selectedDeviceEnumValue == CommonEnums.SEE3CAM_24CUG) || selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU84) && !disableCaptureImage && !getTriggerMode)
             {
                 sendingTriggerKey()
             }
@@ -1879,6 +1880,10 @@ Rectangle {
     {
         cameraMode = Mode
         vidstreamproperty.cameraModeEnabled(cameraMode)
+    }
+
+    function sendWhiteBalanceModeToUVC(isAutoEnabled){
+        getWhiteBalanceModeFromHID(isAutoEnabled)
     }
 
     function getFlipStatus(isHorizontal, isVertical)
