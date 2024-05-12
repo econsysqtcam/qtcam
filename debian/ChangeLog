@@ -1,4 +1,5 @@
-qtcam (26.0.14-0ubuntu1) focal; urgency=medium
+qtcam (26.0.15-0ubuntu1) focal; urgency=medium
+ *Added new HID controls for See3CAM_CU200.
  *BT709 Video recording support for See3CAM_CU31 and Bug fixing for See3CAM_CU84
  *Added new HID controls for See3CAM_CU83 and See3CAM_CU84.
  *Added new HID controls for See3CAM_CU31
@@ -143,5 +144,5 @@ qtcam (26.0.14-0ubuntu1) focal; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Mon 06 May 2024 22:42:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Sun 12 May 2024 22:56:01 +0530
 
