@@ -170,7 +170,6 @@ bool SEE3CAM_CU200::getRBGain()
                 minBGain       = fBGainMin.f;
                 maxBGain       = fBGainMax.f;
                 BGainStepValue = fBGainStepValue.f;
-
                 emit rGainPropertiesReceived(minRGain, maxRGain, RGainStepValue, currentRGain);
                 emit bGainPropertiesReceived(minBGain, maxBGain, BGainStepValue, currentBGain);
           }
@@ -370,6 +369,7 @@ bool SEE3CAM_CU200::getColorCorrectionMatrix()
             currentBr = fCurrentBr.f;
             currentBg = fCurrentBg.f;
             currentBb = fCurrentBb.f;
+
 
             emit currentRrValuesReceived(currentRr);
             emit currentRgValuesReceived(currentRg);
@@ -721,7 +721,6 @@ bool SEE3CAM_CU200::getTargetBrightness()
             g_in_packet_buf[1]  == CAMERA_CONTROL_ID_2 &&
             g_in_packet_buf[2]  == GET_TARGET_BRIGHTNESS &&
             g_in_packet_buf[10] == GET_SUCCESS) {
-
             targetBrightness = (g_in_packet_buf[3] << 8) | (g_in_packet_buf[4] << 0);
             min = (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
             max = (g_in_packet_buf[7] << 8) | (g_in_packet_buf[8] << 0);
@@ -1601,27 +1600,24 @@ bool SEE3CAM_CU200::getWhiteBalanceMode()
 
             whiteBalancePropertiesReceived(g_in_packet_buf[3], g_in_packet_buf[4], g_in_packet_buf[5]);
 
-            if(g_in_packet_buf[5] == PRESET)
-            {
-                //Initialize buffers
-                initializeBuffers();
+            //Initialize buffers
+            initializeBuffers();
 
-                g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
-                g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
-                g_out_packet_buf[3] = GET_WHITE_BALANCE_PRESET;
+            g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+            g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+            g_out_packet_buf[3] = GET_WHITE_BALANCE_PRESET;
 
-                // send request and get reply from camera
-                if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-                    if (g_in_packet_buf[6] == GET_FAIL) {
-                        return false;
-                    } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
-                        g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
-                        g_in_packet_buf[2] == GET_WHITE_BALANCE_PRESET &&
-                        g_in_packet_buf[6] == GET_SUCCESS) {
-                        emit whiteBalancePresetModeReceived(g_in_packet_buf[3]);
+            // send request and get reply from camera
+            if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+                if (g_in_packet_buf[6] == GET_FAIL) {
+                    return false;
+                } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
+                    g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
+                    g_in_packet_buf[2] == GET_WHITE_BALANCE_PRESET &&
+                    g_in_packet_buf[6] == GET_SUCCESS) {
+                    emit whiteBalancePresetModeReceived(g_in_packet_buf[3]);
 
-                        return true;
-                    }
+                    return true;
                 }
             }
 
@@ -1689,10 +1685,6 @@ bool SEE3CAM_CU200::setWhiteBalanceMode(WHITE_BALANCE_MODE mode, AUTO_WB_FEATURE
                             return true;
                         }
                     }
-                } else if(g_in_packet_buf[5] == COLOR_TEMPERATURE) {
-
-                } else if(g_in_packet_buf[5] == PRO_MODE) {
-
                 }
             }
             return true;

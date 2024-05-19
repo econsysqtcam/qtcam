@@ -91,9 +91,12 @@ Item{
     }
 
     Timer {
-        id: readStatisticsTimer
+        id: getCameraSettingsTimer
         interval: 500
         onTriggered: {
+            see3camcu200.getAutoExposureLimit()
+            see3camcu200.getAutoGainLimit()
+            see3camcu200.getTargetBrightness()
             see3camcu200.readStatistics()
             stop()
         }
@@ -162,11 +165,25 @@ Item{
             enableDisableAutoExposureControls(autoExposureSelect)
         }
         onAutoWhiteBalanceSelected:{
-            enableDisableAutoWhiteBalanceControls(autoWhiteBalanceSelect)
+
         }
         onMouseRightClicked:{
             if(expRoiManual.enabled && expRoiManual.checked){
                 see3camcu200.setROIAutoExposure(SEE3CAM_CU200.MANUAL_ROI, width, height, x, y, autoExpoWinSizeCombo.currentText)
+            }
+        }
+        onVideoResolutionChanged:{
+            getCameraSettingsTimer.start()
+        }
+        onPreviewFPSChanged:{
+            getCameraSettingsTimer.start()
+        }
+        onVideoColorSpaceChanged:{
+            getCameraSettingsTimer.start()
+        }
+        onExtensionTabVisible:{
+            if(visible){
+                see3camcu200.getWhiteBalanceMode()
             }
         }
     }
@@ -378,6 +395,75 @@ Item{
                     opacity: 0.50196078431373
                 }
 
+                Column
+                {
+                    spacing: 15
+
+                    RadioButton {
+                         id: colorTemperature
+                         exclusiveGroup: manualWbGroup
+                         checked: false
+                         text: "Color Temperature"
+                         activeFocusOnPress: true
+                         style: econRadioButtonStyle
+                         enabled: (manualWb.enabled && manualWb.checked) ? true : false
+                         opacity: (manualWb.enabled && manualWb.checked) ? 1 : 0.1
+                         tooltip: "It is used for white balancing the scene based on the temperature set by applying predefined R and B digital gain."
+                         onClicked: {
+                             setManualWhiteBalance()
+                         }
+                         Keys.onReturnPressed: {
+                             setManualWhiteBalance()
+                         }
+                     }
+
+                     Row{
+                         spacing: 35
+                         Slider {
+                             id: colorTempSlider
+                             activeFocusOnPress: true
+                             updateValueWhileDragging: false
+                             width: 150
+                             style:econSliderStyle
+                             opacity: (colorTemperature.enabled && colorTemperature.checked) ? 1 : 0.1
+                             enabled: (colorTemperature.enabled && colorTemperature.checked) ? true : false
+                             onValueChanged:  {
+                                 colorTempTextField.text = colorTempSlider.value
+                                 if(skipUpdateColorTemperature){
+
+                                     //Sending color temperature value to update white balance in UVC
+                                     root.sendColorTemperatureToUVC(colorTempSlider.value)
+
+                                     see3camcu200.setColorTemperature(colorTempSlider.value)
+
+                                     //To get color correction matrix and RB gain after color temperature is set
+                                     see3camcu200.getColorCorrectionMatrix()
+                                     see3camcu200.getRBGain()
+                                 }
+
+                                 skipUpdateColorTemperature = true
+                             }
+                         }
+                         TextField {
+                             id: colorTempTextField
+                             text: colorTempSlider.value
+                             font.pixelSize: 10
+                             font.family: "Ubuntu"
+                             smooth: true
+                             horizontalAlignment: TextInput.AlignHCenter
+                             style: econTextFieldStyle
+                             opacity: (colorTemperature.enabled && colorTemperature.checked) ? 1 : 0.1
+                             enabled: (colorTemperature.enabled && colorTemperature.checked) ? true : false
+                             validator: IntValidator {bottom: colorTempSlider.minimumValue; top: colorTempSlider.maximumValue}
+                             onTextChanged: {
+                                 if(text.length > 0){
+                                     colorTempSlider.value = colorTempTextField.text
+                                 }
+                             }
+                         }
+                     }
+                }
+
                 Column{
                     spacing: 15
                     ExclusiveGroup { id: manualWbGroup }
@@ -423,75 +509,6 @@ Item{
                             skipUpdateUIOnWBPresetMode = true
                         }
                     }
-                }
-
-                Column
-                {
-                    spacing: 15
-
-                    RadioButton {
-                         id: colorTemperature
-                         exclusiveGroup: manualWbGroup
-                         checked: false
-                         text: "Color Temperature"
-                         activeFocusOnPress: true
-                         style: econRadioButtonStyle
-                         enabled: (manualWb.enabled && manualWb.checked) ? true : false
-                         opacity: (manualWb.enabled && manualWb.checked) ? 1 : 0.1
-                         tooltip: "It is used for white balancing the scene based on the temperature set by applying predefined R and B digital gain."
-                         onClicked: {
-                             setManualWhiteBalance()
-                         }
-                         Keys.onReturnPressed: {
-                             setManualWhiteBalance()
-                         }
-                     }
-
-                     Row{
-                         spacing: 35
-                         Slider {
-                             id: colorTempSlider
-                             activeFocusOnPress: true
-                             updateValueWhileDragging: false
-                             width: 150
-                             style:econSliderStyle
-                             opacity: (colorTemperature.enabled && colorTemperature.checked) ? 1 : 0.1
-                             enabled: (colorTemperature.enabled && colorTemperature.checked) ? true : false
-                             onValueChanged:  {
-                                 colorTempTextField.text = colorTempSlider.value
-                                 if(skipUpdateColorTemperature){
-
-                                     //Sending color temperature value to update white balance in uVC
-                                     root.sendColorTemperatureToUVC(colorTempSlider.value)
-
-                                     see3camcu200.setColorTemperature(colorTempSlider.value)
-
-                                     //To get color correction matrix and RB gain after color temperature is set
-                                     see3camcu200.getColorCorrectionMatrix()
-                                     see3camcu200.getRBGain()
-                                 }
-
-                                 skipUpdateColorTemperature = true
-                             }
-                         }
-                         TextField {
-                             id: colorTempTextField
-                             text: colorTempSlider.value
-                             font.pixelSize: 10
-                             font.family: "Ubuntu"
-                             smooth: true
-                             horizontalAlignment: TextInput.AlignHCenter
-                             style: econTextFieldStyle
-                             opacity: (colorTemperature.enabled && colorTemperature.checked) ? 1 : 0.1
-                             enabled: (colorTemperature.enabled && colorTemperature.checked) ? true : false
-                             validator: IntValidator {bottom: colorTempSlider.minimumValue; top: colorTempSlider.maximumValue}
-                             onTextChanged: {
-                                 if(text.length > 0){
-                                     colorTempSlider.value = colorTempTextField.text
-                                 }
-                             }
-                         }
-                     }
                 }
 
                 RadioButton {
@@ -1243,13 +1260,11 @@ Item{
                             implicitWidth: 60
                             onClicked: {
                                 lowerLimtSetBtn.enabled = false
-                                setButtonClicked = true
                                 see3camcu200.setAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
                                 lowerLimtSetBtn.enabled = true
                             }
                             Keys.onReturnPressed: {
                                 lowerLimtSetBtn.enabled = false
-                                setButtonClicked = true
                                 see3camcu200.setAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
                                 lowerLimtSetBtn.enabled = true
                             }
@@ -1311,13 +1326,11 @@ Item{
                             implicitWidth: 60
                             onClicked: {
                                 upperLimitSetBtn.enabled = false
-                                setButtonClicked = true
                                 see3camcu200.setAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
                                 upperLimitSetBtn.enabled = true
                             }
                             Keys.onReturnPressed: {
                                 upperLimitSetBtn.enabled = false
-                                setButtonClicked = true
                                 see3camcu200.setAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
                                 upperLimitSetBtn.enabled = true
                             }
@@ -1956,6 +1969,7 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                 }
                 Row{
                     spacing: 40
+                    Layout.alignment: Qt.AlignCenter
                     CheckBox {
                         id: flipCtrlHorizotal
                         activeFocusOnPress : true
@@ -2104,15 +2118,13 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                    Text
                    {
                        id: exposureStatisticsTitle
-                       text: "Exposure(µs) [100 - 1000000]"
+                       text: "Exposure(µs)"
                        font.pixelSize: 14
                        font.family: "Ubuntu"
                        color: "#ffffff"
                        smooth: true
                        width: 80
                        wrapMode: Text.WordWrap
-                       enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
-                       opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                        ToolButton{
                            tooltip: "This control displays the calculated current exposure value in Auto exposure mode."
                            width: 200
@@ -3495,29 +3507,36 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
 
     function setAutoWhiteBalance() {
         if(wbContinious.checked == true) {
-            see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.AUTO_WB,SEE3CAM_CU200.WB_CONTINIOUS, 0, 0)
+            see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.AUTO_WB, SEE3CAM_CU200.WB_CONTINIOUS, 0, 0)
         } else if(wbSingleShot.checked == true) {
-            see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.AUTO_WB,SEE3CAM_CU200.WB_SINGLE_SHOT, 0, 0)
+            see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.AUTO_WB, SEE3CAM_CU200.WB_SINGLE_SHOT, 0, 0)
         }
         root.sendWhiteBalanceModeToUVC(true)
     }
 
     function setManualWhiteBalance() {
+
         root.sendWhiteBalanceModeToUVC(false)
+
         if(wbPreset.checked == true) {
-            setWbPresetMode()
             see3camcu200.getWhiteBalanceMode()
+            setWbPresetMode()
         } else if(colorTemperature.checked == true) {
-            see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.MANUAL_WB, 0, SEE3CAM_CU200.COLOR_TEMPERATURE, SEE3CAM_CU200.HZ_2300K)
+            see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.MANUAL_WB, 0, SEE3CAM_CU200.COLOR_TEMPERATURE, wbPresetCombo.currentText.toString())
 
             //Send get Request for color temperature
             see3camcu200.getColorTemperature()
+            see3camcu200.setColorTemperature(colorTempSlider.value)
+
         } else if(proMode.checked == true) {
-            see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.MANUAL_WB, 0, SEE3CAM_CU200.PRO_MODE, SEE3CAM_CU200.HZ_2300K)
+            see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.MANUAL_WB, 0, SEE3CAM_CU200.PRO_MODE, wbPresetCombo.currentText.toString())
 
             //Send get Request for colorCorrectionMatrix & RB Gain
             see3camcu200.getColorCorrectionMatrix()
+            see3camcu200.setColorCorrectionMatrix(spinBoxRr.value, spinBoxRg.value, spinBoxRb.value, spinBoxGr.value, spinBoxGg.value, spinBoxGb.value, spinBoxBr.value, spinBoxBg.value, spinBoxBb.value)
+
             see3camcu200.getRBGain()
+            see3camcu200.setRBGain(gainRSlider.value, gainBSlider.value)
         }
     }
 
@@ -3534,9 +3553,9 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
             see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.MANUAL_WB, 0, SEE3CAM_CU200.PRESET, SEE3CAM_CU200.CWF_4100K)
         } else if(wbPresetCombo.currentText.toString() === "D50(5000K)"){
             see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.MANUAL_WB, 0, SEE3CAM_CU200.PRESET, SEE3CAM_CU200.D50_5000K)
-        } else if(wbPresetCombo.currentText.toString() === "D60(6000K)"){           
+        } else if(wbPresetCombo.currentText.toString() === "D60(6000K)"){
             see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.MANUAL_WB, 0, SEE3CAM_CU200.PRESET, SEE3CAM_CU200.D60_6000K)
-        } else if(wbPresetCombo.currentText.toString() === "D65(6500K)"){           
+        } else if(wbPresetCombo.currentText.toString() === "D65(6500K)"){
             see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.MANUAL_WB, 0, SEE3CAM_CU200.PRESET, SEE3CAM_CU200.D65_6500K)
         }
 
@@ -3587,8 +3606,8 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
     }
 
     function getCurrentValuesFromCamera() {
+        getCameraSettingsTimer.start()
         see3camcu200.getGainMode()
-        see3camcu200.getAutoGainLimit()
         see3camcu200.getRBGain()
         see3camcu200.getColorCorrectionMatrix()
         see3camcu200.getBlackLevel()
@@ -3601,12 +3620,9 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         see3camcu200.getCameraMode()
         see3camcu200.getStrobeMode()
         see3camcu200.getOrientation()
-        see3camcu200.getAutoExposureLimit()
         see3camcu200.getAutoExpROIModeAndWindowSize()
-        see3camcu200.getTargetBrightness()
         see3camcu200.getAntiFlickerMode()
         see3camcu200.getWhiteBalanceMode()
-        readStatisticsTimer.start()
     }
     Component.onCompleted: {
         getCurrentValuesFromCamera()

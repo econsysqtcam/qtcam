@@ -79,6 +79,7 @@ Item {
     property bool usb3speed: false
     property bool enablePowerLineFreq : true
     property bool hdrModeSelected : false
+    property bool autoWhiteBalanceSelect : false
 
     property bool powerLineComboEnable
     // Skip doing things when exposure combo index changed calls when no selection of any camera
@@ -184,6 +185,14 @@ Item {
                 if(root.selectedDeviceEnumValue == CommonEnums.ECAM82_USB && visible)
                 {
                     root.cameraFilterControls(true)
+                }
+
+                if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200 && visible){
+                    if(autoWhiteBalanceSelect){
+                        autoSelect_wb.checked = true
+                    }else {
+                        autoSelect_wb.checked = false
+                    }
                 }
             }
             Item {
@@ -461,6 +470,7 @@ Item {
                                     white_balance_Slider.opacity = 0.1
                                     white_balance_Slider.enabled = false
                                     wbAutoChangeProperty = true
+                                    autoWhiteBalanceSelect = true
                                 }
                                 else
                                 {
@@ -475,6 +485,7 @@ Item {
                                         white_balance_Slider.opacity = 1
                                         white_balance_Slider.enabled = true
                                     }
+                                    autoWhiteBalanceSelect = false
                                 }
                             }
                         }
@@ -1324,9 +1335,9 @@ Item {
         }
         onGetWhiteBalanceModeFromHID:{
             if(isAutoEnabled){
-                autoSelect_wb.checked = true
+                autoWhiteBalanceSelect = true
             }else {
-                autoSelect_wb.checked = false
+                autoWhiteBalanceSelect = false
             }
         }
     }

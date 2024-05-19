@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.16
+---------------------------
+*Revert back video recording support(Bt.701 Standards) for See3CAM_CU31.
+
 Qtcam Application - 26.0.15
 ---------------------------
 *Added new HID controls for See3CAM_CU200.

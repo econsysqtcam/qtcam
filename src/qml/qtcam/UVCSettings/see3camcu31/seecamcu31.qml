@@ -421,7 +421,7 @@ Item {
                 Text
                 {
                     id: antiFlickerMode
-                    text: "--- Anti Flicker Mode ---"
+                    text: "--- Anti-Flicker Mode ---"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -507,7 +507,7 @@ Item {
                     Layout.alignment: Qt.AlignCenter
                     Text {
                         id: cameraModeText
-                        text: "--- Enhancement Mode ---"
+                        text: "--- Enhancement Modes ---"
                         font.pixelSize: 14
                         font.family: "Ubuntu"
                         color: "#ffffff"
