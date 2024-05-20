@@ -1,4 +1,5 @@
-qtcam (26.0.16-0ubuntu1) bionic; urgency=medium
+qtcam (26.0.17-0ubuntu1) bionic; urgency=medium
+ *Fixed white balance issue in See3CAM_CU200 & Bugs in See3CAM_CU83.
  *Revert back video recording support(Bt.701 Standards) for See3CAM_CU31.
  *Added new HID controls for See3CAM_CU200.
  *BT709 Video recording support for See3CAM_CU31 and Bug fixing for See3CAM_CU84
@@ -146,5 +147,5 @@ qtcam (26.0.16-0ubuntu1) bionic; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Mon 20 May 2024 00:22:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Mon 20 May 2024 22:11:01 +0530
 
