@@ -917,18 +917,6 @@ Item {
         messageDialog.open()
     }
 
-    function contrastUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
-    {
-        contrast.opacity = 1
-        contrast_Slider.enabled = true
-        contrast_value.opacity = 1
-        contrastControlId = controlID
-        contrast_Slider.minimumValue = controlMinValue
-        contrast_Slider.maximumValue = controlMaxValue
-        contrast_Slider.value = controlDefaultValue
-        contrast_Slider.stepSize = controlStepSize
-    }
-
     function currentFlipMirrorMode(mode)
     {
         switch(mode)

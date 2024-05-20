@@ -3092,8 +3092,15 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         onWhiteBalancePropertiesReceived:{
             if(mode === SEE3CAM_CU200.AUTO_WB) {
                 autoWb.checked = true
+                root.sendWhiteBalanceModeToUVC(true, false)
             } else if(mode === SEE3CAM_CU200.MANUAL_WB) {
                 manualWb.checked = true
+
+                if(manualFeature === SEE3CAM_CU200.COLOR_TEMPERATURE) {
+                    root.sendWhiteBalanceModeToUVC(false, true)
+                }else{
+                    root.sendWhiteBalanceModeToUVC(false, false)
+                }
             }
 
             if(autoFeature === SEE3CAM_CU200.WB_CONTINIOUS) {
@@ -3172,12 +3179,9 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         }
 
         onIndicateExposureValueRangeFailure:{
-            if(setButtonClicked){
-                displayMessageBox(title, text)
-                setButtonClicked = false
-                see3camcu200.getExposure()
-                see3camcu200.getAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
-            }
+            displayMessageBox(title, text)
+            see3camcu200.getExposure()
+            see3camcu200.getAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
         }
 
         onIndicateGainValueRangeFailure:{
@@ -3511,22 +3515,22 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         } else if(wbSingleShot.checked == true) {
             see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.AUTO_WB, SEE3CAM_CU200.WB_SINGLE_SHOT, 0, 0)
         }
-        root.sendWhiteBalanceModeToUVC(true)
+        root.sendWhiteBalanceModeToUVC(true, false)
     }
 
     function setManualWhiteBalance() {
 
-        root.sendWhiteBalanceModeToUVC(false)
-
         if(wbPreset.checked == true) {
             see3camcu200.getWhiteBalanceMode()
             setWbPresetMode()
+            root.sendWhiteBalanceModeToUVC(false, false)
         } else if(colorTemperature.checked == true) {
             see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.MANUAL_WB, 0, SEE3CAM_CU200.COLOR_TEMPERATURE, wbPresetCombo.currentText.toString())
 
             //Send get Request for color temperature
             see3camcu200.getColorTemperature()
             see3camcu200.setColorTemperature(colorTempSlider.value)
+            root.sendWhiteBalanceModeToUVC(false, true)
 
         } else if(proMode.checked == true) {
             see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.MANUAL_WB, 0, SEE3CAM_CU200.PRO_MODE, wbPresetCombo.currentText.toString())
@@ -3537,6 +3541,7 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
 
             see3camcu200.getRBGain()
             see3camcu200.setRBGain(gainRSlider.value, gainBSlider.value)
+            root.sendWhiteBalanceModeToUVC(false, false)
         }
     }
 

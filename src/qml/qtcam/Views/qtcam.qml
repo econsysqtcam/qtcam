@@ -97,7 +97,8 @@ Rectangle {
     //To disable manual white balance when the device is closed
     signal disableUVCSettings()
 
-    signal getWhiteBalanceModeFromHID(bool isAutoEnabled)
+    //To send white balance mode & Check wheather manual feature mode is enabled or not
+    signal getWhiteBalanceModeFromHID(bool isAutoEnabled, bool isColorTempEnabled)
 
     property int burstLength;
     property int cameraMode;
@@ -1882,8 +1883,8 @@ Rectangle {
         vidstreamproperty.cameraModeEnabled(cameraMode)
     }
 
-    function sendWhiteBalanceModeToUVC(isAutoEnabled){
-        getWhiteBalanceModeFromHID(isAutoEnabled)
+    function sendWhiteBalanceModeToUVC(isAutoEnabled, isColorTempEnabled){
+        getWhiteBalanceModeFromHID(isAutoEnabled, isColorTempEnabled)
     }
 
     function getFlipStatus(isHorizontal, isVertical)

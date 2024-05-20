@@ -60,15 +60,6 @@ Item{
             stop()
         }
     }
-    Timer {
-        id: getexposureCompTimer
-        interval: 500
-        onTriggered: {
-            see3camcu84.getExposureCompensation()
-            stop()
-        }
-    }
-
     // Used when selecting auto exposure in image Quality settings menu
     Timer {
         id: getAutoExpsoureControlValues
@@ -103,15 +94,12 @@ Item{
             enableDisableAutoExposureControls(autoExposureSelect)
         }
         onVideoResolutionChanged:{
-            getexposureCompTimer.start()
             getCamValuesTimer.start()
         }
         onPreviewFPSChanged:{
-            getexposureCompTimer.start()
             getCamValuesTimer.start()
         }
         onVideoColorSpaceChanged:{
-            getexposureCompTimer.start()
             getCamValuesTimer.start()
         }
         onSetExpCompensation:{
@@ -386,26 +374,7 @@ Item{
               columns: 2
               spacing: 20
               ExclusiveGroup { id: roiExpogroup }
-
-              RadioButton
-              {
-                  exclusiveGroup: roiExpogroup
-                  id: expRoiDisabled
-                  text: "Disable"
-                  activeFocusOnPress: true
-                  style: econRadioButtonStyle
-                  opacity: enabled ? 1 : 0.1
-
-                  // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
-                  // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
-                  // winSize is required only for manual mode
-                  onClicked: {
-                      setROIAutoExposure()
-                  }
-                  Keys.onReturnPressed: {
-                      setROIAutoExposure()
-                  }
-              }
+              Layout.alignment: Qt.AlignCenter
               RadioButton {
                   exclusiveGroup: roiExpogroup
                   id: expRoiFull
@@ -590,16 +559,6 @@ Item{
                 smooth: true
                 Layout.alignment: Qt.AlignCenter
                 opacity: 0.50196078431373
-            }
-
-            Text
-            {
-                id: frequency
-                text: "Frequency :"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
             }
             ComboBox
             {
@@ -1285,12 +1244,6 @@ Item{
                 }else
                     autoExpoWinSizeCombo.currentIndex = winSize-1
                 break
-            case SEE3CAM_CU84.AE_DISABLED:
-                expRoiDisabled.checked = true
-                //To disable comboBox in Disable mode
-                autoExpoWinSizeCombo.enabled = false
-                autoExpoWinSizeCombo.opacity = 0.1
-                break
         }
     }
 
@@ -1308,12 +1261,6 @@ Item{
             //To disable comboBox in manual roi mode
             autoExpoWinSizeCombo.enabled = true
             autoExpoWinSizeCombo.opacity = 1
-        }else if(expRoiDisabled.checked == true){
-            see3camcu84.setROIAutoExposure(SEE3CAM_CU84.AE_DISABLED, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
-
-            //To disable comboBox in disable mode
-            autoExpoWinSizeCombo.enabled = false
-            autoExpoWinSizeCombo.opacity = 0.1
         }
     }
 
@@ -1374,11 +1321,9 @@ Item{
 
             expRoiManual.enabled   = true
             expRoiFull.enabled     = true
-            expRoiDisabled.enabled = true
 
             expRoiManual.opacity   = 1
             expRoiFull.opacity     = 1
-            expRoiDisabled.opacity = 1
 
             if(expRoiManual.checked)
                 autoExpoWinSizeCombo.enabled = true
@@ -1396,11 +1341,9 @@ Item{
 
             expRoiManual.enabled   = false
             expRoiFull.enabled     = false
-            expRoiDisabled.enabled = false
 
             expRoiManual.opacity   = 0.1
             expRoiFull.opacity     = 0.1
-            expRoiDisabled.opacity = 0.1
 
             autoExpoWinSizeCombo.enabled = false
 
@@ -1414,7 +1357,7 @@ Item{
     }
 
     function enableFaceDetectEmbedData(){
-        if(see3camcu84.setFaceDetection(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){
+        if(see3camcu84.setFaceDetection(faceRectEnable.checked, overlayRect.checked, faceDetectEmbedData.checked)){
             if(faceDetectEmbedData.checked){
                 displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_CU84_Face_Detection for more details"))
             }

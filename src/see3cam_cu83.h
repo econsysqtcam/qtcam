@@ -90,7 +90,6 @@ public:
     enum autoExpRoiModes{
         FULL_ROI    = 0x01,
         MANUAL_ROI  = 0x02,
-        AE_DISABLED = 0x03
     };
     Q_ENUMS(autoExpRoiModes)
 
@@ -199,7 +198,7 @@ public slots:
     bool getFlashMode();
 
     bool getFaceDetectMode();
-    bool setFaceDetection(bool enableFaceDetectRect, bool embedData, bool overlayRect);
+    bool setFaceDetection(bool enableFaceDetectRect, bool overlayRect,  bool embedData);
 
     bool setToDefaultValues();
 };

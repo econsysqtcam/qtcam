@@ -99,7 +99,7 @@ Item{
             enableDisableAutoExposureControls(autoExposureSelect)
         }
         onSetHIDControls:{
-            see3camcu84.setFrameRateCtrlValue(frameRateSlider.value)
+            see3camcu83.setFrameRateCtrlValue(frameRateSlider.value)
         }
         onCreateIrWindow:{
             //To enable CheckBox when IR window is created by resolution switch
@@ -359,26 +359,7 @@ Item{
               columns: 2
               spacing: 20
               ExclusiveGroup { id: roiExpogroup }
-
-              RadioButton
-              {
-                  exclusiveGroup: roiExpogroup
-                  id: expRoiDisabled
-                  text: "Disable"
-                  activeFocusOnPress: true
-                  style: econRadioButtonStyle
-                  opacity: enabled ? 1 : 0.1
-
-                  // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
-                  // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
-                  // winSize is required only for manual mode
-                  onClicked: {
-                      setROIAutoExposure()
-                  }
-                  Keys.onReturnPressed: {
-                      setROIAutoExposure()
-                  }
-              }
+              Layout.alignment: Qt.AlignCenter
               RadioButton {
                   exclusiveGroup: roiExpogroup
                   id: expRoiFull
@@ -687,62 +668,10 @@ Item{
                 Layout.alignment: Qt.AlignCenter
                 opacity: 0.50196078431373
             }
-            Row
-            {
-                  spacing:90
-                  ExclusiveGroup { id: antiFlickerModegroup }
 
-                  RadioButton
-                  {
-                      exclusiveGroup: antiFlickerModegroup
-                      id: antiFlickerModeAuto
-                      text: "Auto"
-                      activeFocusOnPress: true
-                      style: econRadioButtonStyle
-                      opacity: enabled ? 1 : 0.1
-                      onClicked: {
-                          defaultValue.enabled = true
-                          see3camcu83.setAntiFlickerMode(See3Cam_CU83.MODE_AUTO);
-                      }
-                      Keys.onReturnPressed: {
-                          defaultValue.enabled = true
-                          see3camcu83.setAntiFlickerMode(See3Cam_CU83.MODE_AUTO);
-                      }
-                  }
-                  RadioButton
-                  {
-                      exclusiveGroup: antiFlickerModegroup
-                      id: antiFlickerModeManual
-                      text: "Manual"
-                      activeFocusOnPress: true
-                      style: econRadioButtonStyle
-                      opacity: enabled ? 1 : 0.1
-                      onClicked: {
-                          defaultValue.enabled = true
-                          setAntiFlickerMode()
-                      }
-                      Keys.onReturnPressed: {
-                          defaultValue.enabled = true
-                          setAntiFlickerMode()
-                      }
-                  }
-            }
-
-            Text
-            {
-                id: frequency
-                text: "Frequency :"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-                opacity: (antiFlickerModeManual.enabled && antiFlickerModeManual.checked) ? 1 : 0.1
-            }
             ComboBox
             {
                 id: antiFlickerCombo
-                enabled: (antiFlickerModeManual.enabled && antiFlickerModeManual.checked) ? true : false
-                opacity: (antiFlickerModeManual.enabled && antiFlickerModeManual.checked) ? 1 : 0.1
                 model: ListModel
                        {
                             ListElement { text: "AUTO" }
@@ -1218,27 +1147,25 @@ Item{
 
         onAntiFlickerModeRecieved:
         {
-            switch(antiFlickerVal)
-            {
+            switch(antiFlickerVal){
                 case See3Cam_CU83.MODE_AUTO:
-                    antiFlickerModeAuto.checked = true
-                    break
-                case See3Cam_CU83.MODE_50Hz:
-                    antiFlickerModeManual.checked = true
                     skipUpdateUIOnAntiFlickerMode = false
                     antiFlickerCombo.currentIndex = 0
                     skipUpdateUIOnAntiFlickerMode = true
                     break
-                case See3Cam_CU83.MODE_60Hz:
-                    antiFlickerModeManual.checked = true
+                case See3Cam_CU83.MODE_50Hz:
                     skipUpdateUIOnAntiFlickerMode = false
                     antiFlickerCombo.currentIndex = 1
                     skipUpdateUIOnAntiFlickerMode = true
                     break
-                case See3Cam_CU83.MODE_DISABLE://need to check the flags
-                    antiFlickerModeManual.checked = true
+                case See3Cam_CU83.MODE_60Hz:
                     skipUpdateUIOnAntiFlickerMode = false
                     antiFlickerCombo.currentIndex = 2
+                    skipUpdateUIOnAntiFlickerMode = true
+                    break
+                case See3Cam_CU83.MODE_DISABLE:
+                    skipUpdateUIOnAntiFlickerMode = false
+                    antiFlickerCombo.currentIndex = 3
                     skipUpdateUIOnAntiFlickerMode = true
                     break
              }
@@ -1325,19 +1252,19 @@ Item{
             if((faceDetectEmbedData.checked == true) && (overlayRect.checked == true)){
                 see3camcu83.setFaceDetection(true, true, true)
             }else if((faceDetectEmbedData.checked == true) && (overlayRect.checked == false)){
-                see3camcu83.setFaceDetection(true, true, false)
-            }else if((faceDetectEmbedData.checked == false) && (overlayRect.checked == true)){
                 see3camcu83.setFaceDetection(true, false, true)
+            }else if((faceDetectEmbedData.checked == false) && (overlayRect.checked == true)){
+                see3camcu83.setFaceDetection(true, true, false)
             }else{
                 see3camcu83.setFaceDetection(true, false, false)
             }
-        }else if(faceRectDisable.checked == false){
+        }else if(faceRectDisable.checked == true){
             if((faceDetectEmbedData.checked == true) && (overlayRect.checked == true)){
                 see3camcu83.setFaceDetection(false, true, true)
             }else if((faceDetectEmbedData.checked == true) && (overlayRect.checked == false)){
-                see3camcu83.setFaceDetection(false, true, false)
-            }else if((faceDetectEmbedData.checked == false) && (overlayRect.checked == true)){
                 see3camcu83.setFaceDetection(false, false, true)
+            }else if((faceDetectEmbedData.checked == false) && (overlayRect.checked == true)){
+                see3camcu83.setFaceDetection(false, true, false)
             }else{
                 see3camcu83.setFaceDetection(false, false, false)
             }
@@ -1345,7 +1272,7 @@ Item{
     }
 
     function enableFaceDetectEmbedData(){
-        if(see3camcu83.setFaceDetection(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){
+        if(see3camcu83.setFaceDetection(faceRectEnable.checked, overlayRect.checked, faceDetectEmbedData.checked)){
             if(faceDetectEmbedData.checked){
                 displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_CU83_Face_Detection for more details"))
             }
@@ -1365,12 +1292,6 @@ Item{
             //To disable comboBox in full roi mode
             autoExpoWinSizeCombo.enabled = true
             autoExpoWinSizeCombo.opacity = 1
-        }else if(expRoiDisabled.checked == true){
-            see3camcu83.setROIAutoExposure(See3Cam_CU83.AE_DISABLED, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
-
-            //To disable comboBox in full roi mode
-            autoExpoWinSizeCombo.enabled = false
-            autoExpoWinSizeCombo.opacity = 0.1
         }
     }
 
@@ -1398,12 +1319,6 @@ Item{
                     autoExpoWinSizeCombo.currentIndex = 0
                 }else
                     autoExpoWinSizeCombo.currentIndex = winSize-1
-                break
-            case See3Cam_CU83.AE_DISABLED:
-                expRoiDisabled.checked = true
-                //To disable comboBox in Disable mode
-                autoExpoWinSizeCombo.enabled = false
-                autoExpoWinSizeCombo.opacity = 0.1
                 break
         }
     }
@@ -1483,7 +1398,6 @@ Item{
 
             expRoiManual.enabled = true
             expRoiFull.enabled = true
-            expRoiDisabled.enabled = true
 
             if(expRoiManual.checked){
                 autoExpoWinSizeCombo.enabled = true
@@ -1493,7 +1407,6 @@ Item{
 
             expRoiManual.opacity = 1
             expRoiFull.opacity = 1
-            expRoiDisabled.opacity = 1
 
             exposureCompValue.enabled = true
             exposureCompValue.opacity = 1
@@ -1509,9 +1422,6 @@ Item{
 
             expRoiFull.enabled = false
             expRoiFull.opacity = 0.1
-
-            expRoiDisabled.enabled = false
-            expRoiDisabled.opacity = 0.1
 
             autoExpoWinSizeCombo.enabled = false
             exposureCompValue.enabled = false

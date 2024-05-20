@@ -80,6 +80,7 @@ Item {
     property bool enablePowerLineFreq : true
     property bool hdrModeSelected : false
     property bool autoWhiteBalanceSelect : false
+    property bool colorTempEnabled : false
 
     property bool powerLineComboEnable
     // Skip doing things when exposure combo index changed calls when no selection of any camera
@@ -187,7 +188,11 @@ Item {
                     root.cameraFilterControls(true)
                 }
 
-                if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200 && visible){
+                /*
+                  Once the Image quality settings is visible, It will sets the white balance mode using
+                  the "autoWhiteBalanceSelect" flag emitted from the extension settings
+                */
+                if(root.selectedDeviceEnumValue === CommonEnums.SEE3CAM_CU200 && visible){
                     if(autoWhiteBalanceSelect){
                         autoSelect_wb.checked = true
                     }else {
@@ -471,21 +476,42 @@ Item {
                                     white_balance_Slider.enabled = false
                                     wbAutoChangeProperty = true
                                     autoWhiteBalanceSelect = true
+
+                                    colorTempEnabled = true
                                 }
                                 else
                                 {
-                                    root.logInfo("White Balance set to Manual Mode")
-                                    root.autoWhiteBalanceSelected(false)
-                                    if(wbAutoChangeProperty){
-                                        root.changeCameraSettings(whiteBalanceControl_auto_Id,0)
-                                        // When click hardware default, selecting manual whitebalance, set to default wb.
-                                        root.changeCameraSettings(whiteBalanceControlId,white_balance_Slider.value.toString())
+                                    if(root.selectedDeviceEnumValue === CommonEnums.SEE3CAM_CU200){
+                                        if(colorTempEnabled){
+                                            root.logInfo("White Balance set to Manual Mode")
+                                            root.autoWhiteBalanceSelected(false)
+                                            if(wbAutoChangeProperty){
+                                                root.changeCameraSettings(whiteBalanceControl_auto_Id,0)
+                                                // When click hardware default, selecting manual whitebalance, set to default wb.
+                                                root.changeCameraSettings(whiteBalanceControlId,white_balance_Slider.value.toString())
+                                            }
+                                            white_balance_Slider.opacity = 1
+                                            white_balance_Slider.enabled = true
+                                            autoWhiteBalanceSelect = false
+
+                                        } else {
+                                            white_balance_Slider.opacity = 1
+                                            white_balance_Slider.enabled = true
+                                        }
+                                    } else {
+                                        root.logInfo("White Balance set to Manual Mode")
+                                        root.autoWhiteBalanceSelected(false)
+                                        if(wbAutoChangeProperty){
+                                            root.changeCameraSettings(whiteBalanceControl_auto_Id,0)
+                                            // When click hardware default, selecting manual whitebalance, set to default wb.
+                                            root.changeCameraSettings(whiteBalanceControlId,white_balance_Slider.value.toString())
+                                        }
+                                        if(root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM){
+                                            white_balance_Slider.opacity = 1
+                                            white_balance_Slider.enabled = true
+                                        }
+                                        autoWhiteBalanceSelect = false
                                     }
-                                    if(root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM){
-                                        white_balance_Slider.opacity = 1
-                                        white_balance_Slider.enabled = true
-                                    }
-                                    autoWhiteBalanceSelect = false
                                 }
                             }
                         }
@@ -1334,11 +1360,15 @@ Item {
             white_balance_Slider.opacity = 0.1
         }
         onGetWhiteBalanceModeFromHID:{
+            //To store the Enable/Disable status of White balance mode
             if(isAutoEnabled){
                 autoWhiteBalanceSelect = true
             }else {
                 autoWhiteBalanceSelect = false
             }
+
+            //To store the Enable/Disable status of color temperature
+            colorTempEnabled = isColorTempEnabled
         }
     }
 

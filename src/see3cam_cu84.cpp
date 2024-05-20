@@ -872,6 +872,7 @@ bool SEE3CAM_CU84::getFaceDetectMode()
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_LSB_SEE3CAM_CU84 &&
             g_in_packet_buf[2] == GET_FACE_DETECTION &&
             g_in_packet_buf[7] == GET_SUCCESS) {
+
             emit faceDetectModeValueReceived(g_in_packet_buf[3], g_in_packet_buf[4], g_in_packet_buf[5]);
             return true;
         }

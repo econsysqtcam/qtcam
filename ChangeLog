@@ -1,3 +1,8 @@
+Qtcam Application - 26.0.17
+---------------------------
+*Fixed white balance issue in See3CAM_CU200.
+*Bug fix for See3CAM_CU83 - Face detection, Frame rate control, Anti-Flicker mode & Auto exposure ROI
+
 Qtcam Application - 26.0.16
 ---------------------------
 *Revert back video recording support(Bt.701 Standards) for See3CAM_CU31.

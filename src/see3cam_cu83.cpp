@@ -689,7 +689,7 @@ bool SEE3CAM_CU83::getWakeOnMotion()
  * @param overlayRect - Enable / Disable overlay Rectangle
  * @return true/false
  */
-bool SEE3CAM_CU83::setFaceDetection(bool isEnableFaceDetect, bool embedData, bool overlayRect){
+bool SEE3CAM_CU83::setFaceDetection(bool isEnableFaceDetect, bool overlayRect,  bool embedData){
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
