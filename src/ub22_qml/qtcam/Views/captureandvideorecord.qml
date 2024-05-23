@@ -149,14 +149,14 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     root.keyEventFiltering = true
-                    if((mouseX > (camera_selected.paintedWidth/2)) && !record_stop.visible) {
-                        video_selected.visible = true;
-                        camera_selected.visible = false;
-                        capture.visible = false
-                        record.visible = true
-                        //Added by sankari - When this mouse area clicked, highlight video button
-                        video_btn.forceActiveFocus()
-                    }
+//                    if((mouseX > (camera_selected.paintedWidth/2)) && !record_stop.visible) {
+//                        video_selected.visible = true;
+//                        camera_selected.visible = false;
+//                        capture.visible = false
+//                        record.visible = true
+//                        //Added by sankari - When this mouse area clicked, highlight video button
+//                        video_btn.forceActiveFocus()
+//                    }
                 }
             }
         }
@@ -213,7 +213,7 @@ Item {
             opacity: enabled ? 1 : 0.5
             activeFocusOnPress: true
             y: -3
-            tooltip: "Click this icon/preview to capture photo"
+            tooltip: "Click this icon/preview to capture photo and Video Recording is not supported for Ubuntu 22.04 as of now"
             style: ButtonStyle {
                 background: Rectangle {
                     border.width: control.activeFocus ? 1 : 0
@@ -254,7 +254,7 @@ Item {
                 }
             }
             Keys.onReturnPressed: {
-                root.videoRecordBegin()
+//                root.videoRecordBegin()
             }
         }
         Button {
@@ -279,7 +279,7 @@ Item {
                 }
             }
             Keys.onReturnPressed: {
-                root.videoSaveVideo()
+//                root.videoSaveVideo()
             }
         }
     }
@@ -334,10 +334,10 @@ Item {
         function onVideoRecordBtnEnable(enable)
         {
             //Disabling video recording as of now
-            record.enabled = true
-            record.opacity = 1
-            if(recordBtnVisible)
-                root.keyEventFiltering = true
+            record.enabled = false
+            record.opacity = 0.1
+//            if(recordBtnVisible)
+//                root.keyEventFiltering = true
         }
     }
 
@@ -362,13 +362,13 @@ Item {
     }
 
     function videoBtnSelected() {
-        if(!record_stop.visible) {
-            root.keyEventFiltering = true
-            video_selected.visible = true;
-            camera_selected.visible = false;
-            capture.visible = false
-            record.visible = true
-        }
+//        if(!record_stop.visible) {
+//            root.keyEventFiltering = true
+//            video_selected.visible = true;
+//            camera_selected.visible = false;
+//            capture.visible = false
+//            record.visible = true
+//        }
     }
     function updateHours() {
         hours = hours + 1

@@ -1249,6 +1249,8 @@ bool SEE3CAM_CU200::setAutoExposureLimit(uint lowerLimit, uint upperLimit)
             g_in_packet_buf[2]  == SET_AUTO_EXPOSURE_LIMIT &&
             g_in_packet_buf[11] == GET_SUCCESS) {
 
+            emit indicateCommandStatus("Success", "Set Exposure Limit Success");
+
             return true;
         }
     }

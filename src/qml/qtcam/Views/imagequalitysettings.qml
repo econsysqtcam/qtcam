@@ -1224,7 +1224,7 @@ Item {
                                         root.changeCameraSettings(focusControlId,focus_Slider.value)
                                     }
                                 }
-                focusAutoChangeProperty = true
+				focusAutoChangeProperty = true
                             }
                         }
                     }
@@ -1502,7 +1502,7 @@ Item {
             focusValueChangeProperty = false
             focusAutoChangeProperty = false
             powerLineComboEnable = false
-        // Skip doing things when exposure combo index changed calls when no selection of any camera
+	    // Skip doing things when exposure combo index changed calls when no selection of any camera
             exposureComboEnable = false
             ledModeComboEnable = false
         }
@@ -2183,10 +2183,10 @@ Item {
             focusValueChangeProperty = true
             focusAutoChangeProperty = true
             video_capture_filter_Child.visible = true
-        // To avoid setting exposure when get the control values
-        exposureComboEnable = false
+	    // To avoid setting exposure when get the control values
+	    exposureComboEnable = false
             root.enableCameraControls();
-        exposureComboEnable = true
+	    exposureComboEnable = true
         } else {
             video_capture_filter_Child.visible = false
             video_capture_filter_Child.focus = false

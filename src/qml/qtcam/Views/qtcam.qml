@@ -70,7 +70,7 @@ Rectangle {
     signal sendCameraModeToQml(int cameraMode)
 
     //signal to enable/disable wakeonMotion
-    signal wakeOnMotionSettings(bool isEnable)
+    signal wakeOnMotionSettings(bool sEnable)
 
     //signal to set exposure compensation while still capture
     signal setExpCompensation();
@@ -1177,7 +1177,7 @@ Rectangle {
             m_Snap = false
 
             //Only for See3CAM_24CUG - Sending trigger key when device is in Master mode
-            if(((selectedDeviceEnumValue == CommonEnums.SEE3CAM_24CUG) || selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU84) && !disableCaptureImage && !getTriggerMode)
+            if((selectedDeviceEnumValue === CommonEnums.SEE3CAM_24CUG) && !disableCaptureImage && !getTriggerMode)
             {
                 sendingTriggerKey()
             }

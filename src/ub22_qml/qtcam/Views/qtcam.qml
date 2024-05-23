@@ -36,6 +36,7 @@ import cameraenum 1.0
 import econ.camera.uvcsettings 1.0
 import econ.camera.qimagerenderer 1.0
 import econ.camera.see3camcu83 1.0
+import econ.camera.see3camcu200 1.0
 
 Rectangle {
     id: root
@@ -74,6 +75,11 @@ Rectangle {
     //signal to set exposure compensation while still capture
     signal setExpCompensation();
 
+    //To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
+    signal updateCrossStillCaptureProperty(bool isEnable);
+
+    signal setHIDControls()
+
     //signal close IR window after unplugging the device
     signal windowCloseAfterUnplug()
 
@@ -92,6 +98,11 @@ Rectangle {
     //signal to minimize ir window
     signal minimizeSecondaryWindow()
 
+    //To disable manual white balance when the device is closed
+    signal disableUVCSettings()
+
+    //To send white balance mode & Check wheather manual feature mode is enabled or not
+    signal getWhiteBalanceModeFromHID(bool isAutoEnabled, bool isColorTempEnabled)
 
     property int burstLength;
     property int cameraMode;
@@ -148,7 +159,7 @@ Rectangle {
     property bool stillCaptureChildVisible: false
     property bool audioCaptureChildVisible: false
     property bool videoSettingsChildVisible: false
-
+    property bool isTriggerMode: false
 
     property bool disableAudio: false
 
@@ -295,7 +306,9 @@ Rectangle {
     signal getGammaFromHID(int gammaFromHID);
     signal getColorTempFromHID(int colorTempFromHID);
     signal getExposureFromHID(int exposureFromHID);
-    signal getExposureStatusFromHID(bool isAutoEnable, int exposure)
+    signal getExposureStatusFromHID(bool isAutoEnable, int exposure);
+    signal setFpsZeroOnTriggerMode();
+    signal getFlipMode();
 
     width:Screen.width
     height:Screen.height
@@ -549,15 +562,18 @@ Rectangle {
             camproperty.logCriticalWriter(_text.toString())
         }
 
+        onSendFps: {
+            statusText = "Current FPS: " + 1 + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
+        }
+
         onAverageFPS: {
-            if(device_box.opacity === 0.5)
-            {
+            if(device_box.opacity === 0.5){
                 if(!(vidstreamproperty.width == 320 && vidstreamproperty.height ==240)){
                     statusText = "Recording..." + " " + "Current FPS: " + fps + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
                 }
-            }
-            else
-            {
+            }else if(isTriggerMode){
+                statusText = " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
+            }else{
                 statusText = "Current FPS: " + fps + " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
             }
         }
@@ -858,6 +874,7 @@ Rectangle {
             onCurrentIndexChanged: {
                 if(currentIndex.toString() != "-1" && currentIndex.toString() != "0") {
                     if(oldIndex!=currentIndex) {
+                        disableUVCSettings()
                         seqAni.restart
                         // when switching camera make "exposureAutoAvailable" as false
                         imageSettingsRootObject.exposureAutoAvailable = false
@@ -871,7 +888,7 @@ Rectangle {
                         // Added by Sankari: 12 Feb 2018 : stop Getting key from camera.
                         keyEvent.stopGetKeyFromCamera()
 
-                        //To enumerate audio settings
+                        //To Enumerate Audio devices
                         enumerateAudioSettings();
 
                         cameraSelected()
@@ -925,6 +942,11 @@ Rectangle {
                         vidstreamproperty.masterModeEnabled()
                         // Moved by Sankari: Mar 20, 2019. For storage camera, before start preview, we need to set ondemand mode.
                         createExtensionUnitQml(selectedDeviceEnumValue) //setting ondemand mode in fscamcu135 qml oncompleted.
+                    
+  			  if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200) {
+                            getFlipMode()
+                        }
+
                         if(ecam83USBstate !=2)     //If PIN2 is streaming, PIN1(H264) should not stream.
                         {
                         vidstreamproperty.startAgain() // Then start preview
@@ -1156,7 +1178,13 @@ Rectangle {
         id: keyEvent
         onCameraTriggerKeyReceived:{
             m_Snap = false
-            if(!disableCaptureImage){ // disable capture by smile trigger key or external key is pressed when recording video
+
+            //Only for See3CAM_24CUG - Sending trigger key when device is in Master mode
+            if((selectedDeviceEnumValue === CommonEnums.SEE3CAM_24CUG) && !disableCaptureImage && !getTriggerMode)
+            {
+                sendingTriggerKey()
+            }
+            else if(!disableCaptureImage){ // disable capture by smile trigger key or external key is pressed when recording video
                 takeScreenShot(true)
             }
         }
@@ -1331,10 +1359,13 @@ Rectangle {
 
 
     function stopUpdatePreviewInTriggerMode(){
+        isTriggerMode = true
+        statusText = " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
         vidstreamproperty.triggerModeEnabled()
     }
 
     function startUpdatePreviewInMasterMode(){
+        isTriggerMode = false
         vidstreamproperty.masterModeEnabled()
     }
 
@@ -1357,6 +1388,7 @@ Rectangle {
             vidstreamproperty.enabled = true
             keyEventFiltering = false
         }
+        isTriggerMode = false
         vidstreamproperty.masterModeEnabled()
         if(JS.videoCaptureFormat !== JS.stillCaptureFormat  || JS.stillCaptureResolution !== JS.videoCaptureResolution)
         {
@@ -1530,7 +1562,7 @@ Rectangle {
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_24CUG) {
             see3cam = Qt.createComponent("../UVCSettings/see3cam24cug/see3cam_24cug.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU81) {
-                    see3cam = Qt.createComponent("../UVCSettings/see3cam_cu81/see3cam_cu81.qml").createObject(root)
+            see3cam = Qt.createComponent("../UVCSettings/see3cam_cu81/see3cam_cu81.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.ECAM51A_USB || selectedDeviceEnumValue == CommonEnums.ECAM51B_USB ) {
             see3cam = Qt.createComponent("../UVCSettings/ecam51_USB/ecam51_usb.qml").createObject(root)
             see3cam.selectedDeviceEnumVal(selectedDeviceEnumValue)
@@ -1590,6 +1622,7 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu84/see3camcu84.qml").createObject(root)
         }
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200) {
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu200/see3camcu200.qml").createObject(root)
         }
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU31) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu31/seecamcu31.qml").createObject(root)
@@ -1663,6 +1696,7 @@ Rectangle {
         case CommonEnums.ECAM_512USB:    //Added by Sushanth.S
         case CommonEnums.SEE3CAM_50CUG:  //Added by Sushanth.S
         case CommonEnums.SEE3CAM_CU84:   //Added by Sushanth.S
+        case CommonEnums.SEE3CAM_CU200:  //Added By Sushanth.S
         case CommonEnums.SEE3CAM_CU31:   //Added By Sushanth.S
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
@@ -1851,10 +1885,26 @@ Rectangle {
         vidstreamproperty.cameraModeEnabled(cameraMode)
     }
 
+    function sendWhiteBalanceModeToUVC(isAutoEnabled, isColorTempEnabled){
+        getWhiteBalanceModeFromHID(isAutoEnabled, isColorTempEnabled)
+    }
+
+
     function minimizeWindow()
     {
       // Emit the signal to minimize the secondary window
       minimizeSecondaryWindow()
+    }
+
+    function getFlipStatus(isHorizontal, isVertical)
+    {
+        vidstreamproperty.sendFlipStatus(isHorizontal, isVertical)
+    }
+
+    //Added by Sushanth
+    function sendingTriggerKey()
+    {
+        vidstreamproperty.isTriggerKeyReceived(true)
     }
 
     //function to create & destroy IR window via CheckBox

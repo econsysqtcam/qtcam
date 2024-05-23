@@ -1260,11 +1260,13 @@ Item{
                             implicitWidth: 60
                             onClicked: {
                                 lowerLimtSetBtn.enabled = false
+                                setButtonClicked = true
                                 see3camcu200.setAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
                                 lowerLimtSetBtn.enabled = true
                             }
                             Keys.onReturnPressed: {
                                 lowerLimtSetBtn.enabled = false
+                                setButtonClicked = true
                                 see3camcu200.setAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
                                 lowerLimtSetBtn.enabled = true
                             }
@@ -1326,11 +1328,13 @@ Item{
                             implicitWidth: 60
                             onClicked: {
                                 upperLimitSetBtn.enabled = false
+                                setButtonClicked = true
                                 see3camcu200.setAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
                                 upperLimitSetBtn.enabled = true
                             }
                             Keys.onReturnPressed: {
                                 upperLimitSetBtn.enabled = false
+                                setButtonClicked = true
                                 see3camcu200.setAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
                                 upperLimitSetBtn.enabled = true
                             }
@@ -2252,7 +2256,7 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                    smooth: true
                    Layout.alignment: Qt.AlignCenter
                    ToolButton{
-                       tooltip: "This control displays the calculated current digital gain of B channel."
+                       tooltip: "This control displays the calculated current 3x3 matrix of RGB channel."
                        width: 200
                        opacity: 0
                    }
@@ -3179,9 +3183,13 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         }
 
         onIndicateExposureValueRangeFailure:{
-            displayMessageBox(title, text)
-            see3camcu200.getExposure()
-            see3camcu200.getAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
+            if(setButtonClicked){
+                setButtonClicked = false
+
+                displayMessageBox(title, text)
+                see3camcu200.getExposure()
+                see3camcu200.getAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
+            }
         }
 
         onIndicateGainValueRangeFailure:{

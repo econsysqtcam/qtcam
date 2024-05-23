@@ -36,6 +36,11 @@ Item{
     property int expoCompMin: 50
     property int expoCompMax: 1000000
 
+    property int qFactorMin: 10
+    property int qFactorMax: 96
+
+    property bool skipUpdateUIQFactor           : false
+
     property bool skipUpdateUIDenoise: false
     property bool skipUpdateUIOnExpWindowSize: false
     property bool skipUpdateUIFrameRate: false
@@ -55,15 +60,6 @@ Item{
             stop()
         }
     }
-    Timer {
-        id: getexposureCompTimer
-        interval: 500
-        onTriggered: {
-            see3camcu84.getExposureCompensation()
-            stop()
-        }
-    }
-
     // Used when selecting auto exposure in image Quality settings menu
     Timer {
         id: getAutoExpsoureControlValues
@@ -98,22 +94,22 @@ Item{
             enableDisableAutoExposureControls(autoExposureSelect)
         }
         function onVideoResolutionChanged(){
-            getexposureCompTimer.start()
             getCamValuesTimer.start()
         }
         function onPreviewFPSChanged(){
-            getexposureCompTimer.start()
             getCamValuesTimer.start()
         }
         function onVideoColorSpaceChanged(){
-            getexposureCompTimer.start()
             getCamValuesTimer.start()
         }
         function onSetExpCompensation(){
             see3camcu84.setExposureCompensation(exposureCompValue.text)
         }
-        function onMouseRightClicked(x, y, width, height){
-            if(autoexpManual.enabled && autoexpManual.checked){
+        function onSetHIDControls(){
+            see3camcu84.setFrameRateCtrlValue(frameRateSlider.value)
+        }
+        function onMouseRightClicked(x, Y, width, height){
+            if(expRoiManual.enabled && expRoiManual.checked){
                 see3camcu84.setROIAutoExposure(SEE3CAM_CU84.MANUAL_ROI, width, height, x, y, autoExpoWinSizeCombo.currentText)
             }
         }
@@ -129,7 +125,7 @@ Item{
         style: econscrollViewStyle
 
     Item{
-        height: 1050
+        height: 1400
         ColumnLayout
         {
             x:2
@@ -362,7 +358,8 @@ Item{
             }
         }
 
-        Text {
+        Text
+        {
             id: roiAutoExpMode
             text: "--- ROI - Auto Exposure ---"
             font.pixelSize: 14
@@ -372,14 +369,15 @@ Item{
             Layout.alignment: Qt.AlignCenter
             opacity: 0.50196078431373
         }
-
-        ColumnLayout{
-              spacing:15
+        Grid
+        {
+              columns: 2
+              spacing: 20
               ExclusiveGroup { id: roiExpogroup }
-
+              Layout.alignment: Qt.AlignCenter
               RadioButton {
                   exclusiveGroup: roiExpogroup
-                  id: autoexpFull
+                  id: expRoiFull
                   text: "Full"
                   activeFocusOnPress: true
                   style: econRadioButtonStyle
@@ -388,51 +386,44 @@ Item{
                   // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
                   // winSize is required only for manual mode
                   onClicked: {
-                      see3camcu84.setROIAutoExposure(SEE3CAM_CU84.FULL_ROI, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
-                      autoExpoWinSizeCombo.enabled = false
-                      autoExpoWinSizeCombo.opacity = 0.1
+                      setROIAutoExposure()
                   }
                   Keys.onReturnPressed: {
-                      see3camcu84.setROIAutoExposure(SEE3CAM_CU84.FULL_ROI, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
-                      autoExpoWinSizeCombo.enabled = false
-                      autoExpoWinSizeCombo.opacity = 0.1
+                      setROIAutoExposure()
                   }
               }
               RadioButton {
                   exclusiveGroup: roiExpogroup
-                  id: autoexpManual
+                  id: expRoiManual
                   text: "Manual"
                   activeFocusOnPress: true
                   style: econRadioButtonStyle
                   opacity: enabled ? 1 : 0.1
+
                   onClicked: {
-                      see3camcu84.setROIAutoExposure(SEE3CAM_CU84.MANUAL_ROI, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
-                      autoExpoWinSizeCombo.enabled = true
-                      autoExpoWinSizeCombo.opacity = 1
+                      setROIAutoExposure()
                   }
                   Keys.onReturnPressed: {
-                      see3camcu84.setROIAutoExposure(SEE3CAM_CU84.MANUAL_ROI, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
-                      autoExpoWinSizeCombo.enabled = true
-                      autoExpoWinSizeCombo.opacity = 1
+                      setROIAutoExposure()
                   }
               }
         }
-
         ComboBox
         {
             id: autoExpoWinSizeCombo
-            enabled: (autoexpManual.enabled && autoexpManual.checked) ? true : false
-            opacity: (autoexpManual.enabled && autoexpManual.checked) ? 1 : 0.1
-            model: ListModel {
-                ListElement { text: "1" }
-                ListElement { text: "2" }
-                ListElement { text: "3" }
-                ListElement { text: "4" }
-                ListElement { text: "5" }
-                ListElement { text: "6" }
-                ListElement { text: "7" }
-                ListElement { text: "8" }
-            }
+            enabled: (expRoiManual.checked && expRoiManual.enabled) ? true : false
+            opacity: (expRoiManual.checked && expRoiManual.enabled) ? 1 : 0.1
+            model: ListModel
+                   {
+                        ListElement { text: "1" }
+                        ListElement { text: "2" }
+                        ListElement { text: "3" }
+                        ListElement { text: "4" }
+                        ListElement { text: "5" }
+                        ListElement { text: "6" }
+                        ListElement { text: "7" }
+                        ListElement { text: "8" }
+                    }
             activeFocusOnPress: true
             style: econComboBoxStyle
             onCurrentIndexChanged: {
@@ -569,16 +560,6 @@ Item{
                 Layout.alignment: Qt.AlignCenter
                 opacity: 0.50196078431373
             }
-
-            Text
-            {
-                id: frequency
-                text: "Frequency :"
-                font.pixelSize: 14
-                font.family: "Ubuntu"
-                color: "#ffffff"
-                smooth: true
-            }
             ComboBox
             {
                 id: antiFlickerCombo
@@ -596,6 +577,227 @@ Item{
                         setAntiFlickerMode()
                     }
                     skipUpdateUIOnAntiFlickerMode = true
+                }
+            }
+
+            Text {
+                id: streamMode
+                text: "--- Stream Mode ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                spacing: 50
+                ExclusiveGroup { id: streamModeGroup }
+                Layout.alignment: Qt.AlignCenter
+
+                RadioButton {
+                    id: masterMode
+                    style:  econRadioButtonStyle
+                    text:   qsTr("Master")
+                    exclusiveGroup: streamModeGroup
+                    activeFocusOnPress: true
+                    onClicked: {
+                        setMasterMode()
+                    }
+                    Keys.onReturnPressed: {
+                        setMasterMode()
+                    }
+                }
+
+                RadioButton {
+                    id: triggerMode
+                    style:  econRadioButtonStyle
+                    text: qsTr("Trigger")
+                    exclusiveGroup: streamModeGroup
+                    activeFocusOnPress: true
+                    onClicked: {
+                        setTriggerMode()
+                    }
+                    Keys.onReturnPressed: {
+                        setTriggerMode()
+                    }
+                }
+            }
+
+
+            Row{
+                Layout.alignment: Qt.AlignCenter
+                Text {
+                    id: flash_modes
+                    text: "--- Flash Mode ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    opacity: 0.50196078431373
+                }
+            }
+            Grid {
+                x: 23
+                y: 235
+                columns: 2
+                spacing: 15
+                ExclusiveGroup { id: flashModeGroup }
+                Layout.alignment: Qt.AlignCenter
+                RadioButton {
+                    id: strobeOff
+                    style:  econRadioButtonStyle
+                    text:   qsTr("Strobe Off")
+                    exclusiveGroup: flashModeGroup
+                    activeFocusOnPress: true
+                    onClicked: {
+                        see3camcu84.setFlashMode(SEE3CAM_CU84.STROBE_OFF)
+                    }
+                    Keys.onReturnPressed:  {
+                        see3camcu84.setFlashMode(SEE3CAM_CU84.STROBE_OFF)
+                    }
+                }
+                RadioButton {
+                    id: strobeOn
+                    style:  econRadioButtonStyle
+                    text: qsTr("Strobe On")
+                    exclusiveGroup: flashModeGroup
+                    activeFocusOnPress: true
+                    onClicked: {
+                        see3camcu84.setFlashMode(SEE3CAM_CU84.STROBE_ON)
+                    }
+                    Keys.onReturnPressed: {
+                        see3camcu84.setFlashMode(SEE3CAM_CU84.STROBE_ON)
+                    }
+                }
+            }
+
+            Text
+            {
+                id: qFactorSliderTitle
+                text: "--- QFactor Slider ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+
+            Row
+            {
+                spacing: 35
+                Slider
+                {
+                    id: qFactorSlider
+                    activeFocusOnPress: true
+                    updateValueWhileDragging: false
+                    width: 150
+                    stepSize: 1
+                    style:econSliderStyle
+                    minimumValue: qFactorMin
+                    maximumValue: qFactorMax
+                    onValueChanged:
+                    {
+                        qFactorTextField.text = qFactorSlider.value
+                        if(skipUpdateUIQFactor)
+                        {
+                            see3camcu84.setQFactor(qFactorSlider.value)
+                        }
+                        skipUpdateUIQFactor = true
+                    }
+                }
+                TextField
+                {
+                    id: qFactorTextField
+                    text: qFactorSlider.value
+                    font.pixelSize: 10
+                    font.family: "Ubuntu"
+                    smooth: true
+                    horizontalAlignment: TextInput.AlignHCenter
+                    style: econTextFieldStyle
+                    validator: IntValidator {bottom: qFactorSlider.minimumValue; top: qFactorSlider.maximumValue}
+                    onTextChanged:
+                    {
+                        if(text.length > 0)
+                        {
+                            qFactorSlider.value = qFactorTextField.text
+                        }
+                    }
+                }
+            }
+
+
+            Text {
+                id: faceDetectionText
+                text: "--- Face Detection ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+
+            Row{
+                spacing: 62
+                ExclusiveGroup { id: faceRectGroup }
+                RadioButton {
+                    exclusiveGroup: faceRectGroup
+                    id: faceRectEnable
+                    text: "Enable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked:{
+                        setFaceDetectionMode()
+                    }
+                    Keys.onReturnPressed: {
+                        setFaceDetectionMode()
+                    }
+                }
+                RadioButton {
+                    exclusiveGroup: faceRectGroup
+                    id:faceRectDisable
+                    text: "Disable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked: {
+                        setFaceDetectionMode()
+                    }
+                    Keys.onReturnPressed: {
+                        setFaceDetectionMode()
+                    }
+                }
+            }
+            Row{
+                spacing: 5
+                CheckBox {
+                    id: faceDetectEmbedData
+                    activeFocusOnPress : true
+                    text: "Embed \nData"
+                    style: econCheckBoxTextWrapModeStyle
+                    enabled: faceRectEnable.checked ? true : false
+                    opacity: enabled ? 1 : 0.1
+                    onClicked:{
+                        enableFaceDetectEmbedData()
+                    }
+                    Keys.onReturnPressed: {
+                        enableFaceDetectEmbedData()
+                    }
+                }
+                CheckBox {
+                    id: overlayRect
+                    activeFocusOnPress : true
+                    text: "Overlay Rectangle"
+                    style: econCheckBoxTextWrapModeStyle
+                    enabled: faceRectEnable.checked ? true : false
+                    opacity: enabled ? 1 : 0.1
+                    onClicked:{
+                        setFaceDetectionMode()
+                    }
+                    Keys.onReturnPressed: {
+                        setFaceDetectionMode()
+                    }
                 }
             }
 
@@ -669,6 +871,25 @@ Item{
         }
           }
             }
+    Component {
+        id: econCheckBoxTextWrapModeStyle
+        CheckBoxStyle {
+            label: Text {
+                text: control.text
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                opacity: 1
+                width: 100
+                wrapMode: Text.WordWrap
+            }
+            background: Rectangle {
+                color: "#222021"
+                border.color: control.activeFocus ? "#ffffff" : "#222021"
+            }
+        }
+    }
     Component {
         id: econRadioButtonStyle
         RadioButtonStyle {
@@ -834,7 +1055,8 @@ Item{
             skipUpdateUIDenoise = true
         }
 
-        onRoiAutoExpMode:{
+        onRoiAutoExpModeRecieved:
+        {
             currentROIAutoExposureMode(roiMode, winSize)
         }
 
@@ -895,6 +1117,24 @@ Item{
              }
         }
 
+        onStreamModeReceived: {
+            currentStreamModeReceived(streamMode)
+        }
+
+        onFlashModeReceived: {
+            currentFlashModeReceived(flashMode)
+        }
+
+        onFaceDetectModeValueReceived: {
+            currentFaceDetectionModeReceived(faceDetectMode, faceDetectOverlayRect, faceDetectEmbedDataValue)
+        }
+
+        onQFactorReceived: {
+            skipUpdateUIQFactor = false
+            qFactorSlider.value = qFactor
+            skipUpdateUIQFactor = true
+        }
+
         //Signal for command Prompt
         onIndicateCommandStatus:{
             if(setButtonClicked){
@@ -911,17 +1151,91 @@ Item{
         }
     }
 
-    function currentROIAutoExposureMode(roiMode, winSize){
+    function currentStreamModeReceived(streamMode){
+        if(streamMode == SEE3CAM_CU84.MASTER_MODE){
+            masterMode.checked = true
+        }
+        else if(streamMode == SEE3CAM_CU84.TRIGGER_MODE){
+            triggerMode.checked = true
+        }
+    }
+
+    function currentFlashModeReceived(flashMode){
+        if(flashMode == SEE3CAM_CU84.STROBE_ON){
+            strobeOn.checked = true
+        }
+        else if(flashMode == SEE3CAM_CU84.STROBE_OFF){
+            strobeOff.checked = true
+        }
+    }
+
+    function currentFaceDetectionModeReceived(faceDetectMode, faceDetectOverlayRect, faceDetectEmbedDataValue){
+        if(faceDetectMode === SEE3CAM_CU84.FaceRectEnable){
+            faceRectEnable.checked = true
+            if(faceDetectEmbedDataValue === SEE3CAM_CU84.FaceDetectEmbedDataEnable){
+                faceDetectEmbedData.checked = true
+            }
+            if(faceDetectOverlayRect === SEE3CAM_CU84.FaceDetectOverlayRectEnable){
+                overlayRect.checked = true
+            }
+        }else if(faceDetectMode === SEE3CAM_CU84.FaceRectDisable){
+            faceRectDisable.checked = true
+            if(faceDetectEmbedDataValue === SEE3CAM_CU84.FaceDetectEmbedDataEnable){
+                faceDetectEmbedData.checked = true
+            }else{
+                faceDetectEmbedData.checked = false
+            }
+            if(faceDetectOverlayRect === SEE3CAM_CU84.FaceDetectOverlayRectEnable){
+                overlayRect.checked = true
+            }else{
+                overlayRect.checked = false
+            }
+        }
+    }
+
+    function setFaceDetectionMode()
+    {
+        if(faceRectEnable.checked == true)
+        {
+            if((faceDetectEmbedData.checked == true) && (overlayRect.checked == true)){
+                see3camcu84.setFaceDetection(true, true, true)
+            }else if((faceDetectEmbedData.checked == true) && (overlayRect.checked == false)){
+                see3camcu84.setFaceDetection(true, false, true)
+            }else if((faceDetectEmbedData.checked == false) && (overlayRect.checked == true)){
+                see3camcu84.setFaceDetection(true, true, false)
+            }else{
+                see3camcu84.setFaceDetection(true, false, false)
+            }
+        }else if(faceRectDisable.checked == true){
+            if((faceDetectEmbedData.checked == true) && (overlayRect.checked == true)){
+                see3camcu84.setFaceDetection(false, true, true)
+            }else if((faceDetectEmbedData.checked == true) && (overlayRect.checked == false)){
+                see3camcu84.setFaceDetection(false, false, true)
+            }else if((faceDetectEmbedData.checked == false) && (overlayRect.checked == true)){
+                see3camcu84.setFaceDetection(false, true, false)
+            }else{
+                see3camcu84.setFaceDetection(false, false, false)
+            }
+        }
+    }
+
+    function currentROIAutoExposureMode(roiMode, winSize)
+    {
         switch(roiMode){
             case SEE3CAM_CU84.FULL_ROI:
-                autoexpFull.checked = true
+                expRoiFull.checked = true
+                expRoiFull.enabled = true
 
+                //To disable comboBox in full roi mode
                 autoExpoWinSizeCombo.enabled = false
                 autoExpoWinSizeCombo.opacity = 0.1
                 break
             case SEE3CAM_CU84.MANUAL_ROI:
                 skipUpdateUIOnExpWindowSize = false
-                autoexpManual.checked = true
+                expRoiManual.enabled = true
+                expRoiManual.checked = true
+
+                //To enable comboBox in manual mode
                 autoExpoWinSizeCombo.enabled = true
                 autoExpoWinSizeCombo.opacity = 1
                 // If window size is got from camera is 0 then set window size to 1 in UI
@@ -930,6 +1244,23 @@ Item{
                 }else
                     autoExpoWinSizeCombo.currentIndex = winSize-1
                 break
+        }
+    }
+
+
+    function setROIAutoExposure(){
+        if(expRoiFull.checked == true){
+            see3camcu84.setROIAutoExposure(SEE3CAM_CU84.FULL_ROI, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText);
+
+            //To disable comboBox in full roi mode
+            autoExpoWinSizeCombo.enabled = false
+            autoExpoWinSizeCombo.opacity = 0.1
+        }else if(expRoiManual.checked == true){
+            see3camcu84.setROIAutoExposure(SEE3CAM_CU84.MANUAL_ROI, 0, 0, 0, 0, autoExpoWinSizeCombo.currentText)
+
+            //To disable comboBox in manual roi mode
+            autoExpoWinSizeCombo.enabled = true
+            autoExpoWinSizeCombo.opacity = 1
         }
     }
 
@@ -988,35 +1319,65 @@ Item{
             //To enable exposure compensation when device is in manual exposure mode in UVC
             root.enableDisableExposureCompensation(autoExposureSelect)
 
-            autoexpManual.enabled = true
-            autoexpFull.enabled = true
-            if(autoexpManual.checked)
+            expRoiManual.enabled   = true
+            expRoiFull.enabled     = true
+
+            expRoiManual.opacity   = 1
+            expRoiFull.opacity     = 1
+
+            if(expRoiManual.checked)
                 autoExpoWinSizeCombo.enabled = true
-            if(autoexpFull.checked)
+            if(expRoiFull.checked)
                 autoExpoWinSizeCombo.enabled = false
-            autoexpManual.opacity = 1
-            autoexpFull.opacity = 1
+
             exposureCompValue.enabled = true
             exposureCompValue.opacity = 1
-            exposureCompSet.enabled = true
-            exposureCompSet.opacity = 1
-            exposureCompText.opacity = 1
+            exposureCompSet.enabled   = true
+            exposureCompSet.opacity   = 1
+            exposureCompText.opacity  = 1
         }else{
             //To disable exposure compensation when device is in manual exposure mode in UVC
             root.enableDisableExposureCompensation(autoExposureSelect)
 
-            autoexpManual.enabled = false
-            autoexpFull.enabled = false
+            expRoiManual.enabled   = false
+            expRoiFull.enabled     = false
+
+            expRoiManual.opacity   = 0.1
+            expRoiFull.opacity     = 0.1
+
             autoExpoWinSizeCombo.enabled = false
-            autoexpManual.opacity = 0.1
-            autoexpFull.opacity = 0.1
+
             exposureCompValue.enabled = false
             exposureCompValue.opacity = 0.1
-            exposureCompSet.enabled = false
-            exposureCompSet.opacity = 0.1
-            exposureCompText.opacity = 0.1
+            exposureCompSet.enabled   = false
+            exposureCompSet.opacity   = 0.1
+            exposureCompText.opacity  = 0.1
         }
         getAutoExpsoureControlValues.start()
+    }
+
+    function enableFaceDetectEmbedData(){
+        if(see3camcu84.setFaceDetection(faceRectEnable.checked, overlayRect.checked, faceDetectEmbedData.checked)){
+            if(faceDetectEmbedData.checked){
+                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_CU84_Face_Detection for more details"))
+            }
+        }
+    }
+
+    function setMasterMode(){
+        see3camcu84.setStreamMode(SEE3CAM_CU84.MASTER_MODE)
+        root.startUpdatePreviewInMasterMode()
+        root.checkForTriggerMode(false)
+        root.videoRecordBtnEnable(true)
+        root.captureBtnEnable(true)
+    }
+
+    function setTriggerMode(){
+        see3camcu84.setStreamMode(SEE3CAM_CU84.TRIGGER_MODE)
+        root.stopUpdatePreviewInTriggerMode()
+        root.checkForTriggerMode(true)
+        root.captureBtnEnable(false)
+        root.videoRecordBtnEnable(false)
     }
 
     function displayMessageBox(title, text){
@@ -1056,6 +1417,10 @@ Item{
         see3camcu84.getBurstLength()
         see3camcu84.getOrientation()
         see3camcu84.getAntiFlickerMode()
+        see3camcu84.getStreamMode()
+        see3camcu84.getFlashMode()
+        see3camcu84.getQFactor()
+        see3camcu84.getFaceDetectMode()
     }
 
     Component.onCompleted: {

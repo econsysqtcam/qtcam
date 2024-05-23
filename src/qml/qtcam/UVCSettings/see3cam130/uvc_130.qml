@@ -79,6 +79,9 @@ Item {
          onEnableFaceRectafterBurst:{
              seecam130.enableDisableFaceRectangle(true)
          }
+         onUpdateCrossStillCaptureProperty:{
+             seecam130.setFrameRateCtrlValue(frameRateSlider.value)
+         }
     }
 
     Connections{

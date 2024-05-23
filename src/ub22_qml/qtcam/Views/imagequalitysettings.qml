@@ -79,6 +79,8 @@ Item {
     property bool usb3speed: false
     property bool enablePowerLineFreq : true
     property bool hdrModeSelected : false
+    property bool autoWhiteBalanceSelect : false
+    property bool colorTempEnabled : false
 
     property bool powerLineComboEnable
     // Skip doing things when exposure combo index changed calls when no selection of any camera
@@ -184,6 +186,18 @@ Item {
                 if(root.selectedDeviceEnumValue == CommonEnums.ECAM82_USB && visible)
                 {
                     root.cameraFilterControls(true)
+                }
+
+                /*
+                  Once the Image quality settings is visible, It will sets the white balance mode using
+                  the "autoWhiteBalanceSelect" flag emitted from the extension settings
+                */
+                if(root.selectedDeviceEnumValue === CommonEnums.SEE3CAM_CU200 && visible){
+                    if(autoWhiteBalanceSelect){
+                        autoSelect_wb.checked = true
+                    }else {
+                        autoSelect_wb.checked = false
+                    }
                 }
             }
             Item {
@@ -461,19 +475,42 @@ Item {
                                     white_balance_Slider.opacity = 0.1
                                     white_balance_Slider.enabled = false
                                     wbAutoChangeProperty = true
+                                    autoWhiteBalanceSelect = true
+
+                                    colorTempEnabled = true
                                 }
                                 else
                                 {
-                                    root.logInfo("White Balance set to Manual Mode")
-                                    root.autoWhiteBalanceSelected(false)
-                                    if(wbAutoChangeProperty){
-                                        root.changeCameraSettings(whiteBalanceControl_auto_Id,0)
-					// When click hardware default, selecting manual whitebalance, set to default wb.
-					root.changeCameraSettings(whiteBalanceControlId,white_balance_Slider.value.toString())
-                                    }
-                                    if(root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM){
-                                        white_balance_Slider.opacity = 1
-                                        white_balance_Slider.enabled = true
+                                    if(root.selectedDeviceEnumValue === CommonEnums.SEE3CAM_CU200){
+                                        if(colorTempEnabled){
+                                            root.logInfo("White Balance set to Manual Mode")
+                                            root.autoWhiteBalanceSelected(false)
+                                            if(wbAutoChangeProperty){
+                                                root.changeCameraSettings(whiteBalanceControl_auto_Id,0)
+                                                // When click hardware default, selecting manual whitebalance, set to default wb.
+                                                root.changeCameraSettings(whiteBalanceControlId,white_balance_Slider.value.toString())
+                                            }
+                                            white_balance_Slider.opacity = 1
+                                            white_balance_Slider.enabled = true
+                                            autoWhiteBalanceSelect = false
+
+                                        } else {
+                                            white_balance_Slider.opacity = 1
+                                            white_balance_Slider.enabled = true
+                                        }
+                                    } else {
+                                        root.logInfo("White Balance set to Manual Mode")
+                                        root.autoWhiteBalanceSelected(false)
+                                        if(wbAutoChangeProperty){
+                                            root.changeCameraSettings(whiteBalanceControl_auto_Id,0)
+                                            // When click hardware default, selecting manual whitebalance, set to default wb.
+                                            root.changeCameraSettings(whiteBalanceControlId,white_balance_Slider.value.toString())
+                                        }
+                                        if(root.selectedDeviceEnumValue != CommonEnums.CX3_UVC_CAM){
+                                            white_balance_Slider.opacity = 1
+                                            white_balance_Slider.enabled = true
+                                        }
+                                        autoWhiteBalanceSelect = false
                                     }
                                 }
                             }
@@ -765,30 +802,24 @@ Item {
                         onCurrentIndexChanged: {
                             // Skip doing things when exposure combo index changed calls when no selection of any camera
                             if(exposureComboEnable){
-                                if(hdrModeSelected && root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU81){
-                                    updateUIifHdrModeSelected()
-                                }
-                                else{
-                                    root.selectMenuIndex(exposureAutoControlId,currentIndex)
-                                    //To set Auto/Manual exposure mode
-                                    if(currentText.toString() != "Auto Mode" && currentText.toString() != "Aperture Priority Mode") {
-                                        root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())
-
-                                        root.autoExposureSelected(false)
-                                        JS.autoExposureSelected = false
-                                        exposure_absolute.opacity = 1
-                                        exposure_Slider.opacity = 1
-                                        exposure_Slider.enabled = true
-                                        exposure_value.opacity = 1
-                                    } else {
-                                        root.autoExposureSelected(true)
-                                        JS.autoExposureSelected = true
-                                        exposure_absolute.opacity = 0.1
-                                        exposure_Slider.opacity = 0.1
-                                        exposure_Slider.enabled = false
-                                        exposure_value.opacity = 0
-                                        exposure_value.enabled = false
-                                    }
+                                root.selectMenuIndex(exposureAutoControlId,currentIndex)
+                                //To set Auto/Manual exposure mode
+                                if(currentText.toString() != "Auto Mode" && currentText.toString() != "Aperture Priority Mode") {
+                                    root.changeCameraSettings(exposurecontrolId,exposure_Slider.value.toString())
+                                    root.autoExposureSelected(false)
+                                    JS.autoExposureSelected = false
+                                    exposure_absolute.opacity = 1
+                                    exposure_Slider.opacity = 1
+                                    exposure_Slider.enabled = true
+                                    exposure_value.opacity = 1
+                                } else {
+                                    root.autoExposureSelected(true)
+                                    JS.autoExposureSelected = true
+                                    exposure_absolute.opacity = 0.1
+                                    exposure_Slider.opacity = 0.1
+                                    exposure_Slider.enabled = false
+                                    exposure_value.opacity = 0
+                                    exposure_value.enabled = false
                                 }
                             }
                         }
@@ -1320,7 +1351,27 @@ Item {
                 exposure_Slider.value = exposure
             }
         }
+//        function onGetExposureFromHID(exposureFromHID){
+//            exposure_Slider.value = exposureFromHID
+//        }
+
+        function onDisableUVCSettings(){
+            white_balance_Slider.enabled = false
+            white_balance_Slider.opacity = 0.1
+        }
+        function onGetWhiteBalanceModeFromHID(isAutoEnabled, isColorTempEnabled){
+            //To store the Enable/Disable status of White balance mode
+            if(isAutoEnabled){
+                autoWhiteBalanceSelect = true
+            }else {
+                autoWhiteBalanceSelect = false
+            }
+
+            //To store the Enable/Disable status of color temperature
+            colorTempEnabled = isColorTempEnabled
+        }
     }
+
     Connections
     {
         target: root
@@ -1476,50 +1527,32 @@ Item {
 
     }
 
-    function updateHIDIn50CUG(whiteBalance)
-    {
-        switch(whiteBalance)
-        {
-             case 1:
-                 root.getColorTemperature(2300)
-                 break
-             case 2:
-                 root.getColorTemperature(2800)
-                 break
-             case 3:
-                 root.getColorTemperature(3000)
-                 break
-             case 4:
-                 root.getColorTemperature(4000)
-                 break
-             case 5:
-                 if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200)
-                 {
-                     root.getColorTemperature(4100)
-                 }
-                 else
-                 {
+    function convertWhiteBalanceToColorTemperature(whiteBalance){
+        if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200){
+            root.getColorTemperature(whiteBalance)
+        }else if (root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_50CUG){
+            switch(whiteBalance)
+            {
+                 case 1:
+                     root.getColorTemperature(2300)
+                     break
+                 case 2:
+                     root.getColorTemperature(2800)
+                     break
+                 case 3:
+                     root.getColorTemperature(3000)
+                     break
+                 case 4:
+                     root.getColorTemperature(4000)
+                     break
+                 case 5:
                      root.getColorTemperature(6000)
-                 }
-                 break
-             case 6:
-                 if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200)
-                 {
-                     root.getColorTemperature(6000)
-                 }
-                 else
-                 {
+                     break
+                 case 6:
                      root.getColorTemperature(6500)
-                 }
-                 break
-             case 7:
-                 if(root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200)
-                 {
-                     root.getColorTemperature(6500)
-                 }
-                 break
+                     break
+            }
         }
-
     }
 
     function setCameraControls(controlName,controlType,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue,controlID)
@@ -1568,7 +1601,7 @@ Item {
             case 9963779://Hue
                 hueUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
-            case 9963802://White Balance(Temperature)
+            case 9963802://Manual White Balance(Temperature)
                 whiteBalanceUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
             case 9963792://Gamma
@@ -1990,9 +2023,6 @@ Item {
                 exposure_Slider.enabled = false
                 exposure_Slider.opacity = 0.1
                 exposure_value.opacity = 0
-            }
-            if(hdrModeSelected && root.selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU81){
-                updateUIifHdrModeSelected()
             }
         }
     }

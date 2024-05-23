@@ -4446,6 +4446,11 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
     }
     else if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {
+        //To Enable/Disable HID to set still properties for capturing still in cross resolution
+        if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_130)
+        {
+            emit setCrossStillProperties(false);
+        }
         // Added by Sankari: disable paint in preview while capturing image when still and preview resolution
         //are different
         m_renderer->updateStop = true;
@@ -5499,7 +5504,7 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
     if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {
         //Added By Sushanth - To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
-        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200))
+        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_130))
         {
             emit setCrossStillProperties(true);
         }
