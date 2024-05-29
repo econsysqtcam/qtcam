@@ -1,4 +1,5 @@
-qtcam (26.0.18-0ubuntu1) focal; urgency=medium
+qtcam (26.0.19-0ubuntu1) focal; urgency=medium
+ *Added tooltip support in Ubuntu 16.04 for See3CAM_CU200 & Bug fix for See3CAM_50CUG.
  *Updated latest code for Ubuntu 22.04 & Added message box for AE Limit in See3CAM_CU200.
  *Fixed white balance issue in See3CAM_CU200 & Bugs in See3CAM_CU83.
  *Revert back video recording support(Bt.701 Standards) for See3CAM_CU31.
@@ -147,5 +148,5 @@ qtcam (26.0.18-0ubuntu1) focal; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Thu 23 May 2024 18:59:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Wed 29 May 2024 21:33:01 +0530
 
