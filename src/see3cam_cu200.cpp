@@ -1842,7 +1842,6 @@ bool SEE3CAM_CU200::readStatistics(){
                   g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
             g_in_packet_buf[2]  == READ_STATISTICS &&
             g_in_packet_buf[52] == SET_SUCCESS) {
-
             currentExposure  = (g_in_packet_buf[3] << 24) | (g_in_packet_buf[4] << 16) | (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
 
             fCurrentRGain.u   = (g_in_packet_buf[8] << 24) | (g_in_packet_buf[9] << 16) | (g_in_packet_buf[10] << 8) | (g_in_packet_buf[11] << 0);

@@ -92,6 +92,8 @@ Item {
     property bool exposureAutoAvailable: false
     property var menuitems:[]
 
+    property real adjustedBrightness
+
     property int adjustedExposure
     property int exposureInt
     property int seconds : 0
@@ -226,7 +228,7 @@ Item {
                         onValueChanged: {
                             if(brightValueChangeProperty) {
                                 //Sending UVC value to HID
-                                var adjustedBrightness = (brightness_Slider.value) / 200.0;
+                                adjustedBrightness = (brightness_Slider.value) / 200.0;
                                 root.getBrightness(adjustedBrightness)
 
                                 root.logInfo("Brightness changed to: "+ value.toString())

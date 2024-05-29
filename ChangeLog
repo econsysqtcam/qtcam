@@ -1,3 +1,8 @@
+Qtcam Application - 26.0.19
+---------------------------
+*Fixed Bug in See3CAM_50CUG.
+*Tooltip support in Ubuntu 16.04 for See3CAM_CU200.
+
 Qtcam Application - 26.0.18
 ---------------------------
 *Updated latest code in ubuntu 22.04

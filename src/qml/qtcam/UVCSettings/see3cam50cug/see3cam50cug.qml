@@ -79,13 +79,19 @@ Item{
             gainSlider.value = gainHid
         }
         onGetBrightnessFromUVC:{
+            skipUpdateBrightness = false
             brightnessSlider.value = brightnessFromUVC
+            see3cam50cug.setBrightness(brightnessFromUVC)
+            skipUpdateBrightness = true
         }
         onGetContrastFromUVC:{
             contrastSlider.value = contrastFromUVC
         }
         onGetSaturationFromUVC:{
+            skipUpdateSaturation = false
             saturationSlider.value = saturationFromUVC
+            see3cam50cug.setSaturation(saturationFromUVC)
+            skipUpdateSaturation = true
         }
         onGetGammaFromUVC:{
             gammaCorrectionSlider.value = gammaFromUVC
@@ -588,7 +594,6 @@ Used for changing brightness by modifying Y channel gain in steps of 0.04"
                        maximumValue: brightnessMax
                        stepSize: 0.005
                        onValueChanged:  {
-
                            brightnessTextField.text = brightnessSlider.value
                            if(skipUpdateBrightness){
                                // Round the slider and TextField to three decimal places
@@ -613,7 +618,9 @@ Used for changing brightness by modifying Y channel gain in steps of 0.04"
                        style: econTextFieldStyle
                        validator: IntValidator {bottom: brightnessSlider.minimumValue; top: brightnessSlider.maximumValue}
                        onTextChanged: {
-                           if(text.length > 0){
+                           const match = brightnessTextField.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                           if(match){
+                               brightnessTextField.text = match[1];
                                brightnessSlider.value = brightnessTextField.text
                            }
                        }
@@ -729,7 +736,9 @@ Used for changing saturation by modifying the gain of Z curve applied to UV chan
                        style: econTextFieldStyle
                        validator: IntValidator {bottom: saturationSlider.minimumValue; top: saturationSlider.maximumValue}
                        onTextChanged: {
-                           if(text.length > 0){
+                           const match = saturationTextField.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                           if(match){
+                               saturationTextField.text = match[1];
                                saturationSlider.value = saturationTextField.text
                            }
                        }
@@ -1363,6 +1372,7 @@ This feature is supported in Acquisition trigger."
         onGainValueReceived: {
             skipUpdateGainMode = false
             gainSlider.value = gainValue
+            root.getGainValueFromHID(gainValue)
             skipUpdateGainMode = true
         }
 
@@ -1391,12 +1401,14 @@ This feature is supported in Acquisition trigger."
             brightness = parseFloat((brightness).toFixed(3));
             brightnessSlider.value = brightness
             brightnessTextField.text = brightness
+            root.sendBrightnessToUVC(brightness)
             skipUpdateBrightness = true
         }
 
         onContrastReceived: {
             skipUpdateContrast = false
             contrastSlider.value = contrast
+            root.sendContrastToUVC(contrast)
             skipUpdateContrast = true
         }
 
@@ -1405,6 +1417,7 @@ This feature is supported in Acquisition trigger."
             saturation = parseFloat((saturation).toFixed(3));
             saturationSlider.value = saturation
             saturationTextField.text = saturation
+            root.sendSaturationToUVC(saturation)
             skipUpdateSaturation = true
         }
 
@@ -1412,29 +1425,24 @@ This feature is supported in Acquisition trigger."
             skipUpdateColorTemperature = false
             colorTempTextField.text = colorTemp
 
-            if(colorTemp == "2300")
-            {
+            if(colorTemp == "2300") {
                colorTempSlider.value = 0
-            }
-            else if(colorTemp == "2800")
-            {
+               root.sendColorTemperatureToUVC(1)
+            } else if(colorTemp == "2800") {
                 colorTempSlider.value = 1
-            }
-            else if(colorTemp == "3000")
-            {
+                root.sendColorTemperatureToUVC(2)
+            } else if(colorTemp == "3000") {
                 colorTempSlider.value = 2
-            }
-            else if(colorTemp == "4000")
-            {
+                root.sendColorTemperatureToUVC(3)
+            } else if(colorTemp == "4000") {
                 colorTempSlider.value = 3
-            }
-            else if(colorTemp == "6000")
-            {
+                root.sendColorTemperatureToUVC(4)
+            } else if(colorTemp == "6000") {
                 colorTempSlider.value = 4
-            }
-            else if(colorTemp == "6500")
-            {
+                root.sendColorTemperatureToUVC(5)
+            } else if(colorTemp == "6500") {
                 colorTempSlider.value = 5
+                root.sendColorTemperatureToUVC(6)
             }
 
             skipUpdateColorTemperature = true
@@ -1445,6 +1453,7 @@ This feature is supported in Acquisition trigger."
             gammaCorrection = parseFloat((gammaCorrection).toFixed(1));
             gammaCorrectionSlider.value = gammaCorrection
             gammaCorrectionTextField.text = gammaCorrection
+            root.sendGammaToUVC(gammaCorrection)
             skipUpdateGammaCorrection = true
         }
 

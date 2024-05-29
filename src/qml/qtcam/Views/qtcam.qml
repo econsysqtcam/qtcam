@@ -1370,6 +1370,7 @@ Rectangle {
         captureBtnEnable(false)
         videoRecordBtnEnable(false)
         keyEventFiltering = true
+        isTriggerMode = true
         vidstreamproperty.enabled = false
         vidstreamproperty.triggerModeEnabled()
         vidstreamproperty.stopCapture()
