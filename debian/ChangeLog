@@ -1,4 +1,5 @@
-qtcam (26.0.17-0ubuntu1) xenial; urgency=medium
+qtcam (26.0.19-0ubuntu1) xenial; urgency=medium
+ *Added tooltip support in Ubuntu 16.04 for See3CAM_CU200 & Bug fix for See3CAM_50CUG.
  *Fixed white balance issue in See3CAM_CU200 & Bugs in See3CAM_CU83.
  *Revert back video recording support(Bt.701 Standards) for See3CAM_CU31.
  *Added new HID controls for See3CAM_CU200.
@@ -184,4 +185,4 @@ qtcam (26.0.17-0ubuntu1) xenial; urgency=medium
   * Added ARM support.
   * Initial release.  
 
- -- econsysqtcam <qtcam@e-consystems.com> Mon 20 May 2024 22:15:00 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Wed 29 May 2024 21:35:00 +0530
