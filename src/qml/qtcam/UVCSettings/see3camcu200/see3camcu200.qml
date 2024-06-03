@@ -129,7 +129,7 @@ Item{
         }
         onGetBrightnessFromUVC:{
             skipUpdateBrightness = false
-            brightnessSlider.value = brightnessFromUVC
+            brightnessSlider.value = brightnessFromUVC.toFixed(3)
             see3camcu200.setBrightness(brightnessFromUVC)
             skipUpdateBrightness = true
         }
@@ -138,7 +138,7 @@ Item{
         }
         onGetSaturationFromUVC:{
             skipUpdateSaturation = false
-            saturationSlider.value = saturationFromUVC
+            saturationSlider.value = saturationFromUVC.toFixed(3)
             see3camcu200.setSaturation(saturationFromUVC)
             skipUpdateSaturation = true
         }
@@ -959,7 +959,7 @@ Item{
                         style:econSliderStyle
 
                         onValueChanged:  {
-                            saturationTextField.text = saturationSlider.value
+                            saturationTextField.text = saturationSlider.value.toFixed(3)
                             if(skipUpdateSaturation){
                                 // Round the slider and TextField to three decimal places
                                 adjustedSaturation = parseFloat((saturationSlider.value).toFixed(3));
@@ -968,8 +968,8 @@ Item{
                                 saturationInt = adjustedSaturation * 200
                                 root.sendSaturationToUVC(saturationInt)
 
-                                saturationTextField.text = adjustedSaturation
-                                see3camcu200.setSaturation(adjustedSaturation)
+                                saturationTextField.text = adjustedSaturation.toFixed(3)
+                                see3camcu200.setSaturation(adjustedSaturation.toFixed(3))
                             }
                             skipUpdateSaturation = true
                         }
@@ -1050,11 +1050,6 @@ Item{
                     smooth: true
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
-                    ToolButton{
-                        tooltip: "It controls the integration time of the sensor. It changes in the range of 100µs to 1s. It is expressed in microseconds(µs)."
-                        opacity: 0
-                        width: 100
-                    }
                 }
                 Row{
                     spacing: 30
@@ -1862,7 +1857,7 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                         width: 150
                         style:econSliderStyle
                         onValueChanged:  {
-                            brightnessTextField.text = brightnessSlider.value
+                            brightnessTextField.text = brightnessSlider.value.toFixed(3)
                             if(skipUpdateBrightness){
                                 // Round the slider and TextField to three decimal places
                                 adjustedBrightness = parseFloat((brightnessSlider.value).toFixed(3));
@@ -1871,8 +1866,8 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                 brightnessInt = adjustedBrightness * 200;
                                 root.sendBrightnessToUVC(brightnessInt)
 
-                                brightnessTextField.text = adjustedBrightness
-                                see3camcu200.setBrightness(adjustedBrightness)
+                                brightnessTextField.text = adjustedBrightness.toFixed(3)
+                                see3camcu200.setBrightness(adjustedBrightness.toFixed(3))
                             }
                             skipUpdateBrightness = true
                         }
@@ -1981,8 +1976,8 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                 gammaInt = adjustedGammaCorrection * 10
                                 root.sendGammaToUVC(gammaInt)
 
-                                gammaCorrectionTextField.text = adjustedGammaCorrection
-                                see3camcu200.setGammaCorrection(adjustedGammaCorrection)
+                                gammaCorrectionTextField.text = adjustedGammaCorrection.toFixed(1)
+                                see3camcu200.setGammaCorrection(adjustedGammaCorrection.toFixed(1))
                             }
                             skipUpdateGammaCorrection = true
                         }
@@ -3178,8 +3173,8 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
             saturationSlider.stepSize = stepValue
 
             currentSaturation = parseFloat((currentSaturation).toFixed(3));
-            saturationSlider.value = currentSaturation
-            saturationTextField.text = currentSaturation
+            saturationSlider.value = currentSaturation.toFixed(3)
+            saturationTextField.text = currentSaturation.toFixed(3)
 
             adjustedSaturation = parseFloat((saturationSlider.value).toFixed(3));
 
@@ -3212,8 +3207,8 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
 
             currentGamma = parseFloat((currentGamma).toFixed(1));
 
-            gammaCorrectionSlider.value = currentGamma
-            gammaCorrectionTextField.text = currentGamma
+            gammaCorrectionSlider.value = currentGamma.toFixed(1)
+            gammaCorrectionTextField.text = currentGamma.toFixed(1)
 
             adjustedGammaCorrection = parseFloat((gammaCorrectionSlider.value).toFixed(1));
 
