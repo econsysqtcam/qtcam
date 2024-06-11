@@ -138,13 +138,15 @@ Item {
         function onVideoColorSpaceChanged(){
             getCameraSettingsTimer.start()
         }
-        function onSetExpCompensation(){
-            see3camcu135mH01r1.setAutoExposureLowerLimit(lowerLimitTextField.text)
-            see3camcu135mH01r1.setAutoExposureUpperLimit(upperLimitTextField.text)
+
+        function onUpdateCrossStillCaptureProperty(isEnable){
+            if(isEnable) {
+                see3camcu135mH01r1.setPropertiesForCrossStill(true)
+            } else {
+                see3camcu135mH01r1.setPropertiesForCrossStill(false)
+            }
         }
-        function onSetGainInStream(){
-            see3camcu135mH01r1.setGainLimit(gainLowerLimitSlider.value, gainUpperLimitSlider.value)
-        }
+
         function onSendGainValueToHID(gainHid){
            gainSlider.value = gainHid
         }

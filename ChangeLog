@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.21
+---------------------------
+*Added support for See3CAM_CU200M.
+
 Qtcam Application - 26.0.20
 ---------------------------
 *Fixed Floating-Point precession error in ubuntu 16.04 for See3CAM_CU200 & See3CAM_50CUG.

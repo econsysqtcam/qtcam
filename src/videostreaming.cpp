@@ -753,7 +753,7 @@ void FrameRenderer::drawYUYVBUffer(){
     if(renderyuyvMutex.tryLock()){
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200 || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200 || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200M || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
             skipFrames = frame;
         }
         else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
@@ -773,7 +773,9 @@ void FrameRenderer::drawYUYVBUffer(){
         renderyuyvMutex.unlock();
     }
     else{
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+        if(gotFrame && !updateStop && skipFrames >3){
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+        }
     }
 skip:
     m_shaderProgram->disableAttributeArray(0);
@@ -1003,11 +1005,13 @@ void FrameRenderer::changeShader(){
                 drawBufferForYUV420();
                 break;
             case RAW_Y10_PIX_FMT:
-                shaderUYVY();
-                drawUYVYBUffer();
-                if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200)
-                {
+                if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200){
                     renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
+                    shaderUYVY();
+                    drawUYVYBUffer();
+                } else if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200M) {
+                    shaderYUYV();
+                    drawYUYVBUffer();
                 }
                 break;
         }
@@ -1559,6 +1563,62 @@ bool Videostreaming::saveRawFile(void *inputBuffer, int buffersize){
     return ret;
 }
 
+/**
+* Added By Sushanth
+* convertYUYVToRGB - To Convert YUYV to RGB
+* @param: inputBuffer - YUYV data to convert.
+* @param: inputSize   - input buffer size.
+* @param: outputBuffer - output buffer.
+* return true/false
+*/
+bool Videostreaming::convertYUYVToRGB(unsigned char *inputBuffer, int inputSize, unsigned char *outputBuffer)
+{
+    int R1, G1, B1, R2, G2, B2, iter, iter2 = 0;
+    uint8_t Y1, Y2, U, V;
+
+    if(outputBuffer != NULL)
+    {
+        for(iter = 0; iter < inputSize; iter++)
+        {
+            Y1 = *(inputBuffer + iter);
+            iter++;
+            U = *(inputBuffer + iter);
+            iter++;
+            Y2 = *(inputBuffer + iter);
+            iter++;
+            V = *(inputBuffer + iter);
+
+
+            R1 = Y1 + ((403 * (V - 128)) >> 8);
+            G1 = Y1 - ((48 * (U - 128) + 120 * (V - 128)) >> 8);
+            B1 = Y1 + ((475 * (U - 128)) >> 8);
+
+            R2 = Y2 + ((403 * (V - 128)) >> 8);
+            G2 = Y2 - ((48 * (U - 128) + 120 * (V - 128)) >> 8);
+            B2 = Y2 + ((475 * (U - 128)) >> 8);
+
+            R1 = R1 > 255 ? 255: ((R1 < 0) ? 0 : R1);
+            G1 = G1 > 255 ? 255: ((G1 < 0) ? 0 : G1);
+            B1 = B1 > 255 ? 255: ((B1 < 0) ? 0 : B1);
+
+            R2 = R2 > 255 ? 255: ((R2 < 0) ? 0 : R2);
+            G2 = G2 > 255 ? 255: ((G2 < 0) ? 0 : G2);
+            B2 = B2 > 255 ? 255: ((B2 < 0) ? 0 : B2);
+
+            //store 2 pixel values in the RGB buffer
+            outputBuffer[iter2++] = R1;
+            outputBuffer[iter2++] = G1;
+            outputBuffer[iter2++] = B1;
+
+            outputBuffer[iter2++] = R2;
+            outputBuffer[iter2++] = G2;
+            outputBuffer[iter2++] = B2;
+        }
+    }
+    return true;
+}
+
+
 
 /**
 * Added By Sushanth
@@ -1717,7 +1777,7 @@ void Videostreaming::capFrame()
         return;
     }
 
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200 && m_capSrcFormat.fmt.pix.pixelformat == RAW_Y10_PIX_FMT){
+    if(m_capSrcFormat.fmt.pix.pixelformat == RAW_Y10_PIX_FMT){
         m_renderer->rawY10Format = true;
     }else{
         m_renderer->rawY10Format = false;
@@ -2099,7 +2159,14 @@ void Videostreaming::capFrame()
 
             //For See3CAM_CU40 & See3CAM_CU200 - Saving RGB frame after debayering
             if(m_renderer->y16BayerFormat || m_renderer->rawY10Format){
-                bufferToSave = y16BayerDestBuffer;
+                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
+                    bufferToSave = y16BayerDestBuffer;
+                } else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M){//No Debayering for Monochrome camera
+                    //Converting YUYV to RGB for saving image using QImage
+                    convertYUYVToRGB(m_renderer->yuvBuffer, (width*height*2), m_capImage->bits());
+
+                    bufferToSave = m_capImage->bits();
+                }
 
                 QImage qImage3(bufferToSave, width, height, QImage::Format_RGB888);
                 QImageWriter writer(filename);
@@ -3601,8 +3668,6 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
         }
         else if(m_renderer->rawY10Format)
         {
-            m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
-
             int inputBufSize;
             inputBufSize = width*height*BYTES_PER_PIXEL_RAW_Y10;
 
@@ -3610,80 +3675,103 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
 
             memset(rawY16Buffer, 0, (width*height*BYTES_PER_PIXEL_Y16));
 
-            if(!convertRawY10ToY16(((void*)inputbuffer),rawY16Buffer, inputBufSize))
+            if(!convertRawY10ToY16(((void*)inputbuffer), rawY16Buffer, inputBufSize))
             {
                 return false;
             }
 
-            /* Applying Nearest neighbour interpolation algorithm - y16 to RGB24 conversion */
-            y16BayerDestBuffer = (unsigned char *)malloc(width * height * BYTES_PER_PIXEL_RGB);
-            if(!horizontalFlip && !verticalFlip)
-            {
-                //GBRG Pattern
-                for (__u32 y = 0; y < height; y += 2) {
-                    for (__u32 x = 0; x < width; x += 2) {
-                        uint8_t g1 = CLIP(Bay(x, y, width));
-                        uint8_t b = CLIP(Bay(x + 1, y, width));
-                        uint8_t r = CLIP(Bay(x, y + 1, width));
-                        uint8_t g2 = CLIP(Bay(x + 1, y + 1, width));
+            if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
 
-                        G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = (g1 + g2) / 2;
-                        R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
-                        B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
+                m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
+
+                /* Applying Nearest neighbour interpolation algorithm - y16 to RGB24 conversion */
+                y16BayerDestBuffer = (unsigned char *)malloc(width * height * BYTES_PER_PIXEL_RGB);
+
+                if(!horizontalFlip && !verticalFlip)
+                {
+                    //GBRG Pattern
+                    for (__u32 y = 0; y < height; y += 2) {
+                        for (__u32 x = 0; x < width; x += 2) {
+                            uint8_t g1 = CLIP(Bay(x, y, width));
+                            uint8_t b = CLIP(Bay(x + 1, y, width));
+                            uint8_t r = CLIP(Bay(x, y + 1, width));
+                            uint8_t g2 = CLIP(Bay(x + 1, y + 1, width));
+
+                            G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = (g1 + g2) / 2;
+                            R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
+                            B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
+                        }
                     }
                 }
-            }
-            else if(horizontalFlip && verticalFlip)
-            {
-                //GRBG Pattern
-                for (__u32 y = 0; y < height; y += 2) {
-                    for (__u32 x = 0; x < width; x += 2) {
-                        uint8_t g1 = CLIP(Bay(x, y, width));
-                        uint8_t r = CLIP(Bay(x + 1, y, width));
-                        uint8_t b = CLIP(Bay(x, y + 1, width));
-                        uint8_t g2 = CLIP(Bay(x + 1, y + 1, width));
+                else if(horizontalFlip && verticalFlip)
+                {
+                    //GRBG Pattern
+                    for (__u32 y = 0; y < height; y += 2) {
+                        for (__u32 x = 0; x < width; x += 2) {
+                            uint8_t g1 = CLIP(Bay(x, y, width));
+                            uint8_t r = CLIP(Bay(x + 1, y, width));
+                            uint8_t b = CLIP(Bay(x, y + 1, width));
+                            uint8_t g2 = CLIP(Bay(x + 1, y + 1, width));
 
-                        G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = (g1 + g2) / 2;
-                        R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
-                        B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
+                            G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = (g1 + g2) / 2;
+                            R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
+                            B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
+                        }
                     }
                 }
-            }
-            else if(horizontalFlip)
-            {
-                //BGGR Pattern
-                for (__u32 y = 0; y < height; y += 2) {
-                    for (__u32 x = 0; x < width; x += 2) {
-                        uint8_t b = CLIP(Bay(x, y, width));
-                        uint8_t g = CLIP(Bay(x + 1, y, width));
-                        uint8_t r = CLIP(Bay(x + 1, y + 1, width));
+                else if(horizontalFlip)
+                {
+                    //BGGR Pattern
+                    for (__u32 y = 0; y < height; y += 2) {
+                        for (__u32 x = 0; x < width; x += 2) {
+                            uint8_t b = CLIP(Bay(x, y, width));
+                            uint8_t g = CLIP(Bay(x + 1, y, width));
+                            uint8_t r = CLIP(Bay(x + 1, y + 1, width));
 
-                        B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
-                        G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = g;
-                        R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
+                            B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
+                            G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = g;
+                            R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
+                        }
                     }
                 }
-            }
-            else if(verticalFlip)
-            {
-                //RGGB Pattern
-                for (__u32 y = 0; y < height; y += 2) {
-                    for (__u32 x = 0; x < width; x += 2) {
-                        uint8_t r = CLIP(Bay(x, y, width));
-                        uint8_t g1 = CLIP(Bay(x + 1, y, width));
-                        uint8_t g2 = CLIP(Bay(x, y + 1, width));
-                        uint8_t b = CLIP(Bay(x + 1, y + 1, width));
+                else if(verticalFlip)
+                {
+                    //RGGB Pattern
+                    for (__u32 y = 0; y < height; y += 2) {
+                        for (__u32 x = 0; x < width; x += 2) {
+                            uint8_t r = CLIP(Bay(x, y, width));
+                            uint8_t g1 = CLIP(Bay(x + 1, y, width));
+                            uint8_t g2 = CLIP(Bay(x, y + 1, width));
+                            uint8_t b = CLIP(Bay(x + 1, y + 1, width));
 
-                        G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = (g1 + g2) / 2;
-                        R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
-                        B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
+                            G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = (g1 + g2) / 2;
+                            R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
+                            B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
+                        }
                     }
                 }
-            }
 
-            //Converting y16BayerDestBuffer to UYVY after Debayering for rendering
-            rgb2uyvy(y16BayerDestBuffer, yuyvBuffer, width, height);
-            memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+                //Converting y16BayerDestBuffer to UYVY after Debayering for rendering
+                rgb2uyvy(y16BayerDestBuffer, yuyvBuffer, width, height);
+                memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+            } else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M) {//No Debayering for monochrome cameras
+
+                m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
+
+                sourceBuf20CUG = (uint16_t *)malloc(width * height * 2);
+                uint8_t *pfmb = yuyvBuffer;
+                memcpy(sourceBuf20CUG, rawY16Buffer, (width * height * 2));
+
+                /* Y16 to YUYV conversion */
+                for(__u32 l=0; l<(width * height); l++)
+                {
+                    *pfmb++ =uint8_t(sourceBuf20CUG[l] * 0.2490234375);
+                    *pfmb++ = 0x80;
+                }
+
+                memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+                freeBuffer((uint8_t *)sourceBuf20CUG);
+            }
         }
         else if(y16FormatFor20CUG){
             m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
@@ -5251,7 +5339,11 @@ void Videostreaming::recordVideo(){  // Added by Navya : 25 Nov 2019 -- To confi
         if((m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY) && (width != 640 && (height !=480 | height != 360))){    // Added by Navya :  16 March 2020 -passing yuyv data for uyvy format in 640x480 reolution alone to avoid aliasing effect in preview.
             videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->UYVY_BUFFER);
         } else if (m_renderer->rawY10Format){
-            videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->UYVY_BUFFER);
+            if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
+                videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->UYVY_BUFFER);
+            } else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M){
+                videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->YUYV_BUFFER);
+            }
         }
         else if(m_capSrcFormat.fmt.pix.pixelformat==V4L2_PIX_FMT_GREY){
             videoEncoder->encodeImage(m_renderer->greyBuffer,videoEncoder->Y8_BUFFER);
@@ -5445,7 +5537,7 @@ void Videostreaming::masterModeEnabled() {
     trigger_mode = false;
     m_renderer->triggermodeFlag = false;
      m_snapShot = false;
-     if(!(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)){ //To avoid executing mismatched shader function when switched from trigger mode to master mode
+     if(!(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M)){ //To avoid executing mismatched shader function when switched from trigger mode to master mode
          m_renderer->gotFrame = true;        // Added by Nivedha : 09 Mar 2021 -- To get preview when changed from trigger mode to master mode.
      }
      m_renderer->updateStop = false;

@@ -715,7 +715,7 @@ Item {
 
      onCurrentTemperature: {
         temperature = parseFloat((temperature).toFixed(2));
-        readTempTextField.text = temperature
+        readTempTextField.text = temperature.toFixed(2)
      }
      onTitleTextChanged: {
          messageDialog.title = _title.toString()

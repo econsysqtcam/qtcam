@@ -95,7 +95,8 @@ SOURCES += main.cpp \
     see3cam_50cug.cpp \
     see3cam_cu512_m.cpp \
     see3cam_cu84.cpp \
-    see3cam_cu31.cpp
+    see3cam_cu200m.cpp \
+    see3cam_cu31.cpp \
 
 # Installation path
 # target.path =
@@ -171,7 +172,8 @@ HEADERS += \
     see3cam_50cug.h \
     see3cam_cu84.h \
     see3cam_cu512_m.h \
-    see3cam_cu31.h
+    see3cam_cu31.h \
+    see3cam_cu200m.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
@@ -243,7 +245,15 @@ QMAKE_CFLAGS_ISYSTEM = -I                           #For Ubuntu 20.04
 #Conditionally including additional source files depends upon OS type
 contains(DEFINES, UBUNTU_22_04) {
     OTHER_FILES += \
-        ub22_qml/qtcam/Views/qtcam.qml
+        ub22_qml/qtcam/Views/qtcam.qml \
+        ub22_qml/qtcam/Views/aboutview.qml \
+        ub22_qml/qtcam/Views/audiocapturesettings.qml \
+        ub22_qml/qtcam/Views/captureandvideorecord.qml \
+        ub22_qml/qtcam/Views/imagequalitysettings.qml \
+        ub22_qml/qtcam/Views/renderer.qml \
+        ub22_qml/qtcam/Views/statusbar.qml \
+        ub22_qml/qtcam/Views/stillcapturesettings.qml \
+        ub22_qml/qtcam/Views/videocapturesettings.qml
 
     DISTFILES += \
         ub22_qml/qtcam/UVCSettings/ascella/cx3-uvc.qml \
@@ -285,6 +295,7 @@ contains(DEFINES, UBUNTU_22_04) {
         ub22_qml/qtcam/UVCSettings/see3camcu136m/see3cam_cu136m.qml \
         ub22_qml/qtcam/UVCSettings/see3camcu20/see3camcu20.qml \
         ub22_qml/qtcam/UVCSettings/see3camcu200/see3camcu200.qml \
+        ub22_qml/qtcam/UVCSettings/see3camcu200m/see3camcu200m.qml \
         ub22_qml/qtcam/UVCSettings/See3CamCu210/see3camcu210.qml \
         ub22_qml/qtcam/UVCSettings/see3camcu22/see3camcu22.qml \
         ub22_qml/qtcam/UVCSettings/see3camcu27/see3camcu27.qml \
@@ -352,5 +363,6 @@ else:{
         qml/qtcam/UVCSettings/see3camcu83/see3camcu83.qml \
         qml/qtcam/UVCSettings/see3camcu84/see3camcu84.qml \
         qml/qtcam/UVCSettings/see3camcu31/seecamcu31.qml \
+        qml/qtcam/UVCSettings/see3camcu200m/see3camcu200m.qml \
         qml/qtcam/UVCSettings/others/others.qml \
 }

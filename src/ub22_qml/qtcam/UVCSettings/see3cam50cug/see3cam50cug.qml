@@ -86,6 +86,8 @@ Item{
         }
         function onGetSaturationFromUVC(saturationFromUVC){
             saturationSlider.value = saturationFromUVC
+            see3cam50cug.setSaturation(saturationFromUVC)
+            skipUpdateSaturation = true
         }
         function onGetGammaFromUVC(gammaFromUVC){
             gammaCorrectionSlider.value = gammaFromUVC
@@ -273,7 +275,7 @@ Used for modifying Digital Gain of R channel in steps of 0.04"
                             style:econSliderStyle
                             stepSize: 0.005
                             onValueChanged:  {
-                                gainRTextField.text = gainRSlider.value
+                                gainRTextField.text = gainRSlider.value.toFixed(3)
                                 if(skipUpdateRGainMode){
                                     adjustedRGain = parseFloat((gainRSlider.value).toFixed(3));
                                     gainRTextField.text = adjustedRGain
@@ -331,7 +333,7 @@ Used for modifying Digital Gain of B channel in steps of 0.04"
                             style:econSliderStyle
                             stepSize: 0.005
                             onValueChanged:  {
-                                gainBTextField.text = gainBSlider.value
+                                gainBTextField.text = gainBSlider.value.toFixed(3)
                                 if(skipUpdateBGainMode){
                                     adjustedBGain = parseFloat((gainBSlider.value).toFixed(3));
                                     gainBTextField.text = adjustedBGain
@@ -613,7 +615,9 @@ Used for changing brightness by modifying Y channel gain in steps of 0.04"
                        style: econTextFieldStyle
                        validator: IntValidator {bottom: brightnessSlider.minimumValue; top: brightnessSlider.maximumValue}
                        onTextChanged: {
-                           if(text.length > 0){
+                           const match = brightnessTextField.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                           if(match){
+                               brightnessTextField.text = match[1];
                                brightnessSlider.value = brightnessTextField.text
                            }
                        }
@@ -729,7 +733,9 @@ Used for changing saturation by modifying the gain of Z curve applied to UV chan
                        style: econTextFieldStyle
                        validator: IntValidator {bottom: saturationSlider.minimumValue; top: saturationSlider.maximumValue}
                        onTextChanged: {
-                           if(text.length > 0){
+                           const match = saturationTextField.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                           if(match){
+                               saturationTextField.text = match[1];
                                saturationSlider.value = saturationTextField.text
                            }
                        }
@@ -861,7 +867,7 @@ Used for changing gamma by modifying strengths of gamma correction curve applied
                        maximumValue: colorCorrectionMax
                        stepSize: 0.1
                        onValueChanged:  {
-                           gammaCorrectionTextField.text = gammaCorrectionSlider.value
+                           gammaCorrectionTextField.text = gammaCorrectionSlider.value.toFixed(1)
                            if(skipUpdateGammaCorrection){
                                // Round the slider and TextField to three decimal places
                                adjustedGammaCorrection = parseFloat((gammaCorrectionSlider.value).toFixed(1));
@@ -870,8 +876,8 @@ Used for changing gamma by modifying strengths of gamma correction curve applied
                                gammaInt = adjustedGammaCorrection * 10
                                root.sendGammaToUVC(gammaInt)
 
-                               gammaCorrectionTextField.text = adjustedGammaCorrection
-                               see3cam50cug.setGammaCorrection(adjustedGammaCorrection)
+                               gammaCorrectionTextField.text = adjustedGammaCorrection.toFixed(1)
+                               see3cam50cug.setGammaCorrection(adjustedGammaCorrection.toFixed(1))
                            }
                            skipUpdateGammaCorrection = true
                        }
@@ -1363,22 +1369,23 @@ This feature is supported in Acquisition trigger."
         onGainValueReceived: {
             skipUpdateGainMode = false
             gainSlider.value = gainValue
+            root.getGainValueFromHID(gainValue)
             skipUpdateGainMode = true
         }
 
         onGainRReceived: {
             skipUpdateRGainMode = false
             RGain = parseFloat((RGain).toFixed(3));
-            gainRSlider.value = RGain
-            gainRTextField.text = RGain
+            gainRSlider.value = RGain.toFixed(3)
+            gainRTextField.text = RGain.toFixed(3)
             skipUpdateRGainMode = true
         }
 
         onGainBReceived: {
             skipUpdateBGainMode = false
             BGain = parseFloat((BGain).toFixed(3));
-            gainBSlider.value = BGain
-            gainBTextField.text = BGain
+            gainBSlider.value = BGain.toFixed(3)
+            gainBTextField.text = BGain.toFixed(3)
             skipUpdateBGainMode = true
         }
 
@@ -1391,12 +1398,18 @@ This feature is supported in Acquisition trigger."
             brightness = parseFloat((brightness).toFixed(3));
             brightnessSlider.value = brightness
             brightnessTextField.text = brightness
+
+            //Sending values to UVC
+            brightnessInt = brightness * 200;
+            root.sendBrightnessToUVC(brightnessInt)
+
             skipUpdateBrightness = true
         }
 
         onContrastReceived: {
             skipUpdateContrast = false
             contrastSlider.value = contrast
+            root.sendContrastToUVC(contrast)
             skipUpdateContrast = true
         }
 
@@ -1405,6 +1418,11 @@ This feature is supported in Acquisition trigger."
             saturation = parseFloat((saturation).toFixed(3));
             saturationSlider.value = saturation
             saturationTextField.text = saturation
+
+            //Sending values to UVC
+            saturationInt = saturation * 200
+            root.sendSaturationToUVC(saturationInt)
+
             skipUpdateSaturation = true
         }
 
@@ -1412,29 +1430,24 @@ This feature is supported in Acquisition trigger."
             skipUpdateColorTemperature = false
             colorTempTextField.text = colorTemp
 
-            if(colorTemp == "2300")
-            {
+            if(colorTemp == "2300") {
                colorTempSlider.value = 0
-            }
-            else if(colorTemp == "2800")
-            {
+               root.sendColorTemperatureToUVC(1)
+            } else if(colorTemp == "2800") {
                 colorTempSlider.value = 1
-            }
-            else if(colorTemp == "3000")
-            {
+                root.sendColorTemperatureToUVC(2)
+            } else if(colorTemp == "3000") {
                 colorTempSlider.value = 2
-            }
-            else if(colorTemp == "4000")
-            {
+                root.sendColorTemperatureToUVC(3)
+            } else if(colorTemp == "4000") {
                 colorTempSlider.value = 3
-            }
-            else if(colorTemp == "6000")
-            {
+                root.sendColorTemperatureToUVC(4)
+            } else if(colorTemp == "6000") {
                 colorTempSlider.value = 4
-            }
-            else if(colorTemp == "6500")
-            {
+                root.sendColorTemperatureToUVC(5)
+            } else if(colorTemp == "6500") {
                 colorTempSlider.value = 5
+                root.sendColorTemperatureToUVC(6)
             }
 
             skipUpdateColorTemperature = true
@@ -1443,8 +1456,13 @@ This feature is supported in Acquisition trigger."
         onGammaCorrectionReceived: {
             skipUpdateGammaCorrection = false
             gammaCorrection = parseFloat((gammaCorrection).toFixed(1));
-            gammaCorrectionSlider.value = gammaCorrection
-            gammaCorrectionTextField.text = gammaCorrection
+            gammaCorrectionSlider.value = gammaCorrection.toFixed(1)
+            gammaCorrectionTextField.text = gammaCorrection.toFixed(1)
+
+            //Sending values to UVC
+            gammaInt = gammaCorrection * 10
+            root.sendGammaToUVC(gammaInt)
+
             skipUpdateGammaCorrection = true
         }
 
@@ -1481,6 +1499,14 @@ This feature is supported in Acquisition trigger."
 
         onExposureValueReceived: {
             manualExpTextField.text = exposure
+
+            //Sending values to UVC
+            if(manualExpTextField.text <= 2000000){
+                exposureInt = manualExpTextField.text / 100
+                root.sendExposureToUVC(exposureInt)
+            } else{
+                root.sendExposureToUVC(200000)
+            }
         }
 
         onValueRReceived: {

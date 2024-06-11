@@ -1623,6 +1623,9 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu200/see3camcu200.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200M) {
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu200m/see3camcu200m.qml").createObject(root)
+        }
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU31) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu31/seecamcu31.qml").createObject(root)
         }
@@ -1632,7 +1635,6 @@ Rectangle {
         see3cam.visible = false
         extensionTabVisible(false)
     }
-
     // Added by Sankari : 16 Dec 2016
     // Disable saving image when focus is changed from trigger mode to master mode
     // or changing to any other camera if it is m_saveImage flag set as true to avoid displaying unnecessary pop up dialog.
@@ -1696,6 +1698,7 @@ Rectangle {
         case CommonEnums.SEE3CAM_50CUG:  //Added by Sushanth.S
         case CommonEnums.SEE3CAM_CU84:   //Added by Sushanth.S
         case CommonEnums.SEE3CAM_CU200:  //Added By Sushanth.S
+        case CommonEnums.SEE3CAM_CU200M:  //Added By Sushanth.S
         case CommonEnums.SEE3CAM_CU31:   //Added By Sushanth.S
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);

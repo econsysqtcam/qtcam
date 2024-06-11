@@ -128,13 +128,19 @@ Item{
             }
         }
         function onGetBrightnessFromUVC(brightnessFromUVC){
-            brightnessSlider.value = brightnessFromUVC
+            skipUpdateBrightness = false
+            brightnessSlider.value = brightnessFromUVC.toFixed(3)
+            see3camcu200.setBrightness(brightnessFromUVC)
+            skipUpdateBrightness = true
         }
         function onGetContrastFromUVC(contrastFromUVC){
             contrastSlider.value = contrastFromUVC
         }
         function onGetSaturationFromUVC(saturationFromUVC){
-            saturationSlider.value = saturationFromUVC
+            skipUpdateSaturation = false
+            saturationSlider.value = saturationFromUVC.toFixed(3)
+            see3camcu200.setSaturation(saturationFromUVC)
+            skipUpdateSaturation = true
         }
         function onGetGammaFromUVC(gammaFromUVC){
             gammaCorrectionSlider.value = gammaFromUVC
@@ -289,7 +295,12 @@ Item{
                         text: "Auto"
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
-                        tooltip: "This control enables user to set white balance in automatic mode."
+                        ToolButton{
+                            tooltip: "This control enables user to set white balance in automatic mode."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked: {
                             setAutoWhiteBalance()
                         }
@@ -336,7 +347,12 @@ Item{
                         enabled: (autoWb.enabled && autoWb.checked) ? true : false
                         opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
                         style: econRadioButtonStyle
-                        tooltip: "The camera detects the light source and sets the white balance value continuously with respect to change in scenes."
+                        ToolButton{
+                            tooltip: "The camera detects the light source and sets the white balance value continuously with respect to change in scenes."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked: {
                             skipUpdateSingleShotWhiteBalance = true
                             setAutoWhiteBalance()
@@ -358,7 +374,12 @@ Item{
                         style: econRadioButtonStyle
                         enabled: (autoWb.enabled && autoWb.checked) ? true : false
                         opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
-                        tooltip: "The camera calculates the white balance based on the current scene just once and strict with it until next request."
+                        ToolButton{
+                            tooltip: "The camera calculates the white balance based on the current scene just once and strict with it until next request."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked: {
                             setAutoWhiteBalance()
                         }
@@ -408,7 +429,12 @@ Item{
                          style: econRadioButtonStyle
                          enabled: (manualWb.enabled && manualWb.checked) ? true : false
                          opacity: (manualWb.enabled && manualWb.checked) ? 1 : 0.1
-                         tooltip: "It is used for white balancing the scene based on the temperature set by applying predefined R and B digital gain."
+                         ToolButton{
+                             tooltip: "It is used for white balancing the scene based on the temperature set by applying predefined R and B digital gain."
+                             width: 15
+                             height: 20
+                             opacity: 0
+                         }
                          onClicked: {
                              setManualWhiteBalance()
                          }
@@ -645,7 +671,9 @@ Item{
                          opacity: (proMode.enabled && proMode.checked) ? 1 : 0.1
                          enabled: (proMode.enabled && proMode.checked) ? true : false
                          onTextChanged: {
-                             if(text.length > 0){
+                             const match = gainBTextField.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                             if(match){
+                                 gainBTextField.text = match[1];
                                  gainBSlider.value = gainBTextField.text
                              }
                          }
@@ -914,7 +942,7 @@ Item{
                         style:econSliderStyle
 
                         onValueChanged:  {
-                            saturationTextField.text = saturationSlider.value
+                            saturationTextField.text = saturationSlider.value.toFixed(3)
                             if(skipUpdateSaturation){
                                 // Round the slider and TextField to three decimal places
                                 adjustedSaturation = parseFloat((saturationSlider.value).toFixed(3));
@@ -923,8 +951,8 @@ Item{
                                 saturationInt = adjustedSaturation * 200
                                 root.sendSaturationToUVC(saturationInt)
 
-                                saturationTextField.text = adjustedSaturation
-                                see3camcu200.setSaturation(adjustedSaturation)
+                                saturationTextField.text = adjustedSaturation.toFixed(3)
+                                see3camcu200.setSaturation(adjustedSaturation.toFixed(3))
                             }
                             skipUpdateSaturation = true
                         }
@@ -938,7 +966,9 @@ Item{
                         style: econTextFieldStyle
                         validator: IntValidator {bottom: saturationSlider.minimumValue; top: saturationSlider.maximumValue}
                         onTextChanged: {
-                            if(text.length > 0){
+                            const match = saturationTextField.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                            if(match){
+                                saturationTextField.text = match[1];
                                 saturationSlider.value = saturationTextField.text
                             }
                         }
@@ -1003,11 +1033,6 @@ Item{
                     smooth: true
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
-                    ToolButton{
-                        tooltip: "It controls the integration time of the sensor. It changes in the range of 100µs to 1s. It is expressed in microseconds(µs)."
-                        opacity: 0
-                        width: 200
-                    }
                 }
                 Row{
                     spacing: 30
@@ -1019,7 +1044,12 @@ Item{
                         text: "Auto"
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
-                        tooltip: "This control enables user to set exposure in automatic mode."
+                        ToolButton{
+                            tooltip: "This control enables user to set exposure in automatic mode."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked: {
                             setExposureProperties()
                         }
@@ -1034,7 +1064,12 @@ Item{
                         text: "Manual"
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
-                        tooltip: "This control enables user to set the manual exposure value."
+                        ToolButton{
+                            tooltip: "This control enables user to set the manual exposure value."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked: {
                             setExposureProperties()
                         }
@@ -1066,7 +1101,12 @@ Item{
                         enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
                         opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                         style: econRadioButtonStyle
-                        tooltip: "The camera detects the light source and sets the exposure value continuously with respect to change in scenes."
+                        ToolButton{
+                            tooltip: "The camera detects the light source and sets the exposure value continuously with respect to change in scenes."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked: {
                             see3camcu200.setExposure(SEE3CAM_CU200.AUTO_EXPOSURE,SEE3CAM_CU200.CONTINIOUS_EXPOSURE, manualExpTextField.text)
                         }
@@ -1086,7 +1126,12 @@ Item{
                         style: econRadioButtonStyle
                         enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
                         opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
-                        tooltip: "The camera calculates the exposure based on the current scene just once and strict with it until next request."
+                        ToolButton{
+                            tooltip: "The camera calculates the exposure based on the current scene just once and strict with it until next request."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked: {
                             see3camcu200.setExposure(SEE3CAM_CU200.AUTO_EXPOSURE,SEE3CAM_CU200.SINGLE_SHOT_EXPOUSRE, manualExpTextField.text)
                         }
@@ -1366,10 +1411,12 @@ Item{
                           activeFocusOnPress: true
                           style: econRadioButtonStyle
                           opacity: enabled ? 1 : 0.1
-                          // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
-                          // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
-                          // winSize is required only for manual mode
-                          tooltip: "Full region-based exposure value will be applied to the frame."
+                          ToolButton{
+                              tooltip: "Full region-based exposure value will be applied to the frame."
+                              width: 15
+                              height: 20
+                              opacity: 0
+                          }
                           onClicked: {
                               setROIAutoExposure()
                           }
@@ -1384,8 +1431,13 @@ Item{
                           activeFocusOnPress: true
                           style: econRadioButtonStyle
                           opacity: enabled ? 1 : 0.1
-                          tooltip: "Users can select the region of interest to calculate the exposure value for that particular area. This value will then be applied to the entire frame.
+                          ToolButton{
+                              tooltip: "Users can select the region of interest to calculate the exposure value for that particular area. This value will then be applied to the entire frame.
 The mouse click button can be used to select the auto exposure area in the preview."
+                              width: 15
+                              height: 20
+                              opacity: 0
+                          }
                           onClicked: {
                               setROIAutoExposure()
                           }
@@ -1487,7 +1539,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                         text: "Auto"
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
-                        tooltip: "This control enables user to set gain in automatic mode."
+                        ToolButton{
+                            tooltip: "This control enables user to set gain in automatic mode."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked: {
                             setGainProperties()
                         }
@@ -1503,7 +1560,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                         text: "Manual"
                         activeFocusOnPress: true
                         style: econRadioButtonStyle
-                        tooltip: "This control enables user to set the manual gain value."
+                        ToolButton{
+                            tooltip: "This control enables user to set the manual gain value."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked: {
                             setGainProperties()
                         }
@@ -1533,7 +1595,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                         enabled: (autoGain.enabled && autoGain.checked) ? true : false
                         opacity: (autoGain.enabled && autoGain.checked) ? 1 : 0.1
                         style: econRadioButtonStyle
-                        tooltip: "The camera detects the light source and sets the gain value continuously with respect to change in scenes."
+                        ToolButton{
+                            tooltip: "The camera detects the light source and sets the gain value continuously with respect to change in scenes."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked: {
                             setGainProperties()
                         }
@@ -1553,7 +1620,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                         style: econRadioButtonStyle
                         enabled: (autoGain.enabled && autoGain.checked) ? true : false
                         opacity: (autoGain.enabled && autoGain.checked) ? 1 : 0.1
-                        tooltip: "The camera calculates the gain based on the current scene just once and strict with it until next request."
+                        ToolButton{
+                            tooltip: "The camera calculates the gain based on the current scene just once and strict with it until next request."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked: {
                             setGainProperties()
                         }
@@ -1768,7 +1840,7 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                         width: 150
                         style:econSliderStyle
                         onValueChanged:  {
-                            brightnessTextField.text = brightnessSlider.value
+                            brightnessTextField.text = brightnessSlider.value.toFixed(3)
                             if(skipUpdateBrightness){
                                 // Round the slider and TextField to three decimal places
                                 adjustedBrightness = parseFloat((brightnessSlider.value).toFixed(3));
@@ -1777,8 +1849,8 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                 brightnessInt = adjustedBrightness * 200;
                                 root.sendBrightnessToUVC(brightnessInt)
 
-                                brightnessTextField.text = adjustedBrightness
-                                see3camcu200.setBrightness(adjustedBrightness)
+                                brightnessTextField.text = adjustedBrightness.toFixed(3)
+                                see3camcu200.setBrightness(adjustedBrightness.toFixed(3))
                             }
                             skipUpdateBrightness = true
                         }
@@ -1792,7 +1864,9 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                         style: econTextFieldStyle
                         validator: IntValidator {bottom: brightnessSlider.minimumValue; top: brightnessSlider.maximumValue}
                         onTextChanged: {
-                            if(text.length > 0){
+                            const match = brightnessTextField.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                            if(match){
+                                brightnessTextField.text = match[1];
                                 brightnessSlider.value = brightnessTextField.text
                             }
                         }
@@ -1885,8 +1959,8 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                 gammaInt = adjustedGammaCorrection * 10
                                 root.sendGammaToUVC(gammaInt)
 
-                                gammaCorrectionTextField.text = adjustedGammaCorrection
-                                see3camcu200.setGammaCorrection(adjustedGammaCorrection)
+                                gammaCorrectionTextField.text = adjustedGammaCorrection.toFixed(1)
+                                see3camcu200.setGammaCorrection(adjustedGammaCorrection.toFixed(1))
                             }
                             skipUpdateGammaCorrection = true
                         }
@@ -1901,7 +1975,9 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                         readOnly:true
                         validator: IntValidator {bottom: gammaCorrectionSlider.minimumValue; top: gammaCorrectionSlider.maximumValue}
                         onTextChanged: {
-                            if(text.length > 0){
+                            const match = gammaCorrectionTextField.text.match(/^(-?\d+(\.\d{0,1})?).*/);
+                            if(match){
+                                gammaCorrectionTextField.text = match[1];
                                 gammaCorrectionSlider.value = gammaCorrectionTextField.text
                             }
                         }
@@ -1979,7 +2055,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                         activeFocusOnPress : true
                         text: "Horizontal"
                         style: econCheckBoxStyle
-                        tooltip: "Flips the preview left/right."
+                        ToolButton{
+                            tooltip: "Flips the preview left/right."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked:{
                             see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                             sendFlipStatus()
@@ -1994,7 +2075,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                         activeFocusOnPress : true
                         text: "Vertical"
                         style: econCheckBoxStyle
-                        tooltip: "Flips the preview vertically up/down."
+                        ToolButton{
+                            tooltip: "Flips the preview vertically up/down."
+                            width: 15
+                            height: 20
+                            opacity: 0
+                        }
                         onClicked:{
                             see3camcu200.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                             sendFlipStatus()
@@ -2028,7 +2114,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                       text: qsTr("Master")
                       exclusiveGroup: cameraModeGroup
                       activeFocusOnPress: true
-                      tooltip: " After choosing master mode, the application starts video streaming. This is a simple mode of operation for the camera without any external trigger capability."
+                      ToolButton{
+                          tooltip: "After choosing master mode, the application starts video streaming. This is a simple mode of operation for the camera without any external trigger capability."
+                          width: 15
+                          height: 20
+                          opacity: 0
+                      }
                       onClicked: {
                           setMasterMode()
                       }
@@ -2042,7 +2133,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                       text: qsTr("Trigger")
                       exclusiveGroup: cameraModeGroup
                       activeFocusOnPress: true
-                      tooltip: "In Trigger mode, Frames will be out only when external hardware pulses are given to PIN1 of CN4."
+                      ToolButton{
+                          tooltip: "In Trigger mode, Frames will be out only when external hardware pulses are given to PIN1 of CN4."
+                          width: 15
+                          height: 20
+                          opacity: 0
+                      }
                       onClicked: {
                           setTriggerMode()
                       }
@@ -2071,7 +2167,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                        exclusiveGroup: strobesGrp
                        checked: false
                        text: "On"
-                       tooltip: "When this control is enabled, the LED is ON for each frame’s exposure time while Video Streaming."
+                       ToolButton{
+                           tooltip: "When this control is enabled, the LED is ON for each frame’s exposure time while Video Streaming."
+                           width: 15
+                           height: 20
+                           opacity: 0
+                       }
                        activeFocusOnPress: true
                        style: econRadioButtonStyle
                        onClicked: {
@@ -2087,7 +2188,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                        exclusiveGroup: strobesGrp
                        checked: false
                        text: "Off"
-                       tooltip: "It disables strobe control."
+                       ToolButton{
+                           tooltip: "It disables strobe control."
+                           width: 15
+                           height: 20
+                           opacity: 0
+                       }
                        activeFocusOnPress: true
                        style: econRadioButtonStyle
                        onClicked: {
@@ -2213,6 +2319,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                            style: econTextFieldStyle
                            enabled: (autoWb.enabled && autoWb.checked) ? true : false
                            opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
+                           onTextChanged: {
+                               const match = rGainStatTextField.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                               if(match){
+                                   rGainStatTextField.text = match[1];
+                               }
+                           }
                        }
                    }
 
@@ -2243,6 +2355,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                            style: econTextFieldStyle
                            enabled: (autoWb.enabled && autoWb.checked) ? true : false
                            opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
+                           onTextChanged: {
+                               const match = bGainStatTextField.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                               if(match){
+                                   bGainStatTextField.text = match[1];
+                               }
+                           }
                        }
                    }
                }
@@ -2279,6 +2397,13 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                font.family: "Ubuntu"
                                readOnly: true
                                smooth: true
+                               onTextChanged: {
+                                   const match = readRr.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                                   if(match){
+                                       readRr.text = match[1];
+                                   }
+                               }
+
                                horizontalAlignment: TextInput.AlignHCenter
                                enabled: (autoWb.enabled && autoWb.checked) ? true : false
                                opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
@@ -2307,6 +2432,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
                                horizontalAlignment: TextInput.AlignHCenter
                                style: econTextFieldStyle
+                               onTextChanged: {
+                                   const match = readRg.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                                   if(match){
+                                       readRg.text = match[1];
+                                   }
+                               }
                            }
                            Label {
                                text: "Rg"
@@ -2331,6 +2462,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
                                horizontalAlignment: TextInput.AlignHCenter
                                style: econTextFieldStyle
+                               onTextChanged: {
+                                   const match = readRb.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                                   if(match){
+                                       readRb.text = match[1];
+                                   }
+                               }
                            }
                            Label {
                                text: "Rb"
@@ -2361,6 +2498,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
                                horizontalAlignment: TextInput.AlignHCenter
                                style: econTextFieldStyle
+                               onTextChanged: {
+                                   const match = readGr.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                                   if(match){
+                                       readGr.text = match[1];
+                                   }
+                               }
                            }
                            Label {
                                text: "Gr"
@@ -2385,6 +2528,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                enabled: (autoWb.enabled && autoWb.checked) ? true : false
                                opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
                                horizontalAlignment: TextInput.AlignHCenter
+                               onTextChanged: {
+                                   const match = readGg.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                                   if(match){
+                                       readGg.text = match[1];
+                                   }
+                               }
                            }
                            Label {
                                text: "Gg"
@@ -2409,6 +2558,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
                                horizontalAlignment: TextInput.AlignHCenter
                                style: econTextFieldStyle
+                               onTextChanged: {
+                                   const match = readGb.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                                   if(match){
+                                       readGb.text = match[1];
+                                   }
+                               }
                            }
 
                            Label {
@@ -2439,6 +2594,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
                                horizontalAlignment: TextInput.AlignHCenter
                                style: econTextFieldStyle
+                               onTextChanged: {
+                                   const match = readBr.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                                   if(match){
+                                       readBr.text = match[1];
+                                   }
+                               }
                            }
                            Label {
                                text: "Br"
@@ -2463,6 +2624,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
                                horizontalAlignment: TextInput.AlignHCenter
                                style: econTextFieldStyle
+                               onTextChanged: {
+                                   const match = readBg.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                                   if(match){
+                                       readBg.text = match[1];
+                                   }
+                               }
                            }
                            Label {
                                text: "Bg"
@@ -2487,6 +2654,12 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                                opacity: (autoWb.enabled && autoWb.checked) ? 1 : 0.1
                                horizontalAlignment: TextInput.AlignHCenter
                                style: econTextFieldStyle
+                               onTextChanged: {
+                                   const match = readBb.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                                   if(match){
+                                       readBb.text = match[1];
+                                   }
+                               }
                            }
                            Label {
                                text: "Bb"
@@ -2983,8 +3156,8 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
             saturationSlider.stepSize = stepValue
 
             currentSaturation = parseFloat((currentSaturation).toFixed(3));
-            saturationSlider.value = currentSaturation
-            saturationTextField.text = currentSaturation
+            saturationSlider.value = currentSaturation.toFixed(3)
+            saturationTextField.text = currentSaturation.toFixed(3)
 
             adjustedSaturation = parseFloat((saturationSlider.value).toFixed(3));
 
@@ -3017,8 +3190,8 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
 
             currentGamma = parseFloat((currentGamma).toFixed(1));
 
-            gammaCorrectionSlider.value = currentGamma
-            gammaCorrectionTextField.text = currentGamma
+            gammaCorrectionSlider.value = currentGamma.toFixed(1)
+            gammaCorrectionTextField.text = currentGamma.toFixed(1)
 
             adjustedGammaCorrection = parseFloat((gammaCorrectionSlider.value).toFixed(1));
 

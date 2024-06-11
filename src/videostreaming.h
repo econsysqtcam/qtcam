@@ -307,6 +307,9 @@ public:
     //Added By Sushanth - To Convert UYVY to RGB following BT.709 standard
     bool convertUYVYToRGB(unsigned char *inputBuffer, int inputSize, unsigned char *outputBuffer);
 
+    //Added By Sushanth - To Convert UYVY to RGB
+    bool convertYUYVToRGB(unsigned char *inputBuffer, int inputSize, unsigned char *outputBuffer);
+
     static int jpegDecode(Videostreaming *obj, unsigned char **pic, unsigned char *buf, unsigned long bytesUsed);
     static int decomp(Videostreaming *obj, unsigned char **jpegbuf,
                                    unsigned long *jpegsize, unsigned char *dstbuf, int w, int h,
