@@ -1,4 +1,5 @@
-qtcam (26.0.18-0ubuntu1) jammy; urgency=medium
+qtcam (26.0.21-0ubuntu1) jammy; urgency=medium
+ *Added support for See3CAM_CU200M & Updated latest fixes for See3CAM_CU200, See3CAM_50CUG.
  *Updated latest code for See3CAM_CU31, See3CAM_CU200, See3CAM_CU83, See3CAM_CU84, See3CAM_50CUG.
  *Stable streaming for Y10 format in See3CAM_CU200.
  *Added new features and modifications for See3CAM_CU81.
@@ -7,4 +8,4 @@ qtcam (26.0.18-0ubuntu1) jammy; urgency=medium
  *Fix for Mipi Camera streaming issue & Manual white balance in UVC.
  *Added support for ubuntu 22.04.
  *Initial release.  
- -- econsysqtcam <qtcam@e-consystems.com>  Thu 23 May 2024 16:38:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com>  Tue 11 June 2024 13:06:01 +0530
