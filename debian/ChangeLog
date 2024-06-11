@@ -1,4 +1,5 @@
-qtcam (26.0.20-0ubuntu1) xenial; urgency=medium
+qtcam (26.0.21-0ubuntu1) xenial; urgency=medium
+ *Added support for See3CAM_CU200M.
  *Fixed Floating-Point precession error in ubuntu 16.04 for See3CAM_CU200 & See3CAM_50CUG and White Balance issue & Default mode issue in UVC for See3CAM_50CUG.
  *Added tooltip support in Ubuntu 16.04 for See3CAM_CU200 & Bug fix for See3CAM_50CUG.
  *Fixed white balance issue in See3CAM_CU200 & Bugs in See3CAM_CU83.
@@ -186,4 +187,4 @@ qtcam (26.0.20-0ubuntu1) xenial; urgency=medium
   * Added ARM support.
   * Initial release.  
 
- -- econsysqtcam <qtcam@e-consystems.com> Tue 04 Jun 2024 12:43:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Tue 11 Jun 2024 13:03:01 +0530
