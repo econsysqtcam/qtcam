@@ -1761,6 +1761,101 @@ bool See3CAM_130::saveConfiguration()
 
 
 
+
+/**
+ * @brief See3CAM_130::get64BitSerialNumber - To get 64-bit Serial number
+ * @return true/false
+ */
+bool See3CAM_130::get64BitSerialNumber()
+{
+    QString lsb = "";
+    QString msb = "";
+
+    bool timeout = true;
+    int ret = 0;
+    unsigned int start, end = 0;
+
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+
+    //Set the Report Number
+    g_out_packet_buf[1] = GET_64BIT_UNIQUE_ID_1; 	/* Report Number */
+
+    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
+    if (ret < 0) {
+        _text = tr("Device not available");
+        return false;
+    }
+    /* Read the Unique id from the device */
+    start = uvc.getTickCount();
+    while(timeout)
+    {
+        /* Get a report from the device */
+        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
+        if (ret < 0)
+        {
+        }
+        else
+        {
+            if((g_in_packet_buf[0] == GET_64BIT_UNIQUE_ID_1))
+            {
+                lsb.sprintf("%02x%02x%02x%02x",g_in_packet_buf[1],g_in_packet_buf[2],g_in_packet_buf[3],g_in_packet_buf[4]);
+
+                //Initialize the buffer
+                memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+
+                //Set the Report Number
+                g_out_packet_buf[1] = GET_64BIT_UNIQUE_ID_1;
+                g_out_packet_buf[2] = GET_64BIT_UNIQUE_ID_2;
+
+                ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
+                if (ret < 0) {
+                    _text = tr("Device not available");
+                    return false;
+                }
+                start = uvc.getTickCount();
+
+                while(timeout)
+                {
+                    /* Get a report from the device */
+                    ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
+                    if (ret < 0)
+                    {
+                    }
+                    else
+                    {
+                        if((g_in_packet_buf[0] == GET_64BIT_UNIQUE_ID_1))
+                        {
+                            msb.sprintf("%02x%02x%02x%02x",g_in_packet_buf[2],g_in_packet_buf[3],g_in_packet_buf[4],g_in_packet_buf[5]);
+                            timeout = false;
+                        }
+                    }
+                }
+            }
+        }
+        end = uvc.getTickCount();
+        if(end - start > TIMEOUT)
+        {
+            timeout = false;
+            return false;
+        }
+    }
+    _text.clear();
+    _text.append(lsb+msb);
+    _title.clear();
+    _title = tr("Serial Number");
+    emit titleTextChanged(_title,_text);
+    return true;
+}
+
+
+
+
 /**
  * @brief See3CAM_130::initializeBuffers - Initialize input and output buffers
  */

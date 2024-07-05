@@ -1,3 +1,10 @@
+Qtcam Application - 26.0.23
+---------------------------
+See3CAM_130
+*Fix for caturing two images in master mode using trigger board instead of one image.
+*Fix for frame corruption in 640x480
+*Set frame rate control after capturing still in cross resolution.
+
 Qtcam Application - 26.0.22
 ---------------------------
 *Removed restart stream API in Master mode for See3CAM_CU55_MH.

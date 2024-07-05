@@ -123,6 +123,9 @@
 #define ENABLE_FACE_RECTANGLE_130       0x01
 #define DISABLE_FACE_RECTANGLE_130      0x00
 
+#define GET_64BIT_UNIQUE_ID_1      0x41
+#define GET_64BIT_UNIQUE_ID_2      0x01
+
 
 class See3CAM_130 : public QObject
 {
@@ -137,6 +140,9 @@ private:
 
 public:
     explicit See3CAM_130(QObject *parent = 0);
+
+    QString _title;
+    QString _text;
 
     enum SCENE_MODES {
         SCENE_NORMAL   = 0x01,
@@ -282,6 +288,7 @@ signals:
      void greenGainMaxReceived(uint maxGreen);
      void greenGainCurrentReceived(uint currentGreen);
 
+     void titleTextChanged(QString _title,QString _text);
      void indicateCommandStatus(QString title, QString text);
      void indicateExposureValueRangeFailure(QString title, QString text);
 
@@ -357,6 +364,8 @@ public slots:
     bool setToDefault();
 
     bool saveConfiguration();
+
+    bool get64BitSerialNumber();
 
 };
 #endif // SEE3CAM_130_H
