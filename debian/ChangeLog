@@ -1,4 +1,5 @@
-qtcam (26.0.22-0ubuntu1) focal; urgency=medium
+qtcam (26.0.23-0ubuntu1) focal; urgency=medium
+ *Bug fix for See3CAM_130.
  *Removed restart stream API in Master mode for See3CAM_CU55_MH.
  *Added support for See3CAM_CU200M.
  *Fixed Floating-Point precession error in ubuntu 16.04 for See3CAM_CU200 & See3CAM_50CUG and White Balance issue & Default mode issue in UVC for See3CAM_50CUG.
@@ -151,5 +152,5 @@ qtcam (26.0.22-0ubuntu1) focal; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Wed 03 Jul 2024 18:24:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Fri 05 Jul 2024 16:54:01 +0530
 
