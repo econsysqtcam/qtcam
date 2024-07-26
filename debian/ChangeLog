@@ -1,4 +1,5 @@
-qtcam (26.0.23-0ubuntu1) bionic; urgency=medium
+qtcam (26.0.24-0ubuntu1) bionic; urgency=medium
+ *Added support for See3CAM_CU200M_H01R1.
  *Bug fix for See3CAM_130.
  *Removed restart stream API in Master mode for See3CAM_CU55_MH.
  *Added support for See3CAM_CU200M.
@@ -153,5 +154,5 @@ qtcam (26.0.23-0ubuntu1) bionic; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Fri 05 Jul 2024 16:52:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Fri 26 Jul 2024 15:00:01 +0530
 
