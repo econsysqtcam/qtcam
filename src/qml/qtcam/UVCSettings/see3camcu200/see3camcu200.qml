@@ -3679,6 +3679,14 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         }
     }
 
+    function sendExposureStatus(){
+        if(autoExposure.checked == true){
+            root.sendExposureStatusToUVC(true, 0)
+        }else if(manualExposure.checked == true){
+            root.sendExposureStatusToUVC(false, (manualExpTextField.text / 100))
+        }
+    }
+
     function setExposureProperties() {
         if(autoExposure.checked == true){
             root.sendExposureStatusToUVC(true, 0)
@@ -3804,6 +3812,8 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
 
         if(see3camcu200.setToDefault()) {
             getCurrentValuesFromCamera()
+            //To send Exposure properties when set default is clicked
+            sendExposureStatus()
         }
         defaultValue.enabled = true
     }

@@ -55,7 +55,7 @@ int skipFrameForTrigger = 0;
 #define B(x, y, w)	y16BayerDestBuffer[2 + 3 * ((x) + (w) * (y))]
 
 #define Bay(x, y, w) bayerIRBuffer[(x) + (w) * (y)]
-#define Bay(x, y, w) rawY16Buffer[(x) + (w) * (y)]
+#define RawY10(x, y, w) rawY16Buffer[(x) + (w) * (y)]
 
 #define CLIP(x) (((x) >= 255) ? 255 : (x))
 
@@ -753,7 +753,7 @@ void FrameRenderer::drawYUYVBUffer(){
     if(renderyuyvMutex.tryLock()){
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200 || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200M || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200 || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200M || (currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200M_H01R1) || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
             skipFrames = frame;
         }
         else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
@@ -1009,7 +1009,7 @@ void FrameRenderer::changeShader(){
                     renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
                     shaderUYVY();
                     drawUYVYBUffer();
-                } else if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200M) {
+                } else if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200M) || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200M_H01R1) {
                     shaderYUYV();
                     drawYUYVBUffer();
                 }
@@ -2161,7 +2161,7 @@ void Videostreaming::capFrame()
             if(m_renderer->y16BayerFormat || m_renderer->rawY10Format){
                 if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
                     bufferToSave = y16BayerDestBuffer;
-                } else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M){//No Debayering for Monochrome camera
+                } else if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M_H01R1)){//No Debayering for Monochrome camera
                     //Converting YUYV to RGB for saving image using QImage
                     convertYUYVToRGB(m_renderer->yuvBuffer, (width*height*2), m_capImage->bits());
 
@@ -3692,10 +3692,10 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                     //GBRG Pattern
                     for (__u32 y = 0; y < height; y += 2) {
                         for (__u32 x = 0; x < width; x += 2) {
-                            uint8_t g1 = CLIP(Bay(x, y, width));
-                            uint8_t b = CLIP(Bay(x + 1, y, width));
-                            uint8_t r = CLIP(Bay(x, y + 1, width));
-                            uint8_t g2 = CLIP(Bay(x + 1, y + 1, width));
+                            uint8_t g1 = CLIP(RawY10(x, y, width));
+                            uint8_t b = CLIP(RawY10(x + 1, y, width));
+                            uint8_t r = CLIP(RawY10(x, y + 1, width));
+                            uint8_t g2 = CLIP(RawY10(x + 1, y + 1, width));
 
                             G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = (g1 + g2) / 2;
                             R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
@@ -3708,10 +3708,10 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                     //GRBG Pattern
                     for (__u32 y = 0; y < height; y += 2) {
                         for (__u32 x = 0; x < width; x += 2) {
-                            uint8_t g1 = CLIP(Bay(x, y, width));
-                            uint8_t r = CLIP(Bay(x + 1, y, width));
-                            uint8_t b = CLIP(Bay(x, y + 1, width));
-                            uint8_t g2 = CLIP(Bay(x + 1, y + 1, width));
+                            uint8_t g1 = CLIP(RawY10(x, y, width));
+                            uint8_t r = CLIP(RawY10(x + 1, y, width));
+                            uint8_t b = CLIP(RawY10(x, y + 1, width));
+                            uint8_t g2 = CLIP(RawY10(x + 1, y + 1, width));
 
                             G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = (g1 + g2) / 2;
                             R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
@@ -3724,9 +3724,9 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                     //BGGR Pattern
                     for (__u32 y = 0; y < height; y += 2) {
                         for (__u32 x = 0; x < width; x += 2) {
-                            uint8_t b = CLIP(Bay(x, y, width));
-                            uint8_t g = CLIP(Bay(x + 1, y, width));
-                            uint8_t r = CLIP(Bay(x + 1, y + 1, width));
+                            uint8_t b = CLIP(RawY10(x, y, width));
+                            uint8_t g = CLIP(RawY10(x + 1, y, width));
+                            uint8_t r = CLIP(RawY10(x + 1, y + 1, width));
 
                             B(x, y, width) = B(x + 1, y, width) = B(x, y + 1, width) = B(x + 1, y + 1, width) = b;
                             G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = g;
@@ -3739,10 +3739,10 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                     //RGGB Pattern
                     for (__u32 y = 0; y < height; y += 2) {
                         for (__u32 x = 0; x < width; x += 2) {
-                            uint8_t r = CLIP(Bay(x, y, width));
-                            uint8_t g1 = CLIP(Bay(x + 1, y, width));
-                            uint8_t g2 = CLIP(Bay(x, y + 1, width));
-                            uint8_t b = CLIP(Bay(x + 1, y + 1, width));
+                            uint8_t r = CLIP(RawY10(x, y, width));
+                            uint8_t g1 = CLIP(RawY10(x + 1, y, width));
+                            uint8_t g2 = CLIP(RawY10(x, y + 1, width));
+                            uint8_t b = CLIP(RawY10(x + 1, y + 1, width));
 
                             G(x, y, width) = G(x + 1, y, width) = G(x, y + 1, width) = G(x + 1, y + 1, width) = (g1 + g2) / 2;
                             R(x, y, width) = R(x + 1, y, width) = R(x, y + 1, width) = R(x + 1, y + 1, width) = r;
@@ -3754,7 +3754,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                 //Converting y16BayerDestBuffer to UYVY after Debayering for rendering
                 rgb2uyvy(y16BayerDestBuffer, yuyvBuffer, width, height);
                 memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
-            } else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M) {//No Debayering for monochrome cameras
+            } else if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M) || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M_H01R1) {//No Debayering for monochrome cameras
 
                 m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
 
@@ -4289,7 +4289,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
         m_renderer->updateStop = true;
 
         //Added By Sushanth - To Enable/Disable HID to set still properties for capturing still in cross resolution
-        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU31) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200))
+        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU31) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M_H01R1))
         {
             emit setCrossStillProperties(false);
         }
@@ -5336,7 +5336,7 @@ void Videostreaming::recordVideo(){  // Added by Navya : 25 Nov 2019 -- To confi
         } else if (m_renderer->rawY10Format){
             if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
                 videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->UYVY_BUFFER);
-            } else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M){
+            } else if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M_H01R1)){
                 videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->YUYV_BUFFER);
             }
         }
@@ -5591,7 +5591,7 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
     if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {
         //Added By Sushanth - To Enable/Disable HID to set Gain, Brightness, Exposure for capturing still in cross resolution
-        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200))
+        if((currentlySelectedCameraEnum == CommonEnums::See3CAM_CU135M_H01R1) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M_H01R1))
         {
             emit setCrossStillProperties(true);
         }

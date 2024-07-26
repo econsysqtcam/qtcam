@@ -39,7 +39,7 @@ Item{
     property int qFactorMin: 10
     property int qFactorMax: 96
 
-    property bool skipUpdateUIQFactor           : false
+    property bool skipUpdateUIQFactor : false
 
     property bool skipUpdateUIDenoise: false
     property bool skipUpdateUIOnExpWindowSize: false
@@ -881,7 +881,6 @@ Item{
                 color: "#ffffff"
                 smooth: true
                 opacity: 1
-                width: 100
                 wrapMode: Text.WordWrap
             }
             background: Rectangle {
