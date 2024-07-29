@@ -31,181 +31,6 @@ See3CAM_CU200M_H01R1::~See3CAM_CU200M_H01R1()
 
 }
 
-
-
-/**
- *  @brief See3CAM_CU200M_H01R1::getGainMode - Retrieves the gain mode, along with the minimum, maximum, and step values, as well as features of both auto and manual gain modes from the camera.
- *  @return True if successful, false otherwise.
-*/
-bool See3CAM_CU200M_H01R1::getGainMode()
-{
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    //Initializing buffers
-    initializeBuffers();
-
-    //Filling the buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[3] = GET_GAIN_MODE_SEE3CAM_CU200_H01R1;
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[9] == GET_FAIL) {
-            return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[2] == GET_GAIN_MODE_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[9] == GET_SUCCESS) {
-
-            emit gainModeReceived(g_in_packet_buf[3], g_in_packet_buf[6], g_in_packet_buf[7], g_in_packet_buf[8], g_in_packet_buf[4], g_in_packet_buf[5]);
-
-            return true;
-        }
-    }
-    return false;
-}
-
-
-
-/**
- * @brief See3CAM_CU200M_H01R1::setGainMode - Setting the gain mode, auto gain features, and manual gain value on the camera.
- * @param gainMode   - Auto or Manual
- * @param autoGain   - Continious or Single Shot
- * @param manualGain - manual gain value
- * @return True if successful, false otherwise.
- */
-bool See3CAM_CU200M_H01R1::setGainMode(GAIN_MODE gainMode, AUTO_GAIN_FEATURES autoGain, uint manualGain)
-{
-    // hid validation
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-    //Initialize buffers
-    initializeBuffers();
-
-    // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[3] = SET_GAIN_MODE_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[4] = gainMode;
-
-    if(gainMode == AUTO_GAIN){
-        g_out_packet_buf[5] = autoGain;
-    } else if(gainMode == MANUAL_GAIN) {
-        g_out_packet_buf[6] = manualGain;
-    }
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6] == GET_FAIL) {
-            return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[2] == SET_GAIN_MODE_SEE3CAM_CU200_H01R1  &&
-            g_in_packet_buf[6] == SET_SUCCESS) {
-
-            return true;
-        }
-    }
-    return false;
-}
-
-
-
-/**
- * @brief See3CAM_CU200M_H01R1::getAutoGainLimit - To get gain upper and lower limit value in camera
- * return true - success /false - failure
- */
-bool See3CAM_CU200M_H01R1::getAutoGainLimit()
-{
-    // hid validation
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    //Initialize buffers
-    initializeBuffers();
-
-    // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[3] = GET_AUTO_GAIN_LIMIT_SEE3CAM_CU200_H01R1;
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-
-        if (g_in_packet_buf[8] == GET_FAIL) {
-            return false;
-        }else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[1]  == CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[2]  == GET_AUTO_GAIN_LIMIT_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[8]  == GET_SUCCESS) {
-
-            emit currentAutoGainLimitValuesReceived(g_in_packet_buf[5],g_in_packet_buf[6],g_in_packet_buf[7],g_in_packet_buf[3],g_in_packet_buf[4]);
-
-            return true;
-        }
-    }
-    return false;
-}
-
-
-
-/**
- * @brief See3CAM_CU200M_H01R1::setGainLimit - set gain limit value in camera
- * @param lowerLimit - Lower limit to be set
- * @param upperLimit - Upper limit to be set
- * return true - success /false - failure
- */
-bool See3CAM_CU200M_H01R1::setAutoGainLimit(uint lowerLimit, uint upperLimit)
-{
-    if(lowerLimit == upperLimit)
-    {
-
-    }
-    else if(lowerLimit > upperLimit)
-    {
-        emit indicateGainValueRangeFailure();
-        return false;
-    }
-
-    // hid validation
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    //Initialize buffers
-    initializeBuffers();
-
-    // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[3] = SET_AUTO_GAIN_LIMIT_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[4] = lowerLimit;
-    g_out_packet_buf[5] = upperLimit;
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6] == GET_FAIL) {
-            return false;
-        }else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[1]  == CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[2]  == SET_AUTO_GAIN_LIMIT_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[6]  == GET_SUCCESS) {
-            return true;
-        }
-    }
-    return false;
-}
-
-
-
 /**
  * @brief See3CAM_CU200M_H01R1::getExposure - Getting exposure value from the camera
  * @return True if successful, false otherwise.
@@ -289,115 +114,6 @@ bool See3CAM_CU200M_H01R1::setExposure(EXPOSURE_MODE expMode, AUTO_EXPOSURE_FEAT
             g_in_packet_buf[9] == GET_SUCCESS) {
 
             emit indicateCommandStatus("Success", "Exposure set successfully");
-            return true;
-        }
-    }
-    return false;
-}
-
-
-
-/**
- * @brief See3CAM_CU200M_H01R1::getAutoExposureLimit - To retrieve auto exposure limit from the camera
- * @return True if successful, false otherwise.
- */
-bool See3CAM_CU200M_H01R1::getAutoExposureLimit()
-{
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    uint lowerLimit, upperLimit;
-
-    //Initializing buffers
-    initializeBuffers();
-
-    //Filling the buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[3] = GET_AUTO_EXPOSURE_LIMIT_SEE3CAM_CU200_H01R1;
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[11] == GET_FAIL) {
-            return false;
-        } else if((g_in_packet_buf[0]  == CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1) &&
-                  (g_in_packet_buf[1]  == CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1) &&
-                  (g_in_packet_buf[2]  == GET_AUTO_EXPOSURE_LIMIT_SEE3CAM_CU200_H01R1) &&
-                  (g_in_packet_buf[11] == GET_SUCCESS)) {
-
-            lowerLimit  = (g_in_packet_buf[3] << 24) | (g_in_packet_buf[4] << 16) | (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
-            upperLimit  = (g_in_packet_buf[7] << 24) | (g_in_packet_buf[8] << 16) | (g_in_packet_buf[9] << 8) | (g_in_packet_buf[10] << 0);
-
-            emit currentAutoExposureLimitReceived(lowerLimit, upperLimit);
-
-            return true;
-        }
-    }
-    return false;
-}
-
-
-
-/**
- * @brief See3CAM_CU200M_H01R1::setAutoExposureLimit - Setting auto exposure limit values to the camera
- * @param lowerLimit - Lower limit to be set
- * @param upperLimit - Upper limit to be set
- * @return True if successful, false otherwise.
- */
-bool See3CAM_CU200M_H01R1::setAutoExposureLimit(uint lowerLimit, uint upperLimit)
-{
-    exposureLowerLimit = lowerLimit;
-    exposureUpperLimit = upperLimit;
-
-    if((exposureLowerLimit < EXPOSURE_MIN) || (exposureUpperLimit > EXPOSURE_MAX))
-    {
-        emit indicateExposureValueRangeFailure("Failure", "Invalid Lower Limit Value");
-        return false;
-    }
-
-    //Validating the limit values -> Lower auto exposure limit <= Upper auto exposure limit
-    if(exposureLowerLimit > exposureUpperLimit)
-    {
-      emit indicateExposureValueRangeFailure("Failure", "Exposure upper limit should be greater than Exposure lower limit");
-      return false;
-    }
-
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    //Initializing buffers
-    initializeBuffers();
-
-    //Filling the buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1;
-    g_out_packet_buf[3] = SET_AUTO_EXPOSURE_LIMIT_SEE3CAM_CU200_H01R1;
-
-    g_out_packet_buf[4] = ((lowerLimit & 0xFF000000) >> 24);
-    g_out_packet_buf[5] = ((lowerLimit & 0x00FF0000) >> 16);
-    g_out_packet_buf[6] = ((lowerLimit & 0x0000FF00) >> 8);
-    g_out_packet_buf[7] = ((lowerLimit & 0x000000FF) >> 0);
-
-    g_out_packet_buf[8]  = ((upperLimit & 0xFF000000) >> 24);
-    g_out_packet_buf[9]  = ((upperLimit & 0x00FF0000) >> 16);
-    g_out_packet_buf[10] = ((upperLimit & 0x0000FF00) >> 8);
-    g_out_packet_buf[11] = ((upperLimit & 0x000000FF) >> 0);
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[11] == GET_FAIL) {
-            return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[1]  == CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[2]  == SET_AUTO_EXPOSURE_LIMIT_SEE3CAM_CU200_H01R1 &&
-            g_in_packet_buf[11] == GET_SUCCESS) {
-
-            emit indicateCommandStatus("Success", "Set Exposure Limit Success");
-
             return true;
         }
     }
@@ -961,6 +677,167 @@ bool See3CAM_CU200M_H01R1::setOrientation(bool horzModeSel, bool vertiModeSel)
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1 &&
             g_in_packet_buf[2] == SET_ORIENTATION_SEE3CAM_CU200_H01R1 &&
             g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+
+/**
+ * @brief See3CAM_CU200M_H01R1::getExposureCompensation - Getting exposure compensation value from the camera
+ * @return True if successful, false otherwise.
+ */
+bool See3CAM_CU200M_H01R1::getExposureCompensation()
+{
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    uint exposureCompensation;
+
+    //Initializing buffers
+    initializeBuffers();
+
+    //Filling the buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1;
+    g_out_packet_buf[3] = GET_EXPOSURE_COMPENSATION_SEE3CAM_CU200;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1 &&
+            g_in_packet_buf[2] == GET_EXPOSURE_COMPENSATION_SEE3CAM_CU200 &&
+            g_in_packet_buf[7] == GET_SUCCESS) {
+
+            exposureCompensation  = (g_in_packet_buf[3] << 24) | (g_in_packet_buf[4] << 16) | (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
+            emit exposureCompensationReceived(exposureCompensation);
+
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief See3CAM_CU200M_H01R1::setExposureCompensation - Setting Exposure Compensation to the camera
+ * exposureCompensation - exposure compensation value from UI
+ * @return True if successful, false otherwise.
+ */
+bool See3CAM_CU200M_H01R1::setExposureCompensation(uint exposureCompensation)
+{
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initializing buffers
+    initializeBuffers();
+
+    //Filling the buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1;
+    g_out_packet_buf[3] = SET_EXPOSURE_COMPENSATION_SEE3CAM_CU200;
+    g_out_packet_buf[4] = ((exposureCompensation & 0xFF000000) >> 24);
+    g_out_packet_buf[5] = ((exposureCompensation & 0x00FF0000) >> 16);
+    g_out_packet_buf[6] = ((exposureCompensation & 0x0000FF00) >> 8);
+    g_out_packet_buf[7] = ((exposureCompensation & 0x000000FF) >> 0);
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == GET_FAIL) {
+            emit indicateExposureCompensationRangeFailure("Failure", "Exposure Compensation Set Failed");
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1 &&
+            g_in_packet_buf[2] == SET_EXPOSURE_COMPENSATION_SEE3CAM_CU200 &&
+            g_in_packet_buf[7] == GET_SUCCESS) {
+
+            emit indicateCommandStatus("Success", "Exposure Compensation set successfully");
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+/**
+ * @brief See3CAM_CU200M_H01R1::getAutoGainUpperLimit - To get upper gain limit value in camera
+ * return true - success /false - failure
+ */
+bool See3CAM_CU200M_H01R1::getAutoGainUpperLimit()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1;
+    g_out_packet_buf[3] = GET_AUTO_GAIN_LIMIT_SEE3CAM_CU200;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == GET_FAIL) {
+            return false;
+        }else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1 &&
+            g_in_packet_buf[1]  == CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1 &&
+            g_in_packet_buf[2]  == GET_AUTO_GAIN_LIMIT_SEE3CAM_CU200 &&
+            g_in_packet_buf[7]  == GET_SUCCESS) {
+
+            emit autoGainUpperLimitReceived(g_in_packet_buf[4],g_in_packet_buf[5],g_in_packet_buf[6],g_in_packet_buf[3]);
+
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+/**
+ * @brief See3CAM_CU200M_H01R1::setAutoGainUpperLimit - set upper gain limit value in camera
+ * @param upperLimit - Upper limit to be set
+ * return true - success /false - failure
+ */
+bool See3CAM_CU200M_H01R1::setAutoGainUpperLimit(uint upperLimit)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1;
+    g_out_packet_buf[3] = SET_AUTO_GAIN_LIMIT_SEE3CAM_CU200;
+    g_out_packet_buf[4] = upperLimit;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL) {
+            return false;
+        }else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1 &&
+            g_in_packet_buf[1]  == CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1 &&
+            g_in_packet_buf[2]  == SET_AUTO_GAIN_LIMIT_SEE3CAM_CU200 &&
+            g_in_packet_buf[6]  == GET_SUCCESS) {
             return true;
         }
     }

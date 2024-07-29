@@ -94,8 +94,7 @@ Item{
         id: getCameraSettingsTimer
         interval: 500
         onTriggered: {
-            see3camcu200.getAutoExposureLimit()
-            see3camcu200.getAutoGainLimit()
+            see3camcu200.getExposureCompensation()
             see3camcu200.getTargetBrightness()
             see3camcu200.readStatistics()
             stop()
@@ -120,13 +119,6 @@ Item{
             root.insertStillImageFormat(stillImageFormat);
         }
 
-        //Signals getting values from UVC & set its values to the HID controls
-        onSendGainValueToHID:{
-            if(autoGain.checked == true){
-            }else{
-                gainSlider.value = gainHid
-            }
-        }
         onGetBrightnessFromUVC:{
             skipUpdateBrightness = false
             brightnessSlider.value = brightnessFromUVC.toFixed(3)
@@ -206,7 +198,6 @@ Item{
     property int exposureMin: 100
     property int exposureMax: 1000000
 
-    property bool skipUpdateGainMode            : false
     property bool skipUpdateBlackLevelMode      : false
     property bool skipUpdateBrightness          : false
     property bool skipUpdateContrast            : false
@@ -218,16 +209,12 @@ Item{
     property bool skipUpdateRGainMode           : false
     property bool skipUpdateBGainMode           : false
 
-    property bool skipUpdateSingleShotGain      : false
     property bool skipUpdateSingleShotExposure  : false
     property bool skipUpdateSingleShotWhiteBalance  : false
     property bool skipUpdateUIOnWBPresetMode    : false
     property bool skipUpdateTargetBrightness    : false
 
-    property bool skipUpdateLowerLimitSlider    : false
-    property bool skipUpdateUpperLimitSlider    : false
-
-    property bool skipUpdateExposureLowerLimit  : false
+    property bool skipUpdateExposureCompensation : false
     property bool skipUpdateExposureUpperLimit  : false
     property bool skipUpdateUIOnExpWindowSize   : false
     property bool skipUpdateUIOnAntiFlickerMode : false
@@ -266,7 +253,7 @@ Item{
         height: 500
         style: econscrollViewStyle
         Item{
-            height: 3400
+            height: 3000
 
             ColumnLayout{
                 x:2
@@ -1097,6 +1084,132 @@ Item{
                 }
 
                 Text {
+                    id: upperLimitMode
+                    text: "--- Auto Gain Upper Limit ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                    ToolButton{
+                        tooltip: "You can set the required limit by changing the value in the slider"
+                        width: 200
+                        opacity: 0
+                    }
+                }
+                Row{
+                    spacing: 35
+                    Slider {
+                        id: gainUpperLimitSlider
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        width: 150
+                        style:econSliderStyle
+                        enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                        opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                        onValueChanged:  {
+                            gainUpperLimitTextField.text = gainUpperLimitSlider.value
+                            if(skipUpdateExposureUpperLimit){
+                                see3camcu200.setAutoGainUpperLimit(gainUpperLimitSlider.value)
+                            }
+                            skipUpdateExposureUpperLimit = true
+                        }
+                    }
+                    TextField {
+                        id: gainUpperLimitTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                        opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                        validator: IntValidator {bottom: gainUpperLimitSlider.minimumValue; top: gainUpperLimitSlider.maximumValue}
+                        onTextChanged: {
+                            if(text.length > 0){
+                                gainUpperLimitSlider.value = gainUpperLimitTextField.text
+                            }
+                        }
+                    }
+                }
+
+                Text {
+                    id: expCompTitle
+                    text: "--- Exposure Compensation ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                    ToolButton{
+                        tooltip: "You can set the required exposure compensation value by changing the value in the text box and click the Set button"
+                        width: 200
+                        opacity: 0
+                    }
+                }
+
+                Row
+                {
+                    spacing: 9
+                    Text
+                    {
+                        id: expCompLabel
+                        text: "value(µs)[100 - 1000000]"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        width: 80
+                        wrapMode: Text.WordWrap
+                        enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                        opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                    }
+                    TextField
+                    {
+                        id: expCompensationTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                        opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                        implicitHeight: 25
+                        implicitWidth: 80
+                        validator: IntValidator {bottom: exposureMin; top: exposureMax}
+                    }
+                    Button
+                    {
+                        id: expCompSetBtn
+                        activeFocusOnPress : true
+                        text: "Set"
+                        tooltip: "You can set the required exposure compensation value by changing the value in the text box and click the Set button"
+                        style: econButtonStyle
+                        enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                        opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                        implicitHeight: 25
+                        implicitWidth: 60
+                        onClicked:
+                        {
+                            expCompSetBtn.enabled = false
+                            setButtonClicked = true
+                            see3camcu200.setExposureCompensation(expCompensationTextField.text);
+                            expCompSetBtn.enabled = true
+                        }
+                        Keys.onReturnPressed:
+                        {
+                            expCompSetBtn.enabled = false
+                            setButtonClicked = true
+                            see3camcu200.setExposureCompensation(expCompensationTextField.text);
+                            expCompSetBtn.enabled = true
+                        }
+                    }
+                }
+
+
+                Text {
                     id: autoExpModeTitle
                     text: "--- Auto Exposure ---"
                     font.pixelSize: 14
@@ -1267,142 +1380,6 @@ Item{
                     }
                 }
 
-                Text {
-                    id: lowerLimitMode
-                    text: "--- Auto Exposure Lower Limit ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    Layout.alignment: Qt.AlignCenter
-                    opacity: 0.50196078431373
-                    ToolButton{
-                        tooltip: "Enter the Lower Limit Exposure value"
-                        width: 200
-                        opacity: 0
-                    }
-                }
-                Row{
-                        spacing: 9
-
-                        Text {
-                            id: lowerLimitTitle
-                            text: "value(µs)[100 - 1000000]"
-                            font.pixelSize: 14
-                            font.family: "Ubuntu"
-                            color: "#ffffff"
-                            smooth: true
-                            width: 80
-                            wrapMode: Text.WordWrap
-                            opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
-                            enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
-                        }
-                        TextField {
-                            id: expLowerLimitTextField
-                            font.pixelSize: 10
-                            font.family: "Ubuntu"
-                            smooth: true
-                            horizontalAlignment: TextInput.AlignHCenter
-                            opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
-                            enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
-                            style: econTextFieldStyle
-                            implicitHeight: 25
-                            implicitWidth: 80
-                            validator: IntValidator {bottom: exposureMin; top: exposureMax}
-                        }
-                        Button {
-                            id: lowerLimtSetBtn
-                            activeFocusOnPress : true
-                            text: "Set"
-                            tooltip: "Sets the lower limit values of auto exposure used in Auto Exposure Mode"
-                            style: econButtonStyle
-                            opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
-                            enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
-                            implicitHeight: 25
-                            implicitWidth: 60
-                            onClicked: {
-                                lowerLimtSetBtn.enabled = false
-                                setButtonClicked = true
-                                see3camcu200.setAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
-                                lowerLimtSetBtn.enabled = true
-                            }
-                            Keys.onReturnPressed: {
-                                lowerLimtSetBtn.enabled = false
-                                setButtonClicked = true
-                                see3camcu200.setAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
-                                lowerLimtSetBtn.enabled = true
-                            }
-                        }
-                }
-
-                Text {
-                    id: upperLimitMode
-                    text: "--- Auto Exposure Upper Limit ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    Layout.alignment: Qt.AlignCenter
-                    opacity: 0.50196078431373
-                    ToolButton{
-                        tooltip: "Enter the Upper Limit Exposure Value"
-                        width: 200
-                        opacity: 0
-                    }
-                }
-                Row{
-                        spacing: 9
-
-                        Text {
-                            id: upperLimitTitle
-                            text: "value(µs)[100 - 1000000]"
-                            font.pixelSize: 14
-                            font.family: "Ubuntu"
-                            color: "#ffffff"
-                            smooth: true
-                            width: 80
-                            wrapMode: Text.WordWrap
-                            opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
-                            enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
-                        }
-                        TextField {
-                            id: expUpperLimitTextField
-                            font.pixelSize: 10
-                            font.family: "Ubuntu"
-                            smooth: true
-                            horizontalAlignment: TextInput.AlignHCenter
-                            opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
-                            enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
-                            style: econTextFieldStyle
-                            implicitHeight: 25
-                            implicitWidth: 80
-                            validator: IntValidator {bottom: exposureMin; top: exposureMax}
-                        }
-                        Button {
-                            id: upperLimitSetBtn
-                            activeFocusOnPress : true
-                            text: "Set"
-                            tooltip: "Sets the upper limit values of auto exposure used in Auto Exposure Mode"
-                            style: econButtonStyle
-                            opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
-                            enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
-                            implicitHeight: 25
-                            implicitWidth: 60
-                            onClicked: {
-                                upperLimitSetBtn.enabled = false
-                                setButtonClicked = true
-                                see3camcu200.setAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
-                                upperLimitSetBtn.enabled = true
-                            }
-                            Keys.onReturnPressed: {
-                                upperLimitSetBtn.enabled = false
-                                setButtonClicked = true
-                                see3camcu200.setAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
-                                upperLimitSetBtn.enabled = true
-                            }
-                        }
-                }
-
                 Text
                 {
                     id: roiAutoExpMode
@@ -1532,303 +1509,6 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                             setAntiFlicker()
                         }
                         skipUpdateUIOnAntiFlickerMode = true
-                    }
-                }
-
-                Text {
-                    id: gainModeTitle
-                    text: "--- Gain Mode ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    Layout.alignment: Qt.AlignCenter
-                    opacity: 0.50196078431373
-                }
-                Row{
-                    spacing: 30
-                    Layout.alignment: Qt.AlignCenter
-                    ExclusiveGroup { id: gainModeGroup }
-                    RadioButton {
-                        id: autoGain
-                        exclusiveGroup: gainModeGroup
-                        checked: false
-                        text: "Auto"
-                        activeFocusOnPress: true
-                        style: econRadioButtonStyle
-                        ToolButton{
-                            tooltip: "This control enables user to set gain in automatic mode."
-                            width: 15
-                            height: 20
-                            opacity: 0
-                        }
-                        onClicked: {
-                            setGainProperties()
-                        }
-                        Keys.onReturnPressed: {
-                            setGainProperties()
-                        }
-                    }
-
-                    RadioButton {
-                        id: manualGain
-                        exclusiveGroup: gainModeGroup
-                        checked: false
-                        text: "Manual"
-                        activeFocusOnPress: true
-                        style: econRadioButtonStyle
-                        ToolButton{
-                            tooltip: "This control enables user to set the manual gain value."
-                            width: 15
-                            height: 20
-                            opacity: 0
-                        }
-                        onClicked: {
-                            setGainProperties()
-                        }
-                        Keys.onReturnPressed: {
-                            setGainProperties()
-                        }
-                    }
-                }
-                Text {
-                    id: autoGainFeaturesTitle
-                    text: "--- Auto Gain ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    Layout.alignment: Qt.AlignCenter
-                    opacity: 0.50196078431373
-                }
-                Row{
-                    spacing:10
-                    ExclusiveGroup { id: autoGainFeatureGroup }
-                    RadioButton {
-                        exclusiveGroup: autoGainFeatureGroup
-                        id: gainContinious
-                        text: "Continuous"
-                        activeFocusOnPress: true
-                        enabled: (autoGain.enabled && autoGain.checked) ? true : false
-                        opacity: (autoGain.enabled && autoGain.checked) ? 1 : 0.1
-                        style: econRadioButtonStyle
-                        ToolButton{
-                            tooltip: "The camera detects the light source and sets the gain value continuously with respect to change in scenes."
-                            width: 15
-                            height: 20
-                            opacity: 0
-                        }
-                        onClicked: {
-                            setGainProperties()
-                        }
-                        Keys.onReturnPressed: {
-                            setGainProperties()
-                        }
-                    }
-                }
-
-                Row{
-                    spacing:25
-                    RadioButton {
-                        exclusiveGroup: autoGainFeatureGroup
-                        id: gainSingleShot
-                        text: "Single Shot"
-                        activeFocusOnPress: true
-                        style: econRadioButtonStyle
-                        enabled: (autoGain.enabled && autoGain.checked) ? true : false
-                        opacity: (autoGain.enabled && autoGain.checked) ? 1 : 0.1
-                        ToolButton{
-                            tooltip: "The camera calculates the gain based on the current scene just once and strict with it until next request."
-                            width: 15
-                            height: 20
-                            opacity: 0
-                        }
-                        onClicked: {
-                            setGainProperties()
-                        }
-                        Keys.onReturnPressed: {
-                            setGainProperties()
-                        }
-                    }
-                    Button {
-                        id: triggerGainBtn
-                        activeFocusOnPress : true
-                        text: "Trigger"
-                        style: econButtonStyle
-                        enabled: (gainSingleShot.enabled && gainSingleShot.checked) ? true : false
-                        opacity: (gainSingleShot.enabled && gainSingleShot.checked) ? 1 : 0.1
-                        implicitHeight: 25
-                        implicitWidth: 120
-                        action: (gainSingleShot.enabled && gainSingleShot.checked) ? triggerGainAction : null
-                        tooltip: "Allows camera to calculate the gain value once in Single shot mode"
-                        Keys.onReturnPressed: {
-                            see3camcu200.setGainMode(SEE3CAM_CU200.AUTO_GAIN,SEE3CAM_CU200.GAIN_SINGLE_SHOT, gainSlider.value)
-                        }
-                    }
-                }
-
-                Text{
-                     id: manualGainSlider
-                     text: "--- Manual Gain ---"
-                     font.pixelSize: 14
-                     font.family: "Ubuntu"
-                     color: "#ffffff"
-                     smooth: true
-                     Layout.alignment: Qt.AlignCenter
-                     opacity: 0.50196078431373
-
-                     ToolButton{
-                         tooltip: "It is used to modify the gain value of the sensor. "
-                         width: 200
-                         opacity: 0
-                     }
-                }
-                Row
-                {
-                     spacing: 35
-                     Slider
-                     {
-                         id: gainSlider
-                         activeFocusOnPress: true
-                         updateValueWhileDragging: false
-                         width: 150
-                         style:econSliderStyle
-                         opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
-                         enabled: (manualGain.enabled && manualGain.checked) ? true : false
-                         onValueChanged:  {
-                             //Sending HID value to UVC
-                             root.getGainValueFromHID(gainSlider.value)
-
-                             gainTextField.text = gainSlider.value
-                             if(skipUpdateGainMode){
-                                 see3camcu200.setGainMode(SEE3CAM_CU200.MANUAL_GAIN, 0, gainSlider.value)
-                             }
-                             skipUpdateGainMode = true
-                         }
-                     }
-                     TextField
-                     {
-                         id: gainTextField
-                         text: gainSlider.value
-                         font.pixelSize: 10
-                         font.family: "Ubuntu"
-                         smooth: true
-                         horizontalAlignment: TextInput.AlignHCenter
-                         opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
-                         enabled: (manualGain.enabled && manualGain.checked) ? true : false
-                         style: econTextFieldStyle
-                         validator: IntValidator {bottom: gainSlider.minimumValue; top: gainSlider.maximumValue}
-                         onTextChanged: {
-                             if(text.length > 0){
-                                 gainSlider.value = gainTextField.text
-                             }
-                         }
-                     }
-                }
-
-                Text {
-                    id: gainLowerLimit
-                    text: "--- Auto Gain Lower Limit ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    Layout.alignment: Qt.AlignCenter
-                    opacity: 0.50196078431373
-                    ToolButton{
-                        tooltip: "Sets the Lower limit gain value in Auto Gain Mode"
-                        width: 200
-                        opacity: 0
-                    }
-                }
-
-                Row{
-                    spacing: 35
-                    Slider {
-                        activeFocusOnPress: true
-                        updateValueWhileDragging: false
-                        id: gainLowerLimitSlider
-                        width: 150
-                        style:econSliderStyle
-                        opacity: (autoGain.enabled && autoGain.checked) ? 1 : 0.1
-                        enabled: (autoGain.enabled && autoGain.checked) ? true : false
-                        onValueChanged:  {
-                            gainLowerLimitTextField.text = gainLowerLimitSlider.value
-                            if(skipUpdateLowerLimitSlider){
-                                see3camcu200.setAutoGainLimit(gainLowerLimitSlider.value, gainUpperLimitSlider.value)
-                            }
-                            skipUpdateLowerLimitSlider = true
-                        }
-                    }
-                    TextField {
-                        id: gainLowerLimitTextField
-                        text: gainLowerLimitSlider.value
-                        font.pixelSize: 10
-                        font.family: "Ubuntu"
-                        smooth: true
-                        horizontalAlignment: TextInput.AlignHCenter
-                        style: econTextFieldStyle
-                        opacity: (autoGain.enabled && autoGain.checked) ? 1 : 0.1
-                        enabled: (autoGain.enabled && autoGain.checked) ? true : false
-                        validator: IntValidator {bottom: gainLowerLimitSlider.minimumValue; top: gainLowerLimitSlider.maximumValue}
-                        onTextChanged: {
-                            if(text.length > 0){
-                                gainLowerLimitSlider.value = gainLowerLimitTextField.text
-                            }
-                        }
-                    }
-                }
-
-                Text {
-                    id: gainUpperLimit
-                    text: "--- Auto Gain Upper Limit ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    Layout.alignment: Qt.AlignCenter
-                    opacity: 0.50196078431373
-                    ToolButton{
-                        tooltip: "Sets the Upper limit gain value in Auto Gain Mode"
-                        width: 200
-                        opacity: 0
-                    }
-                }
-
-                Row{
-                    spacing: 35
-                    Slider {
-                        activeFocusOnPress: true
-                        updateValueWhileDragging: false
-                        id: gainUpperLimitSlider
-                        width: 150
-                        style:econSliderStyle
-                        opacity: (autoGain.enabled && autoGain.checked) ? 1 : 0.1
-                        enabled: (autoGain.enabled && autoGain.checked) ? true : false
-                        onValueChanged:  {
-                            gainUpperLimitTextField.text = gainUpperLimitSlider.value
-                            if(skipUpdateUpperLimitSlider){
-                                see3camcu200.setAutoGainLimit(gainLowerLimitSlider.value, gainUpperLimitSlider.value)
-                            }
-                            skipUpdateUpperLimitSlider = true
-                        }
-                    }
-                    TextField {
-                        id: gainUpperLimitTextField
-                        text: gainUpperLimitSlider.value
-                        font.pixelSize: 10
-                        font.family: "Ubuntu"
-                        smooth: true
-                        horizontalAlignment: TextInput.AlignHCenter
-                        style: econTextFieldStyle
-                        opacity: (autoGain.enabled && autoGain.checked) ? 1 : 0.1
-                        enabled: (autoGain.enabled && autoGain.checked) ? true : false
-                        validator: IntValidator {bottom: gainUpperLimitSlider.minimumValue; top: gainUpperLimitSlider.maximumValue}
-                        onTextChanged: {
-                            if(text.length > 0){
-                                gainUpperLimitSlider.value = gainUpperLimitTextField.text
-                            }
-                        }
                     }
                 }
 
@@ -2300,8 +1980,8 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                        smooth: true
                        horizontalAlignment: TextInput.AlignHCenter
                        style: econTextFieldStyle
-                       enabled: (autoGain.enabled && autoGain.checked) ? true : false
-                       opacity: (autoGain.enabled && autoGain.checked) ? 1 : 0.1
+                       enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                       opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                    }
                }
 
@@ -3011,28 +2691,6 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
     SEE3CAM_CU200{
         id:see3camcu200
 
-        onGainModeReceived:{
-            skipUpdateGainMode = false
-
-            //Gain mode - Auto or Manual
-            currentGainMode(mode, autoFeature)
-
-            //Auto Gain features - Continious or Single Shot
-            if(autoFeature === SEE3CAM_CU200.GAIN_CONTINIOUS) {
-                gainContinious.checked = true
-            } else if(autoFeature === SEE3CAM_CU200.GAIN_SINGLE_SHOT) {
-                gainSingleShot.checked = true
-            }
-
-            //Manual Gain Values
-            gainSlider.minimumValue = min
-            gainSlider.maximumValue = max
-            gainSlider.stepSize     = stepValue
-            gainSlider.value        = manualValue
-
-            skipUpdateGainMode = true
-        }
-
         onRGainPropertiesReceived: {
             skipUpdateRGainMode = false
             gainRSlider.minimumValue = minRGain
@@ -3235,33 +2893,21 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
             currentFlipMirrorMode(flipMirrorModeValues)
         }
 
-        onCurrentAutoGainLimitValuesReceived:{
-            skipUpdateLowerLimitSlider = false
-            skipUpdateUpperLimitSlider = false
-
-            gainLowerLimitSlider.minimumValue = min
-            gainLowerLimitSlider.maximumValue = max
-            gainLowerLimitSlider.stepSize = stepValue
-            gainLowerLimitSlider.value = lowerLimit
+        onAutoGainUpperLimitReceived:{
+            skipUpdateExposureUpperLimit = false
 
             gainUpperLimitSlider.minimumValue = min
             gainUpperLimitSlider.maximumValue = max
-            gainUpperLimitSlider.stepSize = stepValue
-            gainUpperLimitSlider.value = upperLimit
+            gainUpperLimitSlider.stepSize     = step
+            gainUpperLimitSlider.value        = current
 
-            skipUpdateLowerLimitSlider = true
-            skipUpdateUpperLimitSlider = true
+            skipUpdateExposureUpperLimit = true
         }
 
-        onCurrentAutoExposureLimitReceived:{
-            skipUpdateExposureLowerLimit = false
-            skipUpdateExposureUpperLimit = false
-
-            expLowerLimitTextField.text = lowerLimit
-            expUpperLimitTextField.text = upperLimit
-
-            skipUpdateExposureLowerLimit = true
-            skipUpdateExposureUpperLimit = true
+        onExposureCompensationReceived:{
+            skipUpdateExposureCompensation = false
+            expCompensationTextField.text = exposure
+            skipUpdateExposureCompensation = true
         }
 
         onRoiAutoExpModeReceived: {
@@ -3378,12 +3024,16 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
 
                 displayMessageBox(title, text)
                 see3camcu200.getExposure()
-                see3camcu200.getAutoExposureLimit(expLowerLimitTextField.text, expUpperLimitTextField.text)
             }
         }
 
-        onIndicateGainValueRangeFailure:{
-            see3camcu200.getAutoGainLimit()
+        onIndicateExposureCompensationRangeFailure:{
+            if(setButtonClicked){
+                setButtonClicked = false
+
+                displayMessageBox(title, text)
+                see3camcu200.getExposureCompensation()
+            }
         }
 
         onTitleTextChanged: {
@@ -3702,19 +3352,6 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         }
     }
 
-    function setGainProperties(){
-        if(autoGain.checked == true){
-            if(gainContinious.checked == true) {
-                see3camcu200.setGainMode(SEE3CAM_CU200.AUTO_GAIN,SEE3CAM_CU200.GAIN_CONTINIOUS, 1)
-            } else if(gainSingleShot.checked == true){
-                see3camcu200.setGainMode(SEE3CAM_CU200.AUTO_GAIN,SEE3CAM_CU200.GAIN_SINGLE_SHOT, 1)
-            }
-        }else if(manualGain.checked == true){
-            root.getGainValueFromHID(gainSlider.value)
-            see3camcu200.setGainMode(SEE3CAM_CU200.MANUAL_GAIN, 0, gainSlider.value)
-        }
-    }
-
     function setAutoWhiteBalance() {
         if(wbContinious.checked == true) {
             see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.AUTO_WB, SEE3CAM_CU200.WB_CONTINIOUS, 0, 0)
@@ -3770,6 +3407,7 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
             see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.MANUAL_WB, 0, SEE3CAM_CU200.PRESET, SEE3CAM_CU200.D65_6500K)
         }
 
+        see3camcu200.getRBGain()
         see3camcu200.getWhiteBalanceMode()
     }
 
@@ -3820,7 +3458,6 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
 
     function getCurrentValuesFromCamera() {
         getCameraSettingsTimer.start()
-        see3camcu200.getGainMode()
         see3camcu200.getRBGain()
         see3camcu200.getColorCorrectionMatrix()
         see3camcu200.getBlackLevel()
@@ -3836,6 +3473,7 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         see3camcu200.getAutoExpROIModeAndWindowSize()
         see3camcu200.getAntiFlickerMode()
         see3camcu200.getWhiteBalanceMode()
+        see3camcu200.getAutoGainUpperLimit()
     }
     Component.onCompleted: {
         getCurrentValuesFromCamera()

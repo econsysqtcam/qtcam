@@ -8,18 +8,8 @@
 #define CAMERA_CONTROL_ID_1_SEE3CAM_CU200_H01R1         0xC0
 #define CAMERA_CONTROL_ID_2_SEE3CAM_CU200_H01R1         0x0D
 
-#define GET_GAIN_MODE_SEE3CAM_CU200_H01R1               0x01
-#define SET_GAIN_MODE_SEE3CAM_CU200_H01R1               0x02
-
-#define GET_AUTO_GAIN_LIMIT_SEE3CAM_CU200_H01R1         0x1B
-#define SET_AUTO_GAIN_LIMIT_SEE3CAM_CU200_H01R1         0x1C
-
 #define GET_EXPOSURE_SEE3CAM_CU200_H01R1                0x13
 #define SET_EXPOSURE_SEE3CAM_CU200_H01R1                0x14
-
-#define GET_AUTO_EXPOSURE_LIMIT_SEE3CAM_CU200_H01R1     0x1D
-#define SET_AUTO_EXPOSURE_LIMIT_SEE3CAM_CU200_H01R1     0x1E
-
 
 #define GET_TARGET_BRIGHTNESS_SEE3CAM_CU200_H01R1       0x21
 #define SET_TARGET_BRIGHTNESS_SEE3CAM_CU200_H01R1       0x22
@@ -58,6 +48,11 @@
 #define DEFAULT_CONFIGURATION                           0x00
 #define USER_DEFINED_CONFIGURATION                      0x01
 
+#define GET_EXPOSURE_COMPENSATION_SEE3CAM_CU200         0x2C
+#define SET_EXPOSURE_COMPENSATION_SEE3CAM_CU200         0x2D
+
+#define GET_AUTO_GAIN_LIMIT_SEE3CAM_CU200               0x2E
+#define SET_AUTO_GAIN_LIMIT_SEE3CAM_CU200               0x2F
 
 
 #define GET_FAIL		       0x00
@@ -87,21 +82,6 @@ public:
     QString _title;
     QString _text;
     QString message;
-
-    uint exposureLowerLimit;
-    uint exposureUpperLimit;
-
-    enum GAIN_MODE{
-        AUTO_GAIN   = 0x00,
-        MANUAL_GAIN = 0x01
-    };
-    Q_ENUMS(GAIN_MODE)
-
-    enum AUTO_GAIN_FEATURES{
-        GAIN_CONTINIOUS  = 0x00,
-        GAIN_SINGLE_SHOT = 0x01
-    };
-    Q_ENUMS(AUTO_GAIN_FEATURES)
 
     enum CAMERA_MODE {
         MASTER_MODE  = 0x00,
@@ -180,27 +160,22 @@ signals:
 
     void flipMirrorModeChanged(uint flipMirrorModeValues);
 
+    void exposureCompensationReceived(uint exposure);
+
+    void autoGainUpperLimitReceived(uint min, uint max, uint step, uint current);
+
     void exposureStatisticsReceived(uint exposure);
     void gainStatisticsReceived(uint gain);
 
     void indicateExposureValueRangeFailure(QString title, QString text);
     void indicateCommandStatus(QString title, QString text);
     void titleTextChanged(QString _title,QString _text);
-    void indicateGainValueRangeFailure();
+    void indicateExposureCompensationRangeFailure(QString title, QString text);
 
 public slots:
 
-    bool getGainMode();
-    bool setGainMode(GAIN_MODE gainMode, AUTO_GAIN_FEATURES autoGain, uint manualGainValue);
-
-    bool getAutoGainLimit();
-    bool setAutoGainLimit(uint lowerLimit, uint upperLimit);
-
     bool getExposure();
     bool setExposure(EXPOSURE_MODE expMode, AUTO_EXPOSURE_FEATURE autoFeature, uint manualExposure);
-
-    bool getAutoExposureLimit();
-    bool setAutoExposureLimit(uint lowerLimit, uint upperLimit);
 
     bool getTargetBrightness();
     bool setTargetBrightness(uint targetBrightness);
@@ -222,6 +197,12 @@ public slots:
 
     bool getOrientation();
     bool setOrientation(bool horzModeSel, bool vertiModeSel);
+
+    bool getExposureCompensation();
+    bool setExposureCompensation(uint exposureCompensation);
+
+    bool getAutoGainUpperLimit();
+    bool setAutoGainUpperLimit(uint upperLimit);
 
     bool readStatistics();
 

@@ -9,9 +9,6 @@
 #define CAMERA_CONTROL_ID_1      0xC0
 #define CAMERA_CONTROL_ID_2      0x02
 
-#define GET_GAIN_MODE            0x01
-#define SET_GAIN_MODE            0x02
-
 #define GET_RB_GAIN              0x03
 #define SET_RB_GAIN              0x04
 
@@ -47,12 +44,6 @@
 
 #define GET_ORIENTATION          0x19
 #define SET_ORIENTATION          0x1A
-
-#define GET_AUTO_GAIN_LIMIT           0x1B
-#define SET_AUTO_GAIN_LIMIT           0x1C
-
-#define GET_AUTO_EXPOSURE_LIMIT       0x1D
-#define SET_AUTO_EXPOSURE_LIMIT       0x1E
 
 #define GET_AUTO_EXPOSURE_ROI         0x1F
 #define SET_AUTO_EXPOSURE_ROI         0x20
@@ -94,6 +85,12 @@
 #define EXPOSURE_LIMIT_MIN     100
 #define EXPOSURE_LIMIT_MAX     1000000
 
+#define GET_EXPOSURE_COMPENSATION_SEE3CAM_CU200   0x2C
+#define SET_EXPOSURE_COMPENSATION_SEE3CAM_CU200   0x2D
+
+#define GET_AUTO_GAIN_LIMIT_SEE3CAM_CU200         0x2E
+#define SET_AUTO_GAIN_LIMIT_SEE3CAM_CU200         0x2F
+
 union
 {
     float f;
@@ -119,21 +116,6 @@ public:
     QString _title;
     QString _text;
     QString message;
-
-    uint exposureLowerLimit;
-    uint exposureUpperLimit;
-
-    enum GAIN_MODE{
-        AUTO_GAIN   = 0x00,
-        MANUAL_GAIN = 0x01
-    };
-    Q_ENUMS(GAIN_MODE)
-
-    enum AUTO_GAIN_FEATURES{
-        GAIN_CONTINIOUS  = 0x00,
-        GAIN_SINGLE_SHOT = 0x01
-    };
-    Q_ENUMS(AUTO_GAIN_FEATURES)
 
     enum CAMERA_MODE {
         MASTER_MODE  = 0x00,
@@ -210,7 +192,6 @@ public:
     };
     Q_ENUMS(autoExpRoiModes)
 
-
     enum ANTI_FLICKER_DETECTION{
         MODE_50Hz    = 0x00,
         MODE_60Hz    = 0x01,
@@ -219,10 +200,7 @@ public:
     Q_ENUMS(ANTI_FLICKER_DETECTION)
 
 signals:
-
-    void gainModeReceived(uint mode, uint min, uint max, uint stepValue, uint autoFeature, uint manualValue);
     void currentGainProperties(uint autoGain, float rGain, float bGain);
-    void currentAutoGainLimitValuesReceived(uint min, uint max, uint stepValue, uint lowerLimit, uint upperLimit);
 
     void rGainPropertiesReceived(float minRGain, float maxRGain, float rGainStepValue, float currentRGain);
     void bGainPropertiesReceived(float minBGain, float maxBGain, float bGainStepValue, float currentBGain);
@@ -257,6 +235,8 @@ signals:
 
     void exposurePropertiesReceived(uint mode, uint autoFeature, uint manualValue);
 
+    void exposureCompensationReceived(uint exposure);
+
     void cameraModeReceived(uint cameraMode);
 
     void strobeModeReceived(uint strobeMode);
@@ -273,28 +253,23 @@ signals:
     void currentGMatrixElements(float Gr, float Gg, float Gb);
     void currentBMatrixElements(float Br, float Bg, float Bb);
 
-    void currentAutoExposureLimitReceived(uint lowerLimit, uint upperLimit);
     void roiAutoExpModeReceived(uint roiMode, uint winSize);
 
     void targetBrightnessPropertiesReceived(float min, float max, float stepValue, float current);
 
     void antiFlickerModeReceived(uint antiFlicker);
 
+    void autoGainUpperLimitReceived(uint min, uint max, uint step, uint current);
+
     void indicateExposureValueRangeFailure(QString title, QString text);
     void indicateCommandStatus(QString title, QString text);
     void titleTextChanged(QString _title,QString _text);
-    void indicateGainValueRangeFailure();
+    void indicateExposureCompensationRangeFailure(QString title, QString text);
 
 public slots:
 
-    bool getGainMode();
-    bool setGainMode(GAIN_MODE gainMode, AUTO_GAIN_FEATURES autoGain, uint manualGainValue);
-
     bool getRBGain();
     bool setRBGain(float RGain, float BGain);
-
-    bool getAutoGainLimit();
-    bool setAutoGainLimit(uint lowerLimit, uint upperLimit);
 
     bool getColorCorrectionMatrix();
     bool setColorCorrectionMatrix(float Rr, float Rg, float Rb, float Gr, float Gg, float Gb, float Br, float Bg, float Bb);
@@ -323,8 +298,11 @@ public slots:
     bool getExposure();
     bool setExposure(EXPOSURE_MODE expMode, AUTO_EXPOSURE_FEATURE autoFeature, uint manualExposure);
 
-    bool getAutoExposureLimit();
-    bool setAutoExposureLimit(uint lowerLimit, uint upperLimit);
+    bool getExposureCompensation();
+    bool setExposureCompensation(uint exposureCompensation);
+
+    bool getAutoGainUpperLimit();
+    bool setAutoGainUpperLimit(uint upperLimit);
 
     bool getAutoExpROIModeAndWindowSize();
     bool setROIAutoExposure(autoExpRoiModes see3camAutoexpROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize);
