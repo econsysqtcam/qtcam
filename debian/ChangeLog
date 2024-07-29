@@ -1,4 +1,5 @@
-qtcam (26.0.24-0ubuntu1) xenial; urgency=medium
+qtcam (26.0.25-0ubuntu1) xenial; urgency=medium
+ *Modified FPGA HID controls in See3CAM_CU200 and See3CAM_CU200M_H01R1.
  *Added support for See3CAM_CU200M_H01R1.
  *Bug fix for See3CAM_130.
  *Removed restart stream API in Master mode for See3CAM_CU55_MH.
@@ -190,4 +191,4 @@ qtcam (26.0.24-0ubuntu1) xenial; urgency=medium
   * Added ARM support.
   * Initial release.  
 
- -- econsysqtcam <qtcam@e-consystems.com> Fri 26 Jul 2024 15:30:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Mon 29 Jul 2024 21:22:01 +0530
