@@ -142,9 +142,8 @@ Item{
 
     property bool skipUpdateBlackLevelMode      : false
     property bool setButtonClicked              : false
+    property bool expSingleShotBtnClicked       : false
 
-    property bool skipUpdateSingleShotGain      : false
-    property bool skipUpdateSingleShotExposure  : false
     property bool skipUpdateTargetBrightness    : false
     property bool skipUpdateUIOnExpWindowSize   : false
     property bool skipUpdateUIOnAntiFlickerMode : false
@@ -380,9 +379,11 @@ Item{
                             opacity: 0
                         }
                         onClicked: {
+                            expSingleShotBtnClicked = false
                             see3camcu200mh01r1.setExposure(See3CAM_CU200M_H01R1.AUTO_EXPOSURE,See3CAM_CU200M_H01R1.CONTINIOUS_EXPOSURE, manualExpTextField.text)
                         }
                         Keys.onReturnPressed: {
+                            expSingleShotBtnClicked = false
                             see3camcu200mh01r1.setExposure(See3CAM_CU200M_H01R1.AUTO_EXPOSURE,See3CAM_CU200M_H01R1.CONTINIOUS_EXPOSURE, manualExpTextField.text)
                         }
                     }
@@ -405,10 +406,16 @@ Item{
                             opacity: 0
                         }
                         onClicked: {
-                            see3camcu200mh01r1.setExposure(See3CAM_CU200M_H01R1.AUTO_EXPOSURE,See3CAM_CU200M_H01R1.SINGLE_SHOT_EXPOUSRE, manualExpTextField.text)
+                            if(!expSingleShotBtnClicked){
+                                expSingleShotBtnClicked = true
+                                see3camcu200mh01r1.setExposure(See3CAM_CU200M_H01R1.AUTO_EXPOSURE,See3CAM_CU200M_H01R1.SINGLE_SHOT_EXPOUSRE, manualExpTextField.text)
+                            }
                         }
                         Keys.onReturnPressed: {
-                            see3camcu200mh01r1.setExposure(See3CAM_CU200M_H01R1.AUTO_EXPOSURE,See3CAM_CU200M_H01R1.SINGLE_SHOT_EXPOUSRE, manualExpTextField.text)
+                            if(!expSingleShotBtnClicked){
+                                expSingleShotBtnClicked = true
+                                see3camcu200mh01r1.setExposure(See3CAM_CU200M_H01R1.AUTO_EXPOSURE,See3CAM_CU200M_H01R1.SINGLE_SHOT_EXPOUSRE, manualExpTextField.text)
+                            }
                         }
                     }
                     Button {
@@ -1617,9 +1624,11 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         //Auto Exposure Features
         if(autoFeature === See3CAM_CU200M_H01R1.CONTINIOUS_EXPOSURE){
             exposureContinious.checked = true
+            expSingleShotBtnClicked    = false
         }
         else if(autoFeature === See3CAM_CU200M_H01R1.SINGLE_SHOT_EXPOUSRE){
             exposureSingleShot.checked = true
+            expSingleShotBtnClicked    = true
         }
 
         //Manual Exposure Values

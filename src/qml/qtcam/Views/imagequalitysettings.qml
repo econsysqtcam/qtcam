@@ -1624,6 +1624,9 @@ Item {
             case 10094860://Focus,Auto
                 focusUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
+            case 10094858://Focus,Absolute
+                focusAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
+                break;
         }
 
         switch(controlName)
@@ -1636,9 +1639,6 @@ Item {
                 break;
             case "LED1 Mode":
                 ledModeUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
-                break;
-            case "Focus (absolute)":
-                focusAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
         }
     }

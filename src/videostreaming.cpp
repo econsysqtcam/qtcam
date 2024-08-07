@@ -4088,7 +4088,7 @@ void Videostreaming::getFrameRates(){
             ++m_renderer->frame;
             m_renderer->fps = m_fps;
 
-            if(m_fps == 0.5){
+            if((m_fps >= 0.5) && (m_fps < 1.0)){
                 emit sendFps(m_fps);
             }else{
                 emit averageFPS(m_fps);

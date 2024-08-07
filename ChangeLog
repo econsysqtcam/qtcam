@@ -1,3 +1,8 @@
+Qtcam Application - 26.0.26
+---------------------------
+*Prevent a single-shot radio button (Auto White balance, Auto Exposure) from being clicked again once it has already been selected for See3CAM_CU200 and See3CAM_CU200_H01R1.
+*Using control ID to enumerate Focus, Absolute UVC control instead of control names.
+
 Qtcam Application - 26.0.25
 ---------------------------
 *Removed Gain control and added Exposure compensation in See3CAM_CU200 and See3CAM_CU200M_H01R1 cameras.
