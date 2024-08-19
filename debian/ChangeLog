@@ -157,5 +157,5 @@ qtcam (26.0.27-0ubuntu1) bionic; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Mon 19 Aug 2024 16:24:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Mon 19 Aug 2024 16:32:01 +0530
 
