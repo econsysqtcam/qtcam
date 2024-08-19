@@ -342,7 +342,6 @@ FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
     m_programYUYV = NULL;
     y16BayerFormat = false;
     rawY10Format = false;
-    frameReady = false;
     skipH264Frames = 20;
 
     uyvyBuffer    = NULL;
@@ -805,8 +804,6 @@ void FrameRenderer::drawUYVYBUffer(){
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if(renderyuyvMutex.tryLock()){
-        //Enabled when the frames are available for rendering
-        frameReady = true;
         if((flipModeChanged) && (currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200))
         {
             frame = 0;
@@ -867,10 +864,7 @@ void FrameRenderer::drawUYVYBUffer(){
         renderyuyvMutex.unlock();
     }
     else{
-        //To start rendering the previous frames only when the frames are available for rendering
-        if(frameReady){
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
-        }
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
     }
 
     m_shaderProgram->disableAttributeArray(0);
@@ -956,7 +950,6 @@ void FrameRenderer::clearShader(){
  * @brief FrameRenderer::changeShader - Change the shader program based on the format
  */
 void FrameRenderer::changeShader(){
-    frameReady = false;
     clearShader();
     if(m_shaderProgram){
         delete m_shaderProgram;
@@ -3901,6 +3894,19 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
 
                 case V4L2_PIX_FMT_Y16:{
 
+                    m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
+                    srcBuffer = (uint8_t *)malloc(width * height * 2);
+
+                    uint8_t *pfmb = yuyvBuffer;
+                    memcpy(srcBuffer, inputbuffer, (width * height * 2));
+                    for(__u32 l=0; l<(width * height*2); l=l+2) /* Y16 to YUYV conversion */
+                    {
+                        *pfmb++ = (((srcBuffer[l] & 0xF0) >> 4) | (srcBuffer[l+1] & 0x0F) << 4);
+                        *pfmb++ = 0x80;
+                    }
+                    memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
+                    freeBuffer(srcBuffer);
+
                     //Splitting of UYVY & Y8 buffer for See3Cam_CU83
                     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
                     {
@@ -3912,19 +3918,6 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                             m_renderer->renderyuyvMutex.unlock();
                             return false;
                         }
-                    } else {
-                        m_renderer->renderBufferFormat = CommonEnums::YUYV_BUFFER_RENDER;
-                        srcBuffer = (uint8_t *)malloc(width * height * 2);
-
-                        uint8_t *pfmb = yuyvBuffer;
-                        memcpy(srcBuffer, inputbuffer, (width * height * 2));
-                        for(__u32 l=0; l<(width * height*2); l=l+2) /* Y16 to YUYV conversion */
-                        {
-                            *pfmb++ = (((srcBuffer[l] & 0xF0) >> 4) | (srcBuffer[l+1] & 0x0F) << 4);
-                            *pfmb++ = 0x80;
-                        }
-                        memcpy(m_renderer->yuvBuffer, yuyvBuffer, width*height*2);
-                        freeBuffer(srcBuffer);
                     }
                 }
                     break;

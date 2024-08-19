@@ -200,7 +200,6 @@ public:
     __u32 m_pixelformat;
     bool y16BayerFormat;
     bool rawY10Format;
-    bool frameReady;
 
 signals:
      void ybufferchanged(uint8_t);
