@@ -186,7 +186,12 @@ Item{
             activeFocusOnPress : true
             text: "IR Window"
             style: econCheckBoxStyle
-            tooltip: "Enable this checkBox to create IR window"
+            ToolButton{
+                tooltip: "Enable this checkBox to create IR window."
+                width: 15
+                height: 20
+                opacity: 0
+            }
             Layout.alignment: Qt.AlignCenter
             onClicked:{
                 irWindowEnable()

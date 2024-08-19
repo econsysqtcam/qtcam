@@ -114,7 +114,6 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
 
     snprintf(pFormatCtx->filename, sizeof(pFormatCtx->filename), "%s", fileName.toStdString().c_str());
 
-
     // find the video encoder
 
 #if !LIBAVCODEC_VER_AT_LEAST(54, 25)
@@ -168,7 +167,6 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
         pCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         pCodecCtx->width = getWidth();
         pCodecCtx->height = getHeight();
-
 
         if(fpsDenominator >= 5){
             pCodecCtx->time_base = (AVRational){fpsNumerator, fpsDenominator};

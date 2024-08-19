@@ -70,7 +70,7 @@ Rectangle {
     signal sendCameraModeToQml(int cameraMode)
 
     //signal to enable/disable wakeonMotion
-    signal wakeOnMotionSettings(bool sEnable)
+    signal wakeOnMotionSettings(bool isEnable)
 
     //signal to set exposure compensation while still capture
     signal setExpCompensation();
