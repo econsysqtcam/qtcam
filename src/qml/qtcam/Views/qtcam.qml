@@ -122,6 +122,7 @@ Rectangle {
 
     // Added by Sankari: 16 Dec 2016
     property bool webcamKeyTriggerShot: true
+    property bool recordStopBtnStatus: false
     property string statusText
     property string videofileName
     property variant see3cam
@@ -776,8 +777,11 @@ Rectangle {
                                 videoRecordBegin()
                                 keyEventFiltering = true         // Added by Navya : To avoid capturing image when video record mode is selected.
                             } else if(captureVideoRecordRootObject.recordStopBtnVisible){
-                                videoSaveVideo()
-                                keyEventFiltering = true
+                                if(recordStopBtnStatus){
+                                    videoSaveVideo()
+                                    keyEventFiltering = true
+                                    recordStopBtnStatus = false
+                                }
                             }
                         }
                     }else if(mouse.button == Qt.RightButton){
@@ -2199,5 +2203,9 @@ Rectangle {
         else{
             vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, true)
         }
+    }
+
+    function enableRecStopButton(enable){
+        recordStopBtnStatus = enable
     }
 }

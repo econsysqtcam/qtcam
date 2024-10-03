@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.28
+---------------------------
+*Resolved video recording issue - Prevents background recording even after the recording has stopped.
+
 Qtcam Application - 26.0.27
 ---------------------------
 *Handled deprecated tooltip in Ubuntu 16.04 to fix streaming issue.

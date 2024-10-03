@@ -92,6 +92,16 @@ Item {
         }
     }
 
+    Timer {
+        id: recordStopEnableTimer
+        interval: 1500
+        onTriggered: {
+           record_stop.visible = recordStopBtnVisible
+           root.enableRecStopButton(recordStopBtnVisible)
+           stop()
+        }
+    }
+
     Image {
         id: camera_box
         source: "images/camera_box.png"
@@ -346,7 +356,16 @@ Item {
         onVideoRecordBtnVisible:
         {
             record.visible = visible
-            record_stop.visible = !visible
+            recordStopBtnVisibility(!visible)
+        }
+    }
+
+    function recordStopBtnVisibility(visibility) {
+        recordStopBtnVisible = visibility
+        if(visibility){
+            recordStopEnableTimer.start()
+        } else {
+            record_stop.visible = recordStopBtnVisible
         }
     }
 
