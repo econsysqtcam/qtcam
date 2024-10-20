@@ -1,16 +1,39 @@
-# Check for the Linux distro and set appropriate flags
-distro = $$system(lsb_release -rsd)
 
-equals(distro, 16.04) {
-    DEFINES += UBUNTU_16_04
-}else: equals(distro, 18.04) {
-    DEFINES += UBUNTU_18_04
-} else: equals(distro, 20.04) {
-    DEFINES += UBUNTU_20_04
-} else: equals(distro, 22.04) {
-    DEFINES += UBUNTU_22_04
-} else: equals(distro, Fedora) {
-    DEFINES += FEDORA
+linux {
+    message("Checking Linux distribution...")
+
+    # Check for the Linux distro and set appropriate flags
+    distro = $$system(lsb_release -is)
+    version = $$system(lsb_release -rs)
+
+    message("Detected $$distro $$version ($$QMAKE_HOST.arch)")
+
+    equals(distro, Ubuntu) {
+        equals(version, 16.04) {
+            DEFINES += UBUNTU_16_04
+        }else: equals(version, 18.04) {
+            DEFINES += UBUNTU_18_04
+        } else: equals(version, 20.04) {
+            DEFINES += UBUNTU_20_04
+        } else: equals(version, 22.04) {
+            DEFINES += UBUNTU_22_04
+        } else: equals(version, 24.04) {
+            DEFINES += UBUNTU_24_04
+        } else {
+            error("Unsupported Ubuntu version")
+        }
+    } else: equals(distro, Fedora) {
+        # message("Detected Fedora $$version ($$QMAKE_HOST.arch)")
+        DEFINES += FEDORA
+        # CONFIG += c++1z
+        # CONFIG += c++14
+        # QMAKE_CXX = "g++-5"
+        QMAKE_CXXFLAGS += -std=c++14
+    } else {
+        message("Unknown distro")
+    }
+} else {
+    error("Unsupported platform")
 }
 
 contains(DEFINES, UBUNTU_22_04) {
@@ -28,7 +51,7 @@ else:{
 QT += widgets concurrent multimedia
 TARGET = Qtcam
 
-CONFIG += c++14 release
+CONFIG += release
 
 # Additional import path used to resolve QML modules in Creator's code model
 QML_IMPORT_PATH =
@@ -181,20 +204,23 @@ HEADERS += \
     see3cam_cu200_h01r1.h \
     imx900usbcam.h
 
-
+message("Adding additional include paths...")
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
                 /usr/include/ffmpeg \
-                /usr/include/libusb-1.0
+                /usr/include/libusb-1.0 \
+                /usr/include/libevdev-1.0 \
+                /usr/include/pulse \
+                /usr/include/
 
 DISTRIBUTION_NAME = $$system(lsb_release -a | grep -o "bionic")
 contains(DISTRIBUTION_NAME, bionic):{
+    message("Detected Bionic")
     QMAKE_CXX = "g++-5"
     QMAKE_CXXFLAGS += -std=c++11
 }
 
-contains(QMAKE_HOST.arch, amd64):{
-    message("x86_64 bit libs")
-    LIBS += -lv4l2 -lv4lconvert \
+message("Adding LIBS from system dependencies...")
+LIBS += -lv4l2 -lv4lconvert \
         -lavutil \
         -lavcodec \
         -lavformat \
@@ -202,50 +228,69 @@ contains(QMAKE_HOST.arch, amd64):{
         -ludev \
         -lusb-1.0 \
         -lpulse \
-        -lasound\
-        -L/usr/lib/ -lturbojpeg \
-        -L/usr/lib/x86_64-linux-gnu/ -levdev
-}
+        -lasound \
+        -lturbojpeg \
+        -levdev
 
-contains(QMAKE_HOST.arch, i386):{
-    message("x86_32 bit libs")
-    LIBS += -lv4l2 -lv4lconvert \
-        -lavutil \
-        -lavcodec \
-        -lavformat \
-        -lswscale \
-        -ludev \
-        -lusb-1.0 \
-        -lpulse \
-        -lasound\
-        -L/usr/lib/ -lturbojpeg \
-        -L/usr/lib/i386-linux-gnu/ -levdev
-}
+# Now add the LIB 
+## contains($$QMAKE_HOST.arch, x86_64):{
+##     message("x86_64 bit libs: $$(LIB_DIR)")
+##     LIBS += -lv4l2 -lv4lconvert \
+##         -L/usr/lib64/ -lavutil \
+##         -L/usr/lib64/ -lavcodec \
+##         -L/usr/lib64/ -lavformat \
+##         -L/usr/lib64/ -lswscale \
+##         -L/usr/lib64/ -ludev \
+##         -L/usr/lib64/ -lusb-1.0 \
+##         -L/usr/lib64/pulseaudio/ -lpulse \
+##         -L/usr/lib64/alsa-lib/ -lasound \
+##         -L/usr/lib64/ -lturbojpeg \
+##         -L/usr/lib64/ -levdev
+## }
 
-contains(QMAKE_HOST.arch, arm64):{
-    message("Arm64 libs")
-    LIBS += -lv4l2 -lv4lconvert \
-        -lavutil \
-        -lavcodec \
-        -lavformat \
-        -lswscale \
-        -ludev \
-        -lusb-1.0 \
-        -lpulse \
-        -lasound\
-        -L/usr/lib/ -lturbojpeg \
-        -L/usr/lib/aarch64-linux-gnu/ -levdev
-}
+## contains($$QMAKE_HOST.arch.arch, i386):{
+##     message("x86_32 bit libs")
+##     LIBS += -lv4l2 -lv4lconvert \
+##         -lavutil \
+##         -lavcodec \
+##         -lavformat \
+##         -lswscale \
+##         -ludev \
+##         -lusb-1.0 \
+##         -lpulse \
+##         -lasound\
+##         -L/usr/lib/ -lturbojpeg \
+##         -L/usr/lib/i386-linux-gnu/ -levdev
+## }
+
+## contains($$QMAKE_HOST.arch.arch, arm64):{
+##     message("Arm64 libs")
+##     LIBS += -lv4l2 -lv4lconvert \
+##         -lavutil \
+##         -lavcodec \
+##         -lavformat \
+##         -lswscale \
+##         -ludev \
+##         -lusb-1.0 \
+##         -lpulse \
+##         -lasound\
+##         -L/usr/lib/ -lturbojpeg \
+##         -L/usr/lib/aarch64-linux-gnu/ -levdev
+## }
 
 #QMAKE_CXX += -ggdb
 QMAKE_CFLAGS_THREAD = -D__STDC_CONSTANT_MACROS      #For Ubuntu 12.04 compilation
 QMAKE_CXXFLAGS_THREAD = -D__STDC_CONSTANT_MACROS    #For Ubuntu 12.04 compilation
 QMAKE_CFLAGS_ISYSTEM = -I                           #For Ubuntu 20.04
 
+# makes a difference
+# QMAKE_LFLAGS = -Wl,--copy-dt-needed-entries
 
 
 #Conditionally including additional source files depends upon OS type
-contains(DEFINES, UBUNTU_22_04) {
+if(contains(DEFINES, UBUNTU_22_04)|contains(DEFINES, UBUNTU_24_04)|contains(DEFINES, FEDORA)) {
+    message("Adding QML source files from $$PWD/ub22_qml")
+
     OTHER_FILES += \
         ub22_qml/qtcam/Views/qtcam.qml \
         ub22_qml/qtcam/Views/aboutview.qml \

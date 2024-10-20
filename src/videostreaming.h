@@ -474,7 +474,6 @@ private:
     QString stillOutFormat;
     QString formatType;
     QString filename;
-    QString ubuntuVersion;
     QStringList availableFPS; // Moved from funtion updateFrameInterval() in videostreaming.c to here
 
     QMap<QString,QString> pixFormat;

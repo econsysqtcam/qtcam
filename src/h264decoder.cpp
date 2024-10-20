@@ -33,7 +33,11 @@ static enum AVPixelFormat get_format(AVCodecContext *ctx,const enum AVPixelForma
 H264Decoder::H264Decoder()
 {
     initVars();
-    av_register_all();    
+
+    #if (LIBAVCODEC_VERSION_MAJOR < 54)
+        // FFmpeg used to require a call to av_register_all() but it was deprecated in v4 and has since been removed
+        av_register_all();
+    #endif
 }
 
 H264Decoder::~H264Decoder()
@@ -63,7 +67,11 @@ bool H264Decoder::initH264Decoder(unsigned width, unsigned height)
 
 #if LIBAVCODEC_VER_AT_LEAST(53,6)
     pH264CodecCtx = avcodec_alloc_context3(pH264Codec);
+    #if (LIBAVCODEC_VERSION_MAJOR < 59)
+    // avcodec_get_context_defaults3 has been removed, see:
+    // https://patchwork.ffmpeg.org/project/ffmpeg/patch/20210419141024.8174-23-jamrial@gmail.com/
     avcodec_get_context_defaults3 (pH264CodecCtx, pH264Codec);
+    #endif
 #else
     pH264CodecCtx = avcodec_alloc_context();
     avcodec_get_context_defaults(pH264CodecCtx);
@@ -84,7 +92,10 @@ bool H264Decoder::initH264Decoder(unsigned width, unsigned height)
     pH264CodecCtx->width = width;
     pH264CodecCtx->height = height;
     pH264CodecCtx->thread_count = 10;
+    #if (LIBAVCODEC_VERSION_MAJOR < 60)
+    // see: https://patchwork.ffmpeg.org/project/ffmpeg/patch/20201029140122.10411-1-anton@khirnov.net/#60116
     pH264CodecCtx->thread_safe_callbacks = true;
+    #endif
     pH264CodecCtx->workaround_bugs = FF_BUG_AUTODETECT;
     pH264CodecCtx->err_recognition = 1;
     pH264CodecCtx->thread_type = 3;

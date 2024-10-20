@@ -1,0 +1,62 @@
+name: Build Ubuntu
+
+on:
+  push:
+#    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    name: Ubuntu ${{ matrix.ubuntu_version }}
+    runs-on: ubuntu-${{ matrix.ubuntu_version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_version: [ '20.04', '22.04', '24.04' ]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt update -y
+        sudo apt install -y --no-install-recommends libv4l-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev libudev-dev libavcodec-extra qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools qtdeclarative5-dev freeglut3-dev libjpeg-turbo8-dev libusb-1.0-0-dev libusb-dev libevdev-dev libpulse-dev libpulse0 qtmultimedia5-dev qml-module-qtquick-controls qml-module-qtquick-dialogs qml-module-qtquick-extras qml-module-qtquick-privatewidgets libasound2-dev libturbojpeg0-dev qtquickcontrols5-doc g++ g++-10 lsb-release
+      
+
+      ##    - name: Install Qt
+##      uses: jurplel/install-qt-action@v4
+##      with:
+##        version: '6.7.*'
+##        host: 'linux'
+##        target: 'desktop'
+##        arch: 'linux_gcc_64'
+##        tools: 'tools_qtcreator tools_cmake'
+##
+##    - name: Configure Qt6_ROOT
+##      # The Qt6_ROOT variable can be set based on the install-qt-action
+##      run: echo "Qt6_ROOT=$QT_ROOT_DIR" >> $GITHUB_ENV
+
+# No longer need qt libs from Ubuntu Repo but if we did QT6 will be:
+# qt6-base-dev qt6-base-dev-tools qt6-declarative-dev libqt6svg6-dev qt6-tools-dev linguist-qt6 qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtquick-templates qml6-module-qtquick-window
+
+    - name: Run qmake
+      working-directory: ${{github.workspace}}/src
+      run: |
+        qmake --version
+        qmake
+      env:
+        QT_SELECT: qt5
+
+    - name: Run make
+      working-directory: ${{github.workspace}}/src
+      run: make
+      env:
+        LDFLAGS: '-Wl,--copy-dt-needed-entries -Wl,-rpath-link'
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: qtcam-ubuntu-${{ matrix.ubuntu_version }}.zip
+        if-no-files-found: 'error'
+        path: |
+          src/Qtcam

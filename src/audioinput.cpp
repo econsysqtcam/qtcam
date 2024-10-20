@@ -39,6 +39,10 @@
 #include <time.h>
 #include <sys/time.h>
 #include <libintl.h>
+
+#include <pulse/pulseaudio.h>
+#include <pulse/mainloop.h>
+
 #include <math.h>
 #include <QTimer>
 #include <QAudioDeviceInfo>
