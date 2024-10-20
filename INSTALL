@@ -99,8 +99,8 @@ Then double click the downloaded binary and install it to your local system.
   In ubuntu 20.04,
  $sudo apt-get install libv4l-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev libudev-dev libavcodec-extra qt5-default qtdeclarative5-dev freeglut3 freeglut3-dev libjpeg-turbo8-dev libusb-1.0-0-dev libusb-dev libevdev-dev libpulse-dev qtmultimedia5-dev qml-module-qtquick-controls qml-module-qtquick-dialogs qml-module-qtquick-extras qml-module-qtquick-privatewidgets libasound2-dev libturbojpeg0-dev qtquickcontrols5-doc g++ g++-10 lsb-release
 
- In Fedora 29,
- $ sudo dnf install -y libv4l-devel qt5-devel qtav-devel systemd-devel libusb-devel turbojpeg-devel ffmpeg-devel libevdev-devel
+ In Fedora 40,
+ $ sudo dnf install -y libv4l-devel qt5-qtbase-devel qt5-qtquickcontrols2-devel qt5-qtmultimedia-devel qtav-devel systemd-devel libusb1-devel turbojpeg-devel ffmpeg-devel libevdev-devel
 
 
 3.3 Build the application

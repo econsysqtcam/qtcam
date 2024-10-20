@@ -1,14 +1,16 @@
-# Check for the Ubuntu version and set appropriate flags
-ubuntu_version = $$system(lsb_release -rs)
+# Check for the Linux distro and set appropriate flags
+distro = $$system(lsb_release -rsd)
 
-equals(ubuntu_version, 16.04) {
+equals(distro, 16.04) {
     DEFINES += UBUNTU_16_04
-}else: equals(ubuntu_version, 18.04) {
+}else: equals(distro, 18.04) {
     DEFINES += UBUNTU_18_04
-} else: equals(ubuntu_version, 20.04) {
+} else: equals(distro, 20.04) {
     DEFINES += UBUNTU_20_04
-} else: equals(ubuntu_version, 22.04) {
+} else: equals(distro, 22.04) {
     DEFINES += UBUNTU_22_04
+} else: equals(distro, Fedora) {
+    DEFINES += FEDORA
 }
 
 contains(DEFINES, UBUNTU_22_04) {
@@ -182,18 +184,13 @@ INCLUDEPATH +=  $$PWD/v4l2headers/include \
                 /usr/include/ffmpeg \
                 /usr/include/libusb-1.0
 
-# why not use QMAKE_HOST.arch
-UNAME_MACHINE_32BIT = $$system(dpkg --print-architecture | grep -o "i386")
-UNAME_MACHINE_64BIT = $$system(dpkg --print-architecture | grep -o "amd64")
-BOARD_ARM64 = $$system(dpkg --print-architecture | grep -o "arm64")
-
 DISTRIBUTION_NAME = $$system(lsb_release -a | grep -o "bionic")
-contains(DISTRIBUTION_NAME,bionic):{
-QMAKE_CXX = "g++-5"
-QMAKE_CXXFLAGS += -std=c++11
+contains(DISTRIBUTION_NAME, bionic):{
+    QMAKE_CXX = "g++-5"
+    QMAKE_CXXFLAGS += -std=c++11
 }
 
-contains(UNAME_MACHINE_64BIT, amd64):{
+contains(QMAKE_HOST.arch, amd64):{
     message("x86_64 bit libs")
     LIBS += -lv4l2 -lv4lconvert \
         -lavutil \
@@ -208,7 +205,7 @@ contains(UNAME_MACHINE_64BIT, amd64):{
         -L/usr/lib/x86_64-linux-gnu/ -levdev
 }
 
-contains(UNAME_MACHINE_32BIT, i386):{
+contains(QMAKE_HOST.arch, i386):{
     message("x86_32 bit libs")
     LIBS += -lv4l2 -lv4lconvert \
         -lavutil \
@@ -223,7 +220,7 @@ contains(UNAME_MACHINE_32BIT, i386):{
         -L/usr/lib/i386-linux-gnu/ -levdev
 }
 
-contains(BOARD_ARM64, arm64):{
+contains(QMAKE_HOST.arch, arm64):{
     message("Arm64 libs")
     LIBS += -lv4l2 -lv4lconvert \
         -lavutil \
