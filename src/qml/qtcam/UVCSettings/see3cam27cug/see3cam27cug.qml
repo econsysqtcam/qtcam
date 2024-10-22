@@ -1,5 +1,5 @@
 /*
- * uvc_cu30.qml -- extension settings for other cameras
+ * see3cam27cug.qml -- extension settings for other cameras
  * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
@@ -917,6 +917,18 @@ Item {
         messageDialog.open()
     }
 
+    function contrastUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
+    {
+        contrast.opacity = 1
+        contrast_Slider.enabled = true
+        contrast_value.opacity = 1
+        contrastControlId = controlID
+        contrast_Slider.minimumValue = controlMinValue
+        contrast_Slider.maximumValue = controlMaxValue
+        contrast_Slider.value = controlDefaultValue
+        contrast_Slider.stepSize = controlStepSize
+    }
+
     function currentFlipMirrorMode(mode)
     {
         switch(mode)
@@ -988,7 +1000,7 @@ Item {
         see3cam27cug.setCameraMode(See3CAM_27CUG.RGB)
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
-        root.videoRecordBtnEnable(true)  
+        root.videoRecordBtnEnable(true)
 
         //To disable IR controls in RGB mode
         disableIrControls()

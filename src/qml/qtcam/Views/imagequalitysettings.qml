@@ -868,6 +868,7 @@ Item {
 
                             }else if(!exposureAutoAvailable){ // If a camera does not contain "exposure, auto" control, but having "exposure absolute" control, allow it change exposure value.
                                 root.changeCameraSettings(exposurecontrolId,value.toString())
+                                root.getExposureComponentsUVC(seconds, milliSeconds, microSeconds)
                             }else{
                                 if((exposureCombo.currentText == "Shutter Priority Mode" || exposureCombo.currentText == "Manual Mode")) {
                                     root.getExposureComponentsUVC(seconds, milliSeconds, microSeconds)

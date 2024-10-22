@@ -42,6 +42,9 @@ extern "C" {
 #include "libswscale/swscale.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/dict.h"
+#include "libavutil/avutil.h"
+#include "libavutil/imgutils.h"
+#include "libavutil/opt.h"
 //#include "libavcodec/version.h"
 #if LIBAVUTIL_VER_AT_LEAST(52,2)
     #include "libavutil/channel_layout.h"
@@ -98,12 +101,11 @@ public:
        YUYV_BUFFER = 1,
        UYVY_BUFFER,
        Y8_BUFFER,
-       Y16_BUFFER,
-       RGB_BT709_BUFFER
+       Y16_BUFFER
    }bufferType;
 
    Q_ENUMS(bufferType)
- 
+
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
    bool createFile(QString filename, AVCodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitRate,  int audioDeviceIndex, int sampleRate, int channels);
 #else
@@ -119,14 +121,17 @@ public:
     AVStream* add_audio_stream(AVFormatContext *oc, enum AVCodecID codec_id, int sampleRate, int channels); //Adds an audio stream to the output file.
 #else
     AVStream* add_audio_stream(AVFormatContext *oc, enum CodecID codec_id, int sampleRate, int channels);
-#endif    
+#endif
     int check_sample_fmt(AVCodec *codec, enum AVSampleFormat sample_fmt);
-    int encodeAudio(void *);       
+    int encodeAudio(void *);
 
    bool closeFile();
 
    //Encodes a video frame given a buffer and buffer type.
    int encodeImage(uint8_t *buffer, uint8_t bufferType);
+
+   //To check for Ubuntu 22.04 OS
+   bool isUbuntu2204();
 
    //Encodes a video packet given a buffer and buffer type.
    int encodePacket(uint8_t *buffer, uint8_t bufferType);
@@ -157,27 +162,27 @@ protected:
 
     // FFmpeg stuff
     AVFormatContext *pFormatCtx;
-    
+
     AVStream *pVideoStream, *pAudioStream;
     AVCodec *pCodec;
 
-      // Frame data
-      AVFrame *ppicture;
-      uint8_t *picture_buf;
+    // Frame data
+    AVFrame *ppicture;
+    uint8_t *picture_buf;
 
-      // Compressed data
-      int outbuf_size;
-      uint8_t* outbuf;
-      uint8_t* finalBuf;
+    // Compressed data
+    int outbuf_size;
+    uint8_t* outbuf;
+    uint8_t* finalBuf;
 
-      // Conversion
-      SwsContext *img_convert_ctx;
+    // Conversion
+    SwsContext *img_convert_ctx;
 
     // Packet
-    AVPacket pkt, audioPkt;
+    AVPacket *pkt, *audioPkt;
 
-      QString fileName;
-      QString tempExtensionCheck;
+    QString fileName;
+    QString tempExtensionCheck;
 
     //audio
     int audio_outbuf_size;
@@ -186,27 +191,25 @@ protected:
     u_int8_t *audio_outbuf;
 
     AVCodec *paudioCodec;
-    AVFrame *pAudioFrame;   
-    
+    AVFrame *pAudioFrame;
+
     unsigned getWidth();
     unsigned getHeight();
     bool isSizeValid();
 
-      void initVars();
-      bool initCodec();
-      
+    void initVars();
 
-      // Alloc/free the output buffer
-      bool initOutputBuf();
-      void freeOutputBuf();
+    // Alloc/free the output buffer
+    bool initOutputBuf();
+    void freeOutputBuf();
 
-      // Alloc/free a frame
-      bool initFrame();
-      void freeFrame();
+    // Alloc/free a frame
+    bool initFrame();
+    void freeFrame();
 
-      // Frame conversion
-      bool convertImage(const QImage &img);
-      bool convertImage_sws(uint8_t *buffer, uint8_t bufferType);
+    // Frame conversion
+    bool convertImage(const QImage &img);
+    bool convertImage_sws(uint8_t *buffer, uint8_t bufferType);
 };
 #endif // VideoEncoder_H
 

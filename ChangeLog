@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.29
+---------------------------
+*Added second phase HID controls for See3CAM_CU31.
+
 Qtcam Application - 26.0.28
 ---------------------------
 *Resolved video recording issue - Prevents background recording even after the recording has stopped.

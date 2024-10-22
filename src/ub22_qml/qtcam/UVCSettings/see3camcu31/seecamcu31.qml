@@ -14,9 +14,16 @@ Item {
     property int convergenceSpeedMin: 0
     property int convergenceSpeedMax: 255
 
-    property bool skipUpdateUIAutoExposure: false
+    property int aeMaskIDValue  : 0
+    property int awbMaskIDValue : 0
 
+    property bool skipUpdateUIAutoExposure: false
     property bool uvcAutoExposureSelected: false
+    property bool skipUpdateUIOnAEMaskID: false
+    property bool skipUpdateUIOnAWBMaskID: false
+
+    property int disable : 0
+    property int enable  : 1
 
     Action {
         id: firmwareVersion
@@ -31,6 +38,18 @@ Item {
         onTriggered:
         {
             setToDefaultValues()
+        }
+    }
+
+    Timer {
+        id: getCamValuesTimer
+        interval: 2000
+        onTriggered: {
+            see3camcu31.getAEWindowDimensions()
+            see3camcu31.getAEMaskDimensions(true)
+            see3camcu31.getAWBWindowDimensions()
+            see3camcu31.getAWBMaskDimensions(true)
+            stop()
         }
     }
 
@@ -60,6 +79,10 @@ Item {
         function onAutoExposureSelected(autoExposureSelect){
             enableDisableAutoExposureControls(autoExposureSelect)
         }
+
+        function onVideoResolutionChanged(){
+            getCamValuesTimer.start()
+        }
     }
     ScrollView{
         id: scrollview
@@ -70,7 +93,7 @@ Item {
         style: econscrollViewStyle
 
         Item {
-            height: 1200
+            height: 2500
             ColumnLayout{
                 x:2
                 y:5
@@ -88,16 +111,18 @@ Item {
                 }
                 Row{
                     spacing: 40
+                    Layout.alignment: Qt.AlignCenter
                     CheckBox {
                         id: flipCtrlHorizotal
                         activeFocusOnPress : true
                         text: "Horizontal"
                         style: econCheckBoxStyle
+                        tooltip: "Horizonal flip - Enable horizontal flip"
                         onClicked:{
-                            see3camcu31.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                            setOrientationProperties()
                         }
                         Keys.onReturnPressed: {
-                            see3camcu31.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                            setOrientationProperties()
                         }
                     }
                     CheckBox {
@@ -105,11 +130,12 @@ Item {
                         activeFocusOnPress : true
                         text: "Vertical"
                         style: econCheckBoxStyle
+                        tooltip: "Vertical flip - Enable vertical flip"
                         onClicked:{
-                            see3camcu31.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                            setOrientationProperties()
                         }
                         Keys.onReturnPressed: {
-                            see3camcu31.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                            setOrientationProperties()
                         }
                     }
                 }
@@ -126,10 +152,9 @@ Item {
                         opacity: 0.50196078431373
                     }
                 }
-                ColumnLayout {
-                    x: 23
-                    y: 235
-                    spacing: 15
+                RowLayout {
+                    Layout.alignment: Qt.AlignCenter
+                    spacing: 25
                     ExclusiveGroup { id: rnrModeGroup }
                     RadioButton {
                         id: disableRNR
@@ -137,6 +162,7 @@ Item {
                         text:   qsTr("Disable")
                         exclusiveGroup: rnrModeGroup
                         activeFocusOnPress: true
+                        tooltip: "RNR disable - Disable RNR"
                         onClicked: {
                             see3camcu31.setRawNoiseReductionStatus(SEE3CAM_CU31.RNR_DISABLE)
                         }
@@ -150,6 +176,8 @@ Item {
                         text: qsTr("Enable")
                         exclusiveGroup: rnrModeGroup
                         activeFocusOnPress: true
+                        tooltip: "RNR enable - The RAW noise reduction function reduces noise in RAW signals from each signal
+line."
                         onClicked: {
                             see3camcu31.setRawNoiseReductionStatus(SEE3CAM_CU31.RNR_ENABLE)
                         }
@@ -179,9 +207,10 @@ Item {
                     RadioButton {
                         id: triggerDisable
                         style:  econRadioButtonStyle
-                        text:   qsTr("Disable")
+                        text:   qsTr("Master")
                         exclusiveGroup: triggerModeGroup
                         activeFocusOnPress: true
+                        tooltip: "Disable - Disable trigger mode."
                         onClicked: {
                             disableTriggerMode()
                         }
@@ -195,6 +224,7 @@ Item {
                         text: qsTr("Readout")
                         exclusiveGroup: triggerModeGroup
                         activeFocusOnPress: true
+                        tooltip: "Readout trigger - The sensor starts a read operation based on the input trigger."
                         onClicked: {
                             setTriggerMode()
                         }
@@ -208,6 +238,7 @@ Item {
                         text: qsTr("Shutter")
                         exclusiveGroup: triggerModeGroup
                         activeFocusOnPress: true
+                        tooltip: "Shutter trigger - The sensor starts a shutter operation based on the input trigger."
                         onClicked: {
                             setTriggerMode()
                         }
@@ -216,6 +247,185 @@ Item {
                         }
                     }
                 }
+
+                Text {
+                    id: readTempTitle
+                    text: "--- Read Temperature ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                Row
+                {
+                    spacing: 13
+                    Text {
+                        id: readTempText
+                        text: "Temperature (°C)"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                    }
+                    TextField
+                    {
+                        id: readTempTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        readOnly: true
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                    }
+                    Button {
+                        id: readTempBtn
+                        activeFocusOnPress : true
+                        text: "Get"
+                        style: econButtonStyle
+                        implicitHeight: 20
+                        implicitWidth: 45
+                        tooltip: "This gives the internal temperature readout from the on-chip temperature sensor in the image
+sensor."
+                        onClicked: {
+                            see3camcu31.readTemperature()
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.readTemperature()
+                        }
+                    }
+                }
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: cameraModeText
+                        text: "--- Enhancement Modes ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+
+                Row{
+                    spacing: 20
+                    Layout.alignment: Qt.AlignCenter
+                    ExclusiveGroup { id: cameraModeGroup }
+
+                    RadioButton {
+                        id: autoCameraMode
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Auto")
+                        exclusiveGroup: cameraModeGroup
+                        activeFocusOnPress: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        tooltip: "Auto - Auto mode"
+                        onClicked: {
+                            see3camcu31.setCameraMode(SEE3CAM_CU31.AUTO)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setCameraMode(SEE3CAM_CU31.AUTO)
+                        }
+                    }
+                    RadioButton {
+                        id: lowLightMode
+                        style:  econRadioButtonStyle
+                        text: qsTr("Low Light")
+                        exclusiveGroup: cameraModeGroup
+                        activeFocusOnPress: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        tooltip: "Low Light - This mode enhances lowlight visibility"
+                        onClicked: {
+                            see3camcu31.setCameraMode(SEE3CAM_CU31.LOW_LIGHT)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setCameraMode(SEE3CAM_CU31.LOW_LIGHT)
+                        }
+                    }
+                    RadioButton {
+                        id: ledMode
+                        style:  econRadioButtonStyle
+                        text: qsTr("LED")
+                        exclusiveGroup: cameraModeGroup
+                        activeFocusOnPress: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        tooltip: "LED - This mode enhances visibility of LEDs and reduces the blooming effect."
+                        onClicked: {
+                            see3camcu31.setCameraMode(SEE3CAM_CU31.LED)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setCameraMode(SEE3CAM_CU31.LED)
+                        }
+                    }
+                }
+
+                Text {
+                    id: autoExpControls
+                    text: "AE Controls :"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignLeft
+                    opacity: 1
+                }
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: autoExpStatusTitle
+                        text: "--- AE HOLD ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+                RowLayout {
+                    Layout.alignment: Qt.AlignCenter
+                    spacing: 25
+                    ExclusiveGroup { id: autoExpStatusGroup }
+                    RadioButton {
+                        id: autoExposure
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Auto")
+                        exclusiveGroup: autoExpStatusGroup
+                        activeFocusOnPress: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        tooltip: "AE - Disable Hold. Run Auto Exposure."
+                        onClicked: {
+                            setAutoExposure()
+                        }
+                        Keys.onReturnPressed:  {
+                            setAutoExposure()
+                        }
+                    }
+                    RadioButton {
+                        id: autoExposureHold
+                        style:  econRadioButtonStyle
+                        text: qsTr("Hold")
+                        exclusiveGroup: autoExpStatusGroup
+                        activeFocusOnPress: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        tooltip: "Hold - In this mode the sensor retains the current exposure control settings."
+                        onClicked: {
+                            setAutoExposure()
+                        }
+                        Keys.onReturnPressed: {
+                            setAutoExposure()
+                        }
+                    }
+                }
+
                 Text
                 {
                     id: convergenceSpeedTitle
@@ -226,8 +436,13 @@ Item {
                     smooth: true
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
+                    ToolButton{
+                        tooltip: "Adjust the speed at which auto exposure (AE) converges within the optimum exposure range.
+Increasing the value will increase the AE convergence speed."
+                        width: 200
+                        opacity: 0
+                    }
                 }
-
                 Row
                 {
                     spacing: 35
@@ -275,148 +490,6 @@ Item {
                     }
                 }
 
-
-                Row{
-                    Layout.alignment: Qt.AlignCenter
-                    Text {
-                        id: autoExpStatusTitle
-                        text: "--- AE HOLD ---"
-                        font.pixelSize: 14
-                        font.family: "Ubuntu"
-                        color: "#ffffff"
-                        smooth: true
-                        opacity: 0.50196078431373
-                    }
-                }
-                ColumnLayout {
-                    x: 23
-                    y: 235
-                    spacing: 15
-                    ExclusiveGroup { id: autoExpStatusGroup }
-                    RadioButton {
-                        id: autoExposure
-                        style:  econRadioButtonStyle
-                        text:   qsTr("Auto")
-                        exclusiveGroup: autoExpStatusGroup
-                        activeFocusOnPress: true
-                        enabled: (uvcAutoExposureSelected) ? true : false
-                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
-                        onClicked: {
-                            setAutoExposure()
-                        }
-                        Keys.onReturnPressed:  {
-                            setAutoExposure()
-                        }
-                    }
-                    RadioButton {
-                        id: autoExposureHold
-                        style:  econRadioButtonStyle
-                        text: qsTr("Hold")
-                        exclusiveGroup: autoExpStatusGroup
-                        activeFocusOnPress: true
-                        enabled: (uvcAutoExposureSelected) ? true : false
-                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
-                        onClicked: {
-                            setAutoExposure()
-                        }
-                        Keys.onReturnPressed: {
-                            setAutoExposure()
-                        }
-                    }
-                }
-
-                Row{
-                    Layout.alignment: Qt.AlignCenter
-                    Text {
-                        id: awbStatusTitle
-                        text: "--- AWB HOLD ---"
-                        font.pixelSize: 14
-                        font.family: "Ubuntu"
-                        color: "#ffffff"
-                        smooth: true
-                        opacity: 0.50196078431373
-                    }
-                }
-                ColumnLayout {
-                    x: 23
-                    y: 235
-                    spacing: 15
-                    ExclusiveGroup { id: awbStatusGroup }
-                    RadioButton {
-                        id: awbRelease
-                        style:  econRadioButtonStyle
-                        text:   qsTr("Auto")
-                        exclusiveGroup: awbStatusGroup
-                        activeFocusOnPress: true
-                        onClicked: {
-                            see3camcu31.setAWBStatus(SEE3CAM_CU31.AWB_RELEASE)
-                        }
-                        Keys.onReturnPressed:  {
-                            see3camcu31.setAWBStatus(SEE3CAM_CU31.AWB_RELEASE)
-                        }
-                    }
-                    RadioButton {
-                        id: awbHold
-                        style:  econRadioButtonStyle
-                        text: qsTr("Hold")
-                        exclusiveGroup: awbStatusGroup
-                        activeFocusOnPress: true
-                        onClicked: {
-                            see3camcu31.setAWBStatus(SEE3CAM_CU31.AWB_HOLD)
-                        }
-                        Keys.onReturnPressed: {
-                            see3camcu31.setAWBStatus(SEE3CAM_CU31.AWB_HOLD)
-                        }
-                    }
-                }
-
-                Text {
-                    id: readTempTitle
-                    text: "--- Read Temperature ---"
-                    font.pixelSize: 14
-                    font.family: "Ubuntu"
-                    color: "#ffffff"
-                    smooth: true
-                    Layout.alignment: Qt.AlignCenter
-                    opacity: 0.50196078431373
-                }
-                Row
-                {
-                    spacing: 13
-                    Text {
-                        id: readTempText
-                        text: "Temperature (°C)"
-                        font.pixelSize: 14
-                        font.family: "Ubuntu"
-                        color: "#ffffff"
-                        smooth: true
-                    }
-                    TextField
-                    {
-                        id: readTempTextField
-                        font.pixelSize: 10
-                        font.family: "Ubuntu"
-                        readOnly: true
-                        smooth: true
-                        horizontalAlignment: TextInput.AlignHCenter
-                        style: econTextFieldStyle
-                    }
-                    Button {
-                        id: readTempBtn
-                        activeFocusOnPress : true
-                        text: "Get"
-                        style: econButtonStyle
-                        implicitHeight: 20
-                        implicitWidth: 45
-                        onClicked: {
-                            see3camcu31.readTemperature()
-                        }
-                        Keys.onReturnPressed: {
-                            see3camcu31.readTemperature()
-                        }
-                    }
-                }
-
                 Text
                 {
                     id: antiFlickerMode
@@ -429,7 +502,7 @@ Item {
                     opacity: 0.50196078431373
                 }
 
-                Row{
+                RowLayout{
                     spacing: 35
                     Layout.alignment: Qt.AlignCenter
 
@@ -441,6 +514,7 @@ Item {
                         exclusiveGroup: antiFlickerGroup
                         enabled: (uvcAutoExposureSelected) ? true : false
                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        tooltip: "Automatically detects the flicker and mitigates the flicker."
                         activeFocusOnPress: true
                         onClicked: {
                             setFlickerControl()
@@ -457,6 +531,7 @@ Item {
                         activeFocusOnPress: true
                         enabled: (uvcAutoExposureSelected) ? true : false
                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        tooltip: "Mitigates flicker if it detects 50 Hz flicker only. "
                         onClicked: {
                             setFlickerControl()
                         }
@@ -466,7 +541,7 @@ Item {
                     }
                 }
 
-                Row{
+                RowLayout{
                     spacing: 35
                     Layout.alignment: Qt.AlignCenter
 
@@ -478,6 +553,7 @@ Item {
                         activeFocusOnPress: true
                         enabled: (uvcAutoExposureSelected) ? true : false
                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        tooltip: "Mitigates flicker if it detects 60 Hz flicker only. "
                         onClicked: {
                             setFlickerControl()
                         }
@@ -493,6 +569,7 @@ Item {
                         activeFocusOnPress: true
                         enabled: (uvcAutoExposureSelected) ? true : false
                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        tooltip: "Disable flicker mitigation."
                         onClicked: {
                             setFlickerControl()
                         }
@@ -505,8 +582,408 @@ Item {
                 Row{
                     Layout.alignment: Qt.AlignCenter
                     Text {
-                        id: cameraModeText
-                        text: "--- Enhancement Modes ---"
+                        id: aeWindowOverlay
+                        text: "--- Window Overlay ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+                RowLayout {
+                    x: 23
+                    y: 235
+                    spacing: 15
+                    Layout.alignment: Qt.AlignCenter
+                    ExclusiveGroup { id: aeWindowOverlayGroup }
+                    RadioButton {
+                        id: disableAEWindow
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Disable")
+                        exclusiveGroup: aeWindowOverlayGroup
+                        activeFocusOnPress: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        tooltip: "The user can enable or disable the on-screen display of the AE light metering window.
+The user can check the position of the AE light metering window by displaying it in the preview.
+Since enabling this feature will be applied to both the preview and still capture, it is
+recommended to disable it after configuring the window.
+
+Disable – Selecting this will disable the AE window overlay."
+                        onClicked: {
+                            see3camcu31.setAEWindowOverlay(disable)
+                        }
+                        Keys.onReturnPressed:  {
+                            see3camcu31.setAEWindowOverlay(disable)
+                        }
+                    }
+                    RadioButton {
+                        id: enableAEWindow
+                        style:  econRadioButtonStyle
+                        text: qsTr("Enable")
+                        exclusiveGroup: aeWindowOverlayGroup
+                        activeFocusOnPress: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        tooltip: "The user can enable or disable the on-screen display of the AE light metering window.
+The user can check the position of the AE light metering window by displaying it in the preview.
+Since enabling this feature will be applied to both the preview and still capture, it is
+recommended to disable it after configuring the window.
+
+Enable – Selecting this will activate the window overlay, allowing the on-screen display of the
+light metering window for AE."
+                        onClicked: {
+                            see3camcu31.setAEWindowOverlay(enable)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setAEWindowOverlay(enable)
+                        }
+                    }
+                }
+
+
+               Row{
+                   Layout.alignment: Qt.AlignCenter
+                   Text {
+                       id: aeWindowText
+                       text: "--- Window Dimensions ---"
+                       font.pixelSize: 14
+                       font.family: "Ubuntu"
+                       color: "#ffffff"
+                       smooth: true
+                       opacity: 0.50196078431373
+                   }
+               }
+
+               RowLayout{
+
+                    spacing: 15
+                    Text {
+                        id: aeWidth
+                        text: "Width "
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        ToolButton{
+                            tooltip: "The AE light metering window is an area used to calculate the AE evaluation value.
+The user can set the size and position of the window.
+
+Width – Set the width of AE light metering window."
+                            width: 200
+                            opacity: 0
+                        }
+                    }
+                    TextField
+                    {
+                        id: aeWidthTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                    }
+
+                    Text {
+                        id: aeHeight
+                        text: "Height"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+
+                        ToolButton{
+                            tooltip: "The AE light metering window is an area used to calculate the AE evaluation value.
+The user can set the size and position of the window.
+
+Height – Set the height of AE light metering window."
+                            width: 200
+                            opacity: 0
+                        }
+                    }
+
+                    TextField
+                    {
+                        id: aeHeightTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                    }
+               }
+
+               RowLayout{
+                    spacing: 15
+
+                    Text {
+                        id: aeXStart
+                        text: "XStart "
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        ToolButton{
+                            tooltip: "The AE light metering window is an area used to calculate the AE evaluation value.
+The user can set the size and position of the window.
+
+X Start – Set the starting position of the AE window in horizontal direction."
+                            width: 200
+                            opacity: 0
+                        }
+                    }
+                    TextField
+                    {
+                        id: aeXStartTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                    }
+
+                    Text {
+                        id: aeYStart
+                        text: "YStart"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        ToolButton{
+                            tooltip: "The AE light metering window is an area used to calculate the AE evaluation value.
+The user can set the size and position of the window.
+
+Y Start – Set the starting position of the AE window in vertical direction."
+                            width: 200
+                            opacity: 0
+                        }
+                    }
+
+                    TextField
+                    {
+                        id: aeYStartTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                    }
+               }
+
+               Row
+               {
+                   Layout.alignment: Qt.AlignCenter
+                   Button {
+                       id: aeSetBtn
+                       activeFocusOnPress : true
+                       text: "Set"
+                       style: econButtonStyle
+                       implicitHeight: 23
+                       implicitWidth: 45
+                       enabled: (uvcAutoExposureSelected) ? true : false
+                       opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                       onClicked: {
+                           see3camcu31.setAEWindowDimensions(aeWidthTextField.text, aeHeightTextField.text, aeXStartTextField.text, aeYStartTextField.text)
+                       }
+                       Keys.onReturnPressed: {
+                           see3camcu31.setAEWindowDimensions(aeWidthTextField.text, aeHeightTextField.text, aeXStartTextField.text, aeYStartTextField.text)
+                       }
+                   }
+               }
+
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: aeMaskOverlay
+                        text: "--- Mask Overlay ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+                RowLayout {
+                    x: 23
+                    y: 235
+                    spacing: 15
+                    Layout.alignment: Qt.AlignCenter
+                    ExclusiveGroup { id: aeMaskOverlayGroup }
+                    RadioButton {
+                        id: disableAEMask
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Disable")
+                        exclusiveGroup: aeMaskOverlayGroup
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        activeFocusOnPress: true
+                        tooltip: "The user can enable or disable the on-screen display of AE light metering region
+masking. The user can check the position of the AE masking region by displaying it on the
+preview. Since enabling this feature will be applied to both the preview and still capture, it is
+recommended to disable it after configuring the masking region.
+
+Disable – Selecting this will disable the AE mask overlay."
+                        onClicked: {
+                            see3camcu31.setAEMaskOverlay(disable)
+                        }
+                        Keys.onReturnPressed:  {
+                            see3camcu31.setAEMaskOverlay(disable)
+                        }
+                    }
+                    RadioButton {
+                        id: enableAEMask
+                        style:  econRadioButtonStyle
+                        text: qsTr("Enable")
+                        exclusiveGroup: aeMaskOverlayGroup
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        activeFocusOnPress: true
+                        tooltip: "The user can enable or disable the on-screen display of AE light metering region
+masking. The user can check the position of the AE masking region by displaying it on the
+preview. Since enabling this feature will be applied to both the preview and still capture, it is
+recommended to disable it after configuring the masking region.
+
+Enable – Selecting this will activate the AE mask overlay, allowing the on-screen display of
+masking for AE."
+                        onClicked: {
+                            see3camcu31.setAEMaskOverlay(enable)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setAEMaskOverlay(enable)
+                        }
+                    }
+                }
+
+                Text
+                {
+                    id: aeMaskID
+                    text: "--- Mask ID ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                ComboBox
+                {
+                    id: aeMaskIDCombo
+                    enabled: (uvcAutoExposureSelected) ? true : false
+                    opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                    model: ListModel {
+                        ListElement { text: "1" }
+                        ListElement { text: "2" }
+                        ListElement { text: "3" }
+                        ListElement { text: "4" }
+                        ListElement { text: "5" }
+                    }
+                    activeFocusOnPress: true
+                    style: econComboBoxStyle
+                    onCurrentIndexChanged: {
+                        if(skipUpdateUIOnAEMaskID)
+                        {
+                            setAEMaskDimensionsControl()
+
+                            see3camcu31.getAEMaskDimensions(false)
+                        }
+                        skipUpdateUIOnAEMaskID = true
+                    }
+
+                    ToolButton{
+                        tooltip: "The user can adjust the size and the position of the AE light metering region masking,
+which excludes specific region(s) of the window from the calculation of AE evaluation value.
+
+Mask ID – Select the ID of the AE mask, for which mask state to be switched and the dimensions
+to be set. Any combination of 1 to 5 masks may be applied to the preview concurrently.
+Mask State – Change the state of the AE mask for the selected mask ID."
+                        width: 200
+                        opacity: 0
+                    }
+                }
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: aeMaskStatus
+                        text: "--- Mask Status ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+                RowLayout {
+                    x: 23
+                    y: 235
+                    spacing: 15
+                    Layout.alignment: Qt.AlignCenter
+                    ExclusiveGroup { id: aeMaskStatusGroup }
+                    RadioButton {
+                        id: disableAEMaskStatus
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Disable")
+                        exclusiveGroup: aeMaskStatusGroup
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        activeFocusOnPress: true
+                        tooltip: "The user can adjust the size and the position of the AE light metering region masking,
+which excludes specific region(s) of the window from the calculation of AE evaluation value.
+
+Disable – When selected, no AE masking will be applied to the preview."
+                        onClicked: {
+                            see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, disable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+                        }
+                        Keys.onReturnPressed:  {
+                            see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, disable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+                        }
+                    }
+                    RadioButton {
+                        id: enableAEMaskStatus
+                        style:  econRadioButtonStyle
+                        text: qsTr("Enable")
+                        exclusiveGroup: aeMaskStatusGroup
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        activeFocusOnPress: true
+                        tooltip: "The user can adjust the size and the position of the AE light metering region masking,
+which excludes specific region(s) of the window from the calculation of AE evaluation value.
+
+Enable – When selected, AE masking will be applied to the preview, excluding that region
+from calculation of AE evaluation value."
+                        onClicked: {
+                            see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, enable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, enable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+                        }
+                    }
+                }
+
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: aeMaskWindowText
+                        text: "--- Mask Dimensions ---"
                         font.pixelSize: 14
                         font.family: "Ubuntu"
                         color: "#ffffff"
@@ -515,58 +992,837 @@ Item {
                     }
                 }
 
-                Row{
-                    spacing: 20
-                    Layout.alignment: Qt.AlignCenter
-                    ExclusiveGroup { id: cameraModeGroup }
+                RowLayout{
 
-                    RadioButton {
-                        id: autoCameraMode
-                        style:  econRadioButtonStyle
-                        text:   qsTr("Auto")
-                        exclusiveGroup: cameraModeGroup
-                        activeFocusOnPress: true
+                     spacing: 15
+                     Text {
+                         id: aeMaskWidth
+                         text: "Width "
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+                         enabled: (uvcAutoExposureSelected) ? true : false
+                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+
+                         ToolButton{
+                             tooltip: "The user can adjust the size and the position of the AE light metering region masking,
+which excludes specific region(s) of the window from the calculation of AE evaluation value.
+
+Width – Set the width of the AE mask for the selected mask ID."
+                             width: 200
+                             opacity: 0
+                         }
+                     }
+                     TextField
+                     {
+                         id: aeMaskWidthTextField
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                         enabled: (uvcAutoExposureSelected) ? true : false
+                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                     }
+
+                     Text {
+                         id: aeMaskHeight
+                         text: "Height"
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+                         enabled: (uvcAutoExposureSelected) ? true : false
+                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+
+                         ToolButton{
+                             tooltip: "The user can adjust the size and the position of the AE light metering region masking,
+which excludes specific region(s) of the window from the calculation of AE evaluation value.
+
+Height – Set the height of the AE mask for the selected mask ID.X Start – Set the starting position of the AE mask for the selected mask ID."
+                             width: 200
+                             opacity: 0
+                         }
+                     }
+
+                     TextField
+                     {
+                         id: aeMaskHeightTextField
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                         enabled: (uvcAutoExposureSelected) ? true : false
+                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                     }
+                }
+
+                RowLayout{
+                     spacing: 15
+
+                     Text {
+                         id: aeMaskXStart
+                         text: "XStart "
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+                         enabled: (uvcAutoExposureSelected) ? true : false
+                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                         ToolButton{
+                             tooltip: "The user can adjust the size and the position of the AE light metering region masking,
+which excludes specific region(s) of the window from the calculation of AE evaluation value.
+
+X Start – Set the starting position of the AE mask for the selected mask ID."
+                             width: 200
+                             opacity: 0
+                         }
+                     }
+                     TextField
+                     {
+                         id: aeMaskXStartTextField
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                         enabled: (uvcAutoExposureSelected) ? true : false
+                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                     }
+
+                     Text {
+                         id: aeMaskYStart
+                         text: "YStart"
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+                         enabled: (uvcAutoExposureSelected) ? true : false
+                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                         ToolButton{
+                             tooltip: "The user can adjust the size and the position of the AE light metering region masking,
+which excludes specific region(s) of the window from the calculation of AE evaluation value.
+
+Y Start – Set the starting position of the AE mask for the selected mask ID."
+                             width: 200
+                             opacity: 0
+                         }
+                     }
+
+                     TextField
+                     {
+                         id: aeMaskYStartTextField
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                         enabled: (uvcAutoExposureSelected) ? true : false
+                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                     }
+                }
+
+                Row
+                {
+                    Layout.alignment: Qt.AlignCenter
+                    Button {
+                        id: aeMaskSetBtn
+                        activeFocusOnPress : true
+                        text: "Set"
+                        style: econButtonStyle
+                        implicitHeight: 23
+                        implicitWidth: 45
                         enabled: (uvcAutoExposureSelected) ? true : false
                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
                         onClicked: {
-                            see3camcu31.setCameraMode(SEE3CAM_CU31.AUTO)
+                            setAEMaskDimensionsControl()
                         }
                         Keys.onReturnPressed: {
-                            see3camcu31.setCameraMode(SEE3CAM_CU31.AUTO)
-                        }
-                    }
-                    RadioButton {
-                        id: lowLightMode
-                        style:  econRadioButtonStyle
-                        text: qsTr("Low Light")
-                        exclusiveGroup: cameraModeGroup
-                        activeFocusOnPress: true
-                        enabled: (uvcAutoExposureSelected) ? true : false
-                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
-                        onClicked: {
-                            see3camcu31.setCameraMode(SEE3CAM_CU31.LOW_LIGHT)
-                        }
-                        Keys.onReturnPressed: {
-                            see3camcu31.setCameraMode(SEE3CAM_CU31.LOW_LIGHT)
-                        }
-                    }
-                    RadioButton {
-                        id: ledMode
-                        style:  econRadioButtonStyle
-                        text: qsTr("LED")
-                        exclusiveGroup: cameraModeGroup
-                        activeFocusOnPress: true
-                        enabled: (uvcAutoExposureSelected) ? true : false
-                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
-                        onClicked: {
-                            see3camcu31.setCameraMode(SEE3CAM_CU31.LED)
-                        }
-                        Keys.onReturnPressed: {
-                            see3camcu31.setCameraMode(SEE3CAM_CU31.LED)
+                            setAEMaskDimensionsControl()
                         }
                     }
                 }
 
+                //AWB Settings
+
+                Text {
+                    id: awbControls
+                    text: "AWB Controls :"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignLeft
+                    opacity: 1
+                }
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: awbStatusTitle
+                        text: "--- AWB HOLD ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+                RowLayout {
+                    Layout.alignment: Qt.AlignCenter
+                    spacing: 25
+
+                    ExclusiveGroup { id: awbStatusGroup }
+                    RadioButton {
+                        id: awbRelease
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Auto")
+                        tooltip: "AWB - Disable hold, Run Auto white balance."
+                        exclusiveGroup: awbStatusGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            see3camcu31.setAWBStatus(SEE3CAM_CU31.AWB_RELEASE)
+                        }
+                        Keys.onReturnPressed:  {
+                            see3camcu31.setAWBStatus(SEE3CAM_CU31.AWB_RELEASE)
+                        }
+                    }
+                    RadioButton {
+                        id: awbHold
+                        style:  econRadioButtonStyle
+                        text: qsTr("Hold")
+                        exclusiveGroup: awbStatusGroup
+                        activeFocusOnPress: true
+                        tooltip: "Hold - In this mode the sensor retains the current white balance settings."
+                        onClicked: {
+                            see3camcu31.setAWBStatus(SEE3CAM_CU31.AWB_HOLD)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setAWBStatus(SEE3CAM_CU31.AWB_HOLD)
+                        }
+                    }
+                }
+
+                //Light Metering Window Controls
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: awbWindowOverlay
+                        text: "--- Window Overlay ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+                RowLayout {
+                    x: 23
+                    y: 235
+                    Layout.alignment: Qt.AlignCenter
+                    spacing: 15
+                    ExclusiveGroup { id: awbWindowOverlayGroup }
+                    RadioButton {
+                        id: disableAWBWindow
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Disable")
+                        exclusiveGroup: awbWindowOverlayGroup
+                        activeFocusOnPress: true
+                        tooltip: "The user can enable or disable the on-screen display of the AWB light metering window.
+The user can check the position of the AWB light metering window by displaying it in the
+preview. Since enabling this feature will be applied to both the preview and still capture, it is
+recommended to disable it after configuring the window.
+
+Disable – Selecting this will disable the AWB window overlay."
+                        onClicked: {
+                            see3camcu31.setAWBWindowOverlay(disable)
+                        }
+                        Keys.onReturnPressed:  {
+                            see3camcu31.setAWBWindowOverlay(disable)
+                        }
+                    }
+                    RadioButton {
+                        id: enableAWBWindow
+                        style:  econRadioButtonStyle
+                        text: qsTr("Enable")
+                        exclusiveGroup: awbWindowOverlayGroup
+                        activeFocusOnPress: true
+                        tooltip: "The user can enable or disable the on-screen display of the AWB light metering window.
+The user can check the position of the AWB light metering window by displaying it in the
+preview. Since enabling this feature will be applied to both the preview and still capture, it is
+recommended to disable it after configuring the window.
+
+Enable – Selecting this will activate the window overlay, allowing the on-screen display of the
+light metering window for AWB."
+                        onClicked: {
+                            see3camcu31.setAWBWindowOverlay(enable)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setAWBWindowOverlay(enable)
+                        }
+                    }
+                }
+
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: awbWindowText
+                        text: "--- Window Dimensions ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+
+                RowLayout{
+                     spacing: 15
+                     Text {
+                         id: awbWidth
+                         text: "Width "
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+
+                         ToolButton{
+                             tooltip: "The AWB light metering window is an area used to calculate the white balance value.
+The user can set the size and position of the window.
+
+Width – Set the width of AWB light metering window."
+                             width: 200
+                             opacity: 0
+                         }
+                     }
+                     TextField
+                     {
+                         id: awbWidthTextField
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                     }
+
+                     Text {
+                         id: awbHeight
+                         text: "Height"
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+                         ToolButton{
+                             tooltip: "The AWB light metering window is an area used to calculate the white balance value.
+The user can set the size and position of the window.
+
+Height – Set the height of AWB light metering window."
+                             width: 200
+                             opacity: 0
+                         }
+                     }
+
+                     TextField
+                     {
+                         id: awbHeightTextField
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                     }
+                }
+
+                RowLayout{
+                     spacing: 15
+
+                     Text {
+                         id: awbXStart
+                         text: "XStart "
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+                         ToolButton{
+                             tooltip: "The AWB light metering window is an area used to calculate the white balance value.
+The user can set the size and position of the window.
+
+X Start – Set the starting position of the AWB window in horizontal direction."
+                             width: 200
+                             opacity: 0
+                         }
+                     }
+                     TextField
+                     {
+                         id: awbXStartTextField
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                     }
+
+                     Text {
+                         id: awbYStart
+                         text: "YStart"
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+                         ToolButton{
+                             tooltip: "The AWB light metering window is an area used to calculate the white balance value.
+The user can set the size and position of the window.
+
+Y Start – Set the starting position of the AWB window in vertical direction."
+                             width: 200
+                             opacity: 0
+                         }
+                     }
+
+                     TextField
+                     {
+                         id: awbYStartTextField
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                     }
+                }
+
+                Row
+                {
+                    Layout.alignment: Qt.AlignCenter
+                    Button {
+                        id: awbSetBtn
+                        activeFocusOnPress : true
+                        text: "Set"
+                        style: econButtonStyle
+                        implicitHeight: 23
+                        implicitWidth: 45
+                        onClicked: {
+                            see3camcu31.setAWBWindowDimensions(awbWidthTextField.text, awbHeightTextField.text, awbXStartTextField.text, awbYStartTextField.text)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setAWBWindowDimensions(awbWidthTextField.text, awbHeightTextField.text, awbXStartTextField.text, awbYStartTextField.text)
+                        }
+                    }
+                }
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: awbMaskOverlay
+                        text: "--- Mask Overlay ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+                RowLayout {
+                    x: 23
+                    y: 235
+                    Layout.alignment: Qt.AlignCenter
+                    spacing: 15
+                    ExclusiveGroup { id: awbMaskOverlayGroup }
+                    RadioButton {
+                        id: disableAWBMask
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Disable")
+                        exclusiveGroup: awbMaskOverlayGroup
+                        activeFocusOnPress: true
+                        tooltip: "The user can enable or disable the on-screen display of AWB light metering region
+masking. The user can check the position of the AWB masking region by displaying it on the
+preview. Since enabling this feature will be applied to both the preview and still capture, it is
+recommended to disable it after configuring the masking region.
+
+Disable – Selecting this will disable the AWB mask overlay."
+                        onClicked: {
+                            see3camcu31.setAWBMaskOverlay(disable)
+                        }
+                        Keys.onReturnPressed:  {
+                            see3camcu31.setAWBMaskOverlay(disable)
+                        }
+                    }
+                    RadioButton {
+                        id: enableAWBMask
+                        style:  econRadioButtonStyle
+                        text: qsTr("Enable")
+                        exclusiveGroup: awbMaskOverlayGroup
+                        activeFocusOnPress: true
+                        tooltip: "The user can enable or disable the on-screen display of AWB light metering region
+masking. The user can check the position of the AWB masking region by displaying it on the
+preview. Since enabling this feature will be applied to both the preview and still capture, it is
+recommended to disable it after configuring the masking region.
+
+Enable – Selecting this will activate the AWB mask overlay, allowing the on-screen display of
+masking for AWB."
+                        onClicked: {
+                            see3camcu31.setAWBMaskOverlay(enable)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setAWBMaskOverlay(enable)
+                        }
+                    }
+                }
+
+
+                Text
+                {
+                    id: awbMaskID
+                    text: "--- Mask ID ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+                ComboBox
+                {
+                    id: awbMaskIDCombo
+                    opacity: 1
+                    enabled: true
+                    model: ListModel {
+                        ListElement { text: "1" }
+                        ListElement { text: "2" }
+                        ListElement { text: "3" }
+                        ListElement { text: "4" }
+                        ListElement { text: "5" }
+                    }
+                    activeFocusOnPress: true
+                    style: econComboBoxStyle
+                    onCurrentIndexChanged: {
+                        if(skipUpdateUIOnAWBMaskID)
+                        {
+                            setAWBMaskDimensionsControl()
+                            see3camcu31.getAWBMaskDimensions(false)
+                        }
+                        skipUpdateUIOnAWBMaskID = true
+                    }
+                    ToolButton{
+                        tooltip: "The user can adjust the size and the position of the AWB light metering region masking,
+which excludes specific region(s) of the window from the calculation of white balance value.
+
+Mask ID – Select the ID of the AWB mask, for which mask state to be switched and the
+dimensions to be set. Any combination of 1 to 5 masks may be applied to the preview
+concurrently."
+                        width: 200
+                        opacity: 0
+                    }
+                }
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: awbMaskStatus
+                        text: "--- Mask Status ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+                RowLayout {
+                    x: 23
+                    y: 235
+                    spacing: 15
+                    Layout.alignment: Qt.AlignCenter
+                    ExclusiveGroup { id: awbMaskStatusGroup }
+                    RadioButton {
+                        id: disableAWBMaskStatus
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Disable")
+                        exclusiveGroup: awbMaskStatusGroup
+                        activeFocusOnPress: true
+                        tooltip: "The user can adjust the size and the position of the AWB light metering region masking,
+which excludes specific region(s) of the window from the calculation of white balance value.
+
+Disable – When selected, no AWB masking will be applied to the preview.Enable – When selected, AWB masking will be applied to the preview, excluding that
+region from calculation of white balance value."
+                        onClicked: {
+                            see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, disable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+                        }
+                        Keys.onReturnPressed:  {
+                            see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, disable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+                        }
+                    }
+                    RadioButton {
+                        id: enableAWBMaskStatus
+                        style:  econRadioButtonStyle
+                        text: qsTr("Enable")
+                        exclusiveGroup: awbMaskStatusGroup
+                        activeFocusOnPress: true
+                        tooltip: "The user can adjust the size and the position of the AWB light metering region masking,
+which excludes specific region(s) of the window from the calculation of white balance value."
+                        onClicked: {
+                            see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, enable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, enable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+                        }
+                    }
+                }
+
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: awbMaskWindowText
+                        text: "--- Mask Dimensions ---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+
+                RowLayout{
+
+                     spacing: 15
+                     Text {
+                         id: awbMaskWidth
+                         text: "Width "
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+
+                         ToolButton{
+                             tooltip: "The user can adjust the size and the position of the AWB light metering region masking,
+which excludes specific region(s) of the window from the calculation of white balance value.
+
+Width – Set the width of the AWB mask for the selected mask ID."
+                             width: 200
+                             opacity: 0
+                         }
+                     }
+                     TextField
+                     {
+                         id: awbMaskWidthTextField
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                     }
+
+                     Text {
+                         id: awbMaskHeight
+                         text: "Height"
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+                         ToolButton{
+                             tooltip: "The user can adjust the size and the position of the AWB light metering region masking,
+which excludes specific region(s) of the window from the calculation of white balance value.
+
+Height – Set the height of the AWB mask for the selected mask ID."
+                             width: 200
+                             opacity: 0
+                         }
+                     }
+
+                     TextField
+                     {
+                         id: awbMaskHeightTextField
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                     }
+                }
+
+                RowLayout{
+                     spacing: 15
+
+                     Text {
+                         id: awbMaskXStart
+                         text: "XStart "
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+                         ToolButton{
+                             tooltip: "The user can adjust the size and the position of the AWB light metering region masking,
+which excludes specific region(s) of the window from the calculation of white balance value.
+
+X Start – Set the starting position of the AWB mask for the selected mask ID."
+                             width: 200
+                             opacity: 0
+                         }
+                     }
+                     TextField
+                     {
+                         id: awbMaskXStartTextField
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                     }
+
+                     Text {
+                         id: awbMaskYStart
+                         text: "YStart"
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+
+                         ToolButton{
+                             tooltip: "The user can adjust the size and the position of the AWB light metering region masking,
+which excludes specific region(s) of the window from the calculation of white balance value.
+
+Y Start – Set the starting position of the AWB mask for the selected mask ID."
+                             width: 200
+                             opacity: 0
+                         }
+                     }
+
+                     TextField
+                     {
+                         id: awbMaskYStartTextField
+                         font.pixelSize: 10
+                         font.family: "Ubuntu"
+                         smooth: true
+                         horizontalAlignment: TextInput.AlignHCenter
+                         style: econTextFieldStyle
+                     }
+                }
+
+                Row
+                {
+                    Layout.alignment: Qt.AlignCenter
+                    Button {
+                        id: awbMaskSetBtn
+                        activeFocusOnPress : true
+                        text: "Set"
+                        style: econButtonStyle
+                        implicitHeight: 23
+                        implicitWidth: 45
+                        onClicked: {
+                            setAWBMaskDimensionsControl()
+                        }
+                        Keys.onReturnPressed: {
+                            setAWBMaskDimensionsControl()
+                        }
+                    }
+                }
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Text {
+                        id: presetTitle
+                        text: "--- User Preset---"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        opacity: 0.50196078431373
+                    }
+                }
+                ColumnLayout {
+                    x: 23
+                    y: 235
+                    spacing: 15
+                    ExclusiveGroup { id: presetModeGroup }
+
+                    RadioButton {
+                        id: userPreset1
+                        style:  econRadioButtonStyle
+                        text: qsTr("User Preset 1")
+                        exclusiveGroup: presetModeGroup
+                        activeFocusOnPress: true
+                        tooltip: "The User Preset block allows user to customize controls according to their preferences
+and save them for subsequent use.
+
+User Preset 1 – Selecting this will activate the user-defined settings that are saved to User Preset 1"
+                        onClicked: {
+                            see3camcu31.setPresetMode(SEE3CAM_CU31.USER_PRESET_1, SEE3CAM_CU31.PRESET_SELECT)
+                            getValuesFromCamera()
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setPresetMode(SEE3CAM_CU31.USER_PRESET_1, SEE3CAM_CU31.PRESET_SELECT)
+                            getValuesFromCamera()
+                        }
+                    }
+
+                    RadioButton {
+                        id: userPreset2
+                        style:  econRadioButtonStyle
+                        text: qsTr("User Preset 2")
+                        exclusiveGroup: presetModeGroup
+                        activeFocusOnPress: true
+                        tooltip: "The User Preset block allows user to customize controls according to their preferences
+and save them for subsequent use.
+
+User Preset 2 – Selecting this will activate the user-defined settings that are saved to User Preset 2"
+                        onClicked: {
+                            see3camcu31.setPresetMode(SEE3CAM_CU31.USER_PRESET_2, SEE3CAM_CU31.PRESET_SELECT)
+                            getValuesFromCamera()
+                        }
+                        Keys.onReturnPressed: {
+                            see3camcu31.setPresetMode(SEE3CAM_CU31.USER_PRESET_2, SEE3CAM_CU31.PRESET_SELECT)
+                            getValuesFromCamera()
+                        }
+                    }
+
+                    Row
+                    {
+                        Layout.alignment: Qt.AlignCenter
+                        spacing: 30
+                        RadioButton {
+                            id: manualPreset
+                            style:  econRadioButtonStyle
+                            text:   qsTr("Manual")
+                            exclusiveGroup: presetModeGroup
+                            activeFocusOnPress: true
+                            tooltip: "The User Preset block allows user to customize controls according to their preferences
+and save them for subsequent use.
+
+Manual – The current settings will be applied."
+                            onClicked: {
+                                see3camcu31.setPresetMode(SEE3CAM_CU31.MANUAL_PRESET, SEE3CAM_CU31.PRESET_SELECT)
+                                getValuesFromCamera()
+                            }
+                            Keys.onReturnPressed:  {
+                                see3camcu31.setPresetMode(SEE3CAM_CU31.MANUAL_PRESET, SEE3CAM_CU31.PRESET_SELECT)
+                                getValuesFromCamera()
+                            }
+                        }
+
+                        Button {
+                            id: savePreset
+                            activeFocusOnPress : true
+                            text: "Save"
+                            style: econButtonStyle
+                            implicitHeight: 20
+                            implicitWidth: 40
+                            enabled: (!manualPreset.checked) ? true : false
+                            opacity: (!manualPreset.checked) ? 1 : 0.1
+                            tooltip: "The User Preset block allows user to customize controls according to their preferences
+and save them for subsequent use.
+Save – Allows you to save the specific user-defined settings of the selected preset."
+                            onClicked: {
+                                savingPresetMode()
+                            }
+                            Keys.onReturnPressed: {
+                                savingPresetMode()
+                            }
+                        }
+                    }
+                }
 
                 Row{
                     Layout.alignment: Qt.AlignCenter
@@ -630,6 +1886,22 @@ Item {
                         }
                     }
                 }
+
+               Row{
+                   Layout.alignment: Qt.AlignCenter
+
+                   Button {
+                       id: ispFirmwareVersion
+                       opacity: 1
+                       text: "ISP Version"
+                       activeFocusOnPress : true
+                       tooltip: "Click to view the ISP firmware version"
+                       style: econButtonStyle
+                       onClicked: {
+                           see3camcu31.readISPFirmwareVersion()
+                       }
+                   }
+               }
             }
         }
     }
@@ -712,9 +1984,82 @@ Item {
         currentCameraMode(mode)
      }
 
+     onCurrentAEWindowOverlayStatus: {
+        currentAEWindowOverlayStatusReceived(status)
+     }
+
+     onCurrentAEMaskOverlayStatus: {
+         currentAEMaskOverlayStatusReceived(status)
+     }
+
+     onCurrentAEWindowDimensions: {
+         aeWidthTextField.text  = width
+         aeHeightTextField.text = height
+         aeXStartTextField.text = xStart
+         aeYStartTextField.text = yStart
+     }
+
+     onCurrentAEMaskDimensions:{
+         aeMaskWidthTextField.text = width
+         aeMaskHeightTextField.text = height
+         aeMaskXStartTextField.text = xStart
+         aeMaskYStartTextField.text = yStart
+
+         if(maskState === disable){
+             disableAEMaskStatus.checked = true
+         } else if(maskState === enable){
+             enableAEMaskStatus.checked = true
+         }
+
+         if(isMaskIdNeeded){
+             skipUpdateUIOnAEMaskID = false
+             aeMaskIDCombo.currentIndex = maskID - 1
+             skipUpdateUIOnAEMaskID = true
+         }
+     }
+
+
+     onCurrentAWBWindowOverlayStatus: {
+         currentAWBWindowOverlayStatusReceived(status)
+     }
+
+     onCurrentAWBWindowDimensions: {
+         awbWidthTextField.text  = width
+         awbHeightTextField.text = height
+         awbXStartTextField.text = xStart
+         awbYStartTextField.text = yStart
+     }
+
+     onCurrentAWBMaskOverlayStatus: {
+         currentAWBMaskOverlayStatusReceived(status)
+     }
+
+     onCurrentAWBMaskDimensions:{
+         awbMaskWidthTextField.text = width
+         awbMaskHeightTextField.text = height
+         awbMaskXStartTextField.text = xStart
+         awbMaskYStartTextField.text = yStart
+
+         if(maskState === disable){
+             disableAWBMaskStatus.checked = true
+         } else if(maskState === enable){
+             enableAWBMaskStatus.checked = true
+         }
+
+         if(isMaskIDNeeded){
+             skipUpdateUIOnAWBMaskID = false
+             awbMaskIDCombo.currentIndex = maskID - 1
+             skipUpdateUIOnAWBMaskID = true
+         }
+     }
+
+     onCurrentPresetProperties: {
+         getPresetProperties(presetMode, presetType)
+     }
+
      onCurrentTemperature: {
         temperature = parseFloat((temperature).toFixed(2));
-        readTempTextField.text = temperature
+        readTempTextField.text = temperature.toFixed(2)
      }
      onTitleTextChanged: {
          messageDialog.title = _title.toString()
@@ -725,7 +2070,118 @@ Item {
      onIndicateFailureStatus:{
          displayMessageBox(title, text)
      }
+
+     onIndicateWindowDimensionError:{
+         displayMessageBox("Error",
+         "         Error: Value exceeds range.
+Enter a valid value in the following specified ranges,
+         Width range: [" + minWidth + "   , " + maxWidth + " ]
+         Height range: [ " + minHeight + " , " + maxHeight + " ]
+         X Start range: [ " + minXStart + " , " + maxXStart + " ]
+         Y Start range: [ " + minYStart + " , " + maxYStart + " ] " )
+         see3camcu31.getAEWindowDimensions()
+         see3camcu31.getAWBWindowDimensions()
+     }
+
+     onIndicateMaskDimensionError:{
+         displayMessageBox("Error",
+         "         Error: Value exceeds range.
+Enter a valid value in the following specified ranges,
+         Width range: [" + minWidth + "   , " + maxWidth + " ]
+         Height range: [ " + minHeight + " , " + maxHeight + " ]
+         X Start range: [ " + minXStart + " , " + maxXStart + " ]
+         Y Start range: [ " + minYStart + " , " + maxYStart + " ] " )
+
+         awbMaskIDValue = awbMaskIDCombo.currentText
+         aeMaskIDValue  = aeMaskIDCombo.currentText
+
+         see3camcu31.getAEMaskDimensions(true)
+         see3camcu31.getAWBMaskDimensions(true)
+
+         awbMaskIDCombo.currentIndex = awbMaskIDValue - 1
+         aeMaskIDCombo.currentIndex = aeMaskIDValue - 1
+     }
+
    }
+
+   function getPresetProperties(mode, type)
+   {
+       if(mode === SEE3CAM_CU31.MANUAL_PRESET){
+           manualPreset.checked = true
+       } else if (mode === SEE3CAM_CU31.USER_PRESET_1) {
+           userPreset1.checked = true
+       } else if (mode === SEE3CAM_CU31.USER_PRESET_2) {
+           userPreset2.checked = true
+       }
+   }
+
+   function setOrientationProperties(){
+       see3camcu31.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+
+       see3camcu31.getAEWindowDimensions()
+       see3camcu31.getAEMaskDimensions(true)
+       see3camcu31.getAWBWindowDimensions()
+       see3camcu31.getAWBMaskDimensions(true)
+   }
+
+   function setAWBMaskDimensionsControl()
+   {
+       if(disableAWBMaskStatus.checked == true) {
+           see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, disable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+       } else if(enableAWBMaskStatus.checked == true) {
+           see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, enable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+       }
+   }
+
+   function setAEMaskDimensionsControl()
+   {
+       if(disableAEMaskStatus.checked == true) {
+           see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, disable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+       } else if(enableAEMaskStatus.checked == true) {
+           see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, enable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+       }
+   }
+
+   function savingPresetMode() {
+        if(userPreset1.checked == true){
+            see3camcu31.setPresetMode(SEE3CAM_CU31.USER_PRESET_1, SEE3CAM_CU31.PRESET_SAVE)
+        } else if(userPreset2.checked == true) {
+            see3camcu31.setPresetMode(SEE3CAM_CU31.USER_PRESET_2, SEE3CAM_CU31.PRESET_SAVE)
+        }
+        getValuesFromCamera()
+   }
+
+   function currentAEWindowOverlayStatusReceived(status){
+          if(status === enable){
+               enableAEWindow.checked = true
+          } else if(status === disable) {
+               disableAEWindow.checked = true
+          }
+      }
+
+      function currentAEMaskOverlayStatusReceived(status){
+          if(status === enable){
+               enableAEMask.checked = true
+          } else if(status === disable) {
+               disableAEMask.checked = true
+          }
+      }
+
+      function currentAWBWindowOverlayStatusReceived(status){
+          if(status === enable){
+               enableAWBWindow.checked = true
+          } else if(status === disable) {
+               disableAWBWindow.checked = true
+          }
+      }
+
+      function currentAWBMaskOverlayStatusReceived(status){
+          if(status === enable){
+               enableAWBMask.checked = true
+          } else if(status === disable) {
+               disableAWBMask.checked = true
+          }
+      }
 
    function currentCameraMode(mode){
        if(mode === SEE3CAM_CU31.AUTO){
@@ -998,6 +2454,19 @@ Item {
         see3camcu31.readTemperature()
         see3camcu31.getCameraMode()
         see3camcu31.getAntiFlickerMode()
+
+        see3camcu31.getAEWindowOverlay()
+        see3camcu31.getAEMaskOverlay()
+        see3camcu31.getAEMaskDimensions(true)
+
+        see3camcu31.getAWBWindowOverlay()
+        see3camcu31.getAWBMaskOverlay()
+        see3camcu31.getAWBMaskDimensions(true)
+
+        see3camcu31.getAEWindowDimensions()
+        see3camcu31.getAWBWindowDimensions()
+
+        see3camcu31.getPresetMode()
     }
 
     Component.onCompleted: {

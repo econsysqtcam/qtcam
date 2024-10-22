@@ -8,8 +8,8 @@
 #define CAMERA_CONTROL_ID_1        0xC0
 #define CAMERA_CONTROL_ID_2        0x0A
 
-#define GET_ORIENTATION            0x01
-#define SET_ORIENTATION            0x02
+#define GET_ORIENTATION_SEE3CAM_CU31            0x01
+#define SET_ORIENTATION_SEE3CAM_CU31            0x02
 
 #define GET_RNR_STATUS             0x03
 #define SET_RNR_STATUS             0x04
@@ -36,10 +36,45 @@
 #define GET_ANTI_FLICKER_MODE      0x0E
 #define SET_ANTI_FLICKER_MODE      0x0F
 
-#define GET_CAMERA_MODE      0x10
-#define SET_CAMERA_MODE      0x11
+#define GET_CAMERA_MODE_SEE3CAM_CU31      0x10
+#define SET_CAMERA_MODE_SEE3CAM_CU31      0x11
 
-#define SET_CROSS_STILL_PROPERTIES     0x44
+#define SET_CROSS_STILL_PROPERTIES_SEE3CAM_CU31     0x44
+
+
+//Second Phase Controls
+#define GET_AE_OVERLAY_SEE3CAM_CU31              0x12
+#define SET_AE_OVERLAY_SEE3CAM_CU31              0x13
+
+#define GET_AE_DIMENSIONS_SEE3CAM_CU31           0x14
+#define SET_AE_DIMENSIONS_SEE3CAM_CU31           0x15
+
+#define GET_AE_MASK_OVERLAY_SEE3CAM_CU31         0x16
+#define SET_AE_MASK_OVERLAY_SEE3CAM_CU31         0x17
+
+#define GET_AE_MASK_DIMENSIONS_SEE3CAM_CU31      0x18
+#define SET_AE_MASK_DIMENSIONS_SEE3CAM_CU31      0x19
+
+#define GET_AWB_OVERLAY_SEE3CAM_CU31             0x1A
+#define SET_AWB_OVERLAY_SEE3CAM_CU31             0x1B
+
+#define GET_AWB_WINDOW_DIMENSIONS_SEE3CAM_CU31   0x1C
+#define SET_AWB_WINDOW_DIMENSIONS_SEE3CAM_CU31   0x1D
+
+#define GET_AWB_MASK_OVERLAY_SEE3CAM_CU31        0x1E
+#define SET_AWB_MASK_OVERLAY_SEE3CAM_CU31        0x1F
+
+#define GET_AWB_MASK_DIMENSIONS_SEE3CAM_CU31     0x20
+#define SET_AWB_MASK_DIMENSIONS_SEE3CAM_CU31     0x21
+
+#define GET_USER_PRESET_MODE_SEE3CAM_CU31        0x22
+#define SET_USER_PRESET_MODE_SEE3CAM_CU31        0x23
+
+#define GET_EMBEDDED_DATA_SEE3CAM_CU31           0x24
+#define SET_EMBEDDED_DATA_SEE3CAM_CU31           0x25
+
+#define ISP_FIRMWARE_VERSION_SEE3CAM_CU31        0x45
+
 
 class SEE3CAM_CU31 : public QObject
 {
@@ -106,6 +141,17 @@ public:
         LED       = 0x02
     };Q_ENUMS(CAMERA_MODE)
 
+    enum PRESET_MODE{
+        MANUAL_PRESET  = 0x00,
+        USER_PRESET_1  = 0x01,
+        USER_PRESET_2  = 0x02
+    };Q_ENUMS(PRESET_MODE)
+
+    enum PRESET_BUTTON{
+        PRESET_SAVE   = 0x01,
+        PRESET_SELECT = 0x00
+    };Q_ENUMS(PRESET_BUTTON)
+
 signals:
     void flipMirrorModeChanged(uint flipMirrorModeValues);
     void currentRawNoiseDeductionStatus(uint status);
@@ -118,6 +164,22 @@ signals:
     void currentCameraModeReceived(uint mode);
     void indicateFailureStatus(QString title, QString text);
     void titleTextChanged(QString _title,QString _text);
+
+    void currentAEWindowOverlayStatus(uint status);
+    void currentAEWindowDimensions(uint width, uint height, uint xStart, uint yStart);
+    void currentAEMaskOverlayStatus(uint status);
+    void currentAEMaskDimensions(bool isMaskIdNeeded, uint maskID, uint maskState, uint width, uint height, uint xStart, uint yStart);
+
+    void currentAWBWindowOverlayStatus(uint status);
+    void currentAWBWindowDimensions(uint width, uint height, uint xStart, uint yStart);
+    void currentAWBMaskOverlayStatus(uint status);
+    void currentAWBMaskDimensions(bool isMaskIDNeeded, uint maskID, uint maskState, uint width, uint height, uint xStart, uint yStart);
+
+    void currentPresetProperties(uint presetMode, uint presetType);
+    void currentEmbedDataStatus(uint status);
+
+    void indicateWindowDimensionError(uint minWidth, uint maxWidth, uint minHeight, uint maxHeight, uint minXStart, uint maxXStart, uint minYStart, uint maxYStart);
+    void indicateMaskDimensionError(uint minWidth, uint maxWidth, uint minHeight, uint maxHeight, uint minXStart, uint maxXStart, uint minYStart, uint maxYStart);
 
 public slots:
     bool setOrientation(bool horzModeSel, bool vertiModeSel);
@@ -146,11 +208,46 @@ public slots:
 
     bool readTemperature();
 
+    //AUTO EXPOSURE
+    bool getAEWindowOverlay();
+    bool setAEWindowOverlay(uint status);
+
+    bool getAEWindowDimensions();
+    bool setAEWindowDimensions(uint width, uint height, uint xStart, uint yStart);
+
+    bool getAEMaskOverlay();
+    bool setAEMaskOverlay(uint status);
+
+    bool getAEMaskDimensions(bool isMaskIDNeeded);
+    bool setAEMaskDimensions(uint maskID, uint maskStatus, uint width, uint height, uint xStart, uint yStart);
+
+    //AUTO WHITE BALANCE
+    bool getAWBWindowOverlay();
+    bool setAWBWindowOverlay(uint status);
+
+    bool getAWBWindowDimensions();
+    bool setAWBWindowDimensions(uint width, uint height, uint xStart, uint yStart);
+
+    bool getAWBMaskOverlay();
+    bool setAWBMaskOverlay(uint status);
+
+    bool getAWBMaskDimensions(bool isMaskIDNeeded);
+    bool setAWBMaskDimensions(uint maskID, uint maskStatus, uint width, uint height, uint xStart, uint yStart);
+
+    //OTHER CONTROLS
+    bool getEmbeddedData();
+    bool setEmbeddedData(uint status);
+
+    bool getPresetMode();
+    bool setPresetMode(PRESET_MODE mode, PRESET_BUTTON button);
+
     bool setPropertiesForCrossStill();
 
     bool setToDefaultValues();
 
     bool get64BitSerialNumber();
+
+    bool readISPFirmwareVersion();
 
 };
 

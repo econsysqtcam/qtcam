@@ -5365,12 +5365,7 @@ void Videostreaming::recordVideo(){  // Added by Navya : 25 Nov 2019 -- To confi
     }//VideoRecording for other cameras
     else if(width !=320 && height != 240){   //Stop recording video in 320x240 resolution for See3CAM_20CUG camera.
        if((m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY) && (width != 640 && (height !=480 | height != 360))){    // Added by Navya :  16 March 2020 -passing yuyv data for uyvy format in 640x480 reolution alone to avoid aliasing effect in preview.
-           if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU31){//To convert UYVY to RGB which follows BT.706 conversion standards
-               convertUYVYToRGB(m_renderer->yuvBuffer, (width*height*2), m_renderer->recordingBuffer);
-               videoEncoder->encodeImage(m_renderer->recordingBuffer, videoEncoder->RGB_BT709_BUFFER);
-           }else{
-               videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->UYVY_BUFFER);
-           }
+           videoEncoder->encodeImage(m_renderer->yuvBuffer,videoEncoder->UYVY_BUFFER);
        }
        else if(m_capSrcFormat.fmt.pix.pixelformat==V4L2_PIX_FMT_GREY){
            videoEncoder->encodeImage(m_renderer->greyBuffer,videoEncoder->Y8_BUFFER);

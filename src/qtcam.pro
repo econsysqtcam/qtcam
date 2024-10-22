@@ -97,7 +97,7 @@ SOURCES += main.cpp \
     see3cam_cu84.cpp \
     see3cam_cu200m.cpp \
     see3cam_cu31.cpp \
-    see3cam_cu200_h01r1.cpp
+    see3cam_cu200_h01r1.cpp \
 
 # Installation path
 # target.path =
@@ -175,7 +175,7 @@ HEADERS += \
     see3cam_cu512_m.h \
     see3cam_cu31.h \
     see3cam_cu200m.h \
-    see3cam_cu200_h01r1.h
+    see3cam_cu200_h01r1.h \
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \

@@ -50,6 +50,13 @@ Item {
         y: root.stillCaptureChildVisible ? imageFormatY + 300 + 35 :  (root.videoSettingsChildVisible? imageFormatY + 270: stillPropertyY +  70 )
         action: displayAudioProperties
         activeFocusOnPress : true
+        tooltip: "Audio Recording temporarily not supported in Ubuntu 22.04"
+//        ToolButton{
+//            tooltip: "Audio Recording temporarily not supported in Ubuntu 22.04"
+//            width: 100
+//            height: 20
+//            opacity: 0
+//        }
         style: ButtonStyle {
             background: Rectangle {
                 implicitWidth: 265
@@ -95,294 +102,294 @@ Item {
                 }
                 onVisibleChanged:
                 {
-                    root.audioCaptureChildVisible = visible
-                    root.audioPropertyYValue = audio_Capture.y
+//                    root.audioCaptureChildVisible = visible
+//                    root.audioPropertyYValue = audio_Capture.y
                 }
 
-            Item {
-                height:  250
+//            Item {
+//                height:  250
 
-                GridLayout {
-                    id: audioCapturePropertyGrid
-                    columns: 1
-                    rowSpacing: 10
-                    Text {
-                        id: devices
-                        text: "Input Devices"
-                        font.pixelSize: 14
-                        font.family: "Ubuntu"
-                        color: "#ffffff"
-                        smooth: true
-                        opacity: 1
-                    }
+//                GridLayout {
+//                    id: audioCapturePropertyGrid
+//                    columns: 1
+//                    rowSpacing: 10
+//                    Text {
+//                        id: devices
+//                        text: "Input Devices"
+//                        font.pixelSize: 14
+//                        font.family: "Ubuntu"
+//                        color: "#ffffff"
+//                        smooth: true
+//                        opacity: 1
+//                    }
 
-                    ComboBox {
-                        id: audioDevicesList
-                        opacity: 1
-                        model: audioinputDevModel
-                        textRole: "display"
-                        width: 120
-                        activeFocusOnPress: true
-                        style: ComboBoxStyle {
-                            label: Text {
-                                anchors.fill: parent
-                                color: "#ffffff"
-                                text: control.currentText
-                                elide: Text.ElideRight
-                                verticalAlignment: Text.AlignVCenter
-                                font.family: "Ubuntu"
-                                font.pixelSize: 14
-                                wrapMode: Text.WordWrap
-                            }
-                            background: Image {
-                                id: deviceImage
-                                source: "images/device_box.png"
-                                Rectangle {
-                                    width: deviceImage.sourceSize.width - 28
-                                    height: control.currentText.height
-                                    color: "#222021"
-                                    border.color: "white"
-                                    border.width: control.activeFocus ? 3 : 1
-                                    radius: control.activeFocus ? 5 : 0
-                                }
-                            }
-                        }
-                        onPressedChanged:{
-                            root.minimizeWindow()
-                        }
-                        MouseArea{
-                            anchors.fill: parent
-                            onPressed: {
-                                if(pressed) {
-                                    root.enumerateAudioSettings()
-                                }
-                                mouse.accepted = false
-                            }
-                            onWheel: {
-                            }
-                        }
-                        onCurrentIndexChanged: {                            
-                              if(currentIndex != 0){
-                                  sampleFmtList.enabled = true
-                                  sampleFmtList.opacity = 1
-                                  sampleFmt.opacity = 1
-                                  channelCountList.enabled = true
-                                  channelCountList.opacity = 1
-                                  channelCount.opacity = 1
-                                  muteSelection.enabled = true
-                                  muteSelection.opacity = 1
-                                  if(!muteSelection.checked){
-                                      volume.opacity = 1
-                                      volume_Slider.enabled = true
-                                      volume_value.enabled = true
-                                      volume_value.opacity = 1
-                                  }
+//                    ComboBox {
+//                        id: audioDevicesList
+//                        opacity: 1
+//                        model: audioinputDevModel
+//                        textRole: "display"
+//                        width: 120
+//                        activeFocusOnPress: true
+//                        style: ComboBoxStyle {
+//                            label: Text {
+//                                anchors.fill: parent
+//                                color: "#ffffff"
+//                                text: control.currentText
+//                                elide: Text.ElideRight
+//                                verticalAlignment: Text.AlignVCenter
+//                                font.family: "Ubuntu"
+//                                font.pixelSize: 14
+//                                wrapMode: Text.WordWrap
+//                            }
+//                            background: Image {
+//                                id: deviceImage
+//                                source: "images/device_box.png"
+//                                Rectangle {
+//                                    width: deviceImage.sourceSize.width - 28
+//                                    height: control.currentText.height
+//                                    color: "#222021"
+//                                    border.color: "white"
+//                                    border.width: control.activeFocus ? 3 : 1
+//                                    radius: control.activeFocus ? 5 : 0
+//                                }
+//                            }
+//                        }
+//                        onPressedChanged:{
+//                            root.minimizeWindow()
+//                        }
+//                        MouseArea{
+//                            anchors.fill: parent
+//                            onPressed: {
+//                                if(pressed) {
+//                                    root.enumerateAudioSettings()
+//                                }
+//                                mouse.accepted = false
+//                            }
+//                            onWheel: {
+//                            }
+//                        }
+//                        onCurrentIndexChanged: {
+//                              if(currentIndex != 0){
+//                                  sampleFmtList.enabled = true
+//                                  sampleFmtList.opacity = 1
+//                                  sampleFmt.opacity = 1
+//                                  channelCountList.enabled = true
+//                                  channelCountList.opacity = 1
+//                                  channelCount.opacity = 1
+//                                  muteSelection.enabled = true
+//                                  muteSelection.opacity = 1
+//                                  if(!muteSelection.checked){
+//                                      volume.opacity = 1
+//                                      volume_Slider.enabled = true
+//                                      volume_value.enabled = true
+//                                      volume_value.opacity = 1
+//                                  }
 
 
-                                  audioSettings.updateSupportedInfo(currentIndex)
-                                  root.audioDeviceSelected(currentIndex);
-                                  root.setSampleRate(sampleFmtList.currentText)
-                                  root.setChannelCount(channelCountList.currentText)
-                                  skipSettingVolume = false
+//                                  audioSettings.updateSupportedInfo(currentIndex)
+//                                  root.audioDeviceSelected(currentIndex);
+//                                  root.setSampleRate(sampleFmtList.currentText)
+//                                  root.setChannelCount(channelCountList.currentText)
+//                                  skipSettingVolume = false
 
-                              }
-                              if(currentIndex == 0){
-                                  sampleFmtList.enabled = false
-                                  sampleFmtList.opacity = 0.1
-                                  sampleFmt.opacity = 0.1
-                                  channelCountList.enabled = false
-                                  channelCountList.opacity = 0.1
-                                  channelCount.opacity = 0.1
-                                  muteSelection.enabled = false
-                                  muteSelection.opacity = 0.1
-                                  volume_Slider.enabled = false
-                                  volume.enabled = false
-                                  volume.opacity = 0.1
-                                  volume_value.enabled = false
-                                  volume_value.opacity = 0.1
-                                  root.audioDeviceSelected(currentIndex);
-                              }
-                        }
-                    }
+//                              }
+//                              if(currentIndex == 0){
+//                                  sampleFmtList.enabled = false
+//                                  sampleFmtList.opacity = 0.1
+//                                  sampleFmt.opacity = 0.1
+//                                  channelCountList.enabled = false
+//                                  channelCountList.opacity = 0.1
+//                                  channelCount.opacity = 0.1
+//                                  muteSelection.enabled = false
+//                                  muteSelection.opacity = 0.1
+//                                  volume_Slider.enabled = false
+//                                  volume.enabled = false
+//                                  volume.opacity = 0.1
+//                                  volume_value.enabled = false
+//                                  volume_value.opacity = 0.1
+//                                  root.audioDeviceSelected(currentIndex);
+//                              }
+//                        }
+//                    }
 
-                    Text {
-                        id: sampleFmt
-                        text: "Sample Rate"
-                        font.pixelSize: 14
-                        font.family: "Ubuntu"
-                        color: "#ffffff"
-                        smooth: true
-                        opacity: 1
-                    }
-                    ComboBox {
-                        id: sampleFmtList
-                        opacity: 1                        
-                        model: audioSupportedFormatList
-                        textRole: "display"
-                        width: 120
-                        activeFocusOnPress: true
-                        style: ComboBoxStyle {
-                            label: Text {
-                                anchors.fill: parent
-                                color: "#ffffff"
-                                text: control.currentText
-                                elide: Text.ElideRight
-                                verticalAlignment: Text.AlignVCenter
-                                font.family: "Ubuntu"
-                                font.pixelSize: 14
-                                wrapMode: Text.WordWrap
-                            }
-                            background: Image {
-                                id: sampleFmtIg
-                                source: "images/device_box.png"
-                                Rectangle {
-                                    width: sampleFmtIg.sourceSize.width - 28
-                                    height: control.currentText.height
-                                    color: "#222021"
-                                    border.color: "white"
-                                    border.width: control.activeFocus ? 3 : 1
-                                    radius: control.activeFocus ? 5 : 0
-                                }
-                            }
-                        }
-                        onPressedChanged:{
-                            root.minimizeWindow()
-                        }
-                        onCurrentIndexChanged: {
-                            if(currentText.length != 0){
-                                root.setSampleRate(currentText)
-                            }
+//                    Text {
+//                        id: sampleFmt
+//                        text: "Sample Rate"
+//                        font.pixelSize: 14
+//                        font.family: "Ubuntu"
+//                        color: "#ffffff"
+//                        smooth: true
+//                        opacity: 1
+//                    }
+//                    ComboBox {
+//                        id: sampleFmtList
+//                        opacity: 1
+//                        model: audioSupportedFormatList
+//                        textRole: "display"
+//                        width: 120
+//                        activeFocusOnPress: true
+//                        style: ComboBoxStyle {
+//                            label: Text {
+//                                anchors.fill: parent
+//                                color: "#ffffff"
+//                                text: control.currentText
+//                                elide: Text.ElideRight
+//                                verticalAlignment: Text.AlignVCenter
+//                                font.family: "Ubuntu"
+//                                font.pixelSize: 14
+//                                wrapMode: Text.WordWrap
+//                            }
+//                            background: Image {
+//                                id: sampleFmtIg
+//                                source: "images/device_box.png"
+//                                Rectangle {
+//                                    width: sampleFmtIg.sourceSize.width - 28
+//                                    height: control.currentText.height
+//                                    color: "#222021"
+//                                    border.color: "white"
+//                                    border.width: control.activeFocus ? 3 : 1
+//                                    radius: control.activeFocus ? 5 : 0
+//                                }
+//                            }
+//                        }
+//                        onPressedChanged:{
+//                            root.minimizeWindow()
+//                        }
+//                        onCurrentIndexChanged: {
+//                            if(currentText.length != 0){
+//                                root.setSampleRate(currentText)
+//                            }
 
-                        }
-                    }
+//                        }
+//                    }
 
-                    Text {
-                        id: channelCount
-                        text: "Channels"
-                        font.pixelSize: 14
-                        font.family: "Ubuntu"
-                        color: "#ffffff"
-                        smooth: true
-                        opacity: 1
-                    }
-                    ComboBox {
-                        id: channelCountList
-                        opacity: 1
-                        model: audioChannelCountModel
-                        textRole: "display"
-                        width: 120
-                        activeFocusOnPress: true
-                        style: ComboBoxStyle {
-                            label: Text {
-                                anchors.fill: parent
-                                color: "#ffffff"
-                                text: control.currentText
-                                elide: Text.ElideRight
-                                verticalAlignment: Text.AlignVCenter
-                                font.family: "Ubuntu"
-                                font.pixelSize: 14
-                                wrapMode: Text.WordWrap
-                            }
-                            background: Image {
-                                id: channelCountImg
-                                source: "images/device_box.png"
-                                Rectangle {
-                                    width: channelCountImg.sourceSize.width - 28
-                                    height: control.currentText.height
-                                    color: "#222021"
-                                    border.color: "white"
-                                    border.width: control.activeFocus ? 3 : 1
-                                    radius: control.activeFocus ? 5 : 0
-                                }
-                            }
-                        }
-                        onPressedChanged:{
-                            root.minimizeWindow()
-                        }
-                        onCurrentIndexChanged: {
-                            if(currentText.length != 0){
-                                root.setChannelCount(currentText)
-                            }
-                        }
-                    }
+//                    Text {
+//                        id: channelCount
+//                        text: "Channels"
+//                        font.pixelSize: 14
+//                        font.family: "Ubuntu"
+//                        color: "#ffffff"
+//                        smooth: true
+//                        opacity: 1
+//                    }
+//                    ComboBox {
+//                        id: channelCountList
+//                        opacity: 1
+//                        model: audioChannelCountModel
+//                        textRole: "display"
+//                        width: 120
+//                        activeFocusOnPress: true
+//                        style: ComboBoxStyle {
+//                            label: Text {
+//                                anchors.fill: parent
+//                                color: "#ffffff"
+//                                text: control.currentText
+//                                elide: Text.ElideRight
+//                                verticalAlignment: Text.AlignVCenter
+//                                font.family: "Ubuntu"
+//                                font.pixelSize: 14
+//                                wrapMode: Text.WordWrap
+//                            }
+//                            background: Image {
+//                                id: channelCountImg
+//                                source: "images/device_box.png"
+//                                Rectangle {
+//                                    width: channelCountImg.sourceSize.width - 28
+//                                    height: control.currentText.height
+//                                    color: "#222021"
+//                                    border.color: "white"
+//                                    border.width: control.activeFocus ? 3 : 1
+//                                    radius: control.activeFocus ? 5 : 0
+//                                }
+//                            }
+//                        }
+//                        onPressedChanged:{
+//                            root.minimizeWindow()
+//                        }
+//                        onCurrentIndexChanged: {
+//                            if(currentText.length != 0){
+//                                root.setChannelCount(currentText)
+//                            }
+//                        }
+//                    }
 
-                    CheckBox {
-                        id: muteSelection
-                        activeFocusOnPress : true
-                        checked: false
-                        style: CheckBoxStyle {
-                            label: Text {
-                                text: "Mute"
-                                font.pixelSize: 13
-                                font.family: "SegoeUI-Light"
-                                color: "#ffffff"
-                                smooth: true
-                                opacity: 1
-                            } background: Rectangle {
-                                border.width: control.activeFocus ? 1 :0
-                                color: "#222021"
-                                border.color: control.activeFocus ? "#ffffff" : "#222021"
-                            }
-                        }
-                        onClicked: {
-                            doMuteEnableDisable()
-                            root.minimizeWindow()
-                        }
-                        Keys.onReturnPressed: {
-                            doMuteEnableDisable()
-                        }
-                        onCheckedChanged: {
-                            doMuteEnableDisable()
-                        }
-                    }
-                    Row{
-                        spacing: 10
-                        Text {
-                            id: volume
-                            text: "Volume"
-                            font.pixelSize: 14
-                            font.family: "Ubuntu"
-                            color: "#ffffff"
-                            smooth: true
-                            opacity: muteSelection.checked ? 0.1 : 1
-                        }
-                        Slider {
-                            activeFocusOnPress: true
-                            updateValueWhileDragging: false
-                            id: volume_Slider
-                            width: 120
-                            style:econSliderStyle
-                            enabled: muteSelection.checked ? 0 : 1
-                            opacity: enabled ? 1 : 0.1
-                            stepSize: 17
-                            minimumValue: 1
-                            maximumValue: 100
-                            onValueChanged: {
-                                root.minimizeWindow()
-                                if(audioDevicesList.currentText.length != 0){
-                                    if(!skipSettingVolume){
-                                        audioSettings.setVolume(volume_Slider.value)
-                                        skipSettingVolume = false
-                                    }
-                                }
-                            }
-                        }
-                        TextField {
-                            id: volume_value
-                            text: volume_Slider.value
-                            font.pixelSize: 10
-                            font.family: "Ubuntu"
-                            smooth: true
-                            horizontalAlignment: TextInput.AlignHCenter
-                            validator: IntValidator {bottom: volume_Slider.minimumValue; top: volume_Slider.maximumValue;}
-                            enabled: false
-                            opacity: 1
-                            style: econTextFieldStyle
-                        }
-                    }
+//                    CheckBox {
+//                        id: muteSelection
+//                        activeFocusOnPress : true
+//                        checked: false
+//                        style: CheckBoxStyle {
+//                            label: Text {
+//                                text: "Mute"
+//                                font.pixelSize: 13
+//                                font.family: "SegoeUI-Light"
+//                                color: "#ffffff"
+//                                smooth: true
+//                                opacity: 1
+//                            } background: Rectangle {
+//                                border.width: control.activeFocus ? 1 :0
+//                                color: "#222021"
+//                                border.color: control.activeFocus ? "#ffffff" : "#222021"
+//                            }
+//                        }
+//                        onClicked: {
+//                            doMuteEnableDisable()
+//                            root.minimizeWindow()
+//                        }
+//                        Keys.onReturnPressed: {
+//                            doMuteEnableDisable()
+//                        }
+//                        onCheckedChanged: {
+//                            doMuteEnableDisable()
+//                        }
+//                    }
+//                    Row{
+//                        spacing: 10
+//                        Text {
+//                            id: volume
+//                            text: "Volume"
+//                            font.pixelSize: 14
+//                            font.family: "Ubuntu"
+//                            color: "#ffffff"
+//                            smooth: true
+//                            opacity: muteSelection.checked ? 0.1 : 1
+//                        }
+//                        Slider {
+//                            activeFocusOnPress: true
+//                            updateValueWhileDragging: false
+//                            id: volume_Slider
+//                            width: 120
+//                            style:econSliderStyle
+//                            enabled: muteSelection.checked ? 0 : 1
+//                            opacity: enabled ? 1 : 0.1
+//                            stepSize: 17
+//                            minimumValue: 1
+//                            maximumValue: 100
+//                            onValueChanged: {
+//                                root.minimizeWindow()
+//                                if(audioDevicesList.currentText.length != 0){
+//                                    if(!skipSettingVolume){
+//                                        audioSettings.setVolume(volume_Slider.value)
+//                                        skipSettingVolume = false
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        TextField {
+//                            id: volume_value
+//                            text: volume_Slider.value
+//                            font.pixelSize: 10
+//                            font.family: "Ubuntu"
+//                            smooth: true
+//                            horizontalAlignment: TextInput.AlignHCenter
+//                            validator: IntValidator {bottom: volume_Slider.minimumValue; top: volume_Slider.maximumValue;}
+//                            enabled: false
+//                            opacity: 1
+//                            style: econTextFieldStyle
+//                        }
+//                    }
 
-                }
-            }
+//                }
+//            }
         }
 
         Keys.onReturnPressed: {
@@ -487,9 +494,9 @@ Item {
     }
 
    Component.onCompleted: {
-       cameraSelect = false
-       audioDevicesList.currentIndex = -1
-       root.audioPropertyYValue = audio_Capture.y
+//       cameraSelect = false
+//       audioDevicesList.currentIndex = -1
+//       root.audioPropertyYValue = audio_Capture.y
     }
 }
 

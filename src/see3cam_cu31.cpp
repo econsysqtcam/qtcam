@@ -52,7 +52,7 @@ bool SEE3CAM_CU31::setOrientation(bool horzModeSel, bool vertiModeSel)
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_ID_1; /* camera id_1 */
     g_out_packet_buf[2] = CAMERA_CONTROL_ID_2; /* camera id_2 */
-    g_out_packet_buf[3] = SET_ORIENTATION; /* set orientation command  */
+    g_out_packet_buf[3] = SET_ORIENTATION_SEE3CAM_CU31; /* set orientation command  */
 
     if(horzModeSel && vertiModeSel){
         g_out_packet_buf[4] = ROTATE_180; /* both flip enable */
@@ -70,7 +70,7 @@ bool SEE3CAM_CU31::setOrientation(bool horzModeSel, bool vertiModeSel)
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
-            g_in_packet_buf[2] == SET_ORIENTATION &&
+            g_in_packet_buf[2] == SET_ORIENTATION_SEE3CAM_CU31 &&
             g_in_packet_buf[6] == SET_SUCCESS) {
             return true;
         }
@@ -97,7 +97,7 @@ bool SEE3CAM_CU31::getOrientation()
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_ID_1; /* camera id_1 */
     g_out_packet_buf[2] = CAMERA_CONTROL_ID_2; /* camera id_2 */
-    g_out_packet_buf[3] = GET_ORIENTATION; /* get orientation command */
+    g_out_packet_buf[3] = GET_ORIENTATION_SEE3CAM_CU31; /* get orientation command */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -106,7 +106,7 @@ bool SEE3CAM_CU31::getOrientation()
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
-            g_in_packet_buf[2] == GET_ORIENTATION &&
+            g_in_packet_buf[2] == GET_ORIENTATION_SEE3CAM_CU31 &&
             g_in_packet_buf[6] == GET_SUCCESS) {
             emit flipMirrorModeChanged(g_in_packet_buf[3]);
             return true;
@@ -114,7 +114,6 @@ bool SEE3CAM_CU31::getOrientation()
     }
     return false;
 }
-
 
 
 /**
@@ -193,7 +192,6 @@ bool SEE3CAM_CU31::getRawNoiseReductionStatus()
 }
 
 
-
 /**
  * @brief SEE3CAM_CU31::setTriggerMode - To set the Trigger mode to the camera
  * @param mode - Disable/ ReadOut/ Shutter modes
@@ -268,7 +266,6 @@ bool SEE3CAM_CU31::getTriggerMode()
     }
     return false;
 }
-
 
 
 /**
@@ -347,7 +344,6 @@ bool SEE3CAM_CU31::getAEConvergenceSpeed()
 }
 
 
-
 /**
  * @brief SEE3CAM_CU31::setAutoExposureStatus
  * @param exposureStatus - The value to be set
@@ -421,8 +417,6 @@ bool SEE3CAM_CU31::getAutoExpStatus()
     }
     return false;
 }
-
-
 
 
 /**
@@ -500,7 +494,6 @@ bool SEE3CAM_CU31::getAWBStatus()
 }
 
 
-
 /**
  * @brief SEE3CAM_CU31::readTeperature() - To read the temperature in the camera
  * @return true/false
@@ -544,7 +537,6 @@ bool SEE3CAM_CU31::readTemperature(){
 }
 
 
-
 /**
  * @brief SEE3CAM_CU31::setAntiFlickerMode - setting anti flicker mode
  * @param antiFlickerMode - mode to set [value of enum  - Auto/50hz/60hz/Disable]
@@ -581,6 +573,7 @@ bool SEE3CAM_CU31::setAntiFlickerMode(ANTI_FLICKER_DETECTION antiFlickerMode){
     }
     return false;
 }
+
 
 /**
  * @brief SEE3CAM_CU31::getAntiFlickerMode - get current anti flicker mode from camera
@@ -638,7 +631,7 @@ bool SEE3CAM_CU31::setCameraMode(CAMERA_MODE cameraMode){
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
     g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
-    g_out_packet_buf[3] = SET_CAMERA_MODE;
+    g_out_packet_buf[3] = SET_CAMERA_MODE_SEE3CAM_CU31;
     g_out_packet_buf[4] = cameraMode;
 
     // send request and get reply from camera
@@ -648,13 +641,14 @@ bool SEE3CAM_CU31::setCameraMode(CAMERA_MODE cameraMode){
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
-            g_in_packet_buf[2] == SET_CAMERA_MODE &&
+            g_in_packet_buf[2] == SET_CAMERA_MODE_SEE3CAM_CU31 &&
             g_in_packet_buf[6] == SET_SUCCESS) {
             return true;
         }
     }
     return false;
 }
+
 
 /**
  * @brief SEE3CAM_CU31::getCameraMode - get current camera mode from the camera
@@ -674,7 +668,7 @@ bool SEE3CAM_CU31::getCameraMode()
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
     g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
-    g_out_packet_buf[3] = GET_CAMERA_MODE;
+    g_out_packet_buf[3] = GET_CAMERA_MODE_SEE3CAM_CU31;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -683,9 +677,911 @@ bool SEE3CAM_CU31::getCameraMode()
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
-            g_in_packet_buf[2] == GET_CAMERA_MODE &&
+            g_in_packet_buf[2] == GET_CAMERA_MODE_SEE3CAM_CU31 &&
             g_in_packet_buf[6] == GET_SUCCESS) {
             emit currentCameraModeReceived(g_in_packet_buf[3]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::getAEWindowOverlay - To get AE Light metering window overlay status
+ * @return true/false
+ */
+bool SEE3CAM_CU31::getAEWindowOverlay()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = GET_AE_OVERLAY_SEE3CAM_CU31;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get Auto Exposure LMW Overlay Failed. Retry!");
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
+            (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
+            (g_in_packet_buf[2] == GET_AE_OVERLAY_SEE3CAM_CU31) &&
+            (g_in_packet_buf[6] == GET_SUCCESS)){
+            emit currentAEWindowOverlayStatus(g_in_packet_buf[3]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+/**
+ * @brief SEE3CAM_CU31::setAEWindowOverlay
+ * @param status - The Status to be set
+ * @return true/false
+ */
+bool SEE3CAM_CU31::setAEWindowOverlay(uint status)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = SET_AE_OVERLAY_SEE3CAM_CU31;
+    g_out_packet_buf[4] = status;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Auto Exposure LMW Overlay Failed. Retry!");
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
+            g_in_packet_buf[2] == SET_AE_OVERLAY_SEE3CAM_CU31 &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::getAEWindowDimensions - To get AE Light Metering Window Dimensions from the camera
+ * @return true/false
+ */
+bool SEE3CAM_CU31::getAEWindowDimensions()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = GET_AE_DIMENSIONS_SEE3CAM_CU31;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[15] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get AE Light Metering Window Dimensions Failed. Retry!");
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
+            (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
+            (g_in_packet_buf[2] == GET_AE_DIMENSIONS_SEE3CAM_CU31) &&
+            (g_in_packet_buf[15] == GET_SUCCESS)){
+
+            uint width, height, xStart, yStart;
+
+            width  = (g_in_packet_buf[3] << 8) | (g_in_packet_buf[4] << 0);
+            height = (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
+            xStart = (g_in_packet_buf[7] << 8) | (g_in_packet_buf[8] << 0);
+            yStart = (g_in_packet_buf[9] << 8) | (g_in_packet_buf[10] << 0);
+
+            emit currentAEWindowDimensions(width, height, xStart, yStart);
+
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::setAEWindowDimensions - To set the window dimensions
+ * @return true/false
+ */
+bool SEE3CAM_CU31::setAEWindowDimensions(uint width, uint height, uint xStart, uint yStart)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = SET_AE_DIMENSIONS_SEE3CAM_CU31;
+
+    g_out_packet_buf[4] = ((width & 0xFF00) >> 8);
+    g_out_packet_buf[5] = ((width & 0x00FF) >> 0);
+
+    g_out_packet_buf[6] = ((height & 0xFF00) >> 8);
+    g_out_packet_buf[7] = ((height & 0x00FF) >> 0);
+
+    g_out_packet_buf[8] = ((xStart & 0xFF00) >> 8);
+    g_out_packet_buf[9] = ((xStart & 0x00FF) >> 0);
+
+    g_out_packet_buf[10] = ((yStart & 0xFF00) >> 8);
+    g_out_packet_buf[11] = ((yStart & 0x00FF) >> 0);
+
+    uint minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[15] == SET_FAIL) {
+
+            minWidth  = (g_in_packet_buf[16] << 8) | (g_in_packet_buf[17] << 0);
+            maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
+            minHeight = (g_in_packet_buf[20] << 8) | (g_in_packet_buf[21] << 0);
+            maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
+
+            minXStart  = (g_in_packet_buf[24] << 8) | (g_in_packet_buf[25] << 0);
+            maxXStart  = (g_in_packet_buf[26] << 8) | (g_in_packet_buf[27] << 0);
+            minYStart = (g_in_packet_buf[28] << 8) | (g_in_packet_buf[29] << 0);
+            maxYStart = (g_in_packet_buf[30] << 8) | (g_in_packet_buf[31] << 0);
+
+            emit indicateWindowDimensionError(minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart);
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
+            g_in_packet_buf[2] == SET_AE_DIMENSIONS_SEE3CAM_CU31 &&
+            g_in_packet_buf[15] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::getAEMaskOverlay - To get AE Light metering window Mask overlay status
+ * @return true/false
+ */
+bool SEE3CAM_CU31::getAEMaskOverlay()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = GET_AE_MASK_OVERLAY_SEE3CAM_CU31;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get Auto Exposure Convergence Speed Failed. Retry!");
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
+            (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
+            (g_in_packet_buf[2] == GET_AE_MASK_OVERLAY_SEE3CAM_CU31) &&
+            (g_in_packet_buf[6] == GET_SUCCESS)){
+            emit currentAEMaskOverlayStatus(g_in_packet_buf[3]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::setAEMaskOverlay
+ * @param status - The Status to be set
+ * @return true/false
+ */
+bool SEE3CAM_CU31::setAEMaskOverlay(uint status)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = SET_AE_MASK_OVERLAY_SEE3CAM_CU31;
+    g_out_packet_buf[4] = status;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Auto Exposure Status Failed. Retry!");
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
+            g_in_packet_buf[2] == SET_AE_MASK_OVERLAY_SEE3CAM_CU31 &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::getAEMaskDimensions - To get AE Light metering Window Mask dimensions
+ * @return true/false
+ */
+bool SEE3CAM_CU31::getAEMaskDimensions(bool isMaskIDNeeded)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    uint width, height, xStart, yStart;
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = GET_AE_MASK_DIMENSIONS_SEE3CAM_CU31;
+    g_out_packet_buf[4] = 1; //Setting Mask ID to 1
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[15] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Set AE Light metering Window Mask dimensions Failed. Retry!");
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
+            (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
+            (g_in_packet_buf[2] == GET_AE_MASK_DIMENSIONS_SEE3CAM_CU31) &&
+            (g_in_packet_buf[15] == GET_SUCCESS)){
+
+            width  = (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
+            height = (g_in_packet_buf[7] << 8) | (g_in_packet_buf[8] << 0);
+            xStart = (g_in_packet_buf[9] << 8) | (g_in_packet_buf[10] << 0);
+            yStart = (g_in_packet_buf[11] << 8) | (g_in_packet_buf[12] << 0);
+
+            emit currentAEMaskDimensions(isMaskIDNeeded, 1, g_in_packet_buf[4], width, height, xStart, yStart);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::setAEWindowDimensions - To set AE LMW Mask dimensions
+ * @return true/false
+ */
+bool SEE3CAM_CU31::setAEMaskDimensions(uint maskID, uint maskStatus, uint width, uint height, uint xStart, uint yStart)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = SET_AE_MASK_DIMENSIONS_SEE3CAM_CU31;
+
+    g_out_packet_buf[4] = maskID;
+    g_out_packet_buf[5] = maskStatus;
+
+    g_out_packet_buf[6] = ((width & 0xFF00) >> 8);
+    g_out_packet_buf[7] = ((width & 0x00FF) >> 0);
+
+    g_out_packet_buf[8] = ((height & 0xFF00) >> 8);
+    g_out_packet_buf[9] = ((height & 0x00FF) >> 0);
+
+    g_out_packet_buf[10] = ((xStart & 0xFF00) >> 8);
+    g_out_packet_buf[11] = ((xStart & 0x00FF) >> 0);
+
+    g_out_packet_buf[12] = ((yStart & 0xFF00) >> 8);
+    g_out_packet_buf[13] = ((yStart & 0x00FF) >> 0);
+
+    uint minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[15] == SET_FAIL) {
+
+            minWidth  = (g_in_packet_buf[16] << 8) | (g_in_packet_buf[17] << 0);
+            maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
+            minHeight = (g_in_packet_buf[20] << 8) | (g_in_packet_buf[21] << 0);
+            maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
+
+            minXStart = (g_in_packet_buf[24] << 8) | (g_in_packet_buf[25] << 0);
+            maxXStart = (g_in_packet_buf[26] << 8) | (g_in_packet_buf[27] << 0);
+            minYStart = (g_in_packet_buf[28] << 8) | (g_in_packet_buf[29] << 0);
+            maxYStart = (g_in_packet_buf[30] << 8) | (g_in_packet_buf[31] << 0);
+
+            emit indicateMaskDimensionError(minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart);
+
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
+            g_in_packet_buf[2] == SET_AE_MASK_DIMENSIONS_SEE3CAM_CU31 &&
+            g_in_packet_buf[15] == SET_SUCCESS) {
+
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::getAWBWindowOverlay - To get AWB Light Metering Window Overlay status
+ * @return true/false
+ */
+bool SEE3CAM_CU31::getAWBWindowOverlay()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = GET_AWB_OVERLAY_SEE3CAM_CU31;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get AWB Light Metering Window Overlay Failed. Retry!");
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
+            (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
+            (g_in_packet_buf[2] == GET_AWB_OVERLAY_SEE3CAM_CU31) &&
+            (g_in_packet_buf[6] == GET_SUCCESS)){
+            emit currentAWBWindowOverlayStatus(g_in_packet_buf[3]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::setAWBWindowOverlay - To set AWB LMW Overlay Status
+ * @param status - To set Enable/Disable
+ * @return true/false
+ */
+bool SEE3CAM_CU31::setAWBWindowOverlay(uint status)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = SET_AWB_OVERLAY_SEE3CAM_CU31;
+    g_out_packet_buf[4] = status;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set AWB LMW Overlay Failed. Retry!");
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
+            g_in_packet_buf[2] == SET_AWB_OVERLAY_SEE3CAM_CU31 &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::getAWBWindowDimensions - To get AWB Window Dimension from the camera
+ * @return true/false
+ */
+bool SEE3CAM_CU31::getAWBWindowDimensions()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = GET_AWB_WINDOW_DIMENSIONS_SEE3CAM_CU31;
+
+    uint width, height, xStart, yStart;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[15] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get AWB Window Dimension Failed. Retry!");
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
+            (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
+            (g_in_packet_buf[2] == GET_AWB_WINDOW_DIMENSIONS_SEE3CAM_CU31) &&
+            (g_in_packet_buf[15] == GET_SUCCESS)){
+
+            width  = (g_in_packet_buf[3] << 8) | (g_in_packet_buf[4] << 0);
+            height = (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
+            xStart = (g_in_packet_buf[7] << 8) | (g_in_packet_buf[8] << 0);
+            yStart = (g_in_packet_buf[9] << 8) | (g_in_packet_buf[10] << 0);
+
+            emit currentAWBWindowDimensions(width, height, xStart, yStart);
+
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::setAWBWindowDimensions - To set AWB window dimensions
+ * @return true/false
+ */
+bool SEE3CAM_CU31::setAWBWindowDimensions(uint width, uint height, uint xStart, uint yStart)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = SET_AWB_WINDOW_DIMENSIONS_SEE3CAM_CU31;
+
+    g_out_packet_buf[4] = ((width & 0xFF00) >> 8);
+    g_out_packet_buf[5] = ((width & 0x00FF) >> 0);
+
+    g_out_packet_buf[6] = ((height & 0xFF00) >> 8);
+    g_out_packet_buf[7] = ((height & 0x00FF) >> 0);
+
+    g_out_packet_buf[8] = ((xStart & 0xFF00) >> 8);
+    g_out_packet_buf[9] = ((xStart & 0x00FF) >> 0);
+
+    g_out_packet_buf[10] = ((yStart & 0xFF00) >> 8);
+    g_out_packet_buf[11] = ((yStart & 0x00FF) >> 0);
+
+    uint minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[15] == SET_FAIL) {
+
+            minWidth  = (g_in_packet_buf[16] << 8) | (g_in_packet_buf[17] << 0);
+            maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
+            minHeight = (g_in_packet_buf[20] << 8) | (g_in_packet_buf[21] << 0);
+            maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
+
+            minXStart  = (g_in_packet_buf[24] << 8) | (g_in_packet_buf[25] << 0);
+            maxXStart  = (g_in_packet_buf[26] << 8) | (g_in_packet_buf[27] << 0);
+            minYStart = (g_in_packet_buf[28] << 8) | (g_in_packet_buf[29] << 0);
+            maxYStart = (g_in_packet_buf[30] << 8) | (g_in_packet_buf[31] << 0);
+
+            emit indicateWindowDimensionError(minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart);
+
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
+            g_in_packet_buf[2] == SET_AWB_WINDOW_DIMENSIONS_SEE3CAM_CU31 &&
+            g_in_packet_buf[15] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::getAWBMaskOverlay - To get AE Light Metering Window Overlay status
+ * @return true/false
+ */
+bool SEE3CAM_CU31::getAWBMaskOverlay()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = GET_AWB_MASK_OVERLAY_SEE3CAM_CU31;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get AE Light Metering Window Overlay Failed. Retry!");
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
+            (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
+            (g_in_packet_buf[2] == GET_AWB_MASK_OVERLAY_SEE3CAM_CU31) &&
+            (g_in_packet_buf[6] == GET_SUCCESS)){
+            emit currentAWBMaskOverlayStatus(g_in_packet_buf[3]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::setAWBMaskOverlay
+ * @param exposureStatus - The value to be set
+ * @return true/false
+ */
+bool SEE3CAM_CU31::setAWBMaskOverlay(uint status)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = SET_AWB_MASK_OVERLAY_SEE3CAM_CU31;
+    g_out_packet_buf[4] = status;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set AE Light Metering Window Overlay Failed. Retry!");
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
+            g_in_packet_buf[2] == SET_AWB_MASK_OVERLAY_SEE3CAM_CU31 &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::getAWBMaskDimensions - To get AWB Light Metering Window Mask Dimensions
+ * @return true/false
+ */
+bool SEE3CAM_CU31::getAWBMaskDimensions(bool isMaskIDNeeded)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    uint width, height, xStart, yStart;
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = GET_AWB_MASK_DIMENSIONS_SEE3CAM_CU31;
+    g_out_packet_buf[4] = 1; //Setting Mask ID to 1
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[15] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get AWB Light Metering Window Mask Dimensions Failed. Retry!");
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
+            (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
+            (g_in_packet_buf[2] == GET_AWB_MASK_DIMENSIONS_SEE3CAM_CU31) &&
+            (g_in_packet_buf[15] == GET_SUCCESS)){
+
+            width  = (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
+            height = (g_in_packet_buf[7] << 8) | (g_in_packet_buf[8] << 0);
+            xStart = (g_in_packet_buf[9] << 8) | (g_in_packet_buf[10] << 0);
+            yStart = (g_in_packet_buf[11] << 8) | (g_in_packet_buf[12] << 0);
+
+            emit currentAWBMaskDimensions(isMaskIDNeeded, 1, g_in_packet_buf[4], width, height, xStart, yStart);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::setAWBMaskDimensions - To set the AWB window dimensions
+ * @return true/false
+ */
+bool SEE3CAM_CU31::setAWBMaskDimensions(uint maskID, uint maskStatus, uint width, uint height, uint xStart, uint yStart)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = SET_AWB_MASK_DIMENSIONS_SEE3CAM_CU31;
+
+    g_out_packet_buf[4] = maskID;
+    g_out_packet_buf[5] = maskStatus;
+
+    g_out_packet_buf[6] = ((width & 0xFF00) >> 8);
+    g_out_packet_buf[7] = ((width & 0x00FF) >> 0);
+
+    g_out_packet_buf[8] = ((height & 0xFF00) >> 8);
+    g_out_packet_buf[9] = ((height & 0x00FF) >> 0);
+
+    g_out_packet_buf[10] = ((xStart & 0xFF00) >> 8);
+    g_out_packet_buf[11] = ((xStart & 0x00FF) >> 0);
+
+    g_out_packet_buf[12] = ((yStart & 0xFF00) >> 8);
+    g_out_packet_buf[13] = ((yStart & 0x00FF) >> 0);
+
+    uint minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+
+        if (g_in_packet_buf[15] == SET_FAIL) {
+
+            minWidth  = (g_in_packet_buf[16] << 8) | (g_in_packet_buf[17] << 0);
+            maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
+            minHeight = (g_in_packet_buf[20] << 8) | (g_in_packet_buf[21] << 0);
+            maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
+
+            minXStart = (g_in_packet_buf[24] << 8) | (g_in_packet_buf[25] << 0);
+            maxXStart = (g_in_packet_buf[26] << 8) | (g_in_packet_buf[27] << 0);
+            minYStart = (g_in_packet_buf[28] << 8) | (g_in_packet_buf[29] << 0);
+            maxYStart = (g_in_packet_buf[30] << 8) | (g_in_packet_buf[31] << 0);
+
+            emit indicateMaskDimensionError(minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart);
+
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
+            g_in_packet_buf[2] == SET_AWB_MASK_DIMENSIONS_SEE3CAM_CU31 &&
+            g_in_packet_buf[15] == SET_SUCCESS) {
+
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::getPresetMode - To get Preset Mode from the camera
+ * @return true/false
+ */
+bool SEE3CAM_CU31::getPresetMode()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = GET_USER_PRESET_MODE_SEE3CAM_CU31;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get Preset Mode Failed. Retry!");
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
+            (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
+            (g_in_packet_buf[2] == GET_USER_PRESET_MODE_SEE3CAM_CU31) &&
+            (g_in_packet_buf[6] == GET_SUCCESS)){
+            emit currentPresetProperties(g_in_packet_buf[3], g_in_packet_buf[4]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::setPresetMode
+ * @param mode - Preset Mode to be set
+ * @return true/false
+ */
+bool SEE3CAM_CU31::setPresetMode(PRESET_MODE mode, PRESET_BUTTON button)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = SET_USER_PRESET_MODE_SEE3CAM_CU31;
+    g_out_packet_buf[4] = mode;
+    g_out_packet_buf[5] = button;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Preset Mode Failed. Retry!");
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
+            g_in_packet_buf[2] == SET_USER_PRESET_MODE_SEE3CAM_CU31 &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::getEmbeddedData - To get Embedded data from the camera
+ * @return true/false
+ */
+bool SEE3CAM_CU31::getEmbeddedData()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = GET_EMBEDDED_DATA_SEE3CAM_CU31;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get Embedded Data Failed. Retry!");
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
+            (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
+            (g_in_packet_buf[2] == GET_EMBEDDED_DATA_SEE3CAM_CU31) &&
+            (g_in_packet_buf[6] == GET_SUCCESS)){
+            emit currentEmbedDataStatus(g_in_packet_buf[3]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::setEmbeddedData
+ * @param exposureStatus - The value to be set
+ * @return true/false
+ */
+bool SEE3CAM_CU31::setEmbeddedData(uint status)
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = SET_EMBEDDED_DATA_SEE3CAM_CU31;
+    g_out_packet_buf[4] = status;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateFailureStatus("Failure","Set Embedded Data Failed. Retry!");
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
+            g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
+            g_in_packet_buf[2] == SET_EMBEDDED_DATA_SEE3CAM_CU31 &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
             return true;
         }
     }
@@ -708,14 +1604,14 @@ bool SEE3CAM_CU31::setPropertiesForCrossStill(){
     initializeBuffers();
 
     // fill buffer values
-    g_out_packet_buf[1] = SET_CROSS_STILL_PROPERTIES;
+    g_out_packet_buf[1] = SET_CROSS_STILL_PROPERTIES_SEE3CAM_CU31;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if(g_in_packet_buf[6] == FAILURE){
             emit indicateFailureStatus("Failure","Setting Still Properties Failed. Retry!");
             return false;
-        }else if((g_in_packet_buf[0] == SET_CROSS_STILL_PROPERTIES) && (g_in_packet_buf[6] == SUCCESS)){
+        }else if((g_in_packet_buf[0] == SET_CROSS_STILL_PROPERTIES_SEE3CAM_CU31) && (g_in_packet_buf[6] == SUCCESS)){
             return true;
         }
     }
@@ -758,7 +1654,6 @@ bool SEE3CAM_CU31::setToDefaultValues()
     }
     return false;
 }
-
 
 
 /**
@@ -848,6 +1743,42 @@ bool SEE3CAM_CU31::get64BitSerialNumber()
     _text.append(lsb+msb);
     _title.clear();
     _title = tr("Serial Number");
+    emit titleTextChanged(_title,_text);
+    return true;
+}
+
+
+/**
+ * @brief SEE3CAM_CU31::readISPFirmwareVersion - To read the firmware version of ISP
+ * @return true/false
+ */
+bool SEE3CAM_CU31::readISPFirmwareVersion()
+{
+    _title = tr("ISP Version");
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    g_out_packet_buf[1] = ISP_FIRMWARE_VERSION_SEE3CAM_CU31;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_SUCCESS) {
+
+        } else if(g_in_packet_buf[6] == SET_FAIL) {
+            return false;
+        }
+    }
+
+    _text.clear();
+    _text.append("Version: ");
+    _text.append(QString::number(g_in_packet_buf[1]).append(".").append(QString::number(g_in_packet_buf[2])).append(".").append(QString::number(g_in_packet_buf[3])).append(".").append(QString::number(g_in_packet_buf[4])));
     emit titleTextChanged(_title,_text);
     return true;
 }
