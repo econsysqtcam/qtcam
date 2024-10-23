@@ -81,6 +81,7 @@ Item {
     property bool hdrModeSelected : false
     property bool autoWhiteBalanceSelect : false
     property bool colorTempEnabled : false
+    property bool updateUVCExposure : true
 
     property bool powerLineComboEnable
     // Skip doing things when exposure combo index changed calls when no selection of any camera
@@ -868,11 +869,14 @@ Item {
 
                             }else if(!exposureAutoAvailable){ // If a camera does not contain "exposure, auto" control, but having "exposure absolute" control, allow it change exposure value.
                                 root.changeCameraSettings(exposurecontrolId,value.toString())
+                                if(updateUVCExposure){
+                                    root.getUVCExpForIMX900(seconds, milliSeconds, microSeconds)
+                                }
+                                updateUVCExposure = true
                                 root.getExposureComponentsUVC(seconds, milliSeconds, microSeconds)
                             }else{
                                 if((exposureCombo.currentText == "Shutter Priority Mode" || exposureCombo.currentText == "Manual Mode")) {
-                                    root.getExposureComponentsUVC(seconds, milliSeconds, microSeconds)
-
+                                     root.getExposureComponentsUVC(seconds, milliSeconds, microSeconds)
                                     if(exposureSliderSetEnable){
                                         root.changeCameraSettings(exposurecontrolId,value.toString())
                                     }
@@ -1355,6 +1359,7 @@ Item {
             }
         }
         onGetExposureFromHID:{
+            updateUVCExposure = false
             exposure_Slider.value = exposureFromHID
         }
 

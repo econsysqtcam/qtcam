@@ -86,7 +86,7 @@ Item {
 
     Timer {
         id: getexposureCompFrameRateCtrlTimer
-        interval: 500
+        interval: 10
         onTriggered: {
             see3cam24cug.getExposureCompensation()
             see3cam24cug.getFrameRateCtrlValue()
@@ -225,6 +225,7 @@ Item {
             Row{
                 spacing:38
                 ExclusiveGroup { id: roiExpogroup }
+                Layout.alignment: Qt.AlignCenter
 
                 RadioButton {
                     exclusiveGroup: roiExpogroup
@@ -598,6 +599,8 @@ value in the text box and click the Set button"
             }
             Row{
                 spacing: 55
+                Layout.alignment: Qt.AlignCenter
+
                 CheckBox {
                     id: flipCtrlHorizotal
                     activeFocusOnPress : true
@@ -713,6 +716,8 @@ value in the text box and click the Set button"
                 y:230
                 spacing: 25
                 ExclusiveGroup { id: flashGrp }
+                Layout.alignment: Qt.AlignCenter
+
                 Column{
                     RadioButton {
                         exclusiveGroup: flashGrp

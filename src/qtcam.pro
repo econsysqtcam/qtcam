@@ -98,6 +98,7 @@ SOURCES += main.cpp \
     see3cam_cu200m.cpp \
     see3cam_cu31.cpp \
     see3cam_cu200_h01r1.cpp \
+    imx900usbcam.cpp
 
 # Installation path
 # target.path =
@@ -176,6 +177,7 @@ HEADERS += \
     see3cam_cu31.h \
     see3cam_cu200m.h \
     see3cam_cu200_h01r1.h \
+    imx900usbcam.h
 
 
 INCLUDEPATH +=  $$PWD/v4l2headers/include \
@@ -308,6 +310,7 @@ contains(DEFINES, UBUNTU_22_04) {
         ub22_qml/qtcam/UVCSettings/see3camcu83/see3camcu83.qml \
         ub22_qml/qtcam/UVCSettings/see3camcu84/see3camcu84.qml \
         ub22_qml/qtcam/UVCSettings/see3camcu31/seecamcu31.qml \
+        ub22_qml/qtcam/UVCSettings/imx900USBCam/imx900USBCam.qml \
         ub22_qml/qtcam/UVCSettings/others/others.qml \
 }
 else:{
@@ -366,5 +369,6 @@ else:{
         qml/qtcam/UVCSettings/see3camcu84/see3camcu84.qml \
         qml/qtcam/UVCSettings/see3camcu31/seecamcu31.qml \
         qml/qtcam/UVCSettings/see3camcu200m/see3camcu200m.qml \
+        qml/qtcam/UVCSettings/imx900USBCam/imx900USBCam.qml \
         qml/qtcam/UVCSettings/others/others.qml \
 }

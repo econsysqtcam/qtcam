@@ -293,6 +293,7 @@ Rectangle {
     signal getColorTempFromUVC(int colorTempFromUVC);
     signal getExposureFromUVC(int exposureFromUVC);
     signal exposureComponentsFromUVC(int seconds, int milliSeconds, int microSeconds);
+    signal imx900ExposureFromUVC(int seconds, int milliSeconds, int microSeconds);
 
     //Added by Sushanth 15th May 2023
     signal sendGainValueToUVC(int gain);
@@ -1636,6 +1637,9 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU31) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu31/seecamcu31.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.IMX900USBCAM) {
+            see3cam = Qt.createComponent("../UVCSettings/imx900USBCam/imx900USBCam.qml").createObject(root)
+        }
         else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
@@ -1708,6 +1712,7 @@ Rectangle {
         case CommonEnums.SEE3CAM_CU200M:  //Added By Sushanth.S
         case CommonEnums.SEE3CAM_CU200M_H01R1:  //Added By Sushanth.S
         case CommonEnums.SEE3CAM_CU31:   //Added By Sushanth.S
+        case CommonEnums.IMX900USBCAM: //Added By Sushanth
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
             break;
@@ -1997,6 +2002,10 @@ Rectangle {
     function getExposureComponentsUVC(seconds, milliSeconds, microSeconds)
     {
         exposureComponentsFromUVC(seconds, milliSeconds, microSeconds)
+    }
+
+    function getUVCExpForIMX900(seconds, milliSeconds, microSeconds){
+        imx900ExposureFromUVC(seconds, milliSeconds, microSeconds)
     }
 
     //Added by Sushanth - To clear buffer when device is in trigger mode
