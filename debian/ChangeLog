@@ -1,4 +1,5 @@
-qtcam (26.0.28-0ubuntu1) xenial; urgency=medium
+qtcam (26.0.30-0ubuntu1) xenial; urgency=medium
+ *Added support for See3CAM_37CUG_MHLCC_H01R1.
  *Prevents background video recording even after the recording has stopped.
  *Bug fix for See3CAM_CU83.
  *Prevent a single-shot radio button (Auto White balance, Auto Exposure) from being clicked again once it has already been selected for See3CAM_CU200 and See3CAM_CU200_H01R1. Using control ID to enumerate Focus, Absolute UVC control instead of control names.
@@ -194,4 +195,4 @@ qtcam (26.0.28-0ubuntu1) xenial; urgency=medium
   * Added ARM support.
   * Initial release.  
 
- -- econsysqtcam <qtcam@e-consystems.com> Thu 03 Oct 2024 09:46:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Wed 23 Oct 2024 22:50:01 +0530
