@@ -2,8 +2,9 @@ name: Build Fedora
 
 on:
   push:
-#    branches: [ "master" ]
+    branches: [ "master" ]
   pull_request:
+    types: [ opened, reopened, synchronize ]
     branches: [ "master" ]
 
 jobs:
@@ -13,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        fedora_version: [ '39', '40', '41' ]
+        fedora_version: [ '39', '40' ] # 41 can be added when code is updated for FFmpeg 7
     container: fedora:${{ matrix.fedora_version }}
 
     steps:
@@ -39,8 +40,6 @@ jobs:
     - name: Run make
       working-directory: ${{github.workspace}}/src
       run: make
-      env:
-        LDFLAGS: '-Wl,--copy-dt-needed-entries'
 
     - uses: actions/upload-artifact@v4
       with:
