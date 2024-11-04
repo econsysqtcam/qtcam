@@ -88,9 +88,6 @@ uint AudioInput::devIndex;
 static pthread_t my_read_thread;
 static pa_stream *recordstream = NULL;
 
-bool AudioInput::is20_04 = false;
-bool AudioInput::is22_04 = false;
-
 AudioInfo::AudioInfo(const QAudioFormat &format, QObject *parent)
     :   QIODevice(parent)
     ,   m_format(format)
@@ -380,18 +377,6 @@ void AudioInput::pa_sourcelist_cb(pa_context *c, const pa_source_info *l, int eo
     /* We'll need these state variables to keep track of our requests */
     int state = 0;
     int pa_ready = 0;
-
-    if(is20_04 || is22_04)
-    {
-        process.start("bash", QStringList() << "-c" << "sudo pulseaudio -D");
-        process.waitForFinished();
-        if(process.exitStatus() <0)
-        {
-            qDebug() << Q_FUNC_INFO << "process exit status 0";
-            qDebug() << "AUDIO: PULSE - unable to connect to server: pa_context_connect failed\n";
-            return -1;
-        }
-    }
 
     /* Create a mainloop API and connection to the default server */
     pa_ml = pa_mainloop_new();
@@ -726,19 +711,6 @@ void AudioInput::recordAudio(){
     pa_stream_flags_t flags = PA_STREAM_NOFLAGS;
     int r;
     int pa_ready = 0;
-
-    //To start pulse audio server for ubuntu 20.04 & 22.04
-    if(audioInput->is20_04 || audioInput->is22_04)
-    {
-        audioInput->process.start("bash", QStringList() << "-c" << "sudo pulseaudio -D");
-        audioInput->process.waitForFinished();
-        if(audioInput->process.exitStatus() <0)
-        {
-            qDebug() << Q_FUNC_INFO << "process exit status 0";
-            qDebug() << "AUDIO: PULSE - unable to connect to server: pa_context_connect failed\n";
-            return ((void *) -1);
-        }
-    }
 
     /* Create a mainloop API and connection to the default server */
     pa_ml = pa_mainloop_new();

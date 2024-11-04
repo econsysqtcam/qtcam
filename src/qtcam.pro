@@ -7,34 +7,12 @@ linux {
     version = $$system(lsb_release -rs)
 
     message("Detected $$distro $$version ($$QMAKE_HOST.arch)")
-
-    equals(distro, Ubuntu) {
-        equals(version, 16.04) {
-            DEFINES += UBUNTU_16_04
-        }else: equals(version, 18.04) {
-            DEFINES += UBUNTU_18_04
-        } else: equals(version, 20.04) {
-            DEFINES += UBUNTU_20_04
-        } else: equals(version, 22.04) {
-            DEFINES += UBUNTU_22_04
-        } else: equals(version, 24.04) {
-            DEFINES += UBUNTU_24_04
-        } else {
-            error("Unsupported Ubuntu version")
-        }
-    } else: equals(distro, Fedora) {
-        # message("Detected Fedora $$version ($$QMAKE_HOST.arch)")
-        DEFINES += FEDORA
-        # CONFIG += c++1z
-        # CONFIG += c++14
-        # QMAKE_CXX = "g++-5"
-        QMAKE_CXXFLAGS += -std=c++14
-    } else {
-        message("Unknown distro")
-    }
 } else {
     error("Unsupported platform")
 }
+
+# Ubuntu 18.04 defaults to Qt 5.9 so make your code fail to compile if it uses deprecated APIs.
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x050900    # disables all the APIs deprecated before Qt 5.9.0
 
 contains(DEFINES, UBUNTU_22_04) {
     folder_01.source  = ub22_qml/qtcam
@@ -232,186 +210,132 @@ LIBS += -lv4l2 -lv4lconvert \
         -lturbojpeg \
         -levdev
 
-# Now add the LIB 
-## contains($$QMAKE_HOST.arch, x86_64):{
-##     message("x86_64 bit libs: $$(LIB_DIR)")
-##     LIBS += -lv4l2 -lv4lconvert \
-##         -L/usr/lib64/ -lavutil \
-##         -L/usr/lib64/ -lavcodec \
-##         -L/usr/lib64/ -lavformat \
-##         -L/usr/lib64/ -lswscale \
-##         -L/usr/lib64/ -ludev \
-##         -L/usr/lib64/ -lusb-1.0 \
-##         -L/usr/lib64/pulseaudio/ -lpulse \
-##         -L/usr/lib64/alsa-lib/ -lasound \
-##         -L/usr/lib64/ -lturbojpeg \
-##         -L/usr/lib64/ -levdev
-## }
-
-## contains($$QMAKE_HOST.arch.arch, i386):{
-##     message("x86_32 bit libs")
-##     LIBS += -lv4l2 -lv4lconvert \
-##         -lavutil \
-##         -lavcodec \
-##         -lavformat \
-##         -lswscale \
-##         -ludev \
-##         -lusb-1.0 \
-##         -lpulse \
-##         -lasound\
-##         -L/usr/lib/ -lturbojpeg \
-##         -L/usr/lib/i386-linux-gnu/ -levdev
-## }
-
-## contains($$QMAKE_HOST.arch.arch, arm64):{
-##     message("Arm64 libs")
-##     LIBS += -lv4l2 -lv4lconvert \
-##         -lavutil \
-##         -lavcodec \
-##         -lavformat \
-##         -lswscale \
-##         -ludev \
-##         -lusb-1.0 \
-##         -lpulse \
-##         -lasound\
-##         -L/usr/lib/ -lturbojpeg \
-##         -L/usr/lib/aarch64-linux-gnu/ -levdev
-## }
-
 #QMAKE_CXX += -ggdb
 QMAKE_CFLAGS_THREAD = -D__STDC_CONSTANT_MACROS      #For Ubuntu 12.04 compilation
 QMAKE_CXXFLAGS_THREAD = -D__STDC_CONSTANT_MACROS    #For Ubuntu 12.04 compilation
 QMAKE_CFLAGS_ISYSTEM = -I                           #For Ubuntu 20.04
 
-# makes a difference
-# QMAKE_LFLAGS = -Wl,--copy-dt-needed-entries
 
+message("Adding QML source files from $$PWD/ub22_qml")
 
-#Conditionally including additional source files depends upon OS type
-if(contains(DEFINES, UBUNTU_22_04)|contains(DEFINES, UBUNTU_24_04)|contains(DEFINES, FEDORA)) {
-    message("Adding QML source files from $$PWD/ub22_qml")
+OTHER_FILES += \
+    ub22_qml/qtcam/Views/qtcam.qml \
+    ub22_qml/qtcam/Views/aboutview.qml \
+    ub22_qml/qtcam/Views/audiocapturesettings.qml \
+    ub22_qml/qtcam/Views/captureandvideorecord.qml \
+    ub22_qml/qtcam/Views/imagequalitysettings.qml \
+    ub22_qml/qtcam/Views/renderer.qml \
+    ub22_qml/qtcam/Views/statusbar.qml \
+    ub22_qml/qtcam/Views/stillcapturesettings.qml \
+    ub22_qml/qtcam/Views/videocapturesettings.qml
 
-    OTHER_FILES += \
-        ub22_qml/qtcam/Views/qtcam.qml \
-        ub22_qml/qtcam/Views/aboutview.qml \
-        ub22_qml/qtcam/Views/audiocapturesettings.qml \
-        ub22_qml/qtcam/Views/captureandvideorecord.qml \
-        ub22_qml/qtcam/Views/imagequalitysettings.qml \
-        ub22_qml/qtcam/Views/renderer.qml \
-        ub22_qml/qtcam/Views/statusbar.qml \
-        ub22_qml/qtcam/Views/stillcapturesettings.qml \
-        ub22_qml/qtcam/Views/videocapturesettings.qml
+DISTFILES += \
+    ub22_qml/qtcam/UVCSettings/ascella/cx3-uvc.qml \
+    ub22_qml/qtcam/UVCSettings/barcode/barcode_camera.qml \
+    ub22_qml/qtcam/UVCSettings/cx3SNI/uvcExtCX3SNI.qml \
+    ub22_qml/qtcam/UVCSettings/eCAM512USB/ecam512usb.qml \
+    ub22_qml/qtcam/UVCSettings/ecam51_USB/ecam51_usb.qml \
+    ub22_qml/qtcam/UVCSettings/ecam82_USB/ecam82_usb.qml \
+    ub22_qml/qtcam/UVCSettings/ecam83_USB/ecam83_usb.qml \
+    ub22_qml/qtcam/UVCSettings/fscamcu135/fscamcu135.qml \
+    ub22_qml/qtcam/UVCSettings/h264cam/h264camExt.qml \
+    ub22_qml/qtcam/UVCSettings/nilecam20usb/nilecam20_usb.qml \
+    ub22_qml/qtcam/UVCSettings/nilecam30usb/nilecam30_usb.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam11/uvc11.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam130/uvc_130.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam130A/uvc_130A.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam130D/see3cam_130D.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam1332/see3cam_1332.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam135m/see3cam135m.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam160/see3cam_160.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam16cugm/see3cam16cugm.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam20cug/see3cam_20cug.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam24cug/see3cam_24cug.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam27cug/see3cam27cug.qml\
+    ub22_qml/qtcam/UVCSettings/see3cam30/uvc_30.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam40/uvc40.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam50/uvc50.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam50cug/see3cam50cug.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam50cugm/see3cam_50cug_m.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam51/uvc51.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam80/uvc80.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam81/uvc81.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam_cu512M/see3camcu512m.qml \
+    ub22_qml/qtcam/UVCSettings/see3cam_cu81/see3cam_cu81.qml \
+    ub22_qml/qtcam/UVCSettings/see3camar0130/uvc_ar0130.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu130/uvc_cu130.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu135/uvc_cu135.qml \
+    ub22_qml/qtcam/UVCSettings/see3CamCu135mH01r1/see3CamCu135m_H01r1.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu136m/see3cam_cu136m.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu20/see3camcu20.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu200/see3camcu200.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu200m/see3camcu200m.qml \
+    ub22_qml/qtcam/UVCSettings/See3CamCu210/see3camcu210.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu22/see3camcu22.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu27/see3camcu27.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu30/uvc_cu30.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu38/uvc_cu38.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu55/see3camcu55.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu55_MH/see3camcu55_mh.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu83/see3camcu83.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu84/see3camcu84.qml \
+    ub22_qml/qtcam/UVCSettings/see3camcu31/seecamcu31.qml \
+    ub22_qml/qtcam/UVCSettings/imx900USBCam/imx900USBCam.qml \
+    ub22_qml/qtcam/UVCSettings/others/others.qml
 
-    DISTFILES += \
-        ub22_qml/qtcam/UVCSettings/ascella/cx3-uvc.qml \
-        ub22_qml/qtcam/UVCSettings/barcode/barcode_camera.qml \
-        ub22_qml/qtcam/UVCSettings/cx3SNI/uvcExtCX3SNI.qml \
-        ub22_qml/qtcam/UVCSettings/eCAM512USB/ecam512usb.qml \
-        ub22_qml/qtcam/UVCSettings/ecam51_USB/ecam51_usb.qml \
-        ub22_qml/qtcam/UVCSettings/ecam82_USB/ecam82_usb.qml \
-        ub22_qml/qtcam/UVCSettings/ecam83_USB/ecam83_usb.qml \
-        ub22_qml/qtcam/UVCSettings/fscamcu135/fscamcu135.qml \
-        ub22_qml/qtcam/UVCSettings/h264cam/h264camExt.qml \
-        ub22_qml/qtcam/UVCSettings/nilecam20usb/nilecam20_usb.qml \
-        ub22_qml/qtcam/UVCSettings/nilecam30usb/nilecam30_usb.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam11/uvc11.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam130/uvc_130.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam130A/uvc_130A.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam130D/see3cam_130D.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam1332/see3cam_1332.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam135m/see3cam135m.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam160/see3cam_160.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam16cugm/see3cam16cugm.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam20cug/see3cam_20cug.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam24cug/see3cam_24cug.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam27cug/see3cam27cug.qml\
-        ub22_qml/qtcam/UVCSettings/see3cam30/uvc_30.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam40/uvc40.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam50/uvc50.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam50cug/see3cam50cug.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam50cugm/see3cam_50cug_m.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam51/uvc51.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam80/uvc80.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam81/uvc81.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam_cu512M/see3camcu512m.qml \
-        ub22_qml/qtcam/UVCSettings/see3cam_cu81/see3cam_cu81.qml \
-        ub22_qml/qtcam/UVCSettings/see3camar0130/uvc_ar0130.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu130/uvc_cu130.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu135/uvc_cu135.qml \
-        ub22_qml/qtcam/UVCSettings/see3CamCu135mH01r1/see3CamCu135m_H01r1.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu136m/see3cam_cu136m.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu20/see3camcu20.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu200/see3camcu200.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu200m/see3camcu200m.qml \
-        ub22_qml/qtcam/UVCSettings/See3CamCu210/see3camcu210.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu22/see3camcu22.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu27/see3camcu27.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu30/uvc_cu30.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu38/uvc_cu38.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu55/see3camcu55.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu55_MH/see3camcu55_mh.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu83/see3camcu83.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu84/see3camcu84.qml \
-        ub22_qml/qtcam/UVCSettings/see3camcu31/seecamcu31.qml \
-        ub22_qml/qtcam/UVCSettings/imx900USBCam/imx900USBCam.qml \
-        ub22_qml/qtcam/UVCSettings/others/others.qml \
-}
-else:{
-
-    OTHER_FILES += \
-        qml/qtcam/Views/qtcam.qml
-
-    DISTFILES += \
-        qml/qtcam/UVCSettings/ascella/cx3-uvc.qml \
-        qml/qtcam/UVCSettings/barcode/barcode_camera.qml \
-        qml/qtcam/UVCSettings/cx3SNI/uvcExtCX3SNI.qml \
-        qml/qtcam/UVCSettings/eCAM512USB/ecam512usb.qml \
-        qml/qtcam/UVCSettings/ecam51_USB/ecam51_usb.qml \
-        qml/qtcam/UVCSettings/ecam82_USB/ecam82_usb.qml \
-        qml/qtcam/UVCSettings/ecam83_USB/ecam83_usb.qml \
-        qml/qtcam/UVCSettings/fscamcu135/fscamcu135.qml \
-        qml/qtcam/UVCSettings/h264cam/h264camExt.qml \
-        qml/qtcam/UVCSettings/nilecam20usb/nilecam20_usb.qml \
-        qml/qtcam/UVCSettings/nilecam30usb/nilecam30_usb.qml \
-        qml/qtcam/UVCSettings/see3cam11/uvc11.qml \
-        qml/qtcam/UVCSettings/see3cam130/uvc_130.qml \
-        qml/qtcam/UVCSettings/see3cam130A/uvc_130A.qml \
-        qml/qtcam/UVCSettings/see3cam130D/see3cam_130D.qml \
-        qml/qtcam/UVCSettings/see3cam1332/see3cam_1332.qml \
-        qml/qtcam/UVCSettings/see3cam135m/see3cam135m.qml \
-        qml/qtcam/UVCSettings/see3cam160/see3cam_160.qml \
-        qml/qtcam/UVCSettings/see3cam16cugm/see3cam16cugm.qml \
-        qml/qtcam/UVCSettings/see3cam20cug/see3cam_20cug.qml \
-        qml/qtcam/UVCSettings/see3cam24cug/see3cam_24cug.qml \
-        qml/qtcam/UVCSettings/see3cam27cug/see3cam27cug.qml\
-        qml/qtcam/UVCSettings/see3cam30/uvc_30.qml \
-        qml/qtcam/UVCSettings/see3cam40/uvc40.qml \
-        qml/qtcam/UVCSettings/see3cam50/uvc50.qml \
-        qml/qtcam/UVCSettings/see3cam50cug/see3cam50cug.qml \
-        qml/qtcam/UVCSettings/see3cam50cugm/see3cam_50cug_m.qml \
-        qml/qtcam/UVCSettings/see3cam51/uvc51.qml \
-        qml/qtcam/UVCSettings/see3cam80/uvc80.qml \
-        qml/qtcam/UVCSettings/see3cam81/uvc81.qml \
-        qml/qtcam/UVCSettings/see3cam_cu512M/see3camcu512m.qml \
-        qml/qtcam/UVCSettings/see3cam_cu81/see3cam_cu81.qml \
-        qml/qtcam/UVCSettings/see3camar0130/uvc_ar0130.qml \
-        qml/qtcam/UVCSettings/see3camcu130/uvc_cu130.qml \
-        qml/qtcam/UVCSettings/see3camcu135/uvc_cu135.qml \
-        qml/qtcam/UVCSettings/see3CamCu135mH01r1/see3CamCu135m_H01r1.qml \
-        qml/qtcam/UVCSettings/see3camcu136m/see3cam_cu136m.qml \
-        qml/qtcam/UVCSettings/see3camcu20/see3camcu20.qml \
-        qml/qtcam/UVCSettings/see3camcu200/see3camcu200.qml \
-        qml/qtcam/UVCSettings/See3CamCu210/see3camcu210.qml \
-        qml/qtcam/UVCSettings/see3camcu22/see3camcu22.qml \
-        qml/qtcam/UVCSettings/see3camcu27/see3camcu27.qml \
-        qml/qtcam/UVCSettings/see3camcu30/uvc_cu30.qml \
-        qml/qtcam/UVCSettings/see3camcu38/uvc_cu38.qml \
-        qml/qtcam/UVCSettings/see3camcu55/see3camcu55.qml \
-        qml/qtcam/UVCSettings/see3camcu55_MH/see3camcu55_mh.qml \
-        qml/qtcam/UVCSettings/see3camcu83/see3camcu83.qml \
-        qml/qtcam/UVCSettings/see3camcu84/see3camcu84.qml \
-        qml/qtcam/UVCSettings/see3camcu31/seecamcu31.qml \
-        qml/qtcam/UVCSettings/see3camcu200m/see3camcu200m.qml \
-        qml/qtcam/UVCSettings/imx900USBCam/imx900USBCam.qml \
-        qml/qtcam/UVCSettings/others/others.qml \
-}
+### todo: clean up QML files. There is no need for distro specific QML
+##    OTHER_FILES += qml/qtcam/Views/qtcam.qml
+##
+##    DISTFILES += \
+##        qml/qtcam/UVCSettings/ascella/cx3-uvc.qml \
+##        qml/qtcam/UVCSettings/barcode/barcode_camera.qml \
+##        qml/qtcam/UVCSettings/cx3SNI/uvcExtCX3SNI.qml \
+##        qml/qtcam/UVCSettings/eCAM512USB/ecam512usb.qml \
+##        qml/qtcam/UVCSettings/ecam51_USB/ecam51_usb.qml \
+##        qml/qtcam/UVCSettings/ecam82_USB/ecam82_usb.qml \
+##        qml/qtcam/UVCSettings/ecam83_USB/ecam83_usb.qml \
+##        qml/qtcam/UVCSettings/fscamcu135/fscamcu135.qml \
+##        qml/qtcam/UVCSettings/h264cam/h264camExt.qml \
+##        qml/qtcam/UVCSettings/nilecam20usb/nilecam20_usb.qml \
+##        qml/qtcam/UVCSettings/nilecam30usb/nilecam30_usb.qml \
+##        qml/qtcam/UVCSettings/see3cam11/uvc11.qml \
+##        qml/qtcam/UVCSettings/see3cam130/uvc_130.qml \
+##        qml/qtcam/UVCSettings/see3cam130A/uvc_130A.qml \
+##        qml/qtcam/UVCSettings/see3cam130D/see3cam_130D.qml \
+##        qml/qtcam/UVCSettings/see3cam1332/see3cam_1332.qml \
+##        qml/qtcam/UVCSettings/see3cam135m/see3cam135m.qml \
+##        qml/qtcam/UVCSettings/see3cam160/see3cam_160.qml \
+##        qml/qtcam/UVCSettings/see3cam16cugm/see3cam16cugm.qml \
+##        qml/qtcam/UVCSettings/see3cam20cug/see3cam_20cug.qml \
+##        qml/qtcam/UVCSettings/see3cam24cug/see3cam_24cug.qml \
+##        qml/qtcam/UVCSettings/see3cam27cug/see3cam27cug.qml\
+##        qml/qtcam/UVCSettings/see3cam30/uvc_30.qml \
+##        qml/qtcam/UVCSettings/see3cam40/uvc40.qml \
+##        qml/qtcam/UVCSettings/see3cam50/uvc50.qml \
+##        qml/qtcam/UVCSettings/see3cam50cug/see3cam50cug.qml \
+##        qml/qtcam/UVCSettings/see3cam50cugm/see3cam_50cug_m.qml \
+##        qml/qtcam/UVCSettings/see3cam51/uvc51.qml \
+##        qml/qtcam/UVCSettings/see3cam80/uvc80.qml \
+##        qml/qtcam/UVCSettings/see3cam81/uvc81.qml \
+##        qml/qtcam/UVCSettings/see3cam_cu512M/see3camcu512m.qml \
+##        qml/qtcam/UVCSettings/see3cam_cu81/see3cam_cu81.qml \
+##        qml/qtcam/UVCSettings/see3camar0130/uvc_ar0130.qml \
+##        qml/qtcam/UVCSettings/see3camcu130/uvc_cu130.qml \
+##        qml/qtcam/UVCSettings/see3camcu135/uvc_cu135.qml \
+##        qml/qtcam/UVCSettings/see3CamCu135mH01r1/see3CamCu135m_H01r1.qml \
+##        qml/qtcam/UVCSettings/see3camcu136m/see3cam_cu136m.qml \
+##        qml/qtcam/UVCSettings/see3camcu20/see3camcu20.qml \
+##        qml/qtcam/UVCSettings/see3camcu200/see3camcu200.qml \
+##        qml/qtcam/UVCSettings/See3CamCu210/see3camcu210.qml \
+##        qml/qtcam/UVCSettings/see3camcu22/see3camcu22.qml \
+##        qml/qtcam/UVCSettings/see3camcu27/see3camcu27.qml \
+##        qml/qtcam/UVCSettings/see3camcu30/uvc_cu30.qml \
+##        qml/qtcam/UVCSettings/see3camcu38/uvc_cu38.qml \
+##        qml/qtcam/UVCSettings/see3camcu55/see3camcu55.qml \
+##        qml/qtcam/UVCSettings/see3camcu55_MH/see3camcu55_mh.qml \
+##        qml/qtcam/UVCSettings/see3camcu83/see3camcu83.qml \
+##        qml/qtcam/UVCSettings/see3camcu84/see3camcu84.qml \
+##        qml/qtcam/UVCSettings/see3camcu31/seecamcu31.qml \
+##        qml/qtcam/UVCSettings/see3camcu200m/see3camcu200m.qml \
+##        qml/qtcam/UVCSettings/imx900USBCam/imx900USBCam.qml \
+##        qml/qtcam/UVCSettings/others/others.qml
