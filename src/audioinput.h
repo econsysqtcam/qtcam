@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QStringListModel>
 #include <pulse/pulseaudio.h>
-#include <pulse/mainloop.h>
 #include <QAudioFormat>
 #include <QAudioDeviceInfo>
 #include <QProcess>
