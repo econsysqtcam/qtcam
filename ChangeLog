@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.31
+---------------------------
+*UI Changes in IMX900 and cu31 camera and In cu31,Get call with maskid on MaskId combobox value change.
+
 Qtcam Application - 26.0.30
 ---------------------------
 *Added support for See3CAM_37CUG_MHLCC_H01R1.
