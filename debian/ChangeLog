@@ -1,4 +1,5 @@
-qtcam (26.0.30-0ubuntu1) focal; urgency=medium
+qtcam (26.0.31-0ubuntu1) focal; urgency=medium
+ *UI Changes in IMX900 and cu31 camera and In cu31,Get call with maskid on MaskId combobox value change.
  *Added support for See3CAM_37CUG_MHLCC_H01R1.
  *Added support for the second phase controls of the See3CAM_CU31.
  *Prevents background video recording even after the recording has stopped.
@@ -159,5 +160,5 @@ qtcam (26.0.30-0ubuntu1) focal; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Wed 23 Oct 2024 22:48:01 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Thu Nov 21 16:17:51 2024 +0530
 
