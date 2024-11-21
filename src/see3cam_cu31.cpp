@@ -848,19 +848,32 @@ bool SEE3CAM_CU31::setAEWindowDimensions(uint width, uint height, uint xStart, u
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[15] == SET_FAIL) {
+            if(g_in_packet_buf[32] == DIMENSION_FAILURE){
+                minWidth  = (g_in_packet_buf[16] << 8) | (g_in_packet_buf[17] << 0);
+                maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
+                minHeight = (g_in_packet_buf[20] << 8) | (g_in_packet_buf[21] << 0);
+                maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
 
-            minWidth  = (g_in_packet_buf[16] << 8) | (g_in_packet_buf[17] << 0);
-            maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
-            minHeight = (g_in_packet_buf[20] << 8) | (g_in_packet_buf[21] << 0);
-            maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
+                minXStart  = (g_in_packet_buf[24] << 8) | (g_in_packet_buf[25] << 0);
+                maxXStart  = (g_in_packet_buf[26] << 8) | (g_in_packet_buf[27] << 0);
+                minYStart = (g_in_packet_buf[28] << 8) | (g_in_packet_buf[29] << 0);
+                maxYStart = (g_in_packet_buf[30] << 8) | (g_in_packet_buf[31] << 0);
 
-            minXStart  = (g_in_packet_buf[24] << 8) | (g_in_packet_buf[25] << 0);
-            maxXStart  = (g_in_packet_buf[26] << 8) | (g_in_packet_buf[27] << 0);
-            minYStart = (g_in_packet_buf[28] << 8) | (g_in_packet_buf[29] << 0);
-            maxYStart = (g_in_packet_buf[30] << 8) | (g_in_packet_buf[31] << 0);
+                emit indicateWindowDimensionError(minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart);
+                return false;
+            }
+            else if(g_in_packet_buf[32] == WIDTH_FAILURE){
+                maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
 
-            emit indicateWindowDimensionError(minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart);
-            return false;
+                emit indicateWindowWidthError(maxWidth);
+                return false;
+            }
+            else if(g_in_packet_buf[32] == HEIGHT_FAILURE){
+                maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
+
+                emit indicateWindowHeightError(maxHeight);
+                return false;
+            }
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
             g_in_packet_buf[2] == SET_AE_DIMENSIONS_SEE3CAM_CU31 &&
@@ -952,7 +965,7 @@ bool SEE3CAM_CU31::setAEMaskOverlay(uint status)
  * @brief SEE3CAM_CU31::getAEMaskDimensions - To get AE Light metering Window Mask dimensions
  * @return true/false
  */
-bool SEE3CAM_CU31::getAEMaskDimensions(bool isMaskIDNeeded)
+bool SEE3CAM_CU31::getAEMaskDimensions(bool isMaskIDNeeded, uint maskID)
 {
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -969,7 +982,7 @@ bool SEE3CAM_CU31::getAEMaskDimensions(bool isMaskIDNeeded)
     g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
     g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
     g_out_packet_buf[3] = GET_AE_MASK_DIMENSIONS_SEE3CAM_CU31;
-    g_out_packet_buf[4] = 1; //Setting Mask ID to 1
+    g_out_packet_buf[4] = maskID; //Setting respective Mask ID
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -987,7 +1000,7 @@ bool SEE3CAM_CU31::getAEMaskDimensions(bool isMaskIDNeeded)
             xStart = (g_in_packet_buf[9] << 8) | (g_in_packet_buf[10] << 0);
             yStart = (g_in_packet_buf[11] << 8) | (g_in_packet_buf[12] << 0);
 
-            emit currentAEMaskDimensions(isMaskIDNeeded, 1, g_in_packet_buf[4], width, height, xStart, yStart);
+            emit currentAEMaskDimensions(isMaskIDNeeded, maskID, g_in_packet_buf[4], width, height, xStart, yStart);
             return true;
         }
     }
@@ -1035,20 +1048,34 @@ bool SEE3CAM_CU31::setAEMaskDimensions(uint maskID, uint maskStatus, uint width,
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[15] == SET_FAIL) {
+            if(g_in_packet_buf[32] == DIMENSION_FAILURE){
 
-            minWidth  = (g_in_packet_buf[16] << 8) | (g_in_packet_buf[17] << 0);
-            maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
-            minHeight = (g_in_packet_buf[20] << 8) | (g_in_packet_buf[21] << 0);
-            maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
+                minWidth  = (g_in_packet_buf[16] << 8) | (g_in_packet_buf[17] << 0);
+                maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
+                minHeight = (g_in_packet_buf[20] << 8) | (g_in_packet_buf[21] << 0);
+                maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
 
-            minXStart = (g_in_packet_buf[24] << 8) | (g_in_packet_buf[25] << 0);
-            maxXStart = (g_in_packet_buf[26] << 8) | (g_in_packet_buf[27] << 0);
-            minYStart = (g_in_packet_buf[28] << 8) | (g_in_packet_buf[29] << 0);
-            maxYStart = (g_in_packet_buf[30] << 8) | (g_in_packet_buf[31] << 0);
+                minXStart = (g_in_packet_buf[24] << 8) | (g_in_packet_buf[25] << 0);
+                maxXStart = (g_in_packet_buf[26] << 8) | (g_in_packet_buf[27] << 0);
+                minYStart = (g_in_packet_buf[28] << 8) | (g_in_packet_buf[29] << 0);
+                maxYStart = (g_in_packet_buf[30] << 8) | (g_in_packet_buf[31] << 0);
 
-            emit indicateMaskDimensionError(minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart);
+                emit indicateMaskDimensionError(minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart);
 
-            return false;
+                return false;
+            }
+            else if(g_in_packet_buf[32] == WIDTH_FAILURE){
+                maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
+
+                emit indicateMaskWidthError(maxWidth);
+                return false;
+            }
+            else if(g_in_packet_buf[32] == HEIGHT_FAILURE){
+                maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
+
+                emit indicateMaskHeightError(maxHeight);
+                return false;
+             }
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
             g_in_packet_buf[2] == SET_AE_MASK_DIMENSIONS_SEE3CAM_CU31 &&
@@ -1221,20 +1248,33 @@ bool SEE3CAM_CU31::setAWBWindowDimensions(uint width, uint height, uint xStart, 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[15] == SET_FAIL) {
+            if(g_in_packet_buf[32] == DIMENSION_FAILURE){
+                minWidth  = (g_in_packet_buf[16] << 8) | (g_in_packet_buf[17] << 0);
+                maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
+                minHeight = (g_in_packet_buf[20] << 8) | (g_in_packet_buf[21] << 0);
+                maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
 
-            minWidth  = (g_in_packet_buf[16] << 8) | (g_in_packet_buf[17] << 0);
-            maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
-            minHeight = (g_in_packet_buf[20] << 8) | (g_in_packet_buf[21] << 0);
-            maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
+                minXStart  = (g_in_packet_buf[24] << 8) | (g_in_packet_buf[25] << 0);
+                maxXStart  = (g_in_packet_buf[26] << 8) | (g_in_packet_buf[27] << 0);
+                minYStart = (g_in_packet_buf[28] << 8) | (g_in_packet_buf[29] << 0);
+                maxYStart = (g_in_packet_buf[30] << 8) | (g_in_packet_buf[31] << 0);
 
-            minXStart  = (g_in_packet_buf[24] << 8) | (g_in_packet_buf[25] << 0);
-            maxXStart  = (g_in_packet_buf[26] << 8) | (g_in_packet_buf[27] << 0);
-            minYStart = (g_in_packet_buf[28] << 8) | (g_in_packet_buf[29] << 0);
-            maxYStart = (g_in_packet_buf[30] << 8) | (g_in_packet_buf[31] << 0);
+                emit indicateWindowDimensionError(minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart);
 
-            emit indicateWindowDimensionError(minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart);
+                return false;
+            }
+            else if(g_in_packet_buf[32] == WIDTH_FAILURE){
+                maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
 
-            return false;
+                emit indicateWindowWidthError(maxWidth);
+                return false;
+            }
+            else if(g_in_packet_buf[32] == HEIGHT_FAILURE){
+                maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
+
+                emit indicateWindowHeightError(maxHeight);
+                return false;
+            }
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
             g_in_packet_buf[2] == SET_AWB_WINDOW_DIMENSIONS_SEE3CAM_CU31 &&
@@ -1326,7 +1366,7 @@ bool SEE3CAM_CU31::setAWBMaskOverlay(uint status)
  * @brief SEE3CAM_CU31::getAWBMaskDimensions - To get AWB Light Metering Window Mask Dimensions
  * @return true/false
  */
-bool SEE3CAM_CU31::getAWBMaskDimensions(bool isMaskIDNeeded)
+bool SEE3CAM_CU31::getAWBMaskDimensions(bool isMaskIDNeeded, uint maskID)
 {
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -1343,7 +1383,7 @@ bool SEE3CAM_CU31::getAWBMaskDimensions(bool isMaskIDNeeded)
     g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
     g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
     g_out_packet_buf[3] = GET_AWB_MASK_DIMENSIONS_SEE3CAM_CU31;
-    g_out_packet_buf[4] = 1; //Setting Mask ID to 1
+    g_out_packet_buf[4] = maskID; //Setting respective Mask ID
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -1361,7 +1401,7 @@ bool SEE3CAM_CU31::getAWBMaskDimensions(bool isMaskIDNeeded)
             xStart = (g_in_packet_buf[9] << 8) | (g_in_packet_buf[10] << 0);
             yStart = (g_in_packet_buf[11] << 8) | (g_in_packet_buf[12] << 0);
 
-            emit currentAWBMaskDimensions(isMaskIDNeeded, 1, g_in_packet_buf[4], width, height, xStart, yStart);
+            emit currentAWBMaskDimensions(isMaskIDNeeded, maskID, g_in_packet_buf[4], width, height, xStart, yStart);
             return true;
         }
     }
@@ -1410,20 +1450,33 @@ bool SEE3CAM_CU31::setAWBMaskDimensions(uint maskID, uint maskStatus, uint width
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
 
         if (g_in_packet_buf[15] == SET_FAIL) {
+            if(g_in_packet_buf[32] == DIMENSION_FAILURE){
+                minWidth  = (g_in_packet_buf[16] << 8) | (g_in_packet_buf[17] << 0);
+                maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
+                minHeight = (g_in_packet_buf[20] << 8) | (g_in_packet_buf[21] << 0);
+                maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
 
-            minWidth  = (g_in_packet_buf[16] << 8) | (g_in_packet_buf[17] << 0);
-            maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
-            minHeight = (g_in_packet_buf[20] << 8) | (g_in_packet_buf[21] << 0);
-            maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
+                minXStart = (g_in_packet_buf[24] << 8) | (g_in_packet_buf[25] << 0);
+                maxXStart = (g_in_packet_buf[26] << 8) | (g_in_packet_buf[27] << 0);
+                minYStart = (g_in_packet_buf[28] << 8) | (g_in_packet_buf[29] << 0);
+                maxYStart = (g_in_packet_buf[30] << 8) | (g_in_packet_buf[31] << 0);
 
-            minXStart = (g_in_packet_buf[24] << 8) | (g_in_packet_buf[25] << 0);
-            maxXStart = (g_in_packet_buf[26] << 8) | (g_in_packet_buf[27] << 0);
-            minYStart = (g_in_packet_buf[28] << 8) | (g_in_packet_buf[29] << 0);
-            maxYStart = (g_in_packet_buf[30] << 8) | (g_in_packet_buf[31] << 0);
+                emit indicateMaskDimensionError(minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart);
 
-            emit indicateMaskDimensionError(minWidth, maxWidth, minHeight, maxHeight, minXStart, maxXStart, minYStart, maxYStart);
+                return false;
+            }
+            else if(g_in_packet_buf[32] == WIDTH_FAILURE){
+                maxWidth  = (g_in_packet_buf[18] << 8) | (g_in_packet_buf[19] << 0);
 
-            return false;
+                emit indicateMaskWidthError(maxWidth);
+                return false;
+            }
+            else if(g_in_packet_buf[32] == HEIGHT_FAILURE){
+                maxHeight = (g_in_packet_buf[22] << 8) | (g_in_packet_buf[23] << 0);
+
+                emit indicateMaskHeightError(maxHeight);
+                return false;
+            }
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_ID_1 &&
             g_in_packet_buf[1] == CAMERA_CONTROL_ID_2 &&
             g_in_packet_buf[2] == SET_AWB_MASK_DIMENSIONS_SEE3CAM_CU31 &&

@@ -41,6 +41,9 @@
 
 #define SET_CROSS_STILL_PROPERTIES_SEE3CAM_CU31     0x44
 
+#define DIMENSION_FAILURE   0x01
+#define WIDTH_FAILURE       0x02
+#define HEIGHT_FAILURE      0x03
 
 //Second Phase Controls
 #define GET_AE_OVERLAY_SEE3CAM_CU31              0x12

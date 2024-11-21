@@ -181,7 +181,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 470
         style: econscrollViewStyle
 
         Item{
@@ -192,7 +192,7 @@ Item {
                 y:5
                 spacing:20
 
-                Text {
+                /*Text {
                     id: camereMode
                     text: "--- Camera Mode ---"
                     font.pixelSize: 14
@@ -269,8 +269,7 @@ with the exposure configured in the exposure slider."
                            setCameraControls()
                        }
                    }
-               }
-
+               }*/
 
                 Text {
                     id: flipMode
@@ -323,15 +322,13 @@ with the exposure configured in the exposure slider."
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                     ToolButton{
-                        tooltip: "This Control is used to select Auto Gain mode or Manual Gain mode.
-
-Using manual gain mode, we can vary gain values from 0dB to 24dB (analog
+                        tooltip: "This control is used to vary gain value from 0dB to 24dB (analog
 gain) and from 25dB to 48dB (digital gain)"
                         width: 200
                         opacity: 0
                     }
                 }
-                RowLayout{
+   /*             RowLayout{
                    ExclusiveGroup { id: gainModeGroup }
                    Layout.alignment: Qt.AlignCenter
                    spacing: 40
@@ -447,7 +444,7 @@ gain) and from 25dB to 48dB (digital gain)"
                             imx900USBCAM.setGainMode(IMX900USBCAM.AUTO_GAIN, IMX900USBCAM.SINGLE_GAIN_TRIGGER, gainTextField.text)
                         }
                     }
-                }
+                }*/
 
                 Text
                 {
@@ -511,7 +508,7 @@ gain) and from 25dB to 48dB (digital gain)"
                     }
                 }
 
-                Text {
+                /*Text {
                     id: gainLimit
                     text: "--- Gain Limit ---"
                     font.pixelSize: 14
@@ -646,8 +643,7 @@ Auto gain function."
                             }
                         }
                     }
-                }
-
+                }*/
 
                 Text {
                     id: exposureMode
@@ -659,20 +655,12 @@ Auto gain function."
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                     ToolButton{
-                        tooltip: "The user can enable or disable the on-screen display of AE light metering region masking.
-
-The user can check the position of the AE masking region by displaying it on the
-preview. Since enabling this feature will be applied to both the preview and still capture, it is
-recommended to disable it after configuring the masking region.
-
-Disable – Selecting this will disable the AE mask overlay.
-Enable – Selecting this will activate the AE mask overlay, allowing the on-screen display of
-masking for AE."
+                        tooltip: "This Control is used to vary the exposure time of the sensor."
                         width: 200
                         opacity: 0
                     }
                 }
-                RowLayout{
+                /*RowLayout{
                    ExclusiveGroup { id: autoExpStatusGroup }
                    Layout.alignment: Qt.AlignCenter
                    spacing: 40
@@ -718,9 +706,9 @@ masking for AE."
                            imx900USBCAM.setExposureMode(IMX900USBCAM.MANUAL_EXPOSURE, 0, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                        }
                    }
-               }
+               }*/
 
-                Text
+                /*Text
                 {
                     id: autoExpModeTitle
                     text: "Auto Exposure Features :"
@@ -804,7 +792,7 @@ masking for AE."
                             imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                         }
                     }
-                }
+                }*/
 
                 Text
                 {
@@ -928,7 +916,7 @@ masking for AE."
                     }
                 }
 
-                Text {
+                /*Text {
                     id: exposureLimits
                     text: "--- Exposure Limits ---"
                     font.pixelSize: 14
@@ -1154,9 +1142,9 @@ function."
                             imx900USBCAM.setAutoExposureLowerLimit(lowerLimitSeconds.text, lowerLimitMilliSec.text, lowerLimitMicroSec.text)
                         }
                     }
-                }
+                }*/
 
-                Text
+                /*Text
                 {
                     id: antiFlickerMode
                     text: "--- Anti Flicker Mode ---"
@@ -1201,9 +1189,9 @@ function."
                         }
                         skipUpdateUIOnAntiFlickerMode = true
                     }
-                }
+                }*/
 
-                Text {
+                /*Text {
                     id: blackLevelAdj
                     text: "--- Black Level ---"
                     font.pixelSize: 14
@@ -1261,13 +1249,13 @@ Kindly evaluate enough before changing this value."
                             }
                         }
                     }
-                }
+                }*/
 
                 Row{
                     Layout.alignment: Qt.AlignCenter
                     Text {
                         id: strobeModes
-                        text: "--- Strobe Modes ---"
+                        text: "--- Strobe Mode ---"
                         font.pixelSize: 14
                         font.family: "Ubuntu"
                         color: "#ffffff"
@@ -1328,7 +1316,7 @@ indicate the start and stop of the sensor exposure respectively."
                         ToolButton{
                             tooltip: "Image Capture Count:
     The Image capture count can be selected from dropdown and the exact
-    number of images will be captures and stores in the location specified by the
+    number of images will be captured and stored in the location specified by the
     user"
                             width: 200
                             opacity: 0
@@ -1359,7 +1347,7 @@ indicate the start and stop of the sensor exposure respectively."
                     }
                 }
 
-                Text
+                /*Text
                 {
                     id: brightnessTitle
                     text: "--- Target Brightness ---"
@@ -1407,9 +1395,9 @@ purpose."
                             }
                         }
                     }
-                }
+                }*/
 
-                Text {
+                /*Text {
                     id: readStatistics
                     text: "--- Read Statistics ---"
                     font.pixelSize: 14
@@ -1725,7 +1713,7 @@ Refer Product datasheet before enabling this Quad Shutter Control feature."
                             imx900USBCAM.setQuadShutterControl(disable)
                         }
                     }
-                }
+                }*/
 
                 Row{
                     Layout.alignment: Qt.AlignCenter
@@ -1777,7 +1765,7 @@ Refer Product datasheet before enabling this Fast Auto Exposure feature"
                     }
                 }
 
-                Row{
+                /*Row{
                     Layout.alignment: Qt.AlignCenter
                     Text {
                         id: dualTriggerMode
@@ -1979,7 +1967,7 @@ Refer Product datasheet before enabling this Dual Trigger feature"
                             }
                         }
                     }
-                }
+                }*/
 
                 Row{
                     Layout.alignment: Qt.AlignCenter
@@ -1993,13 +1981,7 @@ Refer Product datasheet before enabling this Dual Trigger feature"
                         opacity: 0.50196078431373
                         ToolButton{
                             tooltip: "Before enabling Self Trigger, switch to 2064x1552 Resolution.
-
-After entering the required values, the image will be captured in the
-2064x1552 resolution, when the required level and count thresholds are met.
-
-By using Calculate H side and Calculate L side push button, the respective pixel
-counts in the sensing frame at that instant will be displayed in their respective
-text boxes."
+Refer Product datasheet before enabling this Self Trigger Feature."
                             width: 200
                             opacity: 0
                         }
@@ -2128,7 +2110,7 @@ text boxes."
                     }
                 }
 
-                Text
+                /*Text
                 {
                     id: sensingFrameExpTitle
                     text: "Sensing Frame Exposure :"
@@ -2172,7 +2154,7 @@ text boxes."
                         implicitWidth: 80
                         validator: IntValidator {bottom: sensingFrameExpMin; top: sensingFrameExpMax}
                     }
-                }
+                }*/
 
                 Text
                 {
@@ -2337,7 +2319,7 @@ text boxes."
                     }
                 }
 
-                Text
+                /*Text
                 {
                     id: sensingFrame
                     text: "Sensing Frame :"
@@ -2431,7 +2413,7 @@ text boxes."
                             imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, sensingFrameExpTextField.text, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, withOutput.checked, normalMode.checked, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
                         }
                     }
-                }
+                }*/
 
                 Text
                 {
@@ -2573,7 +2555,7 @@ text boxes."
                     }
                 }
 
-                Text
+                /*Text
                 {
                     id: detectedPixels
                     text: "Detected Pixels :"
@@ -2692,9 +2674,9 @@ text boxes."
                             imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, sensingFrameExpTextField.text, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, withOutput.checked, normalMode.checked, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
                         }
                     }
-                }
+                }*/
 
-                Text {
+                /*Text {
                     id: multiFrameSetTitle
                     text: "--- Multi Frame Set ---"
                     font.pixelSize: 14
@@ -3247,8 +3229,7 @@ Short Exposure range (1-13us)."
                             }
                         }
                     }
-                }
-
+                }*/
 
                Row{
                     Layout.alignment: Qt.AlignCenter
@@ -3274,7 +3255,8 @@ default values."
                         action: firmwareVersion
                         activeFocusOnPress : true
                         tooltip: "To get the Unique ID that has been assigned to the See3CAM range of
-cameras"
+cameras. The Camera serial number will be displayed along with the
+firmware version."
                         style: ButtonStyle {
                             background: Rectangle {
                             border.width: control.activeFocus ? 3 :0

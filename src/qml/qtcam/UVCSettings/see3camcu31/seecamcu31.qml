@@ -45,10 +45,14 @@ Item {
         id: getCamValuesTimer
         interval: 500
         onTriggered: {
+
+            awbMaskIDValue = awbMaskIDCombo.currentText
+            aeMaskIDValue  = aeMaskIDCombo.currentText
+
             see3camcu31.getAEWindowDimensions()
-            see3camcu31.getAEMaskDimensions(true)
+            see3camcu31.getAEMaskDimensions(true, aeMaskIDValue)
             see3camcu31.getAWBWindowDimensions()
-            see3camcu31.getAWBMaskDimensions(true)
+            see3camcu31.getAWBMaskDimensions(true, awbMaskIDValue)
             stop()
         }
     }
@@ -89,7 +93,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 470
         style: econscrollViewStyle
 
         Item {
@@ -117,7 +121,7 @@ Item {
                         activeFocusOnPress : true
                         text: "Horizontal"
                         style: econCheckBoxStyle
-                        tooltip: "Horizonal flip - Enable horizontal flip"
+                        tooltip: "Horizonal flip - Flips the preview horizontally left/right"
                         onClicked:{
                             setOrientationProperties()
                         }
@@ -130,7 +134,7 @@ Item {
                         activeFocusOnPress : true
                         text: "Vertical"
                         style: econCheckBoxStyle
-                        tooltip: "Vertical flip - Enable vertical flip"
+                        tooltip: "Vertical flip - Flips the preview verically up/down"
                         onClicked:{
                             setOrientationProperties()
                         }
@@ -162,7 +166,7 @@ Item {
                         text:   qsTr("Disable")
                         exclusiveGroup: rnrModeGroup
                         activeFocusOnPress: true
-                        tooltip: "RNR disable - Disable RNR"
+                        tooltip: "Disables RNR"
                         onClicked: {
                             see3camcu31.setRawNoiseReductionStatus(SEE3CAM_CU31.RNR_DISABLE)
                         }
@@ -176,8 +180,8 @@ Item {
                         text: qsTr("Enable")
                         exclusiveGroup: rnrModeGroup
                         activeFocusOnPress: true
-                        tooltip: "RNR enable - The RAW noise reduction function reduces noise in RAW signals from each signal
-line."
+                        tooltip: "Enabling RAW noise reduction function reduces noise in RAW signals from each
+signal line."
                         onClicked: {
                             see3camcu31.setRawNoiseReductionStatus(SEE3CAM_CU31.RNR_ENABLE)
                         }
@@ -210,7 +214,7 @@ line."
                         text:   qsTr("Master")
                         exclusiveGroup: triggerModeGroup
                         activeFocusOnPress: true
-                        tooltip: "Disable - Disable trigger mode."
+                        tooltip: "Master - Disables trigger mode."
                         onClicked: {
                             disableTriggerMode()
                         }
@@ -307,6 +311,14 @@ sensor."
                         color: "#ffffff"
                         smooth: true
                         opacity: 0.50196078431373
+                        Item {
+                            visible: !uvcAutoExposureSelected
+                            ToolButton {
+                                tooltip: "Note: This control is functional only when the exposure mode is configured to Auto."
+                                width: 200
+                                opacity: 0
+                            }
+                        }
                     }
                 }
 
@@ -374,6 +386,14 @@ sensor."
                     smooth: true
                     Layout.alignment: Qt.AlignLeft
                     opacity: 1
+                    Item {
+                        visible: !uvcAutoExposureSelected
+                        ToolButton {
+                            tooltip: "Note: The following AE controls are functional only when the exposure mode is configured to Auto."
+                            width: 200
+                            opacity: 0
+                        }
+                    }
                 }
 
                 Row{
@@ -400,7 +420,7 @@ sensor."
                         activeFocusOnPress: true
                         enabled: (uvcAutoExposureSelected) ? true : false
                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
-                        tooltip: "AE - Disable Hold. Run Auto Exposure."
+                        tooltip: "Auto - Disables hold, runs Auto Exposure."
                         onClicked: {
                             setAutoExposure()
                         }
@@ -514,7 +534,7 @@ Increasing the value will increase the AE convergence speed."
                         exclusiveGroup: antiFlickerGroup
                         enabled: (uvcAutoExposureSelected) ? true : false
                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
-                        tooltip: "Automatically detects the flicker and mitigates the flicker."
+                        tooltip: "Auto - Automatically detects the flicker and mitigates the flicker."
                         activeFocusOnPress: true
                         onClicked: {
                             setFlickerControl()
@@ -531,7 +551,7 @@ Increasing the value will increase the AE convergence speed."
                         activeFocusOnPress: true
                         enabled: (uvcAutoExposureSelected) ? true : false
                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
-                        tooltip: "Mitigates flicker if it detects 50 Hz flicker only. "
+                        tooltip: "50 Hz - Mitigates flicker if it detects 50 Hz flicker only. "
                         onClicked: {
                             setFlickerControl()
                         }
@@ -553,7 +573,7 @@ Increasing the value will increase the AE convergence speed."
                         activeFocusOnPress: true
                         enabled: (uvcAutoExposureSelected) ? true : false
                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
-                        tooltip: "Mitigates flicker if it detects 60 Hz flicker only. "
+                        tooltip: "60 Hz - Mitigates flicker if it detects 60 Hz flicker only. "
                         onClicked: {
                             setFlickerControl()
                         }
@@ -569,7 +589,7 @@ Increasing the value will increase the AE convergence speed."
                         activeFocusOnPress: true
                         enabled: (uvcAutoExposureSelected) ? true : false
                         opacity: (uvcAutoExposureSelected) ? 1 : 0.1
-                        tooltip: "Disable flicker mitigation."
+                        tooltip: "Disable - Disable flicker mitigation."
                         onClicked: {
                             setFlickerControl()
                         }
@@ -900,9 +920,10 @@ masking for AE."
                     onCurrentIndexChanged: {
                         if(skipUpdateUIOnAEMaskID)
                         {
-                            setAEMaskDimensionsControl()
 
-                            see3camcu31.getAEMaskDimensions(false)
+                            aeMaskIDValue  = aeMaskIDCombo.currentText
+                            see3camcu31.getAEMaskDimensions(false, aeMaskIDValue)
+
                         }
                         skipUpdateUIOnAEMaskID = true
                     }
@@ -912,8 +933,7 @@ masking for AE."
 which excludes specific region(s) of the window from the calculation of AE evaluation value.
 
 Mask ID – Select the ID of the AE mask, for which mask state to be switched and the dimensions
-to be set. Any combination of 1 to 5 masks may be applied to the preview concurrently.
-Mask State – Change the state of the AE mask for the selected mask ID."
+to be set. Any combination of 1 to 5 masks may be applied to the preview concurrently."
                         width: 200
                         opacity: 0
                     }
@@ -923,7 +943,7 @@ Mask State – Change the state of the AE mask for the selected mask ID."
                     Layout.alignment: Qt.AlignCenter
                     Text {
                         id: aeMaskStatus
-                        text: "--- Mask Status ---"
+                        text: "--- Mask State ---"
                         font.pixelSize: 14
                         font.family: "Ubuntu"
                         color: "#ffffff"
@@ -948,6 +968,8 @@ Mask State – Change the state of the AE mask for the selected mask ID."
                         tooltip: "The user can adjust the size and the position of the AE light metering region masking,
 which excludes specific region(s) of the window from the calculation of AE evaluation value.
 
+Mask State – Change the state of the AE mask for the selected mask ID.
+
 Disable – When selected, no AE masking will be applied to the preview."
                         onClicked: {
                             see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, disable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
@@ -966,6 +988,8 @@ Disable – When selected, no AE masking will be applied to the preview."
                         activeFocusOnPress: true
                         tooltip: "The user can adjust the size and the position of the AE light metering region masking,
 which excludes specific region(s) of the window from the calculation of AE evaluation value.
+
+Mask State – Change the state of the AE mask for the selected mask ID.
 
 Enable – When selected, AE masking will be applied to the preview, excluding that region
 from calculation of AE evaluation value."
@@ -1040,7 +1064,7 @@ Width – Set the width of the AE mask for the selected mask ID."
                              tooltip: "The user can adjust the size and the position of the AE light metering region masking,
 which excludes specific region(s) of the window from the calculation of AE evaluation value.
 
-Height – Set the height of the AE mask for the selected mask ID.X Start – Set the starting position of the AE mask for the selected mask ID."
+Height – Set the height of the AE mask for the selected mask ID."
                              width: 200
                              opacity: 0
                          }
@@ -1075,7 +1099,8 @@ Height – Set the height of the AE mask for the selected mask ID.X Start – Se
                              tooltip: "The user can adjust the size and the position of the AE light metering region masking,
 which excludes specific region(s) of the window from the calculation of AE evaluation value.
 
-X Start – Set the starting position of the AE mask for the selected mask ID."
+X Start – Set the starting position of the AE mask for the selected mask ID in horizontal
+direction."
                              width: 200
                              opacity: 0
                          }
@@ -1105,7 +1130,8 @@ X Start – Set the starting position of the AE mask for the selected mask ID."
                              tooltip: "The user can adjust the size and the position of the AE light metering region masking,
 which excludes specific region(s) of the window from the calculation of AE evaluation value.
 
-Y Start – Set the starting position of the AE mask for the selected mask ID."
+Y Start – Set the starting position of the AE mask for the selected mask ID in vertical
+direction."
                              width: 200
                              opacity: 0
                          }
@@ -1179,7 +1205,7 @@ Y Start – Set the starting position of the AE mask for the selected mask ID."
                         id: awbRelease
                         style:  econRadioButtonStyle
                         text:   qsTr("Auto")
-                        tooltip: "AWB - Disable hold, Run Auto white balance."
+                        tooltip: "Auto - Disables hold, runs Auto white balance."
                         exclusiveGroup: awbStatusGroup
                         activeFocusOnPress: true
                         onClicked: {
@@ -1501,8 +1527,9 @@ masking for AWB."
                     onCurrentIndexChanged: {
                         if(skipUpdateUIOnAWBMaskID)
                         {
-                            setAWBMaskDimensionsControl()
-                            see3camcu31.getAWBMaskDimensions(false)
+
+                            awbMaskIDValue = awbMaskIDCombo.currentText
+                            see3camcu31.getAWBMaskDimensions(false, awbMaskIDValue)
                         }
                         skipUpdateUIOnAWBMaskID = true
                     }
@@ -1522,7 +1549,7 @@ concurrently."
                     Layout.alignment: Qt.AlignCenter
                     Text {
                         id: awbMaskStatus
-                        text: "--- Mask Status ---"
+                        text: "--- Mask State ---"
                         font.pixelSize: 14
                         font.family: "Ubuntu"
                         color: "#ffffff"
@@ -1545,8 +1572,9 @@ concurrently."
                         tooltip: "The user can adjust the size and the position of the AWB light metering region masking,
 which excludes specific region(s) of the window from the calculation of white balance value.
 
-Disable – When selected, no AWB masking will be applied to the preview.Enable – When selected, AWB masking will be applied to the preview, excluding that
-region from calculation of white balance value."
+Mask State - Change the state of the AWB mask for the selected mask ID.
+
+Disable – When selected, no AWB masking will be applied to the preview."
                         onClicked: {
                             see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, disable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
                         }
@@ -1561,7 +1589,12 @@ region from calculation of white balance value."
                         exclusiveGroup: awbMaskStatusGroup
                         activeFocusOnPress: true
                         tooltip: "The user can adjust the size and the position of the AWB light metering region masking,
-which excludes specific region(s) of the window from the calculation of white balance value."
+which excludes specific region(s) of the window from the calculation of white balance value.
+
+Mask State - Change the state of the AWB mask for the selected mask ID.
+
+Enable – When selected, AWB masking will be applied to the preview, excluding that
+region from calculation of white balance value."
                         onClicked: {
                             see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, enable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
                         }
@@ -1657,7 +1690,8 @@ Height – Set the height of the AWB mask for the selected mask ID."
                              tooltip: "The user can adjust the size and the position of the AWB light metering region masking,
 which excludes specific region(s) of the window from the calculation of white balance value.
 
-X Start – Set the starting position of the AWB mask for the selected mask ID."
+X Start – Set the starting position of the AWB mask for the selected mask ID in horizontal
+direction."
                              width: 200
                              opacity: 0
                          }
@@ -1684,7 +1718,8 @@ X Start – Set the starting position of the AWB mask for the selected mask ID."
                              tooltip: "The user can adjust the size and the position of the AWB light metering region masking,
 which excludes specific region(s) of the window from the calculation of white balance value.
 
-Y Start – Set the starting position of the AWB mask for the selected mask ID."
+Y Start – Set the starting position of the AWB mask for the selected mask ID in vertical
+direction."
                              width: 200
                              opacity: 0
                          }
@@ -1730,6 +1765,17 @@ Y Start – Set the starting position of the AWB mask for the selected mask ID."
                         color: "#ffffff"
                         smooth: true
                         opacity: 0.50196078431373
+                        Item {
+                            visible: !uvcAutoExposureSelected
+                            ToolButton {
+                                tooltip: "The User Preset block allows user to customize controls according to their preferences
+and save them for subsequent use.
+
+Note: This control is functional only when the exposure mode is configured to Auto."
+                                width: 200
+                                opacity: 0
+                            }
+                        }
                     }
                 }
                 ColumnLayout {
@@ -1744,10 +1790,13 @@ Y Start – Set the starting position of the AWB mask for the selected mask ID."
                         text: qsTr("User Preset 1")
                         exclusiveGroup: presetModeGroup
                         activeFocusOnPress: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
                         tooltip: "The User Preset block allows user to customize controls according to their preferences
 and save them for subsequent use.
 
-User Preset 1 – Selecting this will activate the user-defined settings that are saved to User Preset 1"
+User Preset 1 – Selecting this will activate the user-defined settings that are saved to User
+Preset 1"
                         onClicked: {
                             see3camcu31.setPresetMode(SEE3CAM_CU31.USER_PRESET_1, SEE3CAM_CU31.PRESET_SELECT)
                             getValuesFromCamera()
@@ -1764,10 +1813,13 @@ User Preset 1 – Selecting this will activate the user-defined settings that ar
                         text: qsTr("User Preset 2")
                         exclusiveGroup: presetModeGroup
                         activeFocusOnPress: true
+                        enabled: (uvcAutoExposureSelected) ? true : false
+                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
                         tooltip: "The User Preset block allows user to customize controls according to their preferences
 and save them for subsequent use.
 
-User Preset 2 – Selecting this will activate the user-defined settings that are saved to User Preset 2"
+User Preset 2 – Selecting this will activate the user-defined settings that are saved to User
+Preset 2"
                         onClicked: {
                             see3camcu31.setPresetMode(SEE3CAM_CU31.USER_PRESET_2, SEE3CAM_CU31.PRESET_SELECT)
                             getValuesFromCamera()
@@ -1788,6 +1840,8 @@ User Preset 2 – Selecting this will activate the user-defined settings that ar
                             text:   qsTr("Manual")
                             exclusiveGroup: presetModeGroup
                             activeFocusOnPress: true
+                            enabled: (uvcAutoExposureSelected) ? true : false
+                            opacity: (uvcAutoExposureSelected) ? 1 : 0.1
                             tooltip: "The User Preset block allows user to customize controls according to their preferences
 and save them for subsequent use.
 
@@ -1809,10 +1863,11 @@ Manual – The current settings will be applied."
                             style: econButtonStyle
                             implicitHeight: 20
                             implicitWidth: 40
-                            enabled: (!manualPreset.checked) ? true : false
-                            opacity: (!manualPreset.checked) ? 1 : 0.1
+                            enabled: (!manualPreset.checked && uvcAutoExposureSelected) ? true : false
+                            opacity: (!manualPreset.checked && uvcAutoExposureSelected) ? 1 : 0.1
                             tooltip: "The User Preset block allows user to customize controls according to their preferences
 and save them for subsequent use.
+
 Save – Allows you to save the specific user-defined settings of the selected preset."
                             onClicked: {
                                 savingPresetMode()
@@ -2073,34 +2128,79 @@ Save – Allows you to save the specific user-defined settings of the selected p
 
      onIndicateWindowDimensionError:{
          displayMessageBox("Error",
-         "         Error: Value exceeds range.
+         "Error: Value exceeds range and/or an odd number.
 Enter a valid value in the following specified ranges,
          Width range: [" + minWidth + "   , " + maxWidth + " ]
          Height range: [ " + minHeight + " , " + maxHeight + " ]
          X Start range: [ " + minXStart + " , " + maxXStart + " ]
-         Y Start range: [ " + minYStart + " , " + maxYStart + " ] " )
+         Y Start range: [ " + minYStart + " , " + maxYStart + " ]
+Note : Ensure the values entered are all even numbers." )
          see3camcu31.getAEWindowDimensions()
          see3camcu31.getAWBWindowDimensions()
      }
 
      onIndicateMaskDimensionError:{
          displayMessageBox("Error",
-         "         Error: Value exceeds range.
+         "Error: Value exceeds range and/or an odd number.
 Enter a valid value in the following specified ranges,
          Width range: [" + minWidth + "   , " + maxWidth + " ]
          Height range: [ " + minHeight + " , " + maxHeight + " ]
          X Start range: [ " + minXStart + " , " + maxXStart + " ]
-         Y Start range: [ " + minYStart + " , " + maxYStart + " ] " )
+         Y Start range: [ " + minYStart + " , " + maxYStart + " ]
+Note : Ensure the values entered are all even numbers." )
 
          awbMaskIDValue = awbMaskIDCombo.currentText
          aeMaskIDValue  = aeMaskIDCombo.currentText
 
-         see3camcu31.getAEMaskDimensions(true)
-         see3camcu31.getAWBMaskDimensions(true)
+         see3camcu31.getAEMaskDimensions(true, aeMaskIDValue)
+         see3camcu31.getAWBMaskDimensions(true, awbMaskIDValue)
 
          awbMaskIDCombo.currentIndex = awbMaskIDValue - 1
          aeMaskIDCombo.currentIndex = aeMaskIDValue - 1
      }
+
+     onIndicateWindowWidthError:{
+         displayMessageBox("Error",
+         "Error: Window extends beyond frame width - The sum of Width and X Start should not exceed the frame width " + maxWidth + "." )
+         see3camcu31.getAEWindowDimensions()
+         see3camcu31.getAWBWindowDimensions()
+     }
+
+     onIndicateWindowHeightError:{
+         displayMessageBox("Error",
+         "Error: Window extends beyond frame height - The sum of Height and Y Start should not exceed the frame height " + maxHeight + "." )
+         see3camcu31.getAEWindowDimensions()
+         see3camcu31.getAWBWindowDimensions()
+     }
+
+     onIndicateMaskWidthError:{
+         displayMessageBox("Error",
+         "Error: Window extends beyond frame width - The sum of Width and X Start should not exceed the frame width " + maxWidth + "." )
+
+         awbMaskIDValue = awbMaskIDCombo.currentText
+         aeMaskIDValue  = aeMaskIDCombo.currentText
+
+         see3camcu31.getAEMaskDimensions(true, aeMaskIDValue)
+         see3camcu31.getAWBMaskDimensions(true, awbMaskIDValue)
+
+         awbMaskIDCombo.currentIndex = awbMaskIDValue - 1
+         aeMaskIDCombo.currentIndex = aeMaskIDValue - 1
+     }
+
+     onIndicateMaskHeightError:{
+         displayMessageBox("Error",
+         "Error: Window extends beyond frame width - The sum of Height and Y Start should not exceed the frame width " + maxHeight + "." )
+
+         awbMaskIDValue = awbMaskIDCombo.currentText
+         aeMaskIDValue  = aeMaskIDCombo.currentText
+
+         see3camcu31.getAEMaskDimensions(true, aeMaskIDValue)
+         see3camcu31.getAWBMaskDimensions(true, awbMaskIDValue)
+
+         awbMaskIDCombo.currentIndex = awbMaskIDValue - 1
+         aeMaskIDCombo.currentIndex = aeMaskIDValue - 1
+     }
+
 
    }
 
@@ -2118,10 +2218,13 @@ Enter a valid value in the following specified ranges,
    function setOrientationProperties(){
        see3camcu31.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
 
+       awbMaskIDValue = awbMaskIDCombo.currentText
+       aeMaskIDValue  = aeMaskIDCombo.currentText
+
        see3camcu31.getAEWindowDimensions()
-       see3camcu31.getAEMaskDimensions(true)
+       see3camcu31.getAEMaskDimensions(true, aeMaskIDValue)
        see3camcu31.getAWBWindowDimensions()
-       see3camcu31.getAWBMaskDimensions(true)
+       see3camcu31.getAWBMaskDimensions(true, awbMaskIDValue)
    }
 
    function setAWBMaskDimensionsControl()
@@ -2457,11 +2560,11 @@ Enter a valid value in the following specified ranges,
 
         see3camcu31.getAEWindowOverlay()
         see3camcu31.getAEMaskOverlay()
-        see3camcu31.getAEMaskDimensions(true)
+        see3camcu31.getAEMaskDimensions(true, 1)
 
         see3camcu31.getAWBWindowOverlay()
         see3camcu31.getAWBMaskOverlay()
-        see3camcu31.getAWBMaskDimensions(true)
+        see3camcu31.getAWBMaskDimensions(true, 1)
 
         see3camcu31.getAEWindowDimensions()
         see3camcu31.getAWBWindowDimensions()
