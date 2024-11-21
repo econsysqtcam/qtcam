@@ -1661,7 +1661,7 @@ bool SEE3CAM_CU31::setPropertiesForCrossStill(){
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if(g_in_packet_buf[6] == FAILURE){
+        if(g_in_packet_buf[6] == SET_FAIL){
             emit indicateFailureStatus("Failure","Setting Still Properties Failed. Retry!");
             return false;
         }else if((g_in_packet_buf[0] == SET_CROSS_STILL_PROPERTIES_SEE3CAM_CU31) && (g_in_packet_buf[6] == SUCCESS)){
@@ -1749,7 +1749,7 @@ bool SEE3CAM_CU31::get64BitSerialNumber()
         }
         else
         {
-            if((g_in_packet_buf[0] == GET_64BIT_UNIQUE_ID_1))
+            if(g_in_packet_buf[0] == GET_64BIT_UNIQUE_ID_1)
             {
                 lsb.sprintf("%02x%02x%02x%02x",g_in_packet_buf[1],g_in_packet_buf[2],g_in_packet_buf[3],g_in_packet_buf[4]);
 

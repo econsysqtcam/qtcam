@@ -183,6 +183,10 @@ signals:
 
     void indicateWindowDimensionError(uint minWidth, uint maxWidth, uint minHeight, uint maxHeight, uint minXStart, uint maxXStart, uint minYStart, uint maxYStart);
     void indicateMaskDimensionError(uint minWidth, uint maxWidth, uint minHeight, uint maxHeight, uint minXStart, uint maxXStart, uint minYStart, uint maxYStart);
+    void indicateWindowWidthError(uint maxWidth);
+    void indicateWindowHeightError(uint maxHeight);
+    void indicateMaskWidthError(uint maxWidth);
+    void indicateMaskHeightError(uint maxHeight);
 
 public slots:
     bool setOrientation(bool horzModeSel, bool vertiModeSel);
@@ -221,7 +225,7 @@ public slots:
     bool getAEMaskOverlay();
     bool setAEMaskOverlay(uint status);
 
-    bool getAEMaskDimensions(bool isMaskIDNeeded);
+    bool getAEMaskDimensions(bool isMaskIDNeeded, uint maskID);
     bool setAEMaskDimensions(uint maskID, uint maskStatus, uint width, uint height, uint xStart, uint yStart);
 
     //AUTO WHITE BALANCE
@@ -234,7 +238,7 @@ public slots:
     bool getAWBMaskOverlay();
     bool setAWBMaskOverlay(uint status);
 
-    bool getAWBMaskDimensions(bool isMaskIDNeeded);
+    bool getAWBMaskDimensions(bool isMaskIDNeeded,  uint maskID);
     bool setAWBMaskDimensions(uint maskID, uint maskStatus, uint width, uint height, uint xStart, uint yStart);
 
     //OTHER CONTROLS
