@@ -437,7 +437,7 @@ Item {
 
        function onCameraDeviceUnplugged()
         {
-            audioDevicesList.currentIndex = 0
+            //audioDevicesList.currentIndex = 0
             audio_Capture_property_Child.visible = false
         }
 

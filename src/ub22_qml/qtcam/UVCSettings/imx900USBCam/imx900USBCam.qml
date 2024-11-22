@@ -75,7 +75,7 @@ Item {
     Action {
         id: triggerExposureAction
         onTriggered: {
-            imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+            //imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
         }
     }
 
@@ -83,14 +83,14 @@ Item {
         id: readStatisticsCall
         onTriggered:
         {
-            imx900USBCAM.readStatistics()
+            //imx900USBCAM.readStatistics()
         }
     }
 
     Action {
         id: triggerGainAction
         onTriggered: {
-            imx900USBCAM.setGainMode(IMX900USBCAM.AUTO_GAIN, IMX900USBCAM.SINGLE_GAIN_TRIGGER, gainTextField.text)
+            //imx900USBCAM.setGainMode(IMX900USBCAM.AUTO_GAIN, IMX900USBCAM.SINGLE_GAIN_TRIGGER, gainTextField.text)
         }
     }
 
@@ -150,16 +150,17 @@ Item {
 
         function onMouseRightClicked(x, y, width, height){
             if(enableSelfTrigger.enabled && enableSelfTrigger.checked){
-                if(normalMode.checked == true && withOutput.checked == true){
-                    imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, sensingFrameExpTextField.text, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, withOutput.checked, normalMode.checked, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
+                /*if(normalMode.checked == true && withOutput.checked == true){
+                    imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
                 } else if ((normalMode.checked == true) && (withoutOutput.checked == true)){
-                    imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, sensingFrameExpTextField.text, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, withoutOutput.checked, normalMode.checked, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
+                    imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
                 } else if((forcedMode.checked == true) && (withOutput.checked == true)){
-                    imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, sensingFrameExpTextField.text, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, withOutput.checked, forcedMode.checked, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
+                    imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
                 }
                 else if((forcedMode.checked == true) && (withoutOutput.checked == true)){
-                    imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, sensingFrameExpTextField.text, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, withoutOutput.checked, forcedMode.checked, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
-                }
+                    imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
+                }*/
+                imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
             }
         }
 
@@ -454,8 +455,8 @@ gain) and from 25dB to 48dB (digital gain)"
                     font.family: "Ubuntu"
                     color: "#ffffff"
                     smooth: true
-                    enabled: (manualGain.enabled && manualGain.checked) ? true : false
-                    opacity: (manualGain.enabled && manualGain.checked) ? 0.8 : 0.1
+                    //enabled: (manualGain.enabled && manualGain.checked) ? true : false
+                    //opacity: (manualGain.enabled && manualGain.checked) ? 0.8 : 0.1
                 }
                 Row
                 {
@@ -468,8 +469,8 @@ gain) and from 25dB to 48dB (digital gain)"
                         width: 150
                         stepSize: 1
                         style:econSliderStyle
-                        enabled: (manualGain.enabled && manualGain.checked) ? true : false
-                        opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
+                        //enabled: (manualGain.enabled && manualGain.checked) ? true : false
+                        //opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
                         onValueChanged:  {
                             //Sending HID value to UVC
                             root.getGainValueFromHID(gainSlider.value)
@@ -487,8 +488,8 @@ gain) and from 25dB to 48dB (digital gain)"
                         smooth: true
                         horizontalAlignment: TextInput.AlignHCenter
                         style: econTextFieldStyle
-                        enabled: (manualGain.enabled && manualGain.checked) ? true : false
-                        opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
+                        //enabled: (manualGain.enabled && manualGain.checked) ? true : false
+                        //opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
                         validator: IntValidator {bottom: gainSlider.minimumValue; top: gainSlider.maximumValue}
                         Text {
                             text: "   db"
@@ -802,8 +803,8 @@ Auto gain function."
                     font.family: "Ubuntu"
                     color: "#ffffff"
                     smooth: true
-                    enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                    opacity: (manualExposure.enabled && manualExposure.checked) ? 0.8 : 0.1
+                    //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                    //opacity: (manualExposure.enabled && manualExposure.checked) ? 0.8 : 0.1
                 }
 
                 ColumnLayout{
@@ -822,8 +823,8 @@ Auto gain function."
                             smooth: true
                             horizontalAlignment: TextInput.AlignHCenter
                             style: econTextFieldStyle
-                            enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                            opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                            //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                            //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
 
                             // Units Name
                             Text {
@@ -833,8 +834,8 @@ Auto gain function."
                                 font.family: "Ubuntu"
                                 color: "#ffffff"
                                 smooth: true
-                                enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                                opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                                //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                                //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                                 horizontalAlignment: Text.AlignHCenter
                             }
                             validator: IntValidator {bottom: minExpInSeconds; top: maxExpInSeconds}
@@ -849,8 +850,8 @@ Auto gain function."
                             smooth: true
                             horizontalAlignment: TextInput.AlignHCenter
                             style: econTextFieldStyle
-                            enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                            opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                            //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                            //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                             // Units Name
                             Text {
                                 text: "   ms"
@@ -859,8 +860,8 @@ Auto gain function."
                                 font.family: "Ubuntu"
                                 color: "#ffffff"
                                 smooth: true
-                                enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                                opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                                //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                                //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                             }
                             validator: IntValidator {bottom: minExpInMilliSeconds; top: maxExpInMilliSeconds}
                         }
@@ -873,8 +874,8 @@ Auto gain function."
                             smooth: true
                             horizontalAlignment: TextInput.AlignHCenter
                             style: econTextFieldStyle
-                            enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                            opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                            //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                            //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
 
                             // Unit Name
                             Text {
@@ -884,8 +885,8 @@ Auto gain function."
                                 font.family: "Ubuntu"
                                 color: "#ffffff"
                                 smooth: true
-                                enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                                opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                                //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                                //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                                 horizontalAlignment: Text.AlignHCenter
                             }
                             validator: IntValidator {bottom: minExpInMicroSeconds ; top: maxExpInMicroSeconds}
@@ -896,8 +897,8 @@ Auto gain function."
                             activeFocusOnPress : true
                             text: "Set"
                             style: econButtonStyle
-                            enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                            opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                            //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                            //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                             implicitHeight: 25
                             implicitWidth: 50
                             onClicked: {
@@ -1999,10 +2000,10 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                         exclusiveGroup: selfTriggerModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, sensingFrameExpTextField.text, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, withOutput.checked, normalMode.checked, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
+                            imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
                         }
                         Keys.onReturnPressed:  {
-                            imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, sensingFrameExpTextField.text, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, withOutput.checked, normalMode.checked, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
+                            imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
                         }
                     }
                     RadioButton {
@@ -2012,10 +2013,10 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                         exclusiveGroup: selfTriggerModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            imx900USBCAM.setSelfTrigger(disable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, sensingFrameExpTextField.text, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, withOutput.checked, normalMode.checked, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
+                            imx900USBCAM.setSelfTrigger(disable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
                         }
                         Keys.onReturnPressed: {
-                            imx900USBCAM.setSelfTrigger(disable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, sensingFrameExpTextField.text, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, withOutput.checked, normalMode.checked, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
+                            imx900USBCAM.setSelfTrigger(disable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
                         }
                     }
                 }
@@ -2418,7 +2419,7 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                 Text
                 {
                     id: gainText1
-                    text: "Gain :"
+                    text: "Sensing Area Gain :"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -2476,7 +2477,7 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                 Text
                 {
                     id: gainText2
-                    text: "Gain 1:"
+                    text: "Capturing Area Gain:"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -2546,11 +2547,11 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                         implicitWidth: 60
                         onClicked:
                         {
-                            imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, sensingFrameExpTextField.text, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, withOutput.checked, normalMode.checked, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
+                            imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
                         }
                         Keys.onReturnPressed:
                         {
-                            imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, sensingFrameExpTextField.text, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, withOutput.checked, normalMode.checked, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
+                            imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
                         }
                     }
                 }
@@ -3326,7 +3327,7 @@ following power cycles."
      id:imx900USBCAM
 
      onCurrentCameraMode: {
-        getCameraControls(mode)
+        //getCameraControls(mode)
      }
 
      onCurrentFlipMode: {
@@ -3338,7 +3339,7 @@ following power cycles."
      }
 
      onCurrentBlackLevelValue: {
-         blackLevelSlider.value = value
+         //blackLevelSlider.value = value
      }
 
      onCurrentStrobeMode: {
@@ -3361,18 +3362,18 @@ following power cycles."
      }
 
      onCurrentTargetBrightness:{
-         skipUpdateTargetBrightness = false
+         /*skipUpdateTargetBrightness = false
 
          targetBrightness.minimumValue = min
          targetBrightness.maximumValue = max
          targetBrightness.stepSize = step
          targetBrightness.value = value
 
-         skipUpdateTargetBrightness = true
+         skipUpdateTargetBrightness = true*/
      }
 
      onCurrentGainLimit:{
-         skipUpdateLowerLimitSlider = false
+         /*skipUpdateLowerLimitSlider = false
          skipUpdateUpperLimitSlider = false
 
          gainLowerLimitSlider.minimumValue = min
@@ -3386,23 +3387,23 @@ following power cycles."
          gainUpperLimitSlider.value = upperLimit
 
          skipUpdateLowerLimitSlider = true
-         skipUpdateUpperLimitSlider = true
+         skipUpdateUpperLimitSlider = true*/
      }
 
      onCurrentExposureLowerLimit: {
-         lowerLimitSeconds.text  = seconds
+        /* lowerLimitSeconds.text  = seconds
          lowerLimitMilliSec.text = milliSeconds
-         lowerLimitMicroSec.text = microSeconds
+         lowerLimitMicroSec.text = microSeconds*/
      }
 
      onCurrentExposureUpperLimit: {
-         upperLimitSeconds.text  = seconds
+         /*upperLimitSeconds.text  = seconds
          upperLimitMilliSec.text = milliSeconds
-         upperLimitMicroSec.text = microSeconds
+         upperLimitMicroSec.text = microSeconds*/
      }
 
      onMultiFrameSetModeReceived:{
-         if(mode === IMX900USBCAM.FRAME_SET_OFF)
+         /*if(mode === IMX900USBCAM.FRAME_SET_OFF)
          {
              frameSetOff.checked = true
              frameSetTitle.text = "--- Multi Frame Disabled ---"
@@ -3416,47 +3417,47 @@ following power cycles."
          {
              frameSetTitle.text = "--- 4-Frame Set ---"
              frameSet4.checked = true
-         }
+         }*/
      }
 
      onFrameSet1Received:{
-         gainStatTextField1.text = gain1
-         exposureTextField1.text = exposure1
+         //gainStatTextField1.text = gain1
+         //exposureTextField1.text = exposure1
      }
      onFrameSet2Received:{
-         gainStatTextField2.text = gain2
-         exposureTextField2.text = exposure2
+         /*gainStatTextField2.text = gain2
+         exposureTextField2.text = exposure2*/
      }
      onFrameSet3Received:{
-         gainStatTextField3.text = gain3
-         exposureTextField3.text = exposure3
+         /*gainStatTextField3.text = gain3
+         exposureTextField3.text = exposure3*/
      }onFrameSet4Received:{
-         gainStatTextField4.text = gain4
-         exposureTextField4.text = exposure4
+         /*gainStatTextField4.text = gain4
+         exposureTextField4.text = exposure4*/
      }
 
      onCurrentAntiFlickerMode: {
-         getAntiFlickerModes(mode)
+         //getAntiFlickerModes(mode)
      }
 
      onCurrentTemperature: {
-         readTempTextField.text = temperature
+         //readTempTextField.text = temperature
      }
 
      onCurrentHDRStatus: {
-         if(status === enable){
+         /*if(status === enable){
              enableHDR.checked = true
          } else if(status === disable){
              disableHDR.checked = true
-         }
+         }*/
      }
 
      onCurrentQuadShutterControlStatus: {
-         if(status === enable){
+         /*if(status === enable){
              enableQuad.checked = true
          } else if(status === disable){
              disableQuad.checked = true
-         }
+         }*/
      }
 
      onCurrentFastAutoExposureStatus: {
@@ -3468,15 +3469,15 @@ following power cycles."
      }
 
      onCurrentToneControlStatus: {
-         if(status === disable){
+         /*if(status === disable){
              enableToneCtrl.checked = true
          } else if(status === enable){
              disableToneCtrl.checked = true
-         }
+         }*/
      }
 
      onCurrentShortExposureStatus: {
-         if(status === enable){
+         /*if(status === enable){
              enableShortExp.checked = true
          } else if(status === disable){
              disableShortExp.checked = true
@@ -3484,18 +3485,18 @@ following power cycles."
 
          shortExpSlider.minimumValue = min
          shortExpSlider.maximumValue = max
-         shortExpSlider.value = current
+         shortExpSlider.value = current*/
      }
      onCurrentStatistics: {
-        secondsExpStat.text = seconds
-        milliSecExpStat.text = milliSeconds
-        microSecExpStat.text = microSeconds
+        //secondsExpStat.text = seconds
+        //milliSecExpStat.text = milliSeconds
+        //microSecExpStat.text = microSeconds
 
-        gainStatTextField.text = gain
+        //gainStatTextField.text = gain
      }
 
      onCurrentDualModeProperties: {
-         getDualTriggerProperties(mode, switchingDivision, min, max, step, min1, max1, step1, gain, gain1)
+        // getDualTriggerProperties(mode, switchingDivision, min, max, step, min1, max1, step1, gain, gain1)
      }
 
      onCurrentSelfTriggerMode: {
@@ -3522,7 +3523,7 @@ following power cycles."
 
 
      onCurrentSensingFrameExposure: {
-         sensingFrameExpTextField.text = current
+         //sensingFrameExpTextField.text = current
      }
 
      onCurrentCountThreshold:{
@@ -3536,23 +3537,23 @@ following power cycles."
      }
 
      onCurrentSensingFrameMode: {
-        if(mode === disable){
+        /*if(mode === disable){
             withOutput.checked = true
         } else if(mode === enable) {
             withOutput.checked = true
-        }
+        }*/
      }
 
      onCurrentSelfTriggerForce: {
-         if(mode === disable){
+         /*if(mode === disable){
              normalMode.checked = true
          } else if(mode === enable) {
              forcedMode.checked = true
-         }
+         }*/
      }
      onCurrentDetectedPixels: {
-         hSidePixelTextField.text = hPixels
-         lSidePixelTextField.text = vPixels
+         //hSidePixelTextField.text = hPixels
+         //lSidePixelTextField.text = vPixels
      }
 
      onCurrentGainForCapturingFrame: {
@@ -3574,7 +3575,7 @@ following power cycles."
      }
 
      onIndicateMultiFrameSetInvalidInput:{
-         imx900USBCAM.getMultiFrameSet()
+         //imx900USBCAM.getMultiFrameSet()
      }
 
      onIndicateExposureLimitsInvalidInput:{
@@ -3769,7 +3770,7 @@ following power cycles."
         }
     }
 
-    function getCameraControls(mode){
+    /*function getCameraControls(mode){
         if(mode === IMX900USBCAM.MASTER){
             master.checked = true
         } else if(mode === IMX900USBCAM.TRIGGER_EXP){
@@ -3779,7 +3780,7 @@ following power cycles."
         } else if(mode === IMX900USBCAM.TRIGGER_SOFTWARE){
             triggerSoftware.checked = true
         }
-    }
+    }*/
 
     function sendConvertedExpToUVC()
     {
@@ -3799,7 +3800,7 @@ following power cycles."
         }
     }
 
-    function setCameraControls(){
+    /*function setCameraControls(){
         if(master.checked == true){
             imx900USBCAM.setCameraMode(IMX900USBCAM.MASTER)
         } else if(triggerExposure.checked == true){
@@ -3809,9 +3810,9 @@ following power cycles."
         } else if(triggerSoftware.checked == true) {
             imx900USBCAM.setCameraMode(IMX900USBCAM.TRIGGER_SOFTWARE)
         }
-    }
+    }*/
 
-    function getDualTriggerProperties(mode, switchingDivision, min, max, step, min1, max1, step1, gain, gain1)
+    /*function getDualTriggerProperties(mode, switchingDivision, min, max, step, min1, max1, step1, gain, gain1)
     {
         if(mode === disable) {
             disableDualTrigger.checked = true
@@ -3840,9 +3841,9 @@ following power cycles."
         gainDiv2Slider.value = gain1
 
         skipUpdateGainDiv2Slider = true
-    }
+    }*/
 
-    function getAntiFlickerModes(mode) {
+    /*function getAntiFlickerModes(mode) {
         switch(mode) {
             case IMX900USBCAM.MODE_50Hz:
                 skipUpdateUIOnAntiFlickerMode = false
@@ -3869,7 +3870,7 @@ following power cycles."
             imx900USBCAM.setAntiFlickerMode(IMX900USBCAM.MODE_60Hz)
         else if(antiFlickerCombo.currentIndex === 2)
             imx900USBCAM.setAntiFlickerMode(IMX900USBCAM.MODE_DISABLE)
-    }
+    }*/
 
     function currentFlipMirrorMode(mode)
     {
@@ -3896,7 +3897,7 @@ following power cycles."
 
     function getGainProperties(mode, feature, min, max, current, step){
 
-        if(mode === IMX900USBCAM.AUTO_GAIN){
+        /*if(mode === IMX900USBCAM.AUTO_GAIN){
             autoGain.checked   = true
         }else if(mode === IMX900USBCAM.MANUAL_GAIN){
             manualGain.checked = true
@@ -3908,7 +3909,7 @@ following power cycles."
         }
         else if(feature === IMX900USBCAM.SINGLE_GAIN){
             gainSingleShot.checked  = true
-        }
+        }*/
 
         gainSlider.minimumValue = min
         gainSlider.maximumValue = max
@@ -3917,7 +3918,7 @@ following power cycles."
     }
 
     function setGainProperties(){
-        if(autoGain.checked == true){
+        /*if(autoGain.checked == true){
             if(gainContinious.checked == true) {
                 imx900USBCAM.setGainMode(IMX900USBCAM.AUTO_GAIN, IMX900USBCAM.CONTINIOUS_GAIN, gainSlider.value)
             }
@@ -3926,13 +3927,14 @@ following power cycles."
             }
         }else if(manualGain.checked == true){
             imx900USBCAM.setGainMode(IMX900USBCAM.MANUAL_GAIN, 0, gainSlider.value)
-        }
+        }*/
+        imx900USBCAM.setGainMode(IMX900USBCAM.MANUAL_GAIN, 0, gainSlider.value)
     }
 
 
     function currentExposureMode(mode, feature, seconds, milliSeconds, microSeconds) {
 
-        if(mode === IMX900USBCAM.AUTO_EXPOSURE){
+        /*if(mode === IMX900USBCAM.AUTO_EXPOSURE){
             autoExposure.checked   = true
         }else if(mode === IMX900USBCAM.MANUAL_EXPOSURE){
             manualExposure.checked = true
@@ -3945,7 +3947,7 @@ following power cycles."
         else if(feature === IMX900USBCAM.SINGLE_EXP){
             exposureSingleShot.checked = true
             expSingleShotBtnClicked    = true
-        }
+        }*/
 
         //Manual Exposure Values
         expInSecondsTextField.text  = seconds
@@ -3953,7 +3955,7 @@ following power cycles."
         expInMicroSecTextField.text = microSeconds
     }
 
-    function setMultipleFrameSetValues()
+    /*function setMultipleFrameSetValues()
     {
         if(frameSetOff.checked == true) {
 
@@ -3968,9 +3970,9 @@ following power cycles."
             frameSetTitle.text = "--- 4-Frame Set ---"
             imx900USBCAM.setMultiFrameSet(IMX900USBCAM.FRAME_SET_4, gainStatTextField1.text, exposureTextField1.text,  gainStatTextField2.text, exposureTextField2.text, gainStatTextField3.text, exposureTextField3.text , gainStatTextField4.text, exposureTextField4.text)
         }
-    }
+    }*/
 
-    function enableDisableAutoExposureControls(autoExposureSelect){
+    /*function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
             uvcAutoExposureSelected = true
             if(autoExposureHold.checked == true){
@@ -3979,7 +3981,7 @@ following power cycles."
         }else{
             uvcAutoExposureSelected = false
         }
-    }
+    }*/
 
 
     function setToDefaultValues(){
@@ -4008,33 +4010,33 @@ following power cycles."
     }
 
     function getValuesFromCamera(){
-        imx900USBCAM.getCameraMode()
+        //imx900USBCAM.getCameraMode()
         imx900USBCAM.getOrientation()
 
         imx900USBCAM.getGainMode()
         imx900USBCAM.getGainLimit()
 
-        imx900USBCAM.getAutoExposureLowerLimit()
-        imx900USBCAM.getAutoExposureUpperLimit()
+        //imx900USBCAM.getAutoExposureLowerLimit()
+        //imx900USBCAM.getAutoExposureUpperLimit()
 
         imx900USBCAM.getStrobeMode()
-        imx900USBCAM.getTargetBrightness()
-        imx900USBCAM.getBlackLevelAdjustment()
+        //imx900USBCAM.getTargetBrightness()
+        //imx900USBCAM.getBlackLevelAdjustment()
         imx900USBCAM.getBurstLength()
-        imx900USBCAM.calculateTemperature()
-        imx900USBCAM.readStatistics()
+        //imx900USBCAM.calculateTemperature()
+        //imx900USBCAM.readStatistics()
 
-        imx900USBCAM.getHighDynamicRange()
-        imx900USBCAM.getQuadShutterControl()
+        //imx900USBCAM.getHighDynamicRange()
+        //imx900USBCAM.getQuadShutterControl()
 
         imx900USBCAM.getFastAutoExposure()
 
-        imx900USBCAM.getDualTrigger()
+        //imx900USBCAM.getDualTrigger()
         imx900USBCAM.getSelfTrigger()
 
-        imx900USBCAM.getMultiFrameSet()
-        imx900USBCAM.getToneControl()
-        imx900USBCAM.getShortExposureMode()
+        //imx900USBCAM.getMultiFrameSet()
+        //imx900USBCAM.getToneControl()
+        //imx900USBCAM.getShortExposureMode()
 
         getCamValuesTimer.start()
     }
