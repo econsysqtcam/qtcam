@@ -149,8 +149,8 @@ Item {
         }
 
         function onMouseRightClicked(x, y, width, height){
-            if(enableSelfTrigger.enabled && enableSelfTrigger.checked){
-                /*if(normalMode.checked == true && withOutput.checked == true){
+            /*if(enableSelfTrigger.enabled && enableSelfTrigger.checked){
+                if(normalMode.checked == true && withOutput.checked == true){
                     imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
                 } else if ((normalMode.checked == true) && (withoutOutput.checked == true)){
                     imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
@@ -159,9 +159,8 @@ Item {
                 }
                 else if((forcedMode.checked == true) && (withoutOutput.checked == true)){
                     imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
-                }*/
-                imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
-            }
+                }
+            }*/
         }
 
         //Signals getting values from UVC & set its values to the HID controls

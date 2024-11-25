@@ -132,7 +132,7 @@ Item {
                         activeFocusOnPress : true
                         text: "Vertical"
                         style: econCheckBoxStyle
-                        tooltip: "Vertical flip - Flips the preview verically up/down"
+                        tooltip: "Vertical flip - Flips the preview vertically up/down"
                         onClicked:{
                             setOrientationProperties()
                         }
