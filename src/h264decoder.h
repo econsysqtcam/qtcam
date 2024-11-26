@@ -53,7 +53,7 @@ signals:
     void openDialogBox();
 protected:
       AVCodecContext *pH264CodecCtx;
-      AVCodec *pH264Codec;
+      const AVCodec *pH264Codec;
       AVFrame *pH264picture;
       uint8_t *h264pictureBuf;
       int h264PictureSize;

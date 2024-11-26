@@ -20,10 +20,9 @@
 
 #include <QtWidgets/QApplication>
 #include <QDateTime>
-#include <QtWidgets/QWidget>
 #include <QIcon>
 #include <QStandardPaths>
-#include<QProcess>
+#include <QtWidgets>
 #include "qtquick2applicationviewer.h"
 #include "cameraproperty.h"
 #include "videostreaming.h"
@@ -100,26 +99,12 @@
 // * Bayer Camera
 int main(int argc, char *argv[])
 {
-    /*Indentifying OS version*/
-    QProcess process;
-    process.start("bash", QStringList() << "-c" << "cat /etc/os-release | grep \"PRETTY_NAME\" "); //Reading os-release file for checking OS
-    process.waitForFinished();
-    char *os_name = strdup(process.readAllStandardOutput());
-    bool is20_04detected =false;
-    bool is22_04detected = false;
-
-    if(strstr(os_name,"20.04"))
-    {
-        is20_04detected = true;
-    }
-    else if(strstr(os_name,"22.04"))
-    {
-        is22_04detected = true;
-    }
+    // The QT version should be greater than 5.9 (default in Ubuntu 18.04)
+    QT_REQUIRE_VERSION(argc, argv, "5.9.0")
 
     QApplication app(argc, argv);
-    app.setOrganizationName("econsystems");
-    app.setOrganizationDomain("econsystems.com");
+    QApplication::setOrganizationName("econsystems");
+    QApplication::setOrganizationDomain("econsystems.com");
 
     qmlRegisterType<Cameraproperty>("econ.camera.property",1,0,"Camproperty");
     qmlRegisterType<Videostreaming>("econ.camera.stream", 1, 0, "Videostreaming");
@@ -213,9 +198,6 @@ int main(int argc, char *argv[])
 
     QtQuick2ApplicationViewer viewer;
 
-    //Create a object for Camera property
-    Cameraproperty camProperty;
-
     if(argc > 1){
         if(strcmp(argv[1],"-l") == 0 || strcmp(argv[1],"--log") == 0){
             Cameraproperty camPropertyParam(true);
@@ -227,67 +209,20 @@ int main(int argc, char *argv[])
         }
     }
 
-    viewer.rootContext()->setContextProperty("camModels", &camProperty.modelCam);
+    viewer.rootContext()->setContextProperty("camModels", &Cameraproperty::modelCam);
 
-    Videostreaming vs;
-    AudioInput audio;
+    viewer.rootContext()->setContextProperty("resolutionModel", &Videostreaming::resolution);
+    viewer.rootContext()->setContextProperty("stillOutputFormatModel", &Videostreaming::stillOutputFormat);
+    viewer.rootContext()->setContextProperty("videoOutputFormatModel", &Videostreaming::videoOutputFormat);
+    viewer.rootContext()->setContextProperty("fpsAvailable", &Videostreaming::fpsList);
+    viewer.rootContext()->setContextProperty("encodersModel", &Videostreaming::encoderList);
 
-    if(is20_04detected)
-    {
-        viewer.rootContext()->setContextProperty("is20_04detcted", QVariant(true));
-        audio.is20_04 = true;
-    }
-    else if(is22_04detected)
-    {
-        viewer.rootContext()->setContextProperty("is22_04detcted", QVariant(true));
-        audio.is22_04 = true;
-    }
-    else {
-         viewer.rootContext()->setContextProperty("is20_04detcted", QVariant(false));
-         viewer.rootContext()->setContextProperty("is22_04detcted", QVariant(false));
-         audio.is20_04 = false;
-         audio.is22_04 = false;
-    }
+    viewer.rootContext()->setContextProperty("audioinputDevModel", &AudioInput::audioinputDeviceList);
+    viewer.rootContext()->setContextProperty("audioSupportedFormatList", &AudioInput::audiosupportedFmtListModel);
+    viewer.rootContext()->setContextProperty("audioChannelCountModel", &AudioInput::audioChannelCountModel);
 
-    viewer.rootContext()->setContextProperty("resolutionModel", &vs.resolution);
-    viewer.rootContext()->setContextProperty("stillOutputFormatModel", &vs.stillOutputFormat);
-    viewer.rootContext()->setContextProperty("videoOutputFormatModel", &vs.videoOutputFormat);
-    viewer.rootContext()->setContextProperty("fpsAvailable", &vs.fpsList);
-    viewer.rootContext()->setContextProperty("encodersModel", &vs.encoderList);
-    viewer.rootContext()->setContextProperty("audioinputDevModel", &audio.audioinputDeviceList);
-    viewer.rootContext()->setContextProperty("audioSupportedFormatList", &audio.audiosupportedFmtListModel);
-    viewer.rootContext()->setContextProperty("audioChannelCountModel", &audio.audioChannelCountModel);
-
-    //Creating directory in Home for saving videos & pictures instead of saving it in default root folder
-    if(is20_04detected || is22_04detected)
-    {
-        // Create the folder in the home directory
-        QString picturesPath = QDir::homePath() + "/Pictures";
-        QDir pictureDir(picturesPath);
-
-        if (!pictureDir.exists())
-        {//where the directory does not exist
-            pictureDir.mkdir(picturesPath);
-        }
-
-        // Create the folder in the home directory
-        QString videosPath = QDir::homePath() + "/Videos";
-        QDir videosDir(videosPath);
-
-        if (!videosDir.exists())
-        {//where the directory does not exist
-            videosDir.mkdir(videosPath);
-        }
-
-        viewer.rootContext()->setContextProperty("SystemPictureFolder",picturesPath);
-        viewer.rootContext()->setContextProperty("SystemVideoFolder",videosPath);
-    }
-    else
-    {
-        viewer.rootContext()->setContextProperty("SystemPictureFolder",QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).first());
-        viewer.rootContext()->setContextProperty("SystemVideoFolder",QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first());
-    }
-
+    viewer.rootContext()->setContextProperty("SystemPictureFolder", QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).first());
+    viewer.rootContext()->setContextProperty("SystemVideoFolder", QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first());
 
 
 #if LAUNCHPAD
@@ -296,7 +231,7 @@ int main(int argc, char *argv[])
     viewer.setMainQmlFile(QStringLiteral("qml/qtcam/Views/qtcam.qml"));
 #endif
 
-    viewer.rootContext()->setContextProperty("helperQml", &vs.helperObj);
+    viewer.rootContext()->setContextProperty("helperQml", &Videostreaming::helperObj);
 
     QObject *rootObject = dynamic_cast<QObject*>(viewer.rootObject());
 
@@ -313,5 +248,5 @@ int main(int argc, char *argv[])
     viewer.setTitle("Qtcam");
     //Bug fix: There's no "close,Restore Down,minimize" button on the top of the QTCAM when restore the application
     viewer.show();
-    return app.exec();
+    return QApplication::exec();
 }

@@ -122,16 +122,13 @@ public:
 #else
     AVStream* add_audio_stream(AVFormatContext *oc, enum CodecID codec_id, int sampleRate, int channels);
 #endif
-    int check_sample_fmt(AVCodec *codec, enum AVSampleFormat sample_fmt);
+    static int check_sample_fmt(const AVCodec *codec, enum AVSampleFormat sample_fmt);
     int encodeAudio(void *);
 
    bool closeFile();
 
    //Encodes a video frame given a buffer and buffer type.
    int encodeImage(uint8_t *buffer, uint8_t bufferType);
-
-   //To check for Ubuntu 22.04 OS
-   bool isUbuntu2204();
 
    //Encodes a video packet given a buffer and buffer type.
    int encodePacket(uint8_t *buffer, uint8_t bufferType);
@@ -164,7 +161,7 @@ protected:
     AVFormatContext *pFormatCtx;
 
     AVStream *pVideoStream, *pAudioStream;
-    AVCodec *pCodec;
+    const AVCodec *pCodec;
 
     // Frame data
     AVFrame *ppicture;
@@ -190,7 +187,7 @@ protected:
     u_int8_t *samples;
     u_int8_t *audio_outbuf;
 
-    AVCodec *paudioCodec;
+    const AVCodec *paudioCodec;
     AVFrame *pAudioFrame;
 
     unsigned getWidth();

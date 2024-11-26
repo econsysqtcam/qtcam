@@ -1,0 +1,45 @@
+name: Build Ubuntu
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    types: [ opened, reopened, synchronize ]
+    branches: [ "master" ]
+
+jobs:
+  build:
+    name: Ubuntu ${{ matrix.ubuntu_version }}
+    runs-on: ubuntu-${{ matrix.ubuntu_version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_version: [ '20.04', '22.04', '24.04' ]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt update -y
+        sudo apt install -y --no-install-recommends libv4l-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev libudev-dev libavcodec-extra qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools qtdeclarative5-dev freeglut3-dev libjpeg-turbo8-dev libusb-1.0-0-dev libusb-dev libevdev-dev libpulse-dev libpulse0 qtmultimedia5-dev qml-module-qtquick-controls qml-module-qtquick-dialogs qml-module-qtquick-extras qml-module-qtquick-privatewidgets libasound2-dev libturbojpeg0-dev qtquickcontrols5-doc g++ g++-10 lsb-release
+
+    - name: Run qmake
+      working-directory: ${{github.workspace}}/src
+      run: |
+        qmake --version
+        qmake
+      env:
+        QT_SELECT: qt5
+
+    - name: Run make
+      working-directory: ${{github.workspace}}/src
+      run: make
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: qtcam-ubuntu-${{ matrix.ubuntu_version }}.zip
+        if-no-files-found: 'error'
+        path: |
+          src/Qtcam

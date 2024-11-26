@@ -1,0 +1,12 @@
+# Ignore CLion IDE specific stuff:
+.idea/
+*.iml
+
+# Ignore generated files and compiler output:
+.qmake.stash
+Makefile
+moc_*
+*.o
+
+# Ignore the binary
+Qtcam
