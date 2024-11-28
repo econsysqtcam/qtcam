@@ -858,9 +858,12 @@ Item {
 
                             exposureInt = parseInt(exposure_Slider.value)
 
-                            seconds = exposureInt / 1000000
-                            milliSeconds = (exposureInt/1000) - (seconds * 1000)
-                            microSeconds = exposureInt - ((seconds * 1000000) + (milliSeconds * 1000))
+                            //seconds = exposureInt / 1000000
+                            //milliSeconds = (exposureInt/1000) - (seconds * 1000)
+                            //microSeconds = exposureInt - ((seconds * 1000000) + (milliSeconds * 1000))
+                            seconds = parseInt(adjustedExposure / 1000000)
+                            milliSeconds = (Math.floor(adjustedExposure / 1000)) % 1000;
+                            microSeconds = adjustedExposure % 1000;
 
                             if((exposureCombo.currentText == "Manual Mode") && (root.selectedDeviceEnumValue == CommonEnums.CX3_UVC_CAM)){
                                 exposureValueAscella = exposureOrigAscella[value]
@@ -1361,6 +1364,7 @@ Item {
         onGetExposureFromHID:{
             updateUVCExposure = false
             exposure_Slider.value = exposureFromHID
+            updateUVCExposure = true
         }
 
         onDisableUVCSettings:{

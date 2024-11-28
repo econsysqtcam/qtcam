@@ -142,6 +142,9 @@ void uvccamera::initCameraEnumMap()
     cameraEnumMap.insert(econVid + (",c13a"),CommonEnums::IMX900USBCAM);
     //Added By Sushanth 17th January 2024
     cameraEnumMap.insert(econVid + (",c137"),CommonEnums::SEE3CAM_CU31);
+
+    //Added By Geethalakshmi 26th November 2024
+    cameraEnumMap.insert(econVid + (",c18d"),CommonEnums::See3CAM_CU83_H03R1);
 }
 
 unsigned int uvccamera::getTickCount()

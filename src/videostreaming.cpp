@@ -812,7 +812,7 @@ void FrameRenderer::drawUYVYBUffer(){
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_50CUG) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG) | (currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M))
+        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_50CUG) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83) |(currentlySelectedEnumValue == CommonEnums::See3CAM_CU83_H03R1) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG) | (currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M))
         {
             skipFrames = frame;
         }
@@ -821,7 +821,8 @@ void FrameRenderer::drawUYVYBUffer(){
             skipFrames = 4;
         }
 
-        if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83){
+        if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83 ||
+           currentlySelectedEnumValue == CommonEnums::See3CAM_CU83_H03R1){
               if((videoResolutionwidth == Y16_2160p_WIDTH) && (videoResolutionHeight == Y16_2160p_HEIGHT)) {//To render Y16 -> UYVY colorspace
                   if(uyvyBuffer!= NULL){
                         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Y16_2160p_RGB_WIDTH/2, Y16_2160p_RGB_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, uyvyBuffer);
@@ -896,7 +897,8 @@ void FrameRenderer::drawY8BUffer(){
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if(renderyuyvMutex.tryLock()){
         //See3CAM_CU83 -> rendering Y8 (splitted from Y10)
-        if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83){
+        if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83 ||
+           currentlySelectedEnumValue == CommonEnums::See3CAM_CU83_H03R1){
             if((videoResolutionwidth == Y16_1350p_WIDTH)&&(videoResolutionHeight == Y16_1350p_HEIGHT)){
                 if(ir1350pBuffer != NULL){
                     glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth ,Y16_1350p_HEIGHT_MODIFIED, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, ir1350pBuffer);
@@ -988,7 +990,8 @@ void FrameRenderer::changeShader(){
             case V4L2_PIX_FMT_Y12:
             case V4L2_PIX_FMT_SGRBG8:
             case V4L2_PIX_FMT_SBGGR8: //Added by M Vishnu Murali: See3CAM_10CUG_CH uses respective pixel format
-                if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83){
+                if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83 ||
+                   currentlySelectedEnumValue == CommonEnums::See3CAM_CU83_H03R1){
                     if(shaderType == CommonEnums::UYVY_BUFFER_RENDER){
                         shaderUYVY();
                         drawUYVYBUffer();
@@ -1446,7 +1449,8 @@ void FrameRenderer::getDisplayRenderArea(int *displayX, int *displayY, int *dest
     int x, y, destWindowWidth, destWindowHeight;
 
     //changing the height of viewport for See3CAM_CU83
-    if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83){
+    if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83 ||
+       currentlySelectedEnumValue == CommonEnums::See3CAM_CU83_H03R1){
         if((videoResolutionwidth == Y16_1350p_WIDTH)&&(videoResolutionHeight == Y16_1350p_HEIGHT)){//3840x2160
             if(previewBgrdAreaHeight == 0){
                 calculateViewport(videoResolutionwidth, Y16_1350p_HEIGHT_MODIFIED, previewBgrdAreaWidth-xMargin, m_viewportSize.height(), &x, &y, &destWindowWidth, &destWindowHeight);
@@ -1933,7 +1937,8 @@ void Videostreaming::capFrame()
         {
             if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)
             {
-                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
+                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 ||
+                   currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1)
                 {
                     if((width == Y16_2160p_WIDTH) && (height == Y16_2160p_HEIGHT))
                     {
@@ -2186,7 +2191,8 @@ void Videostreaming::capFrame()
             }
             else if(validFilePath){//Capturing image only when the given filepath is valid - Added by Sushanth
                 bufferToSave = m_capImage->bits(); // image data converted using v4l2convert
-                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
+                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 ||
+                   currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1)
                 {
                     if((width == Y16_2160p_WIDTH) && (height == Y16_2160p_HEIGHT))//4440x2160
                     {
@@ -3193,7 +3199,8 @@ bool Videostreaming::prepareStillBuffer(uint8_t *inputBuffer)
             //Enabling imageCapture flag when IR still is already Captured
         }
     }
-    else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
+    else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 ||
+            currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1)
     {
          int defaultWidth  = 4440;
          int defaultHeight = 2160;
@@ -3810,7 +3817,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                     m_renderer->renderBufferFormat = CommonEnums::GREY_BUFFER_RENDER;
 
                     //Added By Sushanth - To enable wakeonMotion in GREY format
-                    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
+                    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 || currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1)
                     {
                         emit wakeOnMotion(false);
                     }
@@ -3821,7 +3828,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
 
                 case V4L2_PIX_FMT_UYVY:{   // directly giving uyvy data for rendering
                     //Added By Sushanth - To disable wakeonMotion in UVVY format
-                    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
+                    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 || currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1)
                     {
                         emit wakeOnMotion(true);
                     }
@@ -3908,7 +3915,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                     freeBuffer(srcBuffer);
 
                     //Splitting of UYVY & Y8 buffer for See3Cam_CU83
-                    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
+                    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 || currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1)
                     {
                         //Added By Sushanth - To enable wakeonMotion in Y16 format
                         emit wakeOnMotion(false);
@@ -4160,7 +4167,8 @@ bool Videostreaming::startCapture()
     }
 
     //To Create window for IR preview & also avoid to create IR window when capturing still
-    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)&&(createWindow))
+    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 ||
+        currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1)&&(createWindow))
     {
         //condition to check dual streaming supported resolution for creating IR Window
         if(((width == Y16_2160p_WIDTH)&&(height == Y16_2160p_HEIGHT)) || ((width == Y16_NEW_WIDTH)&&(height == Y16_NEW_HEIGHT)))
@@ -4507,7 +4515,7 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
     retrieveShot = false;
     imgSaveSuccessCount = 0;
 
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 || currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1)
     {
         createWindow = false; // To stop creating IR window while cross resolution stillCapture
     }
@@ -4543,7 +4551,7 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
         setResolution(stillSize);
         startAgain();
 
-        if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
+        if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 || currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1)
         {
             clearBuffer = true; // to clear buffer in IR preview while cross resolution stillCapture
         }
@@ -4671,7 +4679,7 @@ void Videostreaming::displayFrame() {
     }
     if (startCapture()) {
         sprintf(header,"P6\n%d %d 255\n",width,height);
-        if(((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)) && (m_snapShot || m_burstShot))
+        if(((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83) || (currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1)) && (m_snapShot || m_burstShot))
         {
             stillTimeOutTimer.start(4000);
         }
@@ -5332,7 +5340,8 @@ void Videostreaming::setSampleRate(uint index){
 
 void Videostreaming::recordVideo(){  // Added by Navya : 25 Nov 2019 -- To configure the source format accordingly.
 
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 ||
+       currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1 )
     {//See3CAM_CU83 - VideoRecording for Y16 format
         if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16)
         {
@@ -5434,7 +5443,8 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
         bool tempRet;
         //Creating Video Recording file for See3CAM_CU83
-        if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83)
+        if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 ||
+            currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1)
         {
             if((width == Y16_1350p_WIDTH) && (height == Y16_1350p_HEIGHT))//3840x1350
             {
@@ -5559,7 +5569,9 @@ void Videostreaming::masterModeEnabled() {
     trigger_mode = false;
     m_renderer->triggermodeFlag = false;
      m_snapShot = false;
-     if(!(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M)){ //To avoid executing mismatched shader function when switched from trigger mode to master mode
+     if(!(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 ||
+          currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1||
+          currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M)){ //To avoid executing mismatched shader function when switched from trigger mode to master mode
          m_renderer->gotFrame = true;        // Added by Nivedha : 09 Mar 2021 -- To get preview when changed from trigger mode to master mode.
      }
      m_renderer->updateStop = false;
@@ -5659,7 +5671,8 @@ void Videostreaming::switchToStillPreviewSettings(bool stillSettings)
         }
 
         //To set frame rate after capturing still in cross resolution
-        if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU84) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_130))
+        if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83) || (currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1) ||
+           (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU84) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_130))
         {
             emit setHIDControlsAfterStillCapture();
         }

@@ -27,6 +27,14 @@ Item {
     property int enable : 1
     property int disable: 0
 
+    property int selfTrigEnable : 0
+    property int selfTrigDisable: 1
+
+    property int vidResW : 0
+    property int vidResH : 0
+    property int hCropPos : 0
+    property int vCropPos : 0
+
     property bool skipUpdateUIQFactor           : false
     property bool skipUpdateUIOnAntiFlickerMode : false
     property bool skipUpdateUIOnAWBLockStatus   : false
@@ -119,7 +127,7 @@ Item {
 
     Timer {
         id: getCamValuesTimer
-        interval: 500
+        interval: 1000
         onTriggered: {
             imx900USBCAM.getExposureMode()
             stop()
@@ -149,8 +157,8 @@ Item {
         }
 
         function onMouseRightClicked(x, y, width, height){
-            /*if(enableSelfTrigger.enabled && enableSelfTrigger.checked){
-                if(normalMode.checked == true && withOutput.checked == true){
+            if(enableSelfTrigger.enabled && enableSelfTrigger.checked){
+                /*if(normalMode.checked == true && withOutput.checked == true){
                     imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
                 } else if ((normalMode.checked == true) && (withoutOutput.checked == true)){
                     imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
@@ -159,8 +167,13 @@ Item {
                 }
                 else if((forcedMode.checked == true) && (withoutOutput.checked == true)){
                     imx900USBCAM.setSelfTrigger(enable, width, height, x, y, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, hSidePixelTextField.text, lSidePixelTextField.text, gainSlider1.value, gainSlider2.value)
-                }
-            }*/
+                }*/
+                vidResW = width;
+                vidResH = height;
+                hCropPos = x;
+                vCropPos = y;
+                imx900USBCAM.setSelfTrigger(enable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+            }
         }
 
         //Signals getting values from UVC & set its values to the HID controls
@@ -1999,10 +2012,10 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                         exclusiveGroup: selfTriggerModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+                            imx900USBCAM.setSelfTrigger(enable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
                         }
                         Keys.onReturnPressed:  {
-                            imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+                            imx900USBCAM.setSelfTrigger(enable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
                         }
                     }
                     RadioButton {
@@ -2012,10 +2025,10 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                         exclusiveGroup: selfTriggerModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            imx900USBCAM.setSelfTrigger(disable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+                            imx900USBCAM.setSelfTrigger(disable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
                         }
                         Keys.onReturnPressed: {
-                            imx900USBCAM.setSelfTrigger(disable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+                            imx900USBCAM.setSelfTrigger(disable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
                         }
                     }
                 }
@@ -2546,11 +2559,11 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                         implicitWidth: 60
                         onClicked:
                         {
-                            imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+                            imx900USBCAM.setSelfTrigger(enable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
                         }
                         Keys.onReturnPressed:
                         {
-                            imx900USBCAM.setSelfTrigger(enable, 0, 0, 0, 0, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+                            imx900USBCAM.setSelfTrigger(enable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
                         }
                     }
                 }
@@ -3499,18 +3512,18 @@ following power cycles."
      }
 
      onCurrentSelfTriggerMode: {
-         if(mode === enable){
+         if(mode === selfTrigEnable){
              enableSelfTrigger.checked = true
-         } else if(mode === disable){
+         } else if(mode === selfTrigDisable){
              disableSelfTrigger.checked = true
          }
      }
 
      onCurrentHCropSize:{
-         hCroppingSizeSlider.value = current
          hCroppingSizeSlider.minimumValue = min
          hCroppingSizeSlider.maximumValue = max
          hCroppingSizeSlider.stepSize = step
+         hCroppingSizeSlider.value = current
      }
 
      onCurrentVCropSize:{
@@ -3988,7 +4001,8 @@ following power cycles."
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
         imx900USBCAM.setToDefaultValues()
-        getValuesFromCamera()
+        getValuesFromCamera()     
+        imx900USBCAM.getExposureMode()
 
         //To send Exposure properties when set default is clicked
         sendConvertedExpToUVC()
@@ -4017,7 +4031,6 @@ following power cycles."
 
         //imx900USBCAM.getAutoExposureLowerLimit()
         //imx900USBCAM.getAutoExposureUpperLimit()
-
         imx900USBCAM.getStrobeMode()
         //imx900USBCAM.getTargetBrightness()
         //imx900USBCAM.getBlackLevelAdjustment()

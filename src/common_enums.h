@@ -86,6 +86,8 @@ public:
         SEE3CAM_CU200M, //Added By Sushanth
         SEE3CAM_CU200M_H01R1, //Added By Sushanth
         IMX900USBCAM, //Added By Sushanth
+        See3CAM_CU83_H03R1,        //Added By Geethalakshmi
+
         SEE3CAM_20CUG
     }ECameraNames;
     //Enum for capture shot type

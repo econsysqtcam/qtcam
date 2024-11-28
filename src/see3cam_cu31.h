@@ -238,7 +238,7 @@ public slots:
     bool getAWBMaskOverlay();
     bool setAWBMaskOverlay(uint status);
 
-    bool getAWBMaskDimensions(bool isMaskIDNeeded,  uint maskID);
+    bool getAWBMaskDimensions(bool isMaskIDNeeded, uint maskID);
     bool setAWBMaskDimensions(uint maskID, uint maskStatus, uint width, uint height, uint xStart, uint yStart);
 
     //OTHER CONTROLS

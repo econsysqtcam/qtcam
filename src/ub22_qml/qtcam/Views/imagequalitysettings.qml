@@ -93,6 +93,8 @@ Item {
     property bool exposureAutoAvailable: false
     property var menuitems:[]
 
+    property real adjustedBrightness
+
     property int adjustedExposure
     property int exposureInt
     property int seconds : 0
@@ -227,7 +229,7 @@ Item {
                         onValueChanged: {
                             if(brightValueChangeProperty) {
                                 //Sending UVC value to HID
-                                var adjustedBrightness = (brightness_Slider.value) / 200.0;
+                                adjustedBrightness = (brightness_Slider.value) / 200.0;
                                 root.getBrightness(adjustedBrightness)
 
                                 root.logInfo("Brightness changed to: "+ value.toString())
@@ -521,6 +523,7 @@ Item {
                         activeFocusOnPress: true
                         updateValueWhileDragging: false
                         id: white_balance_Slider
+                        enabled: false
                         opacity: enabled ? 1 : 0.1
                         width: 110
                         style:econSliderStyle
@@ -855,9 +858,13 @@ Item {
 
                             exposureInt = parseInt(exposure_Slider.value)
 
-                            seconds = exposureInt / 1000000
-                            milliSeconds = (exposureInt/1000) - (seconds * 1000)
-                            microSeconds = exposureInt - ((seconds * 1000000) + (milliSeconds * 1000))
+                            //seconds = parseInt(exposureInt / 1000000)
+                            //milliSeconds = (exposureInt/1000) - (seconds * 1000)
+                            //microSeconds = exposureInt - ((seconds * 1000000) + (milliSeconds * 1000))
+
+                            seconds = parseInt(adjustedExposure / 1000000)
+                            milliSeconds = (Math.floor(adjustedExposure / 1000)) % 1000;
+                            microSeconds = adjustedExposure % 1000;
 
                             if((exposureCombo.currentText == "Manual Mode") && (root.selectedDeviceEnumValue == CommonEnums.CX3_UVC_CAM)){
                                 exposureValueAscella = exposureOrigAscella[value]
@@ -1346,6 +1353,7 @@ Item {
         function onGetExposureFromHID(exposureFromHID){
             updateUVCExposure = false
             exposure_Slider.value = exposureFromHID
+            updateUVCExposure = true
         }
         function onGetExposureStatusFromHID(isAutoEnable, exposure){
             if(isAutoEnable)
@@ -1626,6 +1634,9 @@ Item {
             case 10094860://Focus,Auto
                 focusUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
+            case 10094858://Focus,Absolute
+                focusAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
+                break;
         }
 
         switch(controlName)
@@ -1638,9 +1649,6 @@ Item {
                 break;
             case "LED1 Mode":
                 ledModeUIUpdate(controlID,controlMinValue,controlMaxValue,controlDefaultValue)
-                break;
-            case "Focus (absolute)":
-                focusAbsoluteUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)
                 break;
         }
     }
