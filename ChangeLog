@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.32
+---------------------------
+*HID Changes in IMX900 and Changes to support see3cam_cu200 and see3cam_130 in Ubuntu 22.04.
+
 Qtcam Application - 26.0.31
 ---------------------------
 *UI Changes in IMX900 and cu31 camera and In cu31,Get call with maskid on MaskId combobox value change.

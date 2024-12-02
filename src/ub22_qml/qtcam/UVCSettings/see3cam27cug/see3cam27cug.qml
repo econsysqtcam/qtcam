@@ -1,5 +1,5 @@
 /*
- * uvc_cu30.qml -- extension settings for other cameras
+ * see3cam27cug.qml -- extension settings for other cameras
  * Copyright © 2024  e-con Systems India Pvt. Limited
  *
  * This file is part of Qtcam.
