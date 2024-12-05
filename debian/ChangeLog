@@ -1,4 +1,5 @@
-qtcam (26.0.32-0ubuntu1) focal; urgency=medium
+qtcam (26.0.33-0ubuntu1) focal; urgency=medium
+ *HID Changes in See3CAM_CU81, green frame issue fix in See3CAM_160, added new pid for See3CAM_CU83_H03R1 and green frame issue fix in See3CAM_CU83 while switching format in still capture settings.
  *HID Changes in IMX900 and Changes to support see3cam_cu200 and see3cam_130 in Ubuntu 22.04.
  *UI Changes in IMX900 and cu31 camera and In cu31,Get call with maskid on MaskId combobox value change.
  *Added support for See3CAM_37CUG_MHLCC_H01R1.
@@ -161,5 +162,5 @@ qtcam (26.0.32-0ubuntu1) focal; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Mon Dec 2 11:43:02 2024 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Thu Dec 5 18:51:43 2024 +0530
 
