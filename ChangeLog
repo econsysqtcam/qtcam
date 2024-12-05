@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.33
+---------------------------
+*HID Changes in See3CAM_CU81, green frame issue fix in See3CAM_160, added new pid for See3CAM_CU83_H03R1 and green frame issue fix in See3CAM_CU83 while switching format in still capture settings.
+
 Qtcam Application - 26.0.32
 ---------------------------
 *HID Changes in IMX900 and Changes to support see3cam_cu200 and see3cam_130 in Ubuntu 22.04.

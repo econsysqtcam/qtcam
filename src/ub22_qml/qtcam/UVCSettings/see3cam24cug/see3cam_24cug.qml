@@ -34,7 +34,9 @@ Item {
         {
              root.imageCapture(CommonEnums.SNAP_SHOT)
         }
-
+        function onMasterShotCap(){
+            root.imageCapture(CommonEnums.SNAP_SHOT)
+        }
     }
 
     Connections
@@ -56,6 +58,10 @@ Item {
             stillImageFormat.push("raw")
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
+        }
+        function onSetExpCompensation(){
+            see3cam24cug.setExposureCompensation(exposureCompValue.text)
+            see3cam24cug.setFrameRateCtrlValue(frameRateSlider.value)
         }
     }
 
@@ -80,7 +86,7 @@ Item {
 
     Timer {
         id: getexposureCompFrameRateCtrlTimer
-        interval: 500
+        interval: 10
         onTriggered: {
             see3cam24cug.getExposureCompensation()
             see3cam24cug.getFrameRateCtrlValue()
@@ -219,6 +225,7 @@ Item {
             Row{
                 spacing:38
                 ExclusiveGroup { id: roiExpogroup }
+                Layout.alignment: Qt.AlignCenter
 
                 RadioButton {
                     exclusiveGroup: roiExpogroup
@@ -592,6 +599,8 @@ value in the text box and click the Set button"
             }
             Row{
                 spacing: 55
+                Layout.alignment: Qt.AlignCenter
+
                 CheckBox {
                     id: flipCtrlHorizotal
                     activeFocusOnPress : true
@@ -707,6 +716,8 @@ value in the text box and click the Set button"
                 y:230
                 spacing: 25
                 ExclusiveGroup { id: flashGrp }
+                Layout.alignment: Qt.AlignCenter
+
                 Column{
                     RadioButton {
                         exclusiveGroup: flashGrp
@@ -1218,6 +1229,9 @@ value in the text box and click the Set button"
 
     function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
+            //To enable exposure when device is in manual exposure mode in UVC
+            root.enableDisableExposureCompensation(autoExposureSelect)
+
             autoexpManual.enabled = true
             autoexpFull.enabled = true
             if(autoexpManual.checked)
@@ -1232,6 +1246,9 @@ value in the text box and click the Set button"
             exposureCompSet.opacity = 1
             exposureCompText.opacity = 1
         }else{
+            //To disable exposure compensation when device is in manual exposure mode in UVC
+            root.enableDisableExposureCompensation(autoExposureSelect)
+
             autoexpManual.enabled = false
             autoexpFull.enabled = false
             autoExpoWinSizeCombo.enabled = false
@@ -1276,9 +1293,17 @@ value in the text box and click the Set button"
 
     function setDefaultValues(){
         defaultValue.enabled = false //To avoid multiple clicks over Default button
-        see3cam24cug.setToDefault()
+
+        root.checkForTriggerMode(false)
+        root.captureBtnEnable(true)
+        root.videoRecordBtnEnable(true)
+
+        if(see3cam24cug.setToDefault())
+        {
+            getCameraValues()
+        }
+
         root.keyEventFiltering = false
-        getCameraValues()
         defaultValue.enabled = true
     }
 

@@ -479,7 +479,7 @@ void FrameRenderer::drawBufferForYUV420(){
     }
     renderyuyvMutex.lock();
 
-    int skipFrames =4;
+    int skipFrames = frame;
     m_shaderProgram->bind();
 
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
@@ -624,7 +624,7 @@ void FrameRenderer::drawBufferFor360p(){
     }
      renderyuyvMutex.lock();
 
-    int skipFrames =4;
+    int skipFrames = frame;
     m_programYUYV->bind();
 
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
@@ -635,15 +635,8 @@ void FrameRenderer::drawBufferFor360p(){
 
     glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if (yBuffer != NULL && uBuffer != NULL && vBuffer != NULL){
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_16CUGM || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1
-        || currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
-            skipFrames = frame;
-        }
-        else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
+        if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
              goto skip;
-        else{
-            skipFrames = 4;
-        }
         if(gotFrame && !updateStop && skipFrames >3){
             // set active texture and give input y buffer
             glActiveTexture(GL_TEXTURE1);
@@ -691,6 +684,7 @@ skip:
  * @brief FrameRenderer::drawRGBABUffer - Shader for RGBA buffer and render
  */
 void FrameRenderer::drawRGBBUffer(){
+    int skipFrames = frame;
     m_shaderProgram->bind();
 
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
@@ -714,12 +708,12 @@ void FrameRenderer::drawRGBBUffer(){
         if(rgbaDestBuffer){
             glTexImage2D(GL_TEXTURE_2D, 0,  GL_RGBA, videoResolutionwidth, videoResolutionHeight, 0,GL_RGBA , GL_UNSIGNED_BYTE, rgbaDestBuffer);
         }
-        if(gotFrame && !updateStop){
+        if(gotFrame && !updateStop && skipFrames > 3){
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
         }
         renderyuyvMutex.unlock();
     }
-    else{
+    else if(skipFrames > 3){
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData); //Edited by M.Vishnu Murali:Removed renderyuyvMutex.unlock() as it is leading to improper buffer allocations especially at high resolutions.
     }
     m_shaderProgram->disableAttributeArray(0);
@@ -733,7 +727,7 @@ void FrameRenderer::drawRGBBUffer(){
  * @brief FrameRenderer::drawYUYVBUffer - Shader for YUYV buffer and render
  */
 void FrameRenderer::drawYUYVBUffer(){
-    int skipFrames =4;
+    int skipFrames = frame;
     m_shaderProgram->bind();
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
     glVertexAttribPointer(mTexCoordLoc, 2, GL_FLOAT, false, 8, mVerticesDataTextCord);
@@ -753,16 +747,15 @@ void FrameRenderer::drawYUYVBUffer(){
     if(renderyuyvMutex.tryLock()){
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200 || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200M || (currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200M_H01R1) || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M || currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M)){
-            skipFrames = frame;
-        }
-        else if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
+        if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
+         {
+            renderyuyvMutex.unlock();   //Added by M.Vishnu Murali: Inorder to unlock Qmutex when decoding fails.
+            goto skip;
+         }
+        if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
         {
             renderyuyvMutex.unlock();   //Added by M.Vishnu Murali: Inorder to unlock Qmutex when decoding fails.
             goto skip;
-        }
-        else{
-            skipFrames = 4;
         }
         if (yuvBuffer != NULL){
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, videoResolutionwidth/2, videoResolutionHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, yuvBuffer);
@@ -789,7 +782,7 @@ skip:
  * @brief FrameRenderer::drawUYVYBUffer - draw uyvy buffer
  */
 void FrameRenderer::drawUYVYBUffer(){
-    int skipFrames = 4;
+    int skipFrames = frame;
     m_shaderProgram->bind();
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
     glVertexAttribPointer(mTexCoordLoc, 2, GL_FLOAT, false, 8, mVerticesDataTextCord);
@@ -808,18 +801,11 @@ void FrameRenderer::drawUYVYBUffer(){
         {
             frame = 0;
             flipModeChanged = false;
+            skipFrames = frame;
         }
 
         // Added by Navya -- 18 Sep 2019
         // Skipped frames inorder to avoid green strips in streaming while switching resolution or capturing images continuosly.
-        if((currentlySelectedEnumValue == CommonEnums::SEE3CAM_50CUG) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83) |(currentlySelectedEnumValue == CommonEnums::See3CAM_CU83_H03R1) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU200) | (currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG) | (currentlySelectedEnumValue == CommonEnums::ECAM22_USB) |(currentlySelectedEnumValue == CommonEnums::SEE3CAM_20CUG || currentlySelectedEnumValue == CommonEnums::See3CAM_CU135M_H01R1|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_135M|| currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU136M))
-        {
-            skipFrames = frame;
-        }
-        else
-        {
-            skipFrames = 4;
-        }
 
         if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU83 ||
            currentlySelectedEnumValue == CommonEnums::See3CAM_CU83_H03R1){
@@ -859,13 +845,21 @@ void FrameRenderer::drawUYVYBUffer(){
              }
         }
 
-        if(gotFrame && !updateStop && skipFrames >3){
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+        if(gotFrame && !updateStop){
+            if((currentlySelectedEnumValue != CommonEnums::SEE3CAM_CU83 &&
+               currentlySelectedEnumValue != CommonEnums::See3CAM_CU83_H03R1) && skipFrames >3){
+                    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+            }
+            else if(skipFrames > 5){
+                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+            }
         }
         renderyuyvMutex.unlock();
     }
-    else{
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+    else {
+        if(gotFrame && !updateStop && skipFrames > 3){
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+        }
     }
 
     m_shaderProgram->disableAttributeArray(0);
@@ -879,6 +873,7 @@ void FrameRenderer::drawUYVYBUffer(){
  * @brief FrameRenderer::drawY8BUffer - Shader for Y8 buffer and render
  */
 void FrameRenderer::drawY8BUffer(){
+    int skipFrames = frame;
     m_shaderProgram->bind();
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
     glVertexAttribPointer(mTexCoordLoc, 2, GL_FLOAT, false, 8, mVerticesDataTextCord);
@@ -921,12 +916,20 @@ void FrameRenderer::drawY8BUffer(){
             }
         }
         if(gotFrame && !updateStop){
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+            if((currentlySelectedEnumValue != CommonEnums::SEE3CAM_CU83 &&
+               currentlySelectedEnumValue != CommonEnums::See3CAM_CU83_H03R1) && skipFrames >3){
+                    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+            }
+            else if(skipFrames > 5){
+                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+            }
         }
         renderyuyvMutex.unlock();
     }
-    else{
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+    else {
+        if(gotFrame && !updateStop && skipFrames > 3){
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+        }
     }
 
     m_shaderProgram->disableAttributeArray(0);
@@ -973,13 +976,18 @@ void FrameRenderer::changeShader(){
                 drawRGBBUffer(); // To fix white color corruption drawing initially
                 break;
             case V4L2_PIX_FMT_UYVY:
-                if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU31){
-                    shaderUYVYBT709();
-                }else{
-                    shaderUYVY();
+                if(renderBufferFormat == CommonEnums::BUFFER_RENDER_360P){
+                    drawBufferFor360p();
                 }
-                drawUYVYBUffer(); // To fix white color corruption drawing initially
-                renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
+                else{
+                    if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_CU31){
+                        shaderUYVYBT709();
+                    }else{
+                        shaderUYVY();
+                    }
+                    drawUYVYBUffer(); // To fix white color corruption drawing initially
+                    renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
+                }
                 break;
             case V4L2_PIX_FMT_GREY:
                 shaderY8();
@@ -4093,7 +4101,9 @@ void Videostreaming::getFrameRates(){
                 m_tv = tv;
             }
             ++m_frame;
-            ++m_renderer->frame;
+            if(m_renderer->frame <= 7 ){
+                ++m_renderer->frame;
+            }
             m_renderer->fps = m_fps;
 
             if((m_fps >= 0.5) && (m_fps < 1.0)){

@@ -60,20 +60,20 @@ Item {
     Connections
     {
         target: root
-        onTakeScreenShot:
+        function onTakeScreenShot()
         {
             root.imageCapture(CommonEnums.SNAP_SHOT);
         }
-        onGetVideoPinStatus:
+        function onGetVideoPinStatus()
         {
             root.enableVideoPin(true);
         }
-        onAutoExposureSelected:
+        function onAutoExposureSelected(autoExposureSelect)
         {
             enableDisableAutoExposureControls(autoExposureSelect)
         }
 
-        onGetStillImageFormats:
+        function onGetStillImageFormats()
         {
             var stillImageFormat = []
             stillImageFormat.push("jpg")
@@ -82,16 +82,16 @@ Item {
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
-        onVideoResolutionChanged:{
+        function onVideoResolutionChanged(){
             getexposureCompTimer.start()
         }
-        onPreviewFPSChanged:{
+        function onPreviewFPSChanged(){
             getexposureCompTimer.start()
         }
-        onVideoColorSpaceChanged:{
+        function onVideoColorSpaceChanged(){
             getexposureCompTimer.start()
         }
-        onSetExpCompensation:{
+        function onSetExpCompensation(){
             see3cam27cug.setMaximumExposureCompensation(maxExpTextField.text)
             see3cam27cug.setMinimumExposureCompensation(minExpTextField.text)
         }

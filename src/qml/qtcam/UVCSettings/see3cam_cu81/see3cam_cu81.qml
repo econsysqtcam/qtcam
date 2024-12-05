@@ -36,7 +36,7 @@ Item
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 470
         style: econscrollViewStyle
         Item{
             height: 1700
@@ -750,9 +750,25 @@ Item
                     }
                     Row
                     {
-                          spacing:60
+                          spacing : 9
                           Layout.alignment: Qt.AlignCenter
                           ExclusiveGroup { id: antiFlickerModegroup }
+                          RadioButton
+                          {
+                              exclusiveGroup: antiFlickerModegroup
+                              id: antiFlickerModeOff
+                              text: "Off"
+                              activeFocusOnPress: true
+                              style: econRadioButtonStyle
+                              opacity: enabled ? 1 : 0.1
+                              width: 70
+                              onClicked: {
+                                  see3camcu81.setAntiFlickerMode(see3camcu81.AntiFlickerDisable);
+                              }
+                              Keys.onReturnPressed: {
+                                  see3camcu81.setAntiFlickerMode(see3camcu81.AntiFlickerDisable);
+                              }
+                          }
                           RadioButton
                           {
                               exclusiveGroup: antiFlickerModegroup
@@ -761,6 +777,7 @@ Item
                               activeFocusOnPress: true
                               style: econRadioButtonStyle
                               opacity: enabled ? 1 : 0.1
+                              implicitWidth: 70
                               onClicked: {
                                   see3camcu81.setAntiFlickerMode(see3camcu81.AntiFlickerAuto);
                               }
@@ -776,6 +793,7 @@ Item
                               activeFocusOnPress: true
                               style: econRadioButtonStyle
                               opacity: enabled ? 1 : 0.1
+                              implicitWidth: 70
                               onClicked: {
                                   setAntiFlickerMode()
                               }
@@ -886,26 +904,40 @@ Item
                     Row{
                         Layout.alignment: Qt.AlignCenter
                         Button {
-                            id: saveConfig
+                            id: userDefinedConfig
                             opacity: 1
                             activeFocusOnPress : true
                             text: "Save Configuration"
                             style: econButtonStyle
                             tooltip: "This feature will save the current configurations and are retained after the following power cycles."
                             onClicked:{
-                                see3camcu81.saveConfiguration()
+                                setButtonClicked = true
+                                see3camcu81.saveConfiguration(See3CamCU81.USER_DEFINED)
                             }
                             Keys.onReturnPressed: {
-                                see3camcu81.saveConfiguration()
+                                setButtonClicked = true
+                                see3camcu81.saveConfiguration(See3CamCU81.USER_DEFINED)
                             }
                         }
                     }
-                    Row
-                    {
-                        Button
-                        {
-                            id: dummy
-                            opacity: 0
+                    Row{
+                        Layout.alignment: Qt.AlignCenter
+                        Button {
+                            id: defaultConfig
+                            opacity: 1
+                            activeFocusOnPress : true
+                            text: "Default Configuration"
+                            tooltip: "This control is designed to restore the factory-provided default configuration.
+     Upon activation, the device will undergo an automatic reset to seamlessly load and apply the default configuration settings."
+                            style: econButtonStyle
+                            onClicked:{
+                                setButtonClicked = true
+                                see3camcu81.saveConfiguration(See3CamCU81.DEFAULT)
+                            }
+                            Keys.onReturnPressed: {
+                                setButtonClicked = true
+                                see3camcu81.saveConfiguration(See3CamCU81.DEFAULT)
+                            }
                         }
                     }
             }//ColumnLayout
@@ -1177,6 +1209,9 @@ Item
                     skipUpdateUIOnAntiFlickerMode = false
                     antiFlickerCombo.currentIndex = 1
                     skipUpdateUIOnAntiFlickerMode = true
+                    break
+                case See3CamCU81.AntiFlickerDisable:
+                    antiFlickerModeOff.checked = true
                     break
              }
         }

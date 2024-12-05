@@ -103,7 +103,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 460
         style: econscrollViewStyle
         Item {
             height:1300

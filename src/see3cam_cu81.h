@@ -35,7 +35,6 @@
 #define GET_FACE_DETECT_RECT        0x1A
 #define SET_FACE_DETECT_RECT        0x1B
 #define SAVE_CONFIGURATION_CU81     0x42
-#define SAVE_CU81                   0x01
 #define SET_DEFAULTS_CU81           0xFF
 
 
@@ -98,7 +97,8 @@ public:
         enum camAntiFlickerMode {
             AntiFlickerAuto = 0x00,
             AntiFlicker50Hz = 0x01,
-            AntiFlicker60Hz = 0x02
+            AntiFlicker60Hz = 0x02,
+            AntiFlickerDisable = 0x03
         };
         Q_ENUMS(camAntiFlickerMode)
 
@@ -119,6 +119,12 @@ public:
             FaceDetectOverlayRectDisable = 0x00
         };
         Q_ENUMS(camFaceDetectOverlayRect)
+
+        enum SAVECONFIGURATION{
+            DEFAULT      = 0x00,
+            USER_DEFINED = 0x01
+        };
+        Q_ENUMS(SAVECONFIGURATION)
 
 signals:
         void sendCameraModeValue(uint cameraMode);
@@ -176,7 +182,7 @@ public slots:
 
         bool getAutoWhiteBalance();
 
-        bool saveConfiguration();
+        bool saveConfiguration(SAVECONFIGURATION configType);
 
         bool setToDefault();
 };

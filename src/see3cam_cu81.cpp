@@ -787,7 +787,7 @@ bool See3CAM_CU81::getAutoWhiteBalance()
  * @brief See3CAM_CU81::saveConfiguration
  * @return true/false
  */
-bool See3CAM_CU81::saveConfiguration()
+bool See3CAM_CU81::saveConfiguration(SAVECONFIGURATION configMode)
 {
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -800,7 +800,7 @@ bool See3CAM_CU81::saveConfiguration()
 
     // fill buffer values
     g_out_packet_buf[1] = SAVE_CONFIGURATION_CU81;
-    g_out_packet_buf[2] = SAVE_CU81;
+    g_out_packet_buf[2] = configMode;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH))
@@ -811,7 +811,6 @@ bool See3CAM_CU81::saveConfiguration()
             return false;
         }
         else if(g_in_packet_buf[0] == SAVE_CONFIGURATION_CU81  &&
-            g_in_packet_buf[1]==SAVE_CU81 &&
             g_in_packet_buf[6]==SET_SUCCESS){
             emit indicateCommandStatus("Success", "Configurations saved successfully");
             return true;

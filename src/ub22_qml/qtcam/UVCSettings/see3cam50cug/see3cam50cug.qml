@@ -79,12 +79,16 @@ Item{
             gainSlider.value = gainHid
         }
         function onGetBrightnessFromUVC(brightnessFromUVC){
+	    skipUpdateBrightness = false
             brightnessSlider.value = brightnessFromUVC
+            see3cam50cug.setBrightness(brightnessFromUVC)
+            skipUpdateBrightness = true
         }
         function onGetContrastFromUVC(contrastFromUVC){
             contrastSlider.value = contrastFromUVC
         }
         function onGetSaturationFromUVC(saturationFromUVC){
+            skipUpdateSaturation = false
             saturationSlider.value = saturationFromUVC
             see3cam50cug.setSaturation(saturationFromUVC)
             skipUpdateSaturation = true
@@ -175,7 +179,7 @@ Item{
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 460
         style: econscrollViewStyle
         Item{
             height: 1500

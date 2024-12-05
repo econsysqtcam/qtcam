@@ -7,7 +7,6 @@ import econ.camera.uvcsettings 1.0
 import QtQuick.Layouts 1.1
 import cameraenum 1.0
 
-
 Item {
     width:268
     height:750
@@ -35,21 +34,19 @@ Item {
         }
     }
 
-
-
     Connections
     {
         target: root
-        onTakeScreenShot:
+        function onTakeScreenShot()
         {
            root.imageCapture(CommonEnums.SNAP_SHOT);
         }
 
-        onGetVideoPinStatus:
+        function onGetVideoPinStatus()
         {
             root.enableVideoPin(true);
         }
-        onGetStillImageFormats:
+        function onGetStillImageFormats()
         {
             var stillImageFormat = []
             stillImageFormat.push("jpg")
@@ -71,7 +68,86 @@ Item {
             y:5
             spacing:20
 
+            Text {
+                id: streamMode
+                text: "--- Stream Mode ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                spacing: 50
+                ExclusiveGroup { id: streamModeGroup }
 
+                RadioButton {
+                    id: masterMode
+                    style:  econRadioButtonStyle
+                    text:   qsTr("Master")
+                    exclusiveGroup: streamModeGroup
+                    activeFocusOnPress: true
+                    onClicked: {
+                        setMasterMode()
+                    }
+                    Keys.onReturnPressed: {
+                        setMasterMode()
+                    }
+                }
+
+                RadioButton {
+                    id: triggerMode
+                    style:  econRadioButtonStyle
+                    text: qsTr("Trigger")
+                    exclusiveGroup: streamModeGroup
+                    activeFocusOnPress: true
+                    onClicked: {
+                        setTriggerMode()
+                    }
+                    Keys.onReturnPressed: {
+                        setTriggerMode()
+                    }
+                }
+            }
+
+            Text {
+                id: flipMode
+                text: "--- Flip Mode ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                spacing: 40
+                CheckBox {
+                    id: flipCtrlHorizotal
+                    activeFocusOnPress : true
+                    text: "Horizontal"
+                    style: econCheckBoxStyle
+                    onClicked:{
+                        see3camcu512m.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                    }
+                    Keys.onReturnPressed: {
+                        see3camcu512m.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                    }
+                }
+                CheckBox {
+                    id: flipCtrlVertical
+                    activeFocusOnPress : true
+                    text: "Vertical"
+                    style: econCheckBoxStyle
+                    onClicked:{
+                        see3camcu512m.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                    }
+                    Keys.onReturnPressed: {
+                        see3camcu512m.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
+                    }
+                }
+            }
 
             Row{
                 Layout.alignment: Qt.AlignCenter
@@ -148,7 +224,6 @@ Item {
             }
 
            Row{
-               // Layout.alignment: Qt.AlignCenter
                 Button {
                     id: f_wversion_selected130
                     opacity: 1
@@ -192,13 +267,27 @@ Item {
                     }
                 }
             }
-
-        }//Coloumn Layout
-
-    }//ScrollView
+        }
+    }
 
    See3CAM_CU512M{
      id:see3camcu512m
+
+     onStreamModeReceived:{
+         if(streamMode == See3CAM_CU512M.MASTER)
+         {
+            masterMode.checked = true
+         }
+         else if(streamMode == See3CAM_CU512M.TRIGGER)
+         {
+            triggerMode.checked = true
+         }
+     }
+
+     onFlipMirrorModeChanged:
+     {
+         currentFlipMirrorMode(flipMirrorModeValues)
+     }
 
      onFlashModeReceived: {
 
@@ -215,7 +304,49 @@ Item {
             torchMode.checked = true
          }
      }
+   }
 
+   function setMasterMode(){
+       see3camcu512m.setStreamMode(See3CAM_CU512M.MASTER)
+
+       root.startUpdatePreviewInMasterMode()
+
+       root.checkForTriggerMode(false)
+       root.captureBtnEnable(true)
+       root.videoRecordBtnEnable(true)
+   }
+
+   function setTriggerMode(){
+       see3camcu512m.setStreamMode(See3CAM_CU512M.TRIGGER)
+
+       root.stopUpdatePreviewInTriggerMode()
+
+       root.checkForTriggerMode(true)
+       root.captureBtnEnable(false)
+       root.videoRecordBtnEnable(false)
+   }
+
+   function currentFlipMirrorMode(mode)
+   {
+       switch(mode)
+       {
+       case See3CAM_CU512M.NORMAL:
+           flipCtrlVertical.checked  = false
+           flipCtrlHorizotal.checked = false
+           break;
+       case See3CAM_CU512M.VERTICAL:
+           flipCtrlVertical.checked  = true
+           flipCtrlHorizotal.checked = false
+           break;
+       case See3CAM_CU512M.HORIZONTAL:
+           flipCtrlVertical.checked  = false
+           flipCtrlHorizotal.checked = true
+           break;
+       case See3CAM_CU512M.ROTATE_180:
+           flipCtrlVertical.checked  = true
+           flipCtrlHorizotal.checked = true
+           break;
+       }
    }
 
     Uvccamera {
@@ -295,6 +426,23 @@ Item {
         }
     }
 
+    Component {
+        id: econCheckBoxStyle
+        CheckBoxStyle {
+            label: Text {
+                text: control.text
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                opacity: 1
+            }
+            background: Rectangle {
+                color: "#222021"
+                border.color: control.activeFocus ? "#ffffff" : "#222021"
+            }
+        }
+    }
 
     function setToDefaultValues(){
         root.checkForTriggerMode(false)
@@ -315,12 +463,12 @@ Item {
     }
 
     function getValuesFromCamera(){
+        see3camcu512m.getStreamMode()
+        see3camcu512m.getOrientation()
         see3camcu512m.getFlashMode()
     }
 
     Component.onCompleted: {
         getValuesFromCamera();
     }
-
-
-}//Item
+}

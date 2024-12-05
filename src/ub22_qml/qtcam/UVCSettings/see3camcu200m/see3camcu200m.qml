@@ -58,7 +58,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 460
         style: econscrollViewStyle
         ColumnLayout{
             x:2
@@ -86,6 +86,12 @@ Item {
                     text:   qsTr("Master")
                     exclusiveGroup: streamModeGroup
                     activeFocusOnPress: true
+                    ToolButton{
+                        tooltip: "After choosing master mode, the application starts video streaming. This is a simple mode of operation for the camera without any external trigger capability."
+                        width: 15
+                        height: 20
+                        opacity: 0
+                    }
                     onClicked: {
                         setMasterMode()
                     }
@@ -100,6 +106,12 @@ Item {
                     text: qsTr("Trigger")
                     exclusiveGroup: streamModeGroup
                     activeFocusOnPress: true
+                    ToolButton{
+                        tooltip: "In Trigger mode, Frames will be out only when external hardware pulses are given to PIN1 of CN4."
+                        width: 15
+                        height: 20
+                        opacity: 0
+                    }
                     onClicked: {
                         setTriggerMode()
                     }
@@ -134,6 +146,12 @@ Item {
                     text:   qsTr("Disable")
                     exclusiveGroup: flashModeGroup
                     activeFocusOnPress: true
+                    ToolButton{
+                        tooltip: "It disables both strobe and torch flash controls."
+                        width: 15
+                        height: 20
+                        opacity: 0
+                    }
                     onClicked: {
                         see3camcu200m.setFlashMode(SEE3CAM_CU200M.DISABLE)
                     }
@@ -147,6 +165,12 @@ Item {
                     text: qsTr("Strobe")
                     exclusiveGroup: flashModeGroup
                     activeFocusOnPress: true
+                    ToolButton{
+                        tooltip: "When this control is enabled, the LED is ON for each frame’s exposure time while Video Streaming."
+                        width: 15
+                        height: 20
+                        opacity: 0
+                    }
                     onClicked: {
                         see3camcu200m.setFlashMode(SEE3CAM_CU200M.STROBE)
                     }
@@ -160,6 +184,12 @@ Item {
                     text: qsTr("Torch")
                     exclusiveGroup: flashModeGroup
                     activeFocusOnPress: true
+                    ToolButton{
+                        tooltip: "When this control is enabled, the LED is ON until the control is disabled."
+                        width: 15
+                        height: 20
+                        opacity: 0
+                    }
                     onClicked: {
                         see3camcu200m.setFlashMode(SEE3CAM_CU200M.TORCH)
                     }
@@ -187,6 +217,12 @@ Item {
                     activeFocusOnPress : true
                     text: "Horizontal"
                     style: econCheckBoxStyle
+                    ToolButton{
+                        tooltip: "Flips the preview left/right."
+                        width: 15
+                        height: 20
+                        opacity: 0
+                    }
                     onClicked:{
                         see3camcu200m.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                     }
@@ -199,6 +235,12 @@ Item {
                     activeFocusOnPress : true
                     text: "Vertical"
                     style: econCheckBoxStyle
+                    ToolButton{
+                        tooltip: "Flips the preview vertically up/down."
+                        width: 15
+                        height: 20
+                        opacity: 0
+                    }
                     onClicked:{
                         see3camcu200m.setOrientation(flipCtrlHorizotal.checked, flipCtrlVertical.checked)
                     }
@@ -232,6 +274,7 @@ Item {
                     opacity: 1
                     activeFocusOnPress : true
                     text: "Device Reset"
+                    tooltip: "This control is designed to reset all the device settings and provided by default configuration"
                     style: econButtonStyle
                     onClicked:{
                         see3camcu200m.resetDevice()
@@ -331,10 +374,22 @@ Item {
 
     function currentStreamModeReceived(mode){
         if(mode == SEE3CAM_CU200M.MASTER_MODE){
-           masterMode.checked = true
+            masterMode.checked = true
+
+            root.startUpdatePreviewInMasterMode()
+
+            root.checkForTriggerMode(false)
+            root.captureBtnEnable(true)
+            root.videoRecordBtnEnable(true)
         }
         else if(mode == SEE3CAM_CU200M.TRIGGER_MODE){
            triggerMode.checked = true
+
+            root.stopUpdatePreviewInTriggerMode()
+
+            root.checkForTriggerMode(true)
+            root.captureBtnEnable(false)
+            root.videoRecordBtnEnable(false)
         }
     }
 
