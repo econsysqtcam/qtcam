@@ -67,6 +67,9 @@ Item {
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
+        function onSkipFrameCount(){
+            root.setSkipFrameCount(3)
+        }
     }
 
     Timer {
@@ -118,7 +121,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 450
         style: econscrollViewStyle
         ColumnLayout{
             x:2

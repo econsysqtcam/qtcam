@@ -85,6 +85,9 @@ Item {
         function onFrameSkipCount(stillResolution, videoResolution, stillOutFormat){
             nilecam30usb.setStillSkipCount(stillOutFormat)
         }
+        function onSkipFrameCount(){
+            root.setSkipFrameCount(3)
+        }
     }
    
     // Used when selecting auto exposure in image Quality settings menu
@@ -127,7 +130,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 450
         style: econscrollViewStyle
         ColumnLayout{
             x:2

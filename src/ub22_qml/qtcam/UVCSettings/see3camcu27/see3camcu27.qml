@@ -84,7 +84,9 @@ Item {
                 getValuesFromCamera()
             }
         }
-
+        function onSkipFrameCount(){
+            root.setSkipFrameCount(3)
+        }
     }
 
     ScrollView {
@@ -92,7 +94,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 450
         style: econscrollViewStyle
         Item {
             height:1300

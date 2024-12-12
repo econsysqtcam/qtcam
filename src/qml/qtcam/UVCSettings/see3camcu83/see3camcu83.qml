@@ -161,6 +161,9 @@ Item{
                 see3camcu83.setROIAutoExposure(See3Cam_CU83.MANUAL_ROI, width, height, x, y, autoExpoWinSizeCombo.currentText)
             }
         }
+        onSkipFrameCount:{
+            root.setSkipFrameCount(5)
+        }
     }
 
     ScrollView
@@ -169,7 +172,7 @@ Item{
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 450
         style: econscrollViewStyle
 
     Item{

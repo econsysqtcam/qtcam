@@ -200,6 +200,7 @@ public:
     __u32 m_pixelformat;
     bool y16BayerFormat;
     bool rawY10Format;
+    int skipFrameCount = 0;
 
 signals:
      void ybufferchanged(uint8_t);
@@ -379,8 +380,6 @@ public:
         FPS_DEFAULT =0x02
     };
     Q_ENUMS(fpsChange)
-
-
 
 private:
     QFuture <int >threadMonitor;        //Added by M.Vishnu Murali:In order to moitor functions running in seperate thread.
@@ -802,6 +801,8 @@ public slots:
     void triggerModeSkipframes();
     void updatepreview();
     void getecam83USBStreamingState(int streamingState);
+
+    void setSkipFrameCount(int count);
 
 signals:
     void triggerShotCap();

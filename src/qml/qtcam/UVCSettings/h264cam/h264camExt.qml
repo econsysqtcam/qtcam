@@ -58,6 +58,9 @@ Item {
         {
             h264camId.runGetROIAutoExposureMode(H264camera.UVC_GET_CUR)
         }
+        onSkipFrameCount:{
+            root.setSkipFrameCount(3)
+        }
     }
 
     ScrollView{

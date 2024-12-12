@@ -64,6 +64,9 @@ Item {
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
+        onSkipFrameCount:{
+            root.setSkipFrameCount(3)
+        }
         onCameraDeviceUnplugged:
         {
             JS.enableMasterMode_10cugM()

@@ -95,6 +95,9 @@ Item {
             see3cam27cug.setMaximumExposureCompensation(maxExpTextField.text)
             see3cam27cug.setMinimumExposureCompensation(minExpTextField.text)
         }
+        function onSkipFrameCount(){
+            root.setSkipFrameCount(5)
+        }
     }
 
     ScrollView
@@ -103,7 +106,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 450
         style: econscrollViewStyle
 
         Item{

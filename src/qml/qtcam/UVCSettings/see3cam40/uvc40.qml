@@ -66,6 +66,9 @@ Item {
             stillImageFormat.push("IR data(8bit BMP)")
             root.insertStillImageFormat(stillImageFormat);
         }
+        onSkipFrameCount:{
+            root.setSkipFrameCount(3)
+        }
     }
     Text{
         id: flashCtrlText

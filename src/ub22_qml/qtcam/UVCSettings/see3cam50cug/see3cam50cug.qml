@@ -123,6 +123,9 @@ Item{
         function onGetExposureFromUVC(exposureFromUVC){
             manualExpTextField.text = exposureFromUVC
         }
+        function onSkipFrameCount(){
+            root.setSkipFrameCount(3)
+        }
     }
 
     property int gainMin: 0
@@ -179,7 +182,7 @@ Item{
         x: 10
         y: 189.5
         width: 257
-        height: 460
+        height: 450
         style: econscrollViewStyle
         Item{
             height: 1500

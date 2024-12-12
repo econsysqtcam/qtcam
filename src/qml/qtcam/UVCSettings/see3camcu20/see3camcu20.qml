@@ -81,6 +81,9 @@ Item {
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
+        onSkipFrameCount:{
+            root.setSkipFrameCount(3)
+        }
         onMouseRightClicked:{
             if(autoexpManual.enabled && autoexpManual.checked){
                see3camcu20.setROIAutoExposure(See3Camcu20.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
@@ -134,7 +137,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 450
         style: econscrollViewStyle
         Item {
             height: 1500

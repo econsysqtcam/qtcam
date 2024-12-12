@@ -136,13 +136,16 @@ Item {
                ecam512usb.setROIAutoExposure(ECAM_512USB.AutoExpManual, width, height, x, y, autoExpoWinSizeCombo.currentText)
             }
         }
+        onSkipFrameCount:{
+            root.setSkipFrameCount(3)
+        }
     }
     ScrollView{
         id: scrollview
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 450
         style: econscrollViewStyle
 
         Item {

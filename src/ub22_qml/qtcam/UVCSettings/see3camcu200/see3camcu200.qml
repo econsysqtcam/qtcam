@@ -184,6 +184,9 @@ Item{
                 see3camcu200.getWhiteBalanceMode()
             }
         }
+        function onSkipFrameCount(){
+            root.setSkipFrameCount(3)
+        }
     }
 
     property real adjustedRGain: 0.0
@@ -253,7 +256,7 @@ Item{
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 450
         style: econscrollViewStyle
         Item{
             height: 3000

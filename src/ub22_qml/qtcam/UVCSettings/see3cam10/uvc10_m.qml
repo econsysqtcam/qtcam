@@ -72,6 +72,9 @@ Item {
         {
             enableMasterMode();
         }
+        function onSkipFrameCount(){
+            root.setSkipFrameCount(3)
+        }
     }
 
     MessageDialog {

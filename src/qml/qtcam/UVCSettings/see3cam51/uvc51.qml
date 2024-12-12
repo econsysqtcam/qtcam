@@ -53,6 +53,9 @@ Item {
         {
             enableMasterMode();
         }
+        onSkipFrameCount:{
+            root.setSkipFrameCount(3)
+        }
     }
 
     Action {

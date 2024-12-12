@@ -165,6 +165,9 @@ Item {
             stillImageFormat.push("png")
             root.insertStillImageFormat(stillImageFormat);
         }
+        onSkipFrameCount:{
+            root.setSkipFrameCount(3)
+        }
 
         onMouseRightClicked:{
             if(enableSelfTrigger.enabled && enableSelfTrigger.checked){
@@ -209,7 +212,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 470
+        height: 450
         style: econscrollViewStyle
 
         Item{

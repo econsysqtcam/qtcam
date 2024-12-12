@@ -96,6 +96,9 @@ Item {
                 extSettingsBasedOnAutoFocusSelectionInUVCSettings(JS.autoFocusChecked) // Initially get the auto focus mode in UVC settings and enable/disable controls in extension unit
             }
         }
+        function onSkipFrameCount(){
+            root.setSkipFrameCount(3)
+        }
     }
 
     ScrollView {
@@ -103,7 +106,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 460
+        height: 450
         style: econscrollViewStyle
         Item {
             height:1300

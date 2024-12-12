@@ -36,7 +36,7 @@ Item
         x: 10
         y: 189.5
         width: 257
-        height: 460
+        height: 450
         style: econscrollViewStyle
         Item{
             height: 1700
@@ -1319,8 +1319,11 @@ Item
         function onVideoColorSpaceChanged(){
             see3camcu81.getFrameRateCtrlValue()
         }
-	function onAutoExposureSelected(autoExposureSelect){
+        function onAutoExposureSelected(autoExposureSelect){
             enableDisableAutoExposureControls(autoExposureSelect)
+        }
+        function onSkipFrameCount(){
+            root.setSkipFrameCount(3)
         }
     }
 

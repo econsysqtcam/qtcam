@@ -479,7 +479,6 @@ void FrameRenderer::drawBufferForYUV420(){
     }
     renderyuyvMutex.lock();
 
-    int skipFrames = frame;
     m_shaderProgram->bind();
 
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
@@ -494,7 +493,7 @@ void FrameRenderer::drawBufferForYUV420(){
        {
             goto skip;
        }
-       if(gotFrame && !updateStop && skipFrames >3){
+       if(gotFrame && !updateStop ){
 
            // set active texture and give input y buffer
            glActiveTexture(GL_TEXTURE1);
@@ -624,7 +623,6 @@ void FrameRenderer::drawBufferFor360p(){
     }
      renderyuyvMutex.lock();
 
-    int skipFrames = frame;
     m_programYUYV->bind();
 
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
@@ -637,7 +635,7 @@ void FrameRenderer::drawBufferFor360p(){
     if (yBuffer != NULL && uBuffer != NULL && vBuffer != NULL){
         if(currentlySelectedEnumValue == CommonEnums::ECAM22_USB && h264DecodeRet<0 )
              goto skip;
-        if(gotFrame && !updateStop && skipFrames >3){
+        if(gotFrame && !updateStop ){
             // set active texture and give input y buffer
             glActiveTexture(GL_TEXTURE1);
             glUniform1i(samplerLocY, 1);
@@ -708,12 +706,12 @@ void FrameRenderer::drawRGBBUffer(){
         if(rgbaDestBuffer){
             glTexImage2D(GL_TEXTURE_2D, 0,  GL_RGBA, videoResolutionwidth, videoResolutionHeight, 0,GL_RGBA , GL_UNSIGNED_BYTE, rgbaDestBuffer);
         }
-        if(gotFrame && !updateStop && skipFrames > 3){
+        if(gotFrame && !updateStop && skipFrames > skipFrameCount){
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
         }
         renderyuyvMutex.unlock();
     }
-    else if(skipFrames > 3){
+    else {
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData); //Edited by M.Vishnu Murali:Removed renderyuyvMutex.unlock() as it is leading to improper buffer allocations especially at high resolutions.
     }
     m_shaderProgram->disableAttributeArray(0);
@@ -727,7 +725,6 @@ void FrameRenderer::drawRGBBUffer(){
  * @brief FrameRenderer::drawYUYVBUffer - Shader for YUYV buffer and render
  */
 void FrameRenderer::drawYUYVBUffer(){
-    int skipFrames = frame;
     m_shaderProgram->bind();
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
     glVertexAttribPointer(mTexCoordLoc, 2, GL_FLOAT, false, 8, mVerticesDataTextCord);
@@ -760,13 +757,13 @@ void FrameRenderer::drawYUYVBUffer(){
         if (yuvBuffer != NULL){
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, videoResolutionwidth/2, videoResolutionHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, yuvBuffer);
         }
-        if(gotFrame && !updateStop && skipFrames >3){
+        if(gotFrame && !updateStop ){
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
         }
         renderyuyvMutex.unlock();
     }
     else{
-        if(gotFrame && !updateStop && skipFrames >3){
+        if(gotFrame && !updateStop ){
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
         }
     }
@@ -782,7 +779,6 @@ skip:
  * @brief FrameRenderer::drawUYVYBUffer - draw uyvy buffer
  */
 void FrameRenderer::drawUYVYBUffer(){
-    int skipFrames = frame;
     m_shaderProgram->bind();
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
     glVertexAttribPointer(mTexCoordLoc, 2, GL_FLOAT, false, 8, mVerticesDataTextCord);
@@ -801,7 +797,6 @@ void FrameRenderer::drawUYVYBUffer(){
         {
             frame = 0;
             flipModeChanged = false;
-            skipFrames = frame;
         }
 
         // Added by Navya -- 18 Sep 2019
@@ -845,19 +840,13 @@ void FrameRenderer::drawUYVYBUffer(){
              }
         }
 
-        if(gotFrame && !updateStop){
-            if((currentlySelectedEnumValue != CommonEnums::SEE3CAM_CU83 &&
-               currentlySelectedEnumValue != CommonEnums::See3CAM_CU83_H03R1) && skipFrames >3){
-                    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
-            }
-            else if(skipFrames > 5){
-                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
-            }
+        if(gotFrame && !updateStop ){
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
         }
         renderyuyvMutex.unlock();
     }
     else {
-        if(gotFrame && !updateStop && skipFrames > 3){
+        if(gotFrame && !updateStop ){
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
         }
     }
@@ -873,7 +862,6 @@ void FrameRenderer::drawUYVYBUffer(){
  * @brief FrameRenderer::drawY8BUffer - Shader for Y8 buffer and render
  */
 void FrameRenderer::drawY8BUffer(){
-    int skipFrames = frame;
     m_shaderProgram->bind();
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
     glVertexAttribPointer(mTexCoordLoc, 2, GL_FLOAT, false, 8, mVerticesDataTextCord);
@@ -915,19 +903,13 @@ void FrameRenderer::drawY8BUffer(){
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, videoResolutionwidth ,videoResolutionHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, greyBuffer);
             }
         }
-        if(gotFrame && !updateStop){
-            if((currentlySelectedEnumValue != CommonEnums::SEE3CAM_CU83 &&
-               currentlySelectedEnumValue != CommonEnums::See3CAM_CU83_H03R1) && skipFrames >3){
-                    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
-            }
-            else if(skipFrames > 5){
-                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
-            }
+        if(gotFrame && !updateStop ){
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
         }
         renderyuyvMutex.unlock();
     }
     else {
-        if(gotFrame && !updateStop && skipFrames > 3){
+        if(gotFrame && !updateStop ){
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
         }
     }
@@ -1075,6 +1057,7 @@ void FrameRenderer::shaderRGB(){
         glGenTextures (1, &yTextureId); // Generate a texture object
         glActiveTexture(GL_TEXTURE1);
         glBindTexture (GL_TEXTURE_2D, yTextureId);
+        updateStop = true;
     }
 }
 
@@ -1865,6 +1848,7 @@ void Videostreaming::capFrame()
             _bytesUsed = buf.bytesused;
             if(startFrame)
             {
+                m_renderer->gotFrame = false;
                 allocBuffers();
                 startFrame = false;
             }
@@ -3571,7 +3555,12 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
     m_renderer->render27CugMutex.lock();
 
-    m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
+    if(width == 640 && height == 482){
+        m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
+    }
+    else{
+        m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
+    }
     if(!inputBuffer){
         m_renderer->render27CugMutex.unlock();
         return false;
@@ -3580,16 +3569,13 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
     //CameraMode 3 - IR mode
     if((inputBuffer[7] == IR_FRAME) && (cameraMode == 3)){
         memcpy(m_renderer->yuvBuffer, inputBuffer, (width*height*BYTES_PER_PIXEL_UYVY));
-        m_renderer->gotFrame = true;
     }//CameraMode 2 - RGB mode
     else if((inputBuffer[7] == RGB_FRAME) && (cameraMode == 2)){
         memcpy(m_renderer->yuvBuffer, inputBuffer, (width*height*BYTES_PER_PIXEL_UYVY));
-        m_renderer->gotFrame = true;
     }
     //IR-RGB Mode -> Buffer for RGB(MainWindow)
     else if((cameraMode == 1) && (inputBuffer[7]==RGB_FRAME)){
         memcpy(m_renderer->rgbBuffer, inputBuffer, (width*height*BYTES_PER_PIXEL_UYVY));
-        m_renderer->gotFrame = true;
     }
     else if((cameraMode == 1) && (inputBuffer[7] == IR_FRAME)){
         //converting IR frame into QImage, inorder to render in another window
@@ -4247,6 +4233,12 @@ int Videostreaming::findMax(QList<int> *list) {
  */
 void Videostreaming::updateFrameToSkip(uint stillSkip){
     frameToSkip = stillSkip;
+}
+
+void Videostreaming::setSkipFrameCount(int count){
+    if(m_renderer!= NULL){
+        m_renderer->skipFrameCount = count;
+    }
 }
 
 /**
@@ -4959,6 +4951,7 @@ void Videostreaming::setResolution(QString resolution)
         triggerModeSkipframes();            //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when format changed in trigger mode.
     }
     m_renderer->m_videoResolnChange = true;
+    m_renderer->gotFrame = false;
     emit emitResolution(m_width,m_height);
     emit sendResolutionChange(m_renderer->m_videoResolnChange);
 }
@@ -5090,6 +5083,7 @@ void Videostreaming::updateVidOutFormat()
     emit defaultOutputFormat(desc.index);
     emit logDebugHandle("Color Space set to: "+pixfmt2s(m_pixelformat));
     m_renderer->m_formatChange = true;
+    m_renderer->gotFrame = false;
     m_renderer->m_pixelformat = m_pixelformat;
 }
 

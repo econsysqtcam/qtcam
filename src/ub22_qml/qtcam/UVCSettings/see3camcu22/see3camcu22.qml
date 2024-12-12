@@ -102,6 +102,9 @@ Item {
             if(visible)
                 getCurrentValuesFromCamera()
         }
+        function onSkipFrameCount(){
+            root.setSkipFrameCount(3)
+        }
     }
 
     ScrollView{

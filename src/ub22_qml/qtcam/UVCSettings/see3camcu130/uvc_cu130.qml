@@ -94,6 +94,9 @@ Item {
         function onAfterRecordVideo(){
             seecamcu130.enableDisableFaceRectangle(true)
         }
+        function onSkipFrameCount(){
+            root.setSkipFrameCount(3)
+        }
     }
 
     Timer {
@@ -154,7 +157,7 @@ Item {
         x: 10
         y: 189.5
         width: 257
-        height: 500
+        height: 450
         style: uvc130_scrollViewStyle
         Item{
             height:1300

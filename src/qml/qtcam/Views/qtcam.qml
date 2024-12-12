@@ -214,6 +214,9 @@ Rectangle {
 
     property var irPreview: undefined
 
+    //Skip Frame count to prevent green frame
+    signal skipFrameCount()
+
     //Video frame interval
     signal videoFrameInterval(int frameInterval)
 
@@ -1646,6 +1649,7 @@ Rectangle {
         }
         see3cam.visible = false
         extensionTabVisible(false)
+        skipFrameCount();
     }
     // Added by Sankari : 16 Dec 2016
     // Disable saving image when focus is changed from trigger mode to master mode
@@ -1775,6 +1779,7 @@ Rectangle {
         {
             captureVideoRecordRootObject = captureVideoRecordComponent.createObject(root,{});
         }
+        skipFrameCount();
     }
     Component.onDestruction: {
         // Stop the timer when quitting application
@@ -2218,5 +2223,8 @@ Rectangle {
 
     function enableRecStopButton(enable){
         recordStopBtnStatus = enable
+    }
+    function setSkipFrameCount(count){
+        vidstreamproperty.setSkipFrameCount(count)
     }
 }
