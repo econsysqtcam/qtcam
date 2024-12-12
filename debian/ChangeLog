@@ -1,4 +1,5 @@
-qtcam (26.0.33-0ubuntu1) jammy; urgency=medium
+qtcam (26.0.34-0ubuntu1) jammy; urgency=medium
+ *Handled application crash for 27cug at 640x482 resolution.Green frame issue fix to start preview only after frames are available and for MJPEG format, skipping frames based on the skipFrameCount from qml.
  *HID Changes in See3CAM_CU81, green frame issue fix in See3CAM_160, added new pid for See3CAM_CU83_H03R1 and green frame issue fix in See3CAM_CU83 while switching format in still capture settings.
  *HID Changes in IMX900 and Changes to support see3cam_cu200 and see3cam_130 in Ubuntu 22.04.
  *UI Changes in IMX900 and cu31 camera and In cu31,Get call with maskid on MaskId combobox value change.
@@ -14,4 +15,4 @@ qtcam (26.0.33-0ubuntu1) jammy; urgency=medium
  *Fix for Mipi Camera streaming issue & Manual white balance in UVC.
  *Added support for ubuntu 22.04.
  *Initial release.  
- -- econsysqtcam <qtcam@e-consystems.com>  Thu Dec 5 18:51:43 2024 +0530
+ -- econsysqtcam <qtcam@e-consystems.com>  Thu Dec 12 16:52:59 2024 +0530
