@@ -1,4 +1,5 @@
-qtcam (26.0.34-0ubuntu1) jammy; urgency=medium
+qtcam (26.0.35-0ubuntu1) jammy; urgency=medium
+ *Bug fixes for SEE3CAM_37CUGM - Green frame issue fix in still capture and Enabled video recording at 640x480 resolution.
  *Handled application crash for 27cug at 640x482 resolution.Green frame issue fix to start preview only after frames are available and for MJPEG format, skipping frames based on the skipFrameCount from qml.
  *HID Changes in See3CAM_CU81, green frame issue fix in See3CAM_160, added new pid for See3CAM_CU83_H03R1 and green frame issue fix in See3CAM_CU83 while switching format in still capture settings.
  *HID Changes in IMX900 and Changes to support see3cam_cu200 and see3cam_130 in Ubuntu 22.04.
@@ -15,4 +16,4 @@ qtcam (26.0.34-0ubuntu1) jammy; urgency=medium
  *Fix for Mipi Camera streaming issue & Manual white balance in UVC.
  *Added support for ubuntu 22.04.
  *Initial release.  
- -- econsysqtcam <qtcam@e-consystems.com>  Thu Dec 12 16:52:59 2024 +0530
+ -- econsysqtcam <qtcam@e-consystems.com>  Mon Dec 16 16:46:12 2024 +0530
