@@ -126,6 +126,7 @@ Rectangle {
 
     // Added by Sankari: 16 Dec 2016
     property bool webcamKeyTriggerShot: true
+    property bool recordStopBtnStatus: false
     property string statusText
     property string videofileName
     property variant see3cam
@@ -792,8 +793,11 @@ Rectangle {
                                 videoRecordBegin()
                                 keyEventFiltering = true         // Added by Navya : To avoid capturing image when video record mode is selected.
                             } else if(captureVideoRecordRootObject.recordStopBtnVisible){
-                                videoSaveVideo()
-                                keyEventFiltering = true
+                                if(recordStopBtnStatus){
+                                    videoSaveVideo()
+                                    keyEventFiltering = true
+                                    recordStopBtnStatus = false
+                                }
                             }
                         }
                     }else if(mouse.button == Qt.RightButton){
@@ -1396,6 +1400,7 @@ Rectangle {
         captureBtnEnable(false)
         videoRecordBtnEnable(false)
         keyEventFiltering = true
+        isTriggerMode = true
         vidstreamproperty.enabled = false
         vidstreamproperty.triggerModeEnabled()
         vidstreamproperty.stopCapture()
@@ -1431,7 +1436,7 @@ Rectangle {
     }
 
     function videoRecordBegin() {
-        if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130  || selectedDeviceEnumValue == CommonEnums.SEE3CAM_30){
+        if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130  || selectedDeviceEnumValue == CommonEnums.SEE3CAM_30 ){
             recordStartDelayTimer.start() // some delay is required to disable focus rect / face overlay rect. After that delay need to start record.
         }else{
             if(disableAudio){
@@ -1651,6 +1656,9 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200M) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu200m/see3camcu200m.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU200M_H01R1) {
+            see3cam = Qt.createComponent("../UVCSettings/see3camcu200h01r1/see3camcu200h01r1.qml").createObject(root)
+        }
         else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU31) {
             see3cam = Qt.createComponent("../UVCSettings/see3camcu31/seecamcu31.qml").createObject(root)
         }
@@ -1729,11 +1737,10 @@ Rectangle {
         case CommonEnums.SEE3CAM_CU84:   //Added by Sushanth.S
         case CommonEnums.SEE3CAM_CU200:  //Added By Sushanth.S
         case CommonEnums.SEE3CAM_CU200M:  //Added By Sushanth.S
+        case CommonEnums.SEE3CAM_CU200M_H01R1:  //Added By Sushanth.S
         case CommonEnums.SEE3CAM_CU31:   //Added By Sushanth.S
         case CommonEnums.IMX900USBCAM: //Added By Sushanth
-
-        case CommonEnums.See3CAM_CU83_H03R1: //Added By Geethalakshmi
-
+        case CommonEnums.See3CAM_CU83_H03R1:  // Added By Geethalakshmi
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
             break;
@@ -2242,6 +2249,10 @@ Rectangle {
         else{
             vidstreamproperty.setPreviewBgrndArea(previewBgrndArea.width, previewBgrndArea.height, true)
         }
+    }
+
+    function enableRecStopButton(enable){
+        recordStopBtnStatus = enable
     }
     function setSkipFrameCount(count){
         vidstreamproperty.setSkipFrameCount(count)

@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.35
+---------------------------
+*Bug fixes for SEE3CAM_37CUGM : Green frame issue fix in still capture and Enabled video recording at 640x480 resolution.
+
 Qtcam Application - 26.0.34
 ---------------------------
 *Handled application crash for See3CAM_27CUG at 640x482 resolution.

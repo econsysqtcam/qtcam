@@ -4534,6 +4534,7 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
     triggerShot = false;
     m_displayCaptureDialog = true;
     m_saveImage = true;
+    m_renderer->updateStop = true;
 
     //Added by Sushanth - Capturing frame only if the filePath is valid
     if(!validFilePath)
@@ -4547,7 +4548,6 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
     {
         // Added by Sankari: disable paint in preview while capturing image when still and preview resolution
         //are different
-        m_renderer->updateStop = true;
         stopCapture();
         vidCapFormatChanged(stillOutFormat);
         setResolution(stillSize);

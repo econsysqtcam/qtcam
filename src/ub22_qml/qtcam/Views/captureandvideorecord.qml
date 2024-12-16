@@ -92,6 +92,16 @@ Item {
         }
     }
 
+    Timer {
+        id: recordStopEnableTimer
+        interval: 1500
+        onTriggered: {
+           record_stop.visible = recordStopBtnVisible
+           root.enableRecStopButton(recordStopBtnVisible)
+           stop()
+        }
+    }
+
     Image {
         id: camera_box
         source: "images/camera_box.png"
@@ -213,7 +223,7 @@ Item {
             opacity: enabled ? 1 : 0.5
             activeFocusOnPress: true
             y: -3
-            tooltip: "Click this icon/preview to capture photo and Video"
+            tooltip: "Click this icon/preview to capture photo"
             style: ButtonStyle {
                 background: Rectangle {
                     border.width: control.activeFocus ? 1 : 0
@@ -333,7 +343,6 @@ Item {
         target: root
         function onVideoRecordBtnEnable(enable)
         {
-            //Disabling video recording as of now
             record.enabled = enable
             record.opacity = enable ? 1 : 0.5
             if(recordBtnVisible)
@@ -347,7 +356,16 @@ Item {
         function onVideoRecordBtnVisible(visible)
         {
             record.visible = visible
-            record_stop.visible = !visible
+            recordStopBtnVisibility(!visible)
+        }
+    }
+
+    function recordStopBtnVisibility(visibility) {
+        recordStopBtnVisible = visibility
+        if(visibility){
+            recordStopEnableTimer.start()
+        } else {
+            record_stop.visible = recordStopBtnVisible
         }
     }
 
