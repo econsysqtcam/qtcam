@@ -1,4 +1,7 @@
-qtcam (26.0.35-0ubuntu1) bionic; urgency=medium
+qtcam (26.0.36-0ubuntu1) bionic; urgency=medium
+ *Added Auto mode in Antiflicker for See3cam_130.
+ *Bug fixes- FPS drop issue in see3cam_27cug and see3cam_cu83 in Ubuntu 22.04, Shuttering in preview when switching to MJPG format, correctly writing duration to the video file on closing it, and avoided preview corruption for higher resolution while video recording with H264 encoder format. Capture issue fixed- On connecting 2 cameras and switching from master to trigger mode disables the capture in other camera.
+ *Improvement in SEE3CAM_37CUGM- To grey out and disable the Fast auto exposure and self trigger for other resolutions than 2064x1552. To stop showing fps when Trigger mode is set.
  *Bug fixes for SEE3CAM_37CUGM - Green frame issue fix in still capture and Enabled video recording at 640x480 resolution.
  *Handled application crash for 27cug at 640x482 resolution.Green frame issue fix to start preview only after frames are available and for MJPEG format, skipping frames based on the skipFrameCount from qml.
  *HID Changes in See3CAM_CU81, green frame issue fix in See3CAM_160, added new pid for See3CAM_CU83_H03R1 and green frame issue fix in See3CAM_CU83 while switching format in still capture settings.
@@ -165,6 +168,6 @@ qtcam (26.0.35-0ubuntu1) bionic; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Mon Dec 16 16:45:39 2024 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Wed Jan 01 19:24:45 2025 +0530
 
 
