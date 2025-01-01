@@ -1330,6 +1330,8 @@ Item
     Component.onCompleted:
     {
         root.disablePowerLineFreq()
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
     }
     Component
     {

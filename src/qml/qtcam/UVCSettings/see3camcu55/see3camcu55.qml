@@ -1118,7 +1118,9 @@ Item {
      }
 
 
-    Component.onCompleted:{        
+    Component.onCompleted:{
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
         getCameraValues()
         root.getExposureOnResolnCheck()  // getting exposure compensation value only after checking for  setresolution.
         root.disablePowerLineFreq()     //disable powerline Frequency in UVC settings due to mismatch in HID and v4l2 cofigurations.

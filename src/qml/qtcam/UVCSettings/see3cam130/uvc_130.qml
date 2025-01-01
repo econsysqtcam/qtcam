@@ -1379,22 +1379,89 @@ Item {
                     opacity: 0.50196078431373
                 }
 
+                RowLayout{
+                    spacing: 15
+                    Layout.alignment: Qt.AlignCenter
+
+                    ExclusiveGroup { id: antiFlickerGroup }
+
+                    RadioButton
+                    {
+                        exclusiveGroup: antiFlickerGroup
+                        id: antiFlickerModeOff
+                        text: "Off"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        opacity: enabled ? 1 : 0.1
+                        tooltip: "It disables Anti Flicker Mode."
+                        width : 70
+                        onClicked: {
+                            seecam130.setFlickerDetection(See3Cam130.MODE_DISABLE)
+                        }
+                        Keys.onReturnPressed: {
+                            seecam130.setFlickerDetection(See3Cam130.MODE_DISABLE)
+                        }
+                    }
+                    RadioButton {
+                        id: antiFlickerModeAuto
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Auto")
+                        exclusiveGroup: antiFlickerGroup
+                        tooltip: "The device will automatically switch between the flicker frequencies, if the flicker is detected in preview."
+                        activeFocusOnPress: true
+                        width : 70
+                        onClicked: {
+                            seecam130.setFlickerDetection(See3Cam130.MODE_AUTO)
+                        }
+                        Keys.onReturnPressed: {
+                            seecam130.setFlickerDetection(See3Cam130.MODE_AUTO)
+                        }
+                    }
+                    RadioButton
+                    {
+                        id: antiFlickerModeManual
+                        text: "Manual"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        exclusiveGroup: antiFlickerGroup
+                        tooltip: "The flicker frequency has to be choosed manually to avoid the flickering in the preview."
+                        //implicitWidth: 70
+                        width : 70
+                        onClicked: {
+                            setFlickerDetectionFn()
+                        }
+                        Keys.onReturnPressed: {
+                             setFlickerDetectionFn()
+                        }
+                    }
+                }
+                Text
+                {
+                    id: frequency
+                    text: "Frequency :"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    opacity: (antiFlickerModeManual.enabled && antiFlickerModeManual.checked) ? 1 : 0.1
+                }
                 ComboBox
                 {
-                    id: flickercombo
-                    opacity: 1
-                    enabled: true
-                    model: ListModel {
-                        ListElement { text: "50Hz" }
-                        ListElement { text: "60Hz" }
-                        ListElement { text: "DISABLE" }
+                    id: antiFlickerCombo
+                    enabled: (antiFlickerModeManual.enabled && antiFlickerModeManual.checked) ? true : false
+                    opacity: (antiFlickerModeManual.enabled && antiFlickerModeManual.checked) ? 1 : 0.1
+                    model: ListModel
+                    {
+                        ListElement { text: "50 Hz" }
+                        ListElement { text: "60 Hz" }
                     }
                     activeFocusOnPress: true
                     style: econComboBoxStyle
                     onCurrentIndexChanged: {
                         if(skipUpdateUIFlickerCtrl){
-                           setFlickerDetectionFn();
+                            setFlickerDetectionFn()
                         }
+                        skipUpdateUIFlickerCtrl = true
                     }
                 }
 
@@ -1742,15 +1809,28 @@ Item {
             skipUpdateUIFrameRate = true
         }
         onFlickerDetectionModeReceived:{
-            skipUpdateUIFlickerCtrl = false
-            if(flickerMode == See3Cam130.MODE_50Hz){
-                flickercombo.currentIndex = 0
-            }else if(flickerMode == See3Cam130.MODE_60Hz){
-                flickercombo.currentIndex  = 1
-            }else if(flickerMode == See3Cam130.MODE_DISABLE){
-                flickercombo.currentIndex  = 2
-            }else{ }
-            skipUpdateUIFlickerCtrl = true;
+
+            switch(flickerMode)
+            {
+                case See3Cam130.MODE_AUTO:
+                    antiFlickerModeAuto.checked = true
+                    break
+                case See3Cam130.MODE_50Hz:
+                    antiFlickerModeManual.checked = true
+                    skipUpdateUIFlickerCtrl = false
+                    antiFlickerCombo.currentIndex = 0
+                    skipUpdateUIFlickerCtrl = true
+                    break
+                case See3Cam130.MODE_60Hz:
+                    antiFlickerModeManual.checked = true
+                    skipUpdateUIFlickerCtrl = false
+                    antiFlickerCombo.currentIndex = 1
+                    skipUpdateUIFlickerCtrl = true
+                    break
+                 case See3Cam130.MODE_DISABLE:
+                    antiFlickerModeOff.checked = true
+                    break
+             }
         }
 
         onRedGainCurrentReceived: {
@@ -1982,10 +2062,14 @@ Item {
             streamMaster.checked = true
             root.captureBtnEnable(true)
             root.videoRecordBtnEnable(true)
+            root.checkForTriggerMode(false)
+            root.startUpdatePreviewInMasterMode()
         }else if(streamMode == See3Cam130.STREAM_TRIGGER){
             streamTrigger.checked = true
+            root.stopUpdatePreviewInTriggerMode()
             root.captureBtnEnable(false)
             root.videoRecordBtnEnable(false)
+            root.checkForTriggerMode(true)
             displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document."))
         }
     }
@@ -2079,6 +2163,7 @@ Item {
     }
 
     function setMasterMode(){
+        root.startUpdatePreviewInMasterMode()
         seecam130.setStreamMode(See3Cam130.STREAM_MASTER)
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
@@ -2089,6 +2174,7 @@ Item {
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
         seecam130.setStreamMode(See3Cam130.STREAM_TRIGGER)
         displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document See3CAM_130_Trigger_Mode"))
     }
@@ -2104,6 +2190,7 @@ Item {
     }
     function setToDefaultValues(){
         root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
 
         seecam130.setToDefault()
         seecam130.getSceneMode()
@@ -2215,15 +2302,12 @@ Item {
 
     function setFlickerDetectionFn()
     {
-        switch(flickercombo.currentIndex){
+        switch(antiFlickerCombo.currentIndex){
         case 0:
             flickerCtrl= See3Cam130.MODE_50Hz
             break
         case 1:
             flickerCtrl = See3Cam130.MODE_60Hz
-            break
-        case 2:
-            flickerCtrl = See3Cam130.MODE_DISABLE
             break
         }
         seecam130.setFlickerDetection(flickerCtrl)

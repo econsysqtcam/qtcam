@@ -1421,7 +1421,9 @@ Item {
              seecam81.setFocusMode(See3Cam81.SINGLETRIGGER_FOCUS_81)
          }                  
     }
-    Component.onCompleted:{        
+    Component.onCompleted:{
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
         getCameraValues()
         // enable default button if any one of the following controls is selected
         if(flipCtrlVertical.checked || mirrorCtrlHorizontal.checked || radioGreyscale.checked || strobeTorch.checked

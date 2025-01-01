@@ -188,6 +188,7 @@ Item {
                                root.checkForTriggerMode(true)
                                root.captureBtnEnable(false)
                                root.videoRecordBtnEnable(false)
+                               root.stopUpdatePreviewInTriggerMode()
                            }
                        }
                        Keys.onReturnPressed: {
@@ -198,6 +199,7 @@ Item {
                                root.checkForTriggerMode(true)
                                root.captureBtnEnable(false)
                                root.videoRecordBtnEnable(false)
+                               root.stopUpdatePreviewInTriggerMode()
                            }
                        }
                    }
@@ -215,6 +217,7 @@ Item {
                                root.checkForTriggerMode(true)
                                root.captureBtnEnable(false)
                                root.videoRecordBtnEnable(false)
+                               root.stopUpdatePreviewInTriggerMode()
                            }
                        }
                        Keys.onReturnPressed: {
@@ -225,6 +228,7 @@ Item {
                                root.checkForTriggerMode(true)
                                root.captureBtnEnable(false)
                                root.videoRecordBtnEnable(false)
+                               root.stopUpdatePreviewInTriggerMode()
                            }
                        }
                    }
@@ -246,6 +250,7 @@ Item {
                                root.checkForTriggerMode(true)
                                root.captureBtnEnable(false)
                                root.videoRecordBtnEnable(false)
+                               root.stopUpdatePreviewInTriggerMode()
                            }
                        }
                        Keys.onReturnPressed: {
@@ -259,6 +264,7 @@ Item {
                                root.checkForTriggerMode(true)
                                root.captureBtnEnable(false)
                                root.videoRecordBtnEnable(false)
+                               root.stopUpdatePreviewInTriggerMode()
                            }
                        }
                    }
@@ -839,10 +845,18 @@ Item {
             if(streamModeValues == See3CAM_27CUG.MASTER)
             {
                 masterMode.checked = true
+                root.checkForTriggerMode(false)
+                root.captureBtnEnable(true)
+                root.videoRecordBtnEnable(true)
+                root.startUpdatePreviewInMasterMode()
             }
             else if(streamModeValues == See3CAM_27CUG.TRIGGER)
             {
-                triggerMode.checked = true
+                triggerMode.checked = true                
+                root.videoRecordBtnEnable(false)
+                root.captureBtnEnable(false)
+                root.checkForTriggerMode(true)
+                root.stopUpdatePreviewInTriggerMode()
             }
         }
 
@@ -992,6 +1006,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)  
+        root.startUpdatePreviewInMasterMode()
 
         //To disable IR controls in RGB mode
         disableIrControls()
@@ -1003,6 +1018,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
 
         //To enable IR controls in IR mode
         enableIrControls()
@@ -1014,6 +1030,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(false)
+        root.startUpdatePreviewInMasterMode()
 
         //To enable IR controls in IR-RGB mode
         enableIrControls()
@@ -1088,6 +1105,7 @@ Item {
             root.checkForTriggerMode(true)
             root.captureBtnEnable(false)
             root.videoRecordBtnEnable(false)
+            root.stopUpdatePreviewInTriggerMode()
         }
 
         if(rgbMode.checked == true)

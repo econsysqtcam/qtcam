@@ -1279,10 +1279,14 @@ value in the text box and click the Set button"
                 streamMaster.checked = true
                 root.captureBtnEnable(true)
                 root.videoRecordBtnEnable(true)
+                root.checkForTriggerMode(false)
+                root.startUpdatePreviewInMasterMode()
             }else if(streamMode == See3Cam130A.STREAM_TRIGGER){
                 streamTrigger.checked = true
                 root.captureBtnEnable(false)
                 root.videoRecordBtnEnable(false)
+                root.checkForTriggerMode(true)
+                root.stopUpdatePreviewInTriggerMode()
                 displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document."))
             }
         }
@@ -1562,12 +1566,14 @@ value in the text box and click the Set button"
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
         root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
     }
 
     function setTriggerMode(){
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
         seecam130A.setStreamMode(See3Cam130A.STREAM_TRIGGER)
         displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document See3CAM_130A_Trigger_Mode"))
     }

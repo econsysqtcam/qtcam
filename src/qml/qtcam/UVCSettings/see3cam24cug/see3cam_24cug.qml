@@ -1300,6 +1300,7 @@ value in the text box and click the Set button"
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
 
         if(see3cam24cug.setToDefault())
         {

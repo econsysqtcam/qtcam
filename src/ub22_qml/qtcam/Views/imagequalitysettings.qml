@@ -878,10 +878,10 @@ Item {
                                     root.getUVCExpForIMX900(seconds, milliSeconds, microSeconds)
                                 }
                                 updateUVCExposure = true
+                                root.getExposureComponentsUVC(seconds, milliSeconds, microSeconds)
                             }else{
                                 if((exposureCombo.currentText == "Shutter Priority Mode" || exposureCombo.currentText == "Manual Mode")) {
-                                    root.getExposureComponentsUVC(seconds, milliSeconds, microSeconds)
-
+                                     root.getExposureComponentsUVC(seconds, milliSeconds, microSeconds)
                                     if(exposureSliderSetEnable){
                                         root.changeCameraSettings(exposurecontrolId,value.toString())
                                     }

@@ -108,10 +108,12 @@ Item {
                     activeFocusOnPress: true
                     onClicked: {
                         root.checkForTriggerMode(true)
+                        root.stopUpdatePreviewInTriggerMode()
                         setTriggerMode()
                     }
                     Keys.onReturnPressed: {
                         root.checkForTriggerMode(true)
+                        root.stopUpdatePreviewInTriggerMode()
                         setTriggerMode()
                     }
                 }
@@ -267,8 +269,16 @@ Item {
         onStreamModeValue:{
             if(streamMode == See3cam20cug.MODE_MASTER){
                 rdoModeMaster.checked = true
+                root.checkForTriggerMode(false)
+                root.captureBtnEnable(true)
+                root.videoRecordBtnEnable(true)
+                root.startUpdatePreviewInMasterMode()
             }else if(streamMode == See3cam20cug.MODE_TRIGGER){
                 rdoModeTrigger.checked = true
+                root.videoRecordBtnEnable(false)
+                root.captureBtnEnable(false)
+                root.checkForTriggerMode(true)
+                root.stopUpdatePreviewInTriggerMode()
             }
         }
         onFlashModeValue:{
@@ -448,18 +458,22 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         see3cam20cug.setToDefault()
         getValuesFromCamera()
     }
     function setTriggerMode(){
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.checkForTriggerMode(true)
+        root.stopUpdatePreviewInTriggerMode()
         see3cam20cug.setStreamMode(See3cam20cug.MODE_TRIGGER)
     }
     function setMasterMode(){
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         see3cam20cug.setStreamMode(See3cam20cug.MODE_MASTER)
     }
 

@@ -853,8 +853,16 @@ Item {
         onCameraModeReceived:{
             if(cameraMode == See3Camcu22.CAMERA_MASTER){
                 cameraModeMaster.checked = true
+                root.checkForTriggerMode(false)
+                root.videoRecordBtnEnable(true)
+                root.captureBtnEnable(true)
+                root.startUpdatePreviewInMasterMode()
             }else if(cameraMode == See3Camcu22.CAMERA_TRIGGER){
                 cameraModeTrigger.checked = true
+                root.checkForTriggerMode(true)
+                root.videoRecordBtnEnable(false)
+                root.captureBtnEnable(false)
+                root.stopUpdatePreviewInTriggerMode()
             }
         }
         onSpecialModeReceived:{
@@ -996,6 +1004,7 @@ Item {
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
         see3camcu22.setCameraMode(See3Camcu22.CAMERA_TRIGGER)
     }
 
@@ -1003,6 +1012,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         see3camcu22.setCameraMode(See3Camcu22.CAMERA_MASTER)
     }
 
@@ -1010,6 +1020,7 @@ Item {
         root.checkForTriggerMode(false)
         defaultValue.enabled = false
         root.captureBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         root.videoRecordBtnEnable(true)
         if(see3camcu22.setToDefaultValues()){
             see3camcu22.getAutoExpROIModeAndWindowSize()

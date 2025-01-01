@@ -95,9 +95,6 @@ Rectangle {
     //signal to uncheck ir window checkbox when close btn is clicked
     signal irWindowCloseBtnSignal()
 
-    //signal to minimize ir window
-    signal minimizeSecondaryWindow()
-
     //To disable manual white balance when the device is closed
     signal disableUVCSettings()
 
@@ -161,6 +158,9 @@ Rectangle {
     property bool audioCaptureChildVisible: false
     property bool videoSettingsChildVisible: false
     property bool isTriggerMode: false
+
+    property bool maxMainWin : false
+    property bool isMainWinInPrev: true
 
     property bool disableAudio: false
 
@@ -347,7 +347,6 @@ Rectangle {
         }
         Component.onCompleted:{
             close()
-            minimizeSecondaryWindow()
         }
     }
     // Added by Sankari: To notify user about warning
@@ -422,13 +421,6 @@ Rectangle {
         height: layer_0.height
     }
 
-    MouseArea {
-      anchors.fill: parent
-      onClicked: {
-         // Emit the signal to minimize the secondary window
-         minimizeSecondaryWindow()
-      }
-    }
     Videostreaming {
         id: vidstreamproperty
         focus: true
@@ -801,7 +793,7 @@ Rectangle {
                             }
                         }
                     }else if(mouse.button == Qt.RightButton){
-                        // passing mouse x,y cororinates, preview width and height
+                        // passing mouse x,y co-ordinates, preview width and height
                         mouseRightClicked(mouse.x, mouse.y, previewwindow.width, previewwindow.height)
                         mouseRightClickedWithStreamResolution(mouse.x, mouse.y, previewwindow.width, previewwindow.height, vidstreamproperty.width, vidstreamproperty.height)
                     }
@@ -891,9 +883,6 @@ Rectangle {
                         camproperty.checkforDevice()
                     }
                     mouse.accepted = false
-                }
-                onClicked:{
-                   minimizeSecondaryWindow()
                 }
                 onWheel: {
                 }
@@ -1014,9 +1003,6 @@ Rectangle {
             style: tabButtonStyle
             action: cameratab
             activeFocusOnPress: true
-            onClicked:{
-                minimizeSecondaryWindow();
-            }
             onFocusChanged: {
                 if(activeFocus){
                     selectCameraSettings()
@@ -1048,9 +1034,6 @@ Rectangle {
             x: cameraColumnLayout.visible ? 134 : 130
             y: cameraColumnLayout.visible ? 153 : 149
             opacity: 1
-            onClicked:{
-                minimizeSecondaryWindow();
-            }
             onFocusChanged: {
                 if(activeFocus)
                     extensionTab()
@@ -1933,13 +1916,6 @@ Rectangle {
         getWhiteBalanceModeFromHID(isAutoEnabled, isColorTempEnabled)
     }
 
-
-    function minimizeWindow()
-    {
-      // Emit the signal to minimize the secondary window
-      minimizeSecondaryWindow()
-    }
-
     function getFlipStatus(isHorizontal, isVertical)
     {
         vidstreamproperty.sendFlipStatus(isHorizontal, isVertical)
@@ -2101,6 +2077,37 @@ Rectangle {
             */
             irPreview.requestActivate()
         }
+    }
+
+    //To minimize irWindow on minimizing mainWindow
+    function minimizeIrPreviewWindow() {
+        if (irPreview !== undefined && !maxMainWin) {
+            irPreview.setState(Qt.WindowMinimized);
+        }
+        isMainWinInPrev = false;
+        maxMainWin = false;
+    }
+
+    function windowStateChangedToNoState() {
+        // Current state: irWindow and mainWindow are minimized, on trying to activate irWindow, need to activate mainWindow too.
+        if (qmlWindow && !maxMainWin && !isMainWinInPrev) {
+            qmlWindow.showFullScreen();
+            qmlWindow.showMaximized();
+            qmlWindow.width = Screen.width;
+            qmlWindow.height = Screen.height;
+            irPreview.requestActivate()
+            maxMainWin = true;
+        }
+        //Current state: irWindow (minimized) and mainWindow(active state), to activate irWindow alone.
+        else if(!isMainWinInPrev){
+            irPreview.requestActivate()
+            maxMainWin = true;
+        }
+    }
+
+    function maxMainWindow() {
+        maxMainWin = false;
+        isMainWinInPrev = true;
     }
 
     //Added By Sushanth - To uncheck the IR_Window CheckBox when close button is clicked in the window

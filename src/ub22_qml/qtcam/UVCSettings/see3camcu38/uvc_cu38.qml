@@ -1120,7 +1120,9 @@ Item {
     }
 
 
-    Component.onCompleted:{        
+    Component.onCompleted:{
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
         getCameraValues()
     }
 

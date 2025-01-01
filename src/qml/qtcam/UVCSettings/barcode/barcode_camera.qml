@@ -1287,6 +1287,8 @@ Item {
     }
 
     Component.onCompleted: {
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
         getValuesFromCamera();
     }
 }

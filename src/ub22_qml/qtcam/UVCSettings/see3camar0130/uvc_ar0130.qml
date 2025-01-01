@@ -436,6 +436,10 @@ Item {
        masterModeCapture();
         masterMode = seecamar0130.enableMasterMode()
         if(masterMode) {
+            root.startUpdatePreviewInMasterMode()
+            root.checkForTriggerMode(false)
+            root.videoRecordBtnEnable(true)
+            root.captureBtnEnable(true)
             masterModeTimer.start()
             JS.enableMasterMode_12cuinr()
             if(!vga60fps_selected.enabled) {
@@ -457,6 +461,10 @@ Item {
         triggerModeCapture()
         triggerMode = seecamar0130.enableTriggerMode()
         if(triggerMode) {
+            root.stopUpdatePreviewInTriggerMode()
+            root.checkForTriggerMode(true)
+            root.captureBtnEnable(false)
+            root.videoRecordBtnEnable(false)
             JS.enableTriggerMode_12cuinr()
             vga60fps_selected.enabled = false
             vga60fps_selected.opacity = 0.2
@@ -515,6 +523,16 @@ Item {
             vga60fps_selected.opacity = 0.2
             vga30fps_selected.enabled = false
             vga30fps_selected.opacity = 0.2
+            root.checkForTriggerMode(true)
+            root.captureBtnEnable(false)
+            root.videoRecordBtnEnable(false)
+            root.stopUpdatePreviewInTriggerMode()
+
+        }else{
+            root.checkForTriggerMode(false)
+            root.videoRecordBtnEnable(true)
+            root.captureBtnEnable(true)
+            root.startUpdatePreviewInMasterMode()
         }
     }
 //    Connections{

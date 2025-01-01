@@ -1614,6 +1614,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         see3camcu135mH01r1.setToDefault()
         getValuesFromCamera()
     }
@@ -1622,6 +1623,7 @@ Item {
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
         see3camcu135mH01r1.setStreamMode(See3CAM_CU135M_H01R1.MODE_TRIGGER)
     }
 
@@ -1629,6 +1631,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         see3camcu135mH01r1.setStreamMode(See3CAM_CU135M_H01R1.MODE_MASTER)
     }
 

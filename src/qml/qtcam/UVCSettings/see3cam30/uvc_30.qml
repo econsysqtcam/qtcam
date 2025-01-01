@@ -1341,6 +1341,8 @@ Item {
         see3cam30.getSmileDetectMode()
         getFrameRateCtrlValueTimer.start()
         see3cam30.getFlashState()
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
     }
 
     function displayMessageBox(title, text){

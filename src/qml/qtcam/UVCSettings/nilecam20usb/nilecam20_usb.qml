@@ -1002,8 +1002,16 @@ Item {
         onCameraModeReceived:{
             if(cameraModes == NileCam20_USB.CAMERA_MASTER){
                 cameraModeMaster.checked = true
-            }else if(cameraModes == NileCam20_USB.CAMERA_SLAVE){
+                root.checkForTriggerMode(false)
+                root.videoRecordBtnEnable(true)
+                root.captureBtnEnable(true)
+                root.startUpdatePreviewInMasterMode()
+             }else if(cameraModes == NileCam20_USB.CAMERA_SLAVE){
                 cameraModeSlave.checked = true
+                root.checkForTriggerMode(true)
+                root.captureBtnEnable(false)
+                root.videoRecordBtnEnable(false)
+                root.stopUpdatePreviewInTriggerMode()
             }
         }
         onRoiAutoExpModeValue:{
@@ -1211,6 +1219,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
     }
 
     function setTriggerMode(){
@@ -1219,12 +1228,14 @@ Item {
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
     }
 
     function setToDefaultValues(){
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         defaultValue.enabled = false
         if(nilecam20usb.setToDefaultValues()){
             nilecam20usb.getROIAutoExposure()

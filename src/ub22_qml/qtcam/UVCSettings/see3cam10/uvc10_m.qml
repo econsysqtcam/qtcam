@@ -190,6 +190,11 @@ Item {
         if(masterMode) {
             masterModeTimer.start()
             JS.enableMasterMode_10cugM()
+            root.checkForTriggerMode(false)
+            root.videoRecordBtnEnable(true)
+            root.captureBtnEnable(true)
+            root.startUpdatePreviewInMasterMode()
+
         }
         else {
             messageDialog.title = qsTr("Failure")
@@ -203,6 +208,10 @@ Item {
         triggerMode = seecam10.enableTriggerMode()
         if(triggerMode) {
             JS.enableTriggerMode_10cugM()
+            root.checkForTriggerMode(true)
+            root.captureBtnEnable(false)
+            root.videoRecordBtnEnable(false)
+            root.stopUpdatePreviewInTriggerMode()
         }
         else {
             messageDialog.title = qsTr("Failure")

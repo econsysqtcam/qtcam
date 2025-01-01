@@ -751,6 +751,8 @@ Item {
     }
 
     Component.onCompleted:{
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
         focusModeBox.forceActiveFocus()
         seecam80.getFlashLevel()
         seecam80.getTorchLevel()

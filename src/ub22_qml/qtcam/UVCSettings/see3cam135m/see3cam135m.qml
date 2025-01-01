@@ -143,11 +143,9 @@ Item {
                     exclusiveGroup: streamModeGroup
                     activeFocusOnPress: true
                     onClicked: {
-                        root.checkForTriggerMode(true)
                         setTriggerMode()
                     }
                     Keys.onReturnPressed: {
-                        root.checkForTriggerMode(true)
                         setTriggerMode()
                     }
                 }
@@ -471,8 +469,16 @@ Item {
         onStreamModeValue:{
             if(streamMode == See3cam135M.MODE_MASTER){
                 rdoModeMaster.checked = true
+                root.checkForTriggerMode(false)
+                root.captureBtnEnable(true)
+                root.videoRecordBtnEnable(true)
+                root.startUpdatePreviewInMasterMode()
             }else if(streamMode == See3cam135M.MODE_TRIGGER){
                 rdoModeTrigger.checked = true
+                root.videoRecordBtnEnable(false)
+                root.captureBtnEnable(false)
+                root.checkForTriggerMode(true)
+                root.stopUpdatePreviewInTriggerMode()
             }
         }
 
@@ -702,6 +708,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         see3cam135m.setToDefault()
         getValuesFromCamera()
     }
@@ -709,12 +716,14 @@ Item {
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
         see3cam135m.setStreamMode(See3cam135M.MODE_TRIGGER)
     }
     function setMasterMode(){
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         root.masterEnableForMonochrome()
         see3cam135m.setStreamMode(See3cam135M.MODE_MASTER)
     }

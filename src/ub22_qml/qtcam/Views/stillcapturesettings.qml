@@ -59,10 +59,6 @@ Item {
         tooltip: "Still Capture Settings - \nAllows the user to set the image color space, image resolution,\nimage path, and image format(extension) for photo capture"
         action: stillProperty
         activeFocusOnPress : true
-        onClicked:
-        {
-          root.minimizeWindow()
-        }
         style: ButtonStyle {
             background: Rectangle {
                 implicitWidth: 265
@@ -133,11 +129,7 @@ Item {
                         font.pixelSize: 14
                     }
                 }
-                onPressedChanged:{
-                  root.minimizeWindow()
-                }
                 onCurrentIndexChanged: {
-                    root.minimizeWindow()
                     if(color_comp_box.count > 0){
                         JS.stillCaptureFormat = color_comp_box.currentIndex.toString()
                          JS.stillCaptureFormatIndex = output_value.currentIndex
@@ -205,11 +197,7 @@ Item {
                         font.pixelSize: 14
                     }
                 }
-                onPressedChanged:{
-                    root.minimizeWindow()
-                }
                 onCurrentIndexChanged: {
-                    root.minimizeWindow()
                     JS.stillCaptureResolution = output_value.currentText.toString()
                       JS.stillCaptureResolutionIndex = output_value.currentIndex
                     if(JS.triggerMode_11cug === 1 || JS.triggerMode_B === 1 || JS.triggerMode_M === 1 || JS.triggerMode_cu51 === 1 || JS.triggerMode_12cuinr == 1)
@@ -266,9 +254,6 @@ Item {
                             enabled: false
                         }
                     }
-                }
-                onClicked:{
-                  root.minimizeWindow()
                 }
             }
             FileDialog {
@@ -341,9 +326,6 @@ Item {
                         font.family: "Ubuntu"
                         font.pixelSize: 14
                     }
-                }
-                onPressedChanged:{
-                    root.minimizeWindow()
                 }
             }
         }

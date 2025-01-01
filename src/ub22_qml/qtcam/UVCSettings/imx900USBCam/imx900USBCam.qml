@@ -203,6 +203,30 @@ Item {
         function onSkipFrameCount(){
             root.setSkipFrameCount(3)
         }
+        function onSendResolution(width, height){
+            if(width === 2064 && height === 1552)
+            {
+                enableFastAutoExp.enabled = true
+                enableSelfTrigger.enabled = true
+                disableSelfTrigger.enabled = true
+                disableFastAutoExp.enabled = true
+                enableFastAutoExp.opacity = 1
+                enableSelfTrigger.opacity = 1
+                disableSelfTrigger.opacity = 1
+                disableFastAutoExp.opacity = 1
+            }
+            else
+            {
+                enableFastAutoExp.enabled = false
+                enableSelfTrigger.enabled = false
+                disableSelfTrigger.enabled = false
+                disableFastAutoExp.enabled = false
+                enableFastAutoExp.opacity = 0.1
+                enableSelfTrigger.opacity = 0.1
+                disableSelfTrigger.opacity = 0.1
+                disableFastAutoExp.opacity = 0.1
+            }
+        }
     }
 
     ScrollView{
@@ -1774,10 +1798,7 @@ Refer Product datasheet before enabling this Fast Auto Exposure feature"
                         exclusiveGroup: fastAutoModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            if(imx900USBCAM.setFastAutoExposure(enable) === false){
-                                enableFastAutoExp.checked = false
-                                disableFastAutoExp.checked = true
-                            }
+                            imx900USBCAM.setFastAutoExposure(enable)
                             imx900USBCAM.getSelfTrigger()
                         }
                         Keys.onReturnPressed:  {
@@ -2034,17 +2055,10 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                         exclusiveGroup: selfTriggerModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            if(imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value) === false){
-                                enableSelfTrigger.checked = false
-                                disableSelfTrigger.checked = true
-                                imx900USBCAM.getSelfTrigger()
-                            }
-
-                            imx900USBCAM.getFastAutoExposure()
+                            enableSelfTriggerMode()
                         }
                         Keys.onReturnPressed:  {
-                            imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
-                            imx900USBCAM.getFastAutoExposure()
+                            enableSelfTriggerMode()
                         }
                     }
                     RadioButton {
@@ -2054,10 +2068,10 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                         exclusiveGroup: selfTriggerModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            imx900USBCAM.setSelfTrigger(selfTrigDisable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+                            disableSelfTriggerMode()
                         }
                         Keys.onReturnPressed: {
-                            imx900USBCAM.setSelfTrigger(selfTrigDisable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+                            disableSelfTriggerMode()
                         }
                     }
                 }
@@ -3543,8 +3557,16 @@ following power cycles."
      onCurrentSelfTriggerMode: {
          if(mode === selfTrigEnable){
              enableSelfTrigger.checked = true
+             root.stopUpdatePreviewInTriggerMode()
+             root.captureBtnEnable(false)
+             root.videoRecordBtnEnable(false)
+             root.checkForTriggerMode(true)
          } else if(mode === selfTrigDisable){
              disableSelfTrigger.checked = true
+             root.captureBtnEnable(true)
+             root.videoRecordBtnEnable(true)
+             root.checkForTriggerMode(false)
+             root.startUpdatePreviewInMasterMode()
          }
      }
 
@@ -3841,6 +3863,26 @@ following power cycles."
         }
     }
 
+    function disableSelfTriggerMode() {
+        imx900USBCAM.setSelfTrigger(selfTrigDisable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+
+        root.startUpdatePreviewInMasterMode()
+        root.checkForTriggerMode(false)
+        root.videoRecordBtnEnable(true)
+        root.captureBtnEnable(true)
+    }
+
+    function enableSelfTriggerMode() {
+        imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+        //imx900USBCAM.getSelfTrigger()
+        imx900USBCAM.getFastAutoExposure()
+
+        root.stopUpdatePreviewInTriggerMode()
+        root.checkForTriggerMode(true)
+        root.captureBtnEnable(false)
+        root.videoRecordBtnEnable(false)
+    }
+
     /*function setCameraControls(){
         if(master.checked == true){
             imx900USBCAM.setCameraMode(IMX900USBCAM.MASTER)
@@ -4029,6 +4071,7 @@ following power cycles."
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         imx900USBCAM.setToDefaultValues()
         getValuesFromCamera()     
         imx900USBCAM.getExposureMode()

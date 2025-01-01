@@ -282,8 +282,16 @@ Item {
         onStreamModeValue:{
             if(streamMode == See3camcu55MH.MODE_MASTER){
                 rdoModeMaster.checked = true
+                root.checkForTriggerMode(false)
+                root.captureBtnEnable(true)
+                root.videoRecordBtnEnable(true)
+                root.startUpdatePreviewInMasterMode()
             }else if(streamMode == See3camcu55MH.MODE_TRIGGER){
                 rdoModeTrigger.checked = true
+                root.videoRecordBtnEnable(false)
+                root.captureBtnEnable(false)
+                root.checkForTriggerMode(true)
+                root.stopUpdatePreviewInTriggerMode()
             }
         }
         onFlashModeValue:{
@@ -448,6 +456,7 @@ Item {
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
         see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_TRIGGER)
     }
 
@@ -455,12 +464,14 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         see3camcu55_mh.setStreamMode(See3camcu55MH.MODE_MASTER)
     }
     function setToDefaultValues(){
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         see3camcu55_mh.setToDefault()
         getValuesFromCamera()
     }

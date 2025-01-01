@@ -1390,6 +1390,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         ecam512usb.setToDefaultValues()
         getValuesFromCamera()
     }

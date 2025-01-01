@@ -75,6 +75,8 @@
 #include <QDateTime>
 #include <QSocketNotifier>
 #include <QStringList>
+#include <QMetaObject>
+
 #include <QStringListModel>
 #include <QDir>
 #include <sys/mman.h>
@@ -201,6 +203,8 @@ public:
     bool y16BayerFormat;
     bool rawY10Format;
     int skipFrameCount = 0;
+
+    bool decompFailed = false; // This flag is to not render the frames when decompression failed in higher resolution of MJPG with H264 encoder format in Ubuntu 22.04
 
 signals:
      void ybufferchanged(uint8_t);

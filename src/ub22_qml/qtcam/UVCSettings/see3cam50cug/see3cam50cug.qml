@@ -1562,6 +1562,11 @@ This feature is supported in Acquisition trigger."
             strobeOn.opacity = 0.1
             strobeOff.enabled   = false
             strobeOff.opacity   = 0.1
+
+            root.checkForTriggerMode(false)
+            root.videoRecordBtnEnable(true)
+            root.captureBtnEnable(true)
+            root.startUpdatePreviewInMasterMode()
         }
         else
         {
@@ -1572,6 +1577,7 @@ This feature is supported in Acquisition trigger."
             root.checkForTriggerMode(true)
             root.videoRecordBtnEnable(false)
             root.captureBtnEnable(false)
+            root.stopUpdatePreviewInTriggerMode()
 
             if(mode == SEE3CAM_50CUG.TRIGGER_EXP_CONTROL)
             {
@@ -1611,6 +1617,7 @@ This feature is supported in Acquisition trigger."
         root.checkForTriggerMode(false)
         root.videoRecordBtnEnable(true)
         root.captureBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
     }
 
     function setTriggerMode()
@@ -1630,6 +1637,7 @@ This feature is supported in Acquisition trigger."
         root.checkForTriggerMode(true)
         root.videoRecordBtnEnable(false)
         root.captureBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
 
         //disable strobe mode when the camera is in Master mode
         strobeOn.enabled    = false
@@ -1645,6 +1653,7 @@ This feature is supported in Acquisition trigger."
         root.checkForTriggerMode(true)
         root.videoRecordBtnEnable(false)
         root.captureBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
 
         //enable strobe mode when the camera is in trigger mode
         strobeOn.enabled = true
@@ -1694,6 +1703,7 @@ This feature is supported in Acquisition trigger."
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
 
         if(see3cam50cug.setToDefault())
         {

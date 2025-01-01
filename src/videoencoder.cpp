@@ -165,7 +165,7 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
             supportedFpsDen = fpsDenominator;
         }
 
-        pCodecCtx->bit_rate =  getWidth() / 3.0f * getHeight() * fpsNumerator / supportedFpsDen;
+     //   pCodecCtx->bit_rate =  getWidth() / 3.0f * getHeight() * fpsNumerator / supportedFpsDen;
         pCodecCtx->width = getWidth();
         pCodecCtx->height = getHeight();
 
@@ -311,6 +311,9 @@ bool VideoEncoder::closeFile()
         return false;
     }
 
+    //To fix the length(duration) of the video on closing.
+    av_write_trailer(pFormatCtx);//Once all the data has been written, the caller must call av_write_trailer() to flush any buffered packets and finalize the output file
+
     // Close file
     avio_close(pFormatCtx->pb);
 
@@ -420,7 +423,7 @@ int VideoEncoder::encodePacket(uint8_t *buffer, uint8_t bufferType){
             return false;
         }
 
-        if(!av_codec_is_encoder(pCodecCtx->codec))
+       if(!av_codec_is_encoder(pCodecCtx->codec))
         {
             fprintf(stderr, "ENCODER: codec not an encoder\n");
             return false;
@@ -656,6 +659,7 @@ bool VideoEncoder::initFrame()
     }
 
     ppicture->pts = 0;
+    ppicture->pkt_dts =0;
 
     //Return the size in bytes of the amount of data required to store an image with the given parameters.
     int size = av_image_get_buffer_size(pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height,32);
@@ -713,7 +717,7 @@ bool VideoEncoder::convertImage_sws(uint8_t *buffer,uint8_t bufferType)
 #if !LIBAVCODEC_VER_AT_LEAST(54, 25)
         img_convert_ctx = sws_getCachedContext(img_convert_ctx, getWidth(), getHeight(), PIX_FMT_RGBA, getWidth(), getHeight(), pCodecCtx->pix_fmt, SWS_FAST_BILINEAR, NULL, NULL, NULL);
 #else
-        img_convert_ctx = sws_getCachedContext(img_convert_ctx,getWidth(),getHeight(),AV_PIX_FMT_RGBA,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
+        img_convert_ctx = sws_getCachedContext(img_convert_ctx, getWidth(), getHeight(),AV_PIX_FMT_RGBA,getWidth(),getHeight(),pCodecCtx->pix_fmt,SWS_FAST_BILINEAR, NULL, NULL, NULL);
 #endif
     }else if(bufferType == YUYV_BUFFER){
 #if !LIBAVCODEC_VER_AT_LEAST(54, 25)

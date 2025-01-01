@@ -496,6 +496,10 @@ Item {
        masterModeCapture();
         masterMode = seecam11.enableMasterMode()
         if(masterMode) {
+            root.checkForTriggerMode(false)
+            root.videoRecordBtnEnable(true)
+            root.captureBtnEnable(true)
+            root.startUpdatePreviewInMasterMode()
             masterModeTimer.start()
             JS.enableMasterMode_11cug()
             if(!vga60fps_selected.enabled) {
@@ -517,6 +521,10 @@ Item {
         triggerModeCapture()
         triggerMode = seecam11.enableTriggerMode()
         if(triggerMode) {
+            root.checkForTriggerMode(true)
+            root.captureBtnEnable(false)
+            root.videoRecordBtnEnable(false)
+            root.stopUpdatePreviewInTriggerMode()
             JS.enableTriggerMode_11cug()
             vga60fps_selected.enabled = false
             vga60fps_selected.opacity = 0.2
@@ -595,10 +603,21 @@ Item {
     Component.onCompleted:{        
         mastermmode_selected.forceActiveFocus()
         if(JS.triggerMode_11cug === 1) {
+            root.checkForTriggerMode(true)
+            root.captureBtnEnable(false)
+            root.videoRecordBtnEnable(false)
+            root.stopUpdatePreviewInTriggerMode()
+
             vga60fps_selected.enabled = false
             vga60fps_selected.opacity = 0.2
             vga30fps_selected.enabled = false
             vga30fps_selected.opacity = 0.2
+        }
+        else{
+            root.checkForTriggerMode(false)
+            root.videoRecordBtnEnable(true)
+            root.captureBtnEnable(true)
+            root.startUpdatePreviewInMasterMode()
         }
     }
 }

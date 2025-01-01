@@ -703,7 +703,7 @@ void FrameRenderer::drawRGBBUffer(){
 
       glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if(renderyuyvMutex.tryLock()){
-        if(rgbaDestBuffer){
+        if(rgbaDestBuffer && skipFrames > skipFrameCount && !decompFailed){
             glTexImage2D(GL_TEXTURE_2D, 0,  GL_RGBA, videoResolutionwidth, videoResolutionHeight, 0,GL_RGBA , GL_UNSIGNED_BYTE, rgbaDestBuffer);
         }
         if(gotFrame && !updateStop && skipFrames > skipFrameCount){
@@ -2624,8 +2624,10 @@ int Videostreaming::jpegDecode(Videostreaming *obj, unsigned char **pic, unsigne
         {
             if(decomp(obj, jpegbuf, jpegsize, NULL, _w, _h, 0,
                       _tilew, _tileh, pic)==-1){
+                obj->m_renderer->decompFailed = true;
                 goto bailout;
             }
+            obj->m_renderer->decompFailed = false;
         }
 
         for(i=0; i<ntilesw*ntilesh; i++)
@@ -3453,7 +3455,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         memcpy(cu83IRWindow->bits(),(m_renderer->outputIrBuffer),Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
 
         //passing QImage to the setImage() defined in renderer class
-        helperObj.setImage(*cu83IRWindow);
+        helperObj.setImage(cu83IRWindow->bits(), Y16_1080p_WIDTH, Y16_1080p_HEIGHT, 1);
     }
     else if((width == Y16_NEW_WIDTH)&&(height == Y16_NEW_HEIGHT))
     {
@@ -3511,7 +3513,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         memcpy(cu83IRWindow->bits(),(m_renderer->outputIrBuffer),Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
 
         //passing QImage to the setImage() defined in renderer class
-        helperObj.setImage(*cu83IRWindow);
+        helperObj.setImage(cu83IRWindow->bits(), Y16_1080p_WIDTH, Y16_1080p_HEIGHT,1);
     }
     else if((width == Y16_1350p_WIDTH)&&(height == Y16_1350p_HEIGHT))//3840x1350 => 3840x1080
     {
@@ -3579,25 +3581,7 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
     }
     else if((cameraMode == 1) && (inputBuffer[7] == IR_FRAME)){
         //converting IR frame into QImage, inorder to render in another window
-        int err = -1;
-        err = v4lconvert_convert(m_convertData, &m_capSrcFormat, &m_capDestFormat,
-                                    inputBuffer, width*height*2, irRenderer->bits(),
-                                            m_capDestFormat.fmt.pix.sizeimage);
-        if(err == -1){
-            return false;
-        }
-
-       memcpy(qImageRenderer->bits(),irRenderer->bits(),(height*width*BYTES_PER_PIXEL_RGB));
-
-       //set black color in the preview window, when device is in trigger mode
-       if(clearBuffer)
-       {
-           qImageRenderer->fill(Qt::black);
-       }
-
-       //passing QImage to the setImage() defined in renderer class
-       helperObj.setImage(*qImageRenderer);
-       qImageRenderer->fill(Qt::transparent);
+        helperObj.setImage(inputBuffer, width, height, 0);
     }
     m_renderer->render27CugMutex.unlock();
     return true;
@@ -3612,6 +3596,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
             if(check_jpeg_header(inputbuffer,bytesUsed))
             {
                 if(!frameSkip){
+                    m_renderer->renderMutex.lock();
                     getFrameRates();
                     frameSkip = true;
                     memcpy(tempSrcBuffer, (unsigned char *)inputbuffer, bytesUsed);
@@ -3619,6 +3604,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
                         //Added by M.vishnu Murali: threadMonitor used for monitor jpegDecode() in seperate thread.
                         threadMonitor=QtConcurrent::run(jpegDecode, this, &m_renderer->rgbaDestBuffer, tempSrcBuffer, bytesUsed);
                     }
+                    m_renderer->renderMutex.unlock();
                 }else{
                 }
             }
@@ -4185,6 +4171,9 @@ bool Videostreaming::startCapture()
           emit signalToDestroyWindow();
         }
     }
+    else if(currentlySelectedCameraEnum == CommonEnums::IMX900USBCAM){
+        emit emitResolution(width,height);
+    }
     createWindow = true;
 
     // Added by Navya : 11 Feb 2020 -- Enabling capturing images once after streamon
@@ -4503,8 +4492,9 @@ bool Videostreaming::check_jpeg_header(void *inputbuffer, __u32 bytesUsed)
     }
     for(int i=0;i<8;++i)
     {
-        if(((uint8_t *) inputbuffer)[i] == 0xFF && ((uint8_t *) inputbuffer)[i+1] == 0xD8)
+        if(((uint8_t *) inputbuffer)[i] == 0xFF && ((uint8_t *) inputbuffer)[i+1] == 0xD8){
            return true;
+        }
     }
     return false;
 }
@@ -4686,8 +4676,8 @@ void Videostreaming::displayFrame() {
             stillTimeOutTimer.start(4000);
         }
 
-        m_capNotifier = new QSocketNotifier(fd(), QSocketNotifier::Read);
-        connect(m_capNotifier, SIGNAL(activated(int)), this, SLOT(capFrame()));
+         m_capNotifier = new QSocketNotifier(fd(), QSocketNotifier::Read);
+         connect(m_capNotifier, SIGNAL(activated(int)), this, SLOT(capFrame()));
     }
 }
 
@@ -4952,6 +4942,7 @@ void Videostreaming::setResolution(QString resolution)
     }
     m_renderer->m_videoResolnChange = true;
     m_renderer->gotFrame = false;
+    helperObj.clearBufAndShader();
     emit emitResolution(m_width,m_height);
     emit sendResolutionChange(m_renderer->m_videoResolnChange);
 }
@@ -5084,6 +5075,7 @@ void Videostreaming::updateVidOutFormat()
     emit logDebugHandle("Color Space set to: "+pixfmt2s(m_pixelformat));
     m_renderer->m_formatChange = true;
     m_renderer->gotFrame = false;
+    helperObj.clearBufAndShader();
     m_renderer->m_pixelformat = m_pixelformat;
 }
 
@@ -5395,8 +5387,9 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
     if(videoFormatType.isEmpty()) {
         videoFormatType = "avi";        //Application never enters in this condition
     }
-    if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264)
+    if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264){
         videoEncoderType = 1;
+    }
 #if !LIBAVCODEC_VER_AT_LEAST(54, 25)
     switch(videoEncoderType) {
     case 0:
@@ -5408,12 +5401,13 @@ void Videostreaming::recordBegin(int videoEncoderType, QString videoFormatType, 
     }
 #else
     switch(videoEncoderType) {
-    case 0:
+    case 0:{
         videoEncoderType = AV_CODEC_ID_MJPEG;
-        break;
-    case 1:
+        break;}
+    case 1:{
         videoEncoderType = AV_CODEC_ID_H264;
         break;
+    }
     }
 #endif
     fileName = fileLocation +"/Qtcam-" + QDateTime::currentDateTime().toString("yy_MM_dd:hh_mm_ss")+"."+ videoFormatType;
@@ -5562,8 +5556,8 @@ void Videostreaming::triggerModeEnabled() {
     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG)
     {
         triggerModeSkipframes();                //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when trigger mode is enabled.
-        m_renderer->triggermodeFlag = true;
     }
+    m_renderer->triggermodeFlag = true;
     trigger_mode = true;
 
     stopUpdatePreview();
@@ -5573,12 +5567,11 @@ void Videostreaming::masterModeEnabled() {
     trigger_mode = false;
     m_renderer->triggermodeFlag = false;
      m_snapShot = false;
-     if(!(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83 ||
-          currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1||
-          currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M)){ //To avoid executing mismatched shader function when switched from trigger mode to master mode
-         m_renderer->gotFrame = true;        // Added by Nivedha : 09 Mar 2021 -- To get preview when changed from trigger mode to master mode.
-     }
-     m_renderer->updateStop = false;
+
+     //Changed by Geethalakshmi B: 21 Dec 2024
+     //To avoid executing mismatched shader function when switched from trigger mode to master mode . To get preview when changed from trigger mode to master mode.
+     m_renderer->gotFrame = false;
+     m_renderer->updateStop = true;
 }
 //Added by Dhurka - 13th Oct 2016
 /**

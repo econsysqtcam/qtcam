@@ -188,6 +188,11 @@ Item {
         masterModeCapture();
         masterMode = seecam10.enableMasterMode()
         if(masterMode) {
+            root.checkForTriggerMode(false)
+            root.videoRecordBtnEnable(true)
+            root.captureBtnEnable(true)
+            root.startUpdatePreviewInMasterMode()
+
             masterModeTimer.start()
             JS.enableMasterMode_10cugB()
         }
@@ -202,6 +207,11 @@ Item {
         triggerModeCapture()
         triggerMode = seecam10.enableTriggerMode()
         if(triggerMode) {
+            root.checkForTriggerMode(true)
+            root.captureBtnEnable(false)
+            root.videoRecordBtnEnable(false)
+            root.stopUpdatePreviewInTriggerMode()
+
             JS.enableTriggerMode_10cugB()
         }
         else {

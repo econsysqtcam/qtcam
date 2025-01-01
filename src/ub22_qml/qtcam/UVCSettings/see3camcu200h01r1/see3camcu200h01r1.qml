@@ -1706,6 +1706,7 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
 
         if(see3camcu200mh01r1.setToDefault()) {
             getCurrentValuesFromCamera()

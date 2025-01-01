@@ -288,8 +288,14 @@ Item {
         onStreamModeValue:{
             if(streamMode == See3camCU136M.MODE_MASTER){
                 rdoModeMaster.checked = true
+                root.checkForTriggerMode(false)
+                root.captureBtnEnable(true)
+                root.videoRecordBtnEnable(true)
             }else if(streamMode == See3camCU136M.MODE_TRIGGER){
                 rdoModeTrigger.checked = true
+                root.videoRecordBtnEnable(false)
+                root.captureBtnEnable(false)
+                root.checkForTriggerMode(true)
             }
         }
 
@@ -470,6 +476,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         see3camcu136m.setToDefault()
         getValuesFromCamera()
     }
@@ -477,6 +484,7 @@ Item {
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
         see3camcu136m.setStreamMode(See3camCU136M.MODE_TRIGGER)
     }
     function setMasterMode(){
@@ -484,6 +492,7 @@ Item {
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
         root.masterEnableForMonochrome()
+        root.startUpdatePreviewInMasterMode()
         see3camcu136m.setStreamMode(See3camCU136M.MODE_MASTER)
     }
 

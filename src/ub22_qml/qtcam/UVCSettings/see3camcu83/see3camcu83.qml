@@ -1210,9 +1210,17 @@ Item{
     function currentStreamModeReceived(streamMode){
         if(streamMode == See3Cam_CU83.MASTER_MODE){
             masterMode.checked = true
+            root.checkForTriggerMode(false)
+            root.captureBtnEnable(true)
+            root.videoRecordBtnEnable(true)
+            root.startUpdatePreviewInMasterMode()
         }
         else if(streamMode == See3Cam_CU83.TRIGGER_MODE){
             triggerMode.checked = true
+            root.videoRecordBtnEnable(false)
+            root.captureBtnEnable(false)
+            root.stopUpdatePreviewInTriggerMode()
+            root.checkForTriggerMode(true)
         }
     }
 
@@ -1474,6 +1482,7 @@ Item{
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         defaultValue.enabled = false
 
         if(see3camcu83.setToDefaultValues()){

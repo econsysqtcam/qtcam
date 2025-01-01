@@ -585,10 +585,18 @@ Item {
          if(streamMode == See3CAM_16CUGM.MASTER)
          {
              masterMode.checked = true
+             root.checkForTriggerMode(false)
+             root.captureBtnEnable(true)
+             root.videoRecordBtnEnable(true)
+             root.startUpdatePreviewInMasterMode()
          }
          else if(streamMode == See3CAM_16CUGM.TRIGGER)
          {
              triggerMode.checked = true
+             root.videoRecordBtnEnable(false)
+             root.captureBtnEnable(false)
+             root.checkForTriggerMode(true)
+             root.stopUpdatePreviewInTriggerMode()
          }
      }
 
@@ -788,12 +796,14 @@ Item {
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
     }
 
     function setToDefaultValues(){
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         see3cam16cugm.setToDefaultValues()
         getValuesFromCamera()
     }

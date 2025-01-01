@@ -1305,6 +1305,7 @@ Item {
       function setMasterOnDemandMode(){
             root.captureBtnEnable(true)
             root.videoRecordBtnEnable(true)
+            root.startUpdatePreviewInMasterMode()
             fscamcu135.setStreamMode(Fscamcu135.STREAM_MASTER_ONDEMAND)
 
             fscamcu135.grabPreviewFrame()
@@ -1320,6 +1321,7 @@ Item {
 
         // set to default values
         function setToDefaultValues(){
+            root.checkForTriggerMode(false)
             fscamcu135.setToDefault()
            //Added by Navya:28-Feb-2019 -To get a popup window
             messageDialog.title=qsTr("Restore Default")
@@ -1604,11 +1606,23 @@ Item {
             onStreamModeValue:{
                 if(streamMode == Fscamcu135.STREAM_MASTER_ONDEMAND){
                     streamMasterOnDemand.checked = true
+                    root.checkForTriggerMode(false)
+                    root.captureBtnEnable(true)
+                    root.videoRecordBtnEnable(true)
+                    root.startUpdatePreviewInMasterMode()
                  //   root.enableTimerforGrabPreviewFrame(true)
                 }else if(streamMode == Fscamcu135.STREAM_SOFTWARE_TRIGGER){
                     streamSwTrigger.checked = true
+                    root.videoRecordBtnEnable(false)
+                    root.captureBtnEnable(false)
+                    root.checkForTriggerMode(true)
+                    root.stopUpdatePreviewInTriggerMode()
                 }else if(streamMode == Fscamcu135.STREAM_HARDWARE_TRIGGER){
                     streamHwTrigger.checked = true
+                    root.videoRecordBtnEnable(false)
+                    root.captureBtnEnable(false)
+                    root.checkForTriggerMode(true)
+                    root.stopUpdatePreviewInTriggerMode()
                 }
             }
             onFlickerDetectionMode:{

@@ -311,6 +311,33 @@ int main(int argc, char *argv[])
 #endif
     viewer.setIcon(icon);
     viewer.setTitle("Qtcam");
+
+    //Added by Geethalakshmi : 23rd Dec 2024
+    //Bug fix for fps drop issue in 27cug and cu83 on minimizing main window
+    //This minimizes the irwindow on minimizing the main window.
+    QQuickWindow *window = qobject_cast<QQuickWindow*>(viewer.contentItem()->window());
+    viewer.rootContext()->setContextProperty("qmlWindow", window);
+    if (window) {
+        QObject::connect(window, &QQuickWindow::windowStateChanged, [&](Qt::WindowState state) {
+            if (state == Qt::WindowMinimized) {
+                QObject *rootObject = viewer.rootObject();
+                if (rootObject) {
+                    // Call the function defined in QML to minimize the irPreview window
+                    QVariant returnedValue;
+                    QMetaObject::invokeMethod(rootObject, "minimizeIrPreviewWindow", Q_RETURN_ARG(QVariant, returnedValue));
+                 }
+             }
+              else if (state == Qt::WindowMaximized || state == Qt::WindowNoState || state == Qt::WindowFullScreen || state == Qt::WindowActive) {
+                  QObject *rootObject = viewer.rootObject();
+                  if (rootObject) {
+                      // Call the function defined in QML to activate the irPreview window only when the main winow is in either one of these states.
+                      QVariant returnedValue;
+                      QMetaObject::invokeMethod(rootObject, "maxMainWindow", Q_RETURN_ARG(QVariant, returnedValue));
+                    }
+                }
+          });
+     }
+
     //Bug fix: There's no "close,Restore Down,minimize" button on the top of the QTCAM when restore the application
     viewer.show();
     return app.exec();

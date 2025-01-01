@@ -1480,6 +1480,8 @@ Item {
      }
 
     Component.onCompleted:{
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
         uvccamera.initExtensionUnitAscella()
         vidResln = JS.videoCaptureResolution
         vidWidth = vidResln.split('x')[0]

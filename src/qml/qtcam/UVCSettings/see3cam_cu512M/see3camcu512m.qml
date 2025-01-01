@@ -279,11 +279,19 @@ Item {
      onStreamModeReceived:{
          if(streamMode == See3CAM_CU512M.MASTER)
          {
-            masterMode.checked = true
+             masterMode.checked = true
+             root.checkForTriggerMode(false)
+             root.captureBtnEnable(true)
+             root.videoRecordBtnEnable(true)
+             root.startUpdatePreviewInMasterMode()
          }
          else if(streamMode == See3CAM_CU512M.TRIGGER)
          {
-            triggerMode.checked = true
+             triggerMode.checked = true
+             root.videoRecordBtnEnable(false)
+             root.captureBtnEnable(false)
+             root.checkForTriggerMode(true)
+             root.stopUpdatePreviewInTriggerMode()
          }
      }
 
@@ -451,6 +459,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         see3camcu512m.setToDefaultValues()
         getValuesFromCamera()
     }

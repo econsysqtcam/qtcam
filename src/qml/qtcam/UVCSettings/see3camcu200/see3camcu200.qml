@@ -2551,7 +2551,7 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
                        text: "Default"
                        tooltip: "Default button is used to set all the extension unit controls to their default values."
                        style: econButtonStyle
-                       action: setDefault
+                       //action: setDefault
                        onClicked:{
                            setToDefaultValues()
                        }
@@ -3375,10 +3375,10 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
             wbSingleShotBtnClicked = false
             see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.AUTO_WB, SEE3CAM_CU200.WB_CONTINIOUS, 0, 0)
         } else if(wbSingleShot.checked == true) {
-            if(!wbSingleShotBtnClicked){
+            //if(!wbSingleShotBtnClicked){
                 wbSingleShotBtnClicked = true
                 see3camcu200.setWhiteBalanceMode(SEE3CAM_CU200.AUTO_WB, SEE3CAM_CU200.WB_SINGLE_SHOT, 0, 0)
-            }
+            //}
         }
         root.sendWhiteBalanceModeToUVC(true, false)
     }
@@ -3469,6 +3469,7 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
 
         if(see3camcu200.setToDefault()) {
             getCurrentValuesFromCamera()

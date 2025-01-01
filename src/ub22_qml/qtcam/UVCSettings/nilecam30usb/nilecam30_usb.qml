@@ -1147,7 +1147,9 @@ value in the text box and click the Set button"
     }
 
 
-    Component.onCompleted:{        
+    Component.onCompleted:{
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
         getCameraValues()
     }
 

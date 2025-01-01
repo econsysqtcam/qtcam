@@ -817,6 +817,10 @@ Item {
         messageDialog.open()
     }
 
+    Component.onCompleted: {
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
+    }
 
     Component {
         id: econTextFieldStyle

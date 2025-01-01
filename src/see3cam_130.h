@@ -205,9 +205,10 @@ public:
     Q_ENUMS(FLASH_MODE)
 
     enum FLICKER_MODE {
-         MODE_50Hz    = 0x00,
-         MODE_60Hz    = 0x01,
-         MODE_DISABLE = 0x02
+         MODE_AUTO    = 0x00,
+         MODE_50Hz    = 0x01,
+         MODE_60Hz    = 0x02,
+         MODE_DISABLE = 0x03
     };
     Q_ENUMS(FLICKER_MODE)
 

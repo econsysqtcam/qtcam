@@ -1271,6 +1271,8 @@ Item {
         }
     }
     Component.onCompleted: {
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
         uvcExtCamAccessId.initUVCExtensionUnit(root.vidstreamObj)
     }
     Component.onDestruction:{        

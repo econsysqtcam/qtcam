@@ -888,6 +888,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         see3camcu210.setToDefaultValues()
         getValuesFromCamera()
     }
@@ -920,5 +921,9 @@ Item {
 
     Component.onCompleted: {
         getValuesFromCamera();
+        root.checkForTriggerMode(false)
+        root.captureBtnEnable(true)
+        root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
     }
 }

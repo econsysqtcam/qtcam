@@ -1000,8 +1000,16 @@ Item {
         onCameraModeReceived:{
             if(cameraMode == See3Camcu20.CAMERA_MASTER){
                 cameraModeMaster.checked = true
+                root.checkForTriggerMode(false)
+                root.videoRecordBtnEnable(true)
+                root.captureBtnEnable(true)
+                root.startUpdatePreviewInMasterMode()
             }else if(cameraMode == See3Camcu20.CAMERA_SLAVE){
                 cameraModeSlave.checked = true
+                root.checkForTriggerMode(true)
+                root.captureBtnEnable(false)
+                root.videoRecordBtnEnable(false)
+                root.stopUpdatePreviewInTriggerMode()
             }
         }
         onSpecialModeReceived:{
@@ -1202,6 +1210,7 @@ Item {
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
     }
 
     function setTriggerMode(){
@@ -1210,12 +1219,14 @@ Item {
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
     }
 
     function setToDefaultValues(){
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
         defaultValue.enabled = false
         if(see3camcu20.setToDefaultValues()){
             see3camcu20.getAutoExpROIModeAndWindowSize()

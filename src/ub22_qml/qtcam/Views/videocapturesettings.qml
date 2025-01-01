@@ -78,10 +78,6 @@ Item {
         action: videoCap
         activeFocusOnPress : true
         tooltip: "Video Capture Settings - \nAllows the user to set the frame rate, preview color space,\npreview resolution, the format(extension), encoder and video path\nfor video recording"
-        onClicked:
-        {
-          root.minimizeWindow()
-        }
         style: ButtonStyle {
             background: Rectangle {
                 implicitWidth: 265
@@ -173,9 +169,6 @@ Item {
                                 font.pixelSize: 14
                             }
                         }
-                        onPressedChanged:{
-                            root.minimizeWindow()
-                        }
                         onCurrentIndexChanged: {
                             if(frameRateBox) {
                                 if(root.is83USBFormatH264)
@@ -254,9 +247,6 @@ Item {
                                 font.family: "Ubuntu"
                                 font.pixelSize: 14
                             }
-                        }
-                        onPressedChanged:{
-                            root.minimizeWindow()
                         }
                         onCurrentIndexChanged: {
                             if(output_size_box_Video.count > 0){
@@ -340,9 +330,6 @@ Item {
                                 font.family: "Ubuntu"
                                 font.pixelSize: 14
                             }
-                        }
-                        onPressedChanged:{
-                            root.minimizeWindow()
                         }
                         onCurrentIndexChanged: {
                             if(output_size_box_Video.count > 0){
@@ -428,9 +415,6 @@ Item {
                                 font.pixelSize: 14
                             }
                         }
-                        onPressedChanged:{
-                            root.minimizeWindow()
-                        }
                         onCurrentIndexChanged: {
                             JS.videoExtension = fileExtensions.currentText
                         }
@@ -475,9 +459,6 @@ Item {
                                 font.pixelSize: 14
                             }
                         }
-                        onPressedChanged:{
-                            root.minimizeWindow()
-                        }
                         onCurrentIndexChanged: {
                             JS.videoEncoder = fileEncoder.currentIndex
                         }
@@ -515,9 +496,6 @@ Item {
                                         border.color: "#ffffff"
                                     }
                                 }
-                            }
-                            onClicked:{
-                              root.minimizeWindow()
                             }
                             Text {
                                 id: storage_pathVideo

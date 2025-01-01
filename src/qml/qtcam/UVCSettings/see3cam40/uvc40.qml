@@ -271,6 +271,8 @@ Item {
         messageDialog.open()
     }
     Component.onCompleted: {
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
         see3camcu40.getFlashState();
     }
 }

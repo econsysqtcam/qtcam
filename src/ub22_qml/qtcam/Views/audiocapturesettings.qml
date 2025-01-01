@@ -72,7 +72,7 @@ Item {
             }
         }
         onClicked:{
-          root.minimizeWindow()
+          //root.minimizeWindow()
         }
         ScrollView {
                 id: audio_Capture_property_Child

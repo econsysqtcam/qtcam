@@ -533,7 +533,8 @@ Item {
 
     Component.onCompleted:{
         gpioOutputBox.forceActiveFocus()
-        
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
         seecam50.getTorchLevel()
         outputPinFlag = true
         see3camGpio.getGpioLevel(See3CamGpio.OUT1)

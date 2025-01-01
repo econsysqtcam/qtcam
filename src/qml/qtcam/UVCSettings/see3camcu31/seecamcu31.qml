@@ -2537,6 +2537,7 @@ Note : Ensure the values entered are all even numbers." )
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
         see3camcu31.setToDefaultValues()
+        root.startUpdatePreviewInMasterMode()
         getValuesFromCamera()
     }
 

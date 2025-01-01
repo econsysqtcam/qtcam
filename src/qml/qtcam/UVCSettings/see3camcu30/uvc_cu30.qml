@@ -1171,6 +1171,8 @@ Item {
     Component.onCompleted:{
         getCameraValues()
         root.disablePowerLineFreq()
+        root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
     }
 
     function displayMessageBox(title, text){

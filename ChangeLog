@@ -1,3 +1,9 @@
+Qtcam Application - 26.0.36
+---------------------------
+*Added Auto mode in Antiflicker for See3cam_130.
+*Bug fixes: FPS drop issue in see3cam_27cug and see3cam_cu83 in Ubuntu 22.04, Shuttering in preview when switching to MJPG format, correctly writing duration to the video file on closing it, and avoided preview corruption for higher resolution while video recording with H264 encoder format. Capture issue fixed: On connecting 2 cameras and switching from master to trigger mode disables the capture in other camera.
+*Improvement in SEE3CAM_37CUGM: To grey out and disable the Fast auto exposure and self trigger for other resolutions than 2064x1552. To stop showing fps when Trigger mode is set.
+
 Qtcam Application - 26.0.35
 ---------------------------
 *Bug fixes for SEE3CAM_37CUGM : Green frame issue fix in still capture and Enabled video recording at 640x480 resolution.

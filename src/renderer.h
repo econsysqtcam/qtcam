@@ -1,40 +1,74 @@
-#ifndef IMAGEITEM_H
-#define IMAGEITEM_H
+#ifndef RENDERER_H
+#define RENDERER_H
 
-#include <QImage>
-#include <QQuickPaintedItem>
+#include <QOpenGLFunctions>
+#include <QQuickFramebufferObject>
+#include <QOpenGLShaderProgram>
+#include <QMutex>
+#include <QOpenGLBuffer>
+#include <QOpenGLTexture>
 
-class ImageItem : public QQuickPaintedItem
+class Helper : public QObject, public QQuickFramebufferObject::Renderer, public QOpenGLFunctions
 {
     Q_OBJECT
-    Q_PROPERTY(QImage image READ image WRITE setImage NOTIFY imageChanged)
+    Q_PROPERTY(int irWidth READ getIrWidth NOTIFY irWidthChanged)
+    Q_PROPERTY(int irHeight READ getIrHeight NOTIFY irHeightChanged)
+    Q_PROPERTY(int isFrameReceived READ isFramesAvailable NOTIFY framesAvailable)
 public:
-    ImageItem(QQuickItem *parent = NULL);
-    QImage image() const;
-    void setImage(const QImage &image);
+    Helper(QQuickItem *parent = NULL);
+    void setImage(const uchar *data, int width, int height, int isCu83);
+    void shaderY8();
+    void shaderUYVY();
+    void clearBufAndShader();
+    void clearShader();
+    static int irWidth;
+    static int irHeight;
+    static bool isFrameReceived;
+    void render() override;
 
-    void paint(QPainter *painter);
+public slots:
+    void renderY8();
+    void renderUYVY();
+
 signals:
-    void imageChanged();
+    void irWidthChanged();
+    void irHeightChanged();
+    void framesAvailable();
+
 private:
-    QImage m_image;
+
+    QOpenGLShaderProgram *mShaderProgram = nullptr;
+    static GLfloat vertices[];
+    static unsigned short mIndicesData[];
+    int mPositionLoc;
+    int mTexCoordLoc;
+    GLint samplerLoc;
+    GLuint m_vbo;
+    GLuint greyTextureId;
+    GLuint uyvyTextureId;
+    QMutex renderMutex;
+    static const uchar* irFrame ;
+    static int isIrCu83;
+    int getIrWidth() const { return irWidth; }
+    int getIrHeight() const { return irHeight; }
+    bool isFramesAvailable() const { return isFrameReceived;}
 };
 
 
-class Helper: public QObject{
+class ImageItem: public QQuickFramebufferObject
+{
     Q_OBJECT
-    Q_PROPERTY(QImage image READ image WRITE setImage NOTIFY imageChanged)
 public:
-    QImage image() const{
-        return m_image; }
-    void setImage(const QImage &image){
-        m_image = image;
-        emit imageChanged();
-    }
-signals:
-    void imageChanged();
+    Renderer *createRenderer() const override {
+            if (renderer == nullptr) {
+                renderer = new Helper();
+            }
+            return renderer;
+        }
+
 private:
-    QImage m_image;
+    mutable	Helper	*renderer = nullptr;
 };
-#endif // IMAGEITEM_H
+
+#endif // RENDERER_H
 

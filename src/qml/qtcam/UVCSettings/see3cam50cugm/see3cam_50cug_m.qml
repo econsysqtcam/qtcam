@@ -594,6 +594,11 @@ Item{
                 strobeOn.opacity = 0.1
                 strobeOff.enabled   = false
                 strobeOff.opacity   = 0.1
+
+                root.checkForTriggerMode(false)
+                root.videoRecordBtnEnable(true)
+                root.captureBtnEnable(true)
+                root.startUpdatePreviewInMasterMode()
             }
             else
             {
@@ -604,6 +609,7 @@ Item{
                 root.checkForTriggerMode(true)
                 root.videoRecordBtnEnable(false)
                 root.captureBtnEnable(false)
+                root.stopUpdatePreviewInTriggerMode()
 
                 if(cameraMode == SEE3CAM_50CUGM.TRIGGER_EXP_CONTROL)
                 {
@@ -710,6 +716,7 @@ Item{
         root.checkForTriggerMode(false)
         root.videoRecordBtnEnable(true)
         root.captureBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
     }
 
     function setTriggerMode()
@@ -729,6 +736,7 @@ Item{
         root.checkForTriggerMode(true)
         root.videoRecordBtnEnable(false)
         root.captureBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
 
         //disable strobe mode when the camera is in Master mode
         strobeOn.enabled = false
@@ -744,6 +752,7 @@ Item{
         root.checkForTriggerMode(true)
         root.videoRecordBtnEnable(false)
         root.captureBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
 
         //enable strobe mode when the camera is in trigger mode
         strobeOn.enabled = true
@@ -796,6 +805,7 @@ Item{
         root.checkForTriggerMode(false)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+	root.startUpdatePreviewInMasterMode()
 
         if(see3cam50cugm.setToDefaultValues())
         {

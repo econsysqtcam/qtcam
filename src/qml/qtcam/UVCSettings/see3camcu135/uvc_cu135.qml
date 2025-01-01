@@ -1022,11 +1022,13 @@ Item {
         seecamcu135.setStreamMode(See3CamCu135.STREAM_MASTER)
         root.captureBtnEnable(true)
         root.videoRecordBtnEnable(true)
+        root.startUpdatePreviewInMasterMode()
     }
 
     // set to default values
     function setToDefaultValues(){
         root.checkForTriggerMode(false)
+        root.startUpdatePreviewInMasterMode()
         seecamcu135.setToDefault()
         getValuesFromCamera()
         root.keyEventFiltering = true
@@ -1154,6 +1156,7 @@ Item {
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
+        root.stopUpdatePreviewInTriggerMode()
         seecamcu135.setStreamMode(See3CamCu135.STREAM_TRIGGER)
         displayMessageBox(qsTr("Trigger Mode"), qsTr("Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document See3CAM_CU135_Trigger_Mode"))
     }
@@ -1304,10 +1307,14 @@ Item {
                 streamMaster.checked = true
                 root.captureBtnEnable(true)
                 root.videoRecordBtnEnable(true)
+                root.checkForTriggerMode(false)
+                root.startUpdatePreviewInMasterMode()
             }else if(streamMode == See3CamCu135.STREAM_TRIGGER){
                 streamTrigger.checked = true
                 root.captureBtnEnable(false)
                 root.videoRecordBtnEnable(false)
+                root.checkForTriggerMode(true)
+                root.stopUpdatePreviewInTriggerMode()
                 messageDialog.title = "Trigger Mode"
                 messageDialog.text = "Frames will be out only when external hardware pulses are given to PIN 5 of CN3. Refer the document."
                 messageDialog.open()
