@@ -1,3 +1,8 @@
+Qtcam Application - 26.0.37
+---------------------------
+*Added and changed some HID controls in See3CAM_130D, See3CAM_37CUG and See3CAM_160.
+*Bug fix: Set actual fps to the file header on video recording.
+
 Qtcam Application - 26.0.36
 ---------------------------
 *Added Auto mode in Antiflicker for See3cam_130.

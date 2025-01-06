@@ -35,6 +35,9 @@ Item {
     property int hCropPos : 0
     property int vCropPos : 0
 
+    property int xCoord : 0
+    property int yCoord : 0
+
     property bool skipUpdateUIQFactor           : false
     property bool skipUpdateUIOnAntiFlickerMode : false
     property bool skipUpdateUIOnAWBLockStatus   : false
@@ -52,11 +55,27 @@ Item {
     property bool skipUpdateGainDiv2Slider      : false
 
     property int minExpInSeconds: 0
-    property int maxExpInSeconds: 14
+    property int maxExpInSeconds: 1
     property int minExpInMilliSeconds: 0
     property int maxExpInMilliSeconds: 999
     property int minExpInMicroSeconds: 0
     property int maxExpInMicroSeconds: 999
+
+
+    property int minExpCompInSec: 0
+    property int maxExpCompInSec: 1
+    property int minExpCompInMilliSeconds: 0
+    property int maxExpCompInMilliSeconds: 999
+    property int minExpCompInMicroSeconds: 0
+    property int maxExpCompInMicroSeconds: 999
+
+    property int gainMinVal: 0
+    property int gainMaxVal: 24
+
+    property int minRoiXCoord: 0
+    property int maxRoiXCoord: 255
+    property int minRoiYCoord: 0
+    property int maxRoiYCoord: 255
 
     property int blackLevelMin: 0
     property int blackLevelMax: 4095
@@ -72,6 +91,10 @@ Item {
     property int  milliSecondInt : 0
     property int  microSecondInt : 0
 
+    property bool uvcAutoExposureSelected: false
+
+    property bool isAutoExpMode : false
+
     Action {
         id: firmwareVersion
         onTriggered:
@@ -83,7 +106,8 @@ Item {
     Action {
         id: triggerExposureAction
         onTriggered: {
-            //imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+            imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+            root.sendExposureStatusToUVC(true, 0);
         }
     }
 
@@ -91,7 +115,7 @@ Item {
         id: readStatisticsCall
         onTriggered:
         {
-            //imx900USBCAM.readStatistics()
+            imx900USBCAM.readStatistics()
         }
     }
 
@@ -184,6 +208,15 @@ Item {
                 vCropPos = y;
                 imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
             }
+            if(roiAutoExpManual.checked && roiAutoExpManual.enabled){
+                vidResW = width;
+                vidResH = height;
+                xCoord = x;
+                yCoord = y;
+                imx900USBCAM.setROIAutoExposure(IMX900USBCAM.AE_MANUAL_ROI, vidResW, vidResH, xCoord, yCoord, autoExpoWinSizeCombo.currentText)
+
+            }
+
         }
 
         //Signals getting values from UVC & set its values to the HID controls
@@ -191,10 +224,10 @@ Item {
             gainSlider.value = gainHid
         }
 
-        function onImx900ExposureFromUVC(seconds, milliSeconds, microSeconds){
-               expInSecondsTextField.text  = seconds
-               expInMilliSecTextField.text = milliSeconds
-               expInMicroSecTextField.text = microSeconds
+        function onExposureComponentsFromUVC(seconds, milliSeconds, microSeconds){
+            expInSecondsTextField.text  = seconds
+            expInMilliSecTextField.text = milliSeconds
+            expInMicroSecTextField.text = microSeconds
         }
 
         function onVideoResolutionChanged(){
@@ -226,7 +259,34 @@ Item {
                 disableSelfTrigger.opacity = 0.1
                 disableFastAutoExp.opacity = 0.1
             }
+
+            if(width === 1024  && height === 768){
+                autoExpHDR.enabled = true
+                outdoorHdr.enabled = true
+                indoorHdr.enabled  = true
+                autoExpHDR.opacity = 1
+                outdoorHdr.opacity = 1
+                indoorHdr.opacity  = 1
+            }
+            else{
+                autoExpHDR.enabled = false
+                outdoorHdr.enabled = false
+                indoorHdr.enabled  = false
+                autoExpHDR.opacity = 0.1
+                outdoorHdr.opacity = 0.1
+                indoorHdr.opacity  = 0.1
+            }
         }
+
+        function onAutoExposureSelected(autoExposureSelect){
+            enableDisableAutoExposureControls(autoExposureSelect)
+        }
+        function onImx900ExposureFromUVC(seconds, milliSeconds, microSeconds){
+            expInSecondsTextField.text  = seconds
+            expInMilliSecTextField.text = milliSeconds
+            expInMicroSecTextField.text = microSeconds
+        }
+
     }
 
     ScrollView{
@@ -246,7 +306,7 @@ Item {
                 y:5
                 spacing:20
 
-                /*Text {
+                Text {
                     id: camereMode
                     text: "--- Camera Mode ---"
                     font.pixelSize: 14
@@ -262,7 +322,7 @@ Item {
                    RadioButton {
                        id: master
                        style:  econRadioButtonStyle
-                       text: qsTr("Auto")
+                       text: qsTr("Master")
                        exclusiveGroup: cameraModeGroup
                        activeFocusOnPress: true
                        tooltip: "This is a simple mode of operation for the camera without any external trigger
@@ -283,9 +343,9 @@ After selecting master mode, the application starts video streaming"
                        activeFocusOnPress: true
                        tooltip: "In this mode, the sensor integration time is decided by the pulse width input
 (low level) to the trigger pin.
-
 For example, If the width of the low-level trigger is 15.6ms, then the exposure
-configured in the sensor is 15.6ms."
+configured in the sensor is 15.6ms.
+Refer Product Datasheet for more information."
                        onClicked: {
                            setCameraControls()
                        }
@@ -293,7 +353,7 @@ configured in the sensor is 15.6ms."
                            setCameraControls()
                        }
                    }
-                   RadioButton {
+                  /* RadioButton {
                        id: triggerAcquisition
                        style:  econRadioButtonStyle
                        text: qsTr("Trigger-Acquisition")
@@ -322,8 +382,8 @@ with the exposure configured in the exposure slider."
                        Keys.onReturnPressed: {
                            setCameraControls()
                        }
-                   }
-               }*/
+                   } */
+                }
 
                 Text {
                     id: flipMode
@@ -377,7 +437,7 @@ with the exposure configured in the exposure slider."
                     opacity: 0.50196078431373
                     ToolButton{
                         tooltip: "This control is used to vary gain value from 0dB to 24dB (analog
-gain) and from 25dB to 48dB (digital gain)"
+gain)"
                         width: 200
                         opacity: 0
                     }
@@ -714,7 +774,7 @@ Auto gain function."
                         opacity: 0
                     }
                 }
-                /*RowLayout{
+                RowLayout{
                    ExclusiveGroup { id: autoExpStatusGroup }
                    Layout.alignment: Qt.AlignCenter
                    spacing: 40
@@ -723,22 +783,34 @@ Auto gain function."
                        style:  econRadioButtonStyle
                        text: qsTr("Auto")
                        exclusiveGroup: autoExpStatusGroup
+                       tooltip: "Exposure – Auto :
+    This control enables user to set exposure in automatic mode"
                        activeFocusOnPress: true
                        onClicked: {
-                           if(exposureContinious.checked == true) {
+                           if(!exposureContinious.checked && !exposureSingleShot.checked ){
+                               imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.CONTINIOUS_EXP, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+                               exposureContinious.checked = true
+                           }
+                           else if(exposureContinious.checked == true) {
                                imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.CONTINIOUS_EXP, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                            }
                            else if(exposureSingleShot.checked == true) {
-                               imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+                               imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                            }
+                           root.sendExposureStatusToUVC(true, 0);
                        }
                        Keys.onReturnPressed: {
-                           if(exposureContinious.checked == true) {
+                           if(!exposureContinious.checked && !exposureSingleShot.checked){
+                               exposureContinious.checked = true
+                               imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.CONTINIOUS_EXP, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+                           }
+                           else if(exposureContinious.checked == true) {
                                imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.CONTINIOUS_EXP, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                            }
                            else if(exposureSingleShot.checked == true) {
-                               imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+                               imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                            }
+                           root.sendExposureStatusToUVC(true, 0);
                        }
                    }
                    RadioButton {
@@ -747,22 +819,22 @@ Auto gain function."
                        text: qsTr("Manual")
                        exclusiveGroup: autoExpStatusGroup
                        activeFocusOnPress: true
+                       tooltip: " Exposure – Manual :
+    This control enables the user to set the manual exposure value"
                        onClicked: {
+                           imx900USBCAM.setExposureMode(IMX900USBCAM.MANUAL_EXPOSURE, 0, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                            //Sending exposure value from HID to UVC
                            sendConvertedExpToUVC()
-
-                           imx900USBCAM.setExposureMode(IMX900USBCAM.MANUAL_EXPOSURE, 0, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                        }
                        Keys.onReturnPressed: {
+                           imx900USBCAM.setExposureMode(IMX900USBCAM.MANUAL_EXPOSURE, 0, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                            //Sending exposure value from HID to UVC
                            sendConvertedExpToUVC()
-
-                           imx900USBCAM.setExposureMode(IMX900USBCAM.MANUAL_EXPOSURE, 0, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                        }
                    }
-               }*/
+               }
 
-                /*Text
+                Text
                 {
                     id: autoExpModeTitle
                     text: "Auto Exposure Features :"
@@ -786,7 +858,9 @@ Auto gain function."
                         opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                         style: econRadioButtonStyle
                         ToolButton{
-                            tooltip: "The camera detects the light source and sets the exposure value continuously with respect to change in scenes."
+                            tooltip: "Auto Exposure – Continuous :
+    This control enables the camera to detect the light source and set appropriate
+exposure value continuously with respect to change in the scenes."
                             width: 15
                             height: 20
                             opacity: 0
@@ -794,10 +868,12 @@ Auto gain function."
                         onClicked: {
                             expSingleShotBtnClicked = false
                             imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.CONTINIOUS_EXP, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+                            root.sendExposureStatusToUVC(true, 0);
                         }
                         Keys.onReturnPressed: {
                             expSingleShotBtnClicked = false
                             imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.CONTINIOUS_EXP, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+                            root.sendExposureStatusToUVC(true, 0);
                         }
                     }
                 }
@@ -813,22 +889,25 @@ Auto gain function."
                         enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
                         opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                         ToolButton{
-                            tooltip: "The camera calculates the exposure based on the current scene just once and strict with it until next request."
+                            tooltip: "Auto Exposure – Single Shot:
+    This control enables the camera to calculate the exposure based on the current
+scene (when the trigger button is pressed) just once and maintain that exposure
+until next request."
                             width: 15
                             height: 20
                             opacity: 0
                         }
                         onClicked: {
-                            if(!expSingleShotBtnClicked){
-                                expSingleShotBtnClicked = true
-                                imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
-                            }
+                            expSingleShotBtnClicked = true
+                            root.sendExposureStatusToUVC(true, 0);
+                            imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+
                         }
                         Keys.onReturnPressed: {
-                            if(!expSingleShotBtnClicked){
-                                expSingleShotBtnClicked = true
-                                imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
-                            }
+                            expSingleShotBtnClicked = true
+                            root.sendExposureStatusToUVC(true, 0);
+                             imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+
                         }
                     }
                     Button {
@@ -841,12 +920,18 @@ Auto gain function."
                         implicitHeight: 25
                         implicitWidth: 120
                         action: (exposureSingleShot.enabled && exposureSingleShot.checked) ? triggerExposureAction : null
-                        tooltip: "Allows camera to calculate the exposure value once in Single shot mode"
+                        tooltip: "Auto Exposure – Single Shot:
+    This control enables the camera to calculate the exposure based on the current
+scene (when the trigger button is pressed) just once and maintain that exposure
+until next request."
                         Keys.onReturnPressed: {
-                            imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+                            if(expSingleShotBtnClicked){
+                                imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
+                                root.sendExposureStatusToUVC(true, 0)
+                            }
                         }
                     }
-                }*/
+                }
 
                 Text
                 {
@@ -856,8 +941,8 @@ Auto gain function."
                     font.family: "Ubuntu"
                     color: "#ffffff"
                     smooth: true
-                    //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                    //opacity: (manualExposure.enabled && manualExposure.checked) ? 0.8 : 0.1
+                    enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                    opacity: (manualExposure.enabled && manualExposure.checked) ? 0.8 : 0.1
                 }
 
                 ColumnLayout{
@@ -876,8 +961,16 @@ Auto gain function."
                             smooth: true
                             horizontalAlignment: TextInput.AlignHCenter
                             style: econTextFieldStyle
-                            //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                            //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                            ToolButton{
+                                tooltip: "Exposure – Manual:
+This control enables the user to manually enter the integration time of the
+sensor. For example, 15.6ms should be entered as 15ms and 600ms."
+                                width: 15
+                                height: 20
+                                opacity: 0
+                            }
+                            enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                            opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
 
                             // Units Name
                             Text {
@@ -887,8 +980,8 @@ Auto gain function."
                                 font.family: "Ubuntu"
                                 color: "#ffffff"
                                 smooth: true
-                                //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                                //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                                enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                                opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                                 horizontalAlignment: Text.AlignHCenter
                             }
                             validator: IntValidator {bottom: minExpInSeconds; top: maxExpInSeconds}
@@ -903,8 +996,16 @@ Auto gain function."
                             smooth: true
                             horizontalAlignment: TextInput.AlignHCenter
                             style: econTextFieldStyle
-                            //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                            //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                            ToolButton{
+                                tooltip: "Exposure – Manual:
+This control enables the user to manually enter the integration time of the
+sensor. For example, 15.6ms should be entered as 15ms and 600ms."
+                                width: 15
+                                height: 20
+                                opacity: 0
+                            }
+                            enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                            opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                             // Units Name
                             Text {
                                 text: "   ms"
@@ -913,8 +1014,8 @@ Auto gain function."
                                 font.family: "Ubuntu"
                                 color: "#ffffff"
                                 smooth: true
-                                //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                                //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                                enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                                opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                             }
                             validator: IntValidator {bottom: minExpInMilliSeconds; top: maxExpInMilliSeconds}
                         }
@@ -927,8 +1028,16 @@ Auto gain function."
                             smooth: true
                             horizontalAlignment: TextInput.AlignHCenter
                             style: econTextFieldStyle
-                            //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                            //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                            ToolButton{
+                                tooltip: "Exposure – Manual:
+This control enables the user to manually enter the integration time of the
+sensor. For example, 15.6ms should be entered as 15ms and 600ms."
+                                width: 15
+                                height: 20
+                                opacity: 0
+                            }
+                            enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                            opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
 
                             // Unit Name
                             Text {
@@ -938,8 +1047,8 @@ Auto gain function."
                                 font.family: "Ubuntu"
                                 color: "#ffffff"
                                 smooth: true
-                                //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                                //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                                enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                                opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                                 horizontalAlignment: Text.AlignHCenter
                             }
                             validator: IntValidator {bottom: minExpInMicroSeconds ; top: maxExpInMicroSeconds}
@@ -950,21 +1059,24 @@ Auto gain function."
                             activeFocusOnPress : true
                             text: "Set"
                             style: econButtonStyle
-                            //enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
-                            //opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
+                            enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                            opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                             implicitHeight: 25
                             implicitWidth: 50
                             onClicked: {
+                                if(imx900USBCAM.setExposureMode(IMX900USBCAM.MANUAL_EXPOSURE, 0, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text) == false){
+                                    imx900USBCAM.getExposureMode()
+                                }
                                 //Sending exposure value from HID to UVC
                                 sendConvertedExpToUVC()
 
-                                imx900USBCAM.setExposureMode(IMX900USBCAM.MANUAL_EXPOSURE, 0, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                             }
                             Keys.onReturnPressed: {
                                 //Sending exposure value from HID to UVC
+                                if(imx900USBCAM.setExposureMode(IMX900USBCAM.MANUAL_EXPOSURE, 0, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text) == false){
+                                    imx900USBCAM.getExposureMode()
+                                }
                                 sendConvertedExpToUVC()
-
-                                imx900USBCAM.setExposureMode(IMX900USBCAM.MANUAL_EXPOSURE, 0, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                             }
                         }
                     }
@@ -1198,7 +1310,7 @@ function."
                     }
                 }*/
 
-                /*Text
+                Text
                 {
                     id: antiFlickerMode
                     text: "--- Anti Flicker Mode ---"
@@ -1214,8 +1326,84 @@ function."
                         width: 200
                     }
                 }
+                RowLayout{
+                    spacing: 25
+                    Layout.alignment: Qt.AlignCenter
 
-                ComboBox
+                    ExclusiveGroup { id: antiFlickerGroup }
+                    RadioButton {
+                        id: flicker50hz
+                        style:  econRadioButtonStyle
+                        text: qsTr("50 Hz")
+                        exclusiveGroup: antiFlickerGroup
+                        activeFocusOnPress: true
+                        tooltip: "Anti-flicker – 50Hz :
+50Hz flicker frequency is applied in auto exposure mode"
+                        opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                        enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                        onClicked: {
+                            if(skipUpdateUIOnAntiFlickerMode){
+                                setAntiFlicker()
+                            }
+                             skipUpdateUIOnAntiFlickerMode = true
+                        }
+                        Keys.onReturnPressed: {
+                            if(skipUpdateUIOnAntiFlickerMode){
+                                setAntiFlicker()
+                            }
+                             skipUpdateUIOnAntiFlickerMode = true
+                        }
+                    }
+                    RadioButton {
+                        id: flicker60Hz
+                        style:  econRadioButtonStyle
+                        text:   qsTr("60Hz")
+                        exclusiveGroup: antiFlickerGroup
+                        tooltip: "Anti-flicker – 60Hz :
+60Hz flicker frequency is applied in auto exposure mode"
+                        opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                        enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                        activeFocusOnPress: true
+                        onClicked: {
+                            if(skipUpdateUIOnAntiFlickerMode){
+                                setAntiFlicker()
+                            }
+                             skipUpdateUIOnAntiFlickerMode = true
+                        }
+                        Keys.onReturnPressed: {
+                            if(skipUpdateUIOnAntiFlickerMode){
+                                setAntiFlicker()
+                            }
+                             skipUpdateUIOnAntiFlickerMode = true
+                        }
+                    }
+                    RadioButton {
+                        id: flickerDisable
+                        style:  econRadioButtonStyle
+                        text:   qsTr("Disable")
+                        exclusiveGroup: antiFlickerGroup
+                        tooltip: "Anti-flicker disable :
+It disables Anti-flicker mode"
+                        opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                        enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                        activeFocusOnPress: true
+                        onClicked: {
+                            if(skipUpdateUIOnAntiFlickerMode){
+                                setAntiFlicker()
+                            }
+                             skipUpdateUIOnAntiFlickerMode = true
+                        }
+                        Keys.onReturnPressed: {
+                            if(skipUpdateUIOnAntiFlickerMode){
+                                setAntiFlicker()
+                            }
+                             skipUpdateUIOnAntiFlickerMode = true
+                        }
+                    }
+                }
+
+
+                /*ComboBox
                 {
                     id: antiFlickerCombo
                     model: ListModel
@@ -1316,12 +1504,6 @@ Kindly evaluate enough before changing this value."
                         smooth: true
                         opacity: 0.50196078431373
 
-                        ToolButton{
-                            tooltip: "The transition of high to low and low to high of strobe pulses will directly
-indicate the start and stop of the sensor exposure respectively."
-                            width: 200
-                            opacity: 0
-                        }
                     }
                 }
                 RowLayout {
@@ -1334,6 +1516,11 @@ indicate the start and stop of the sensor exposure respectively."
                         text:   qsTr("Strobe ON")
                         exclusiveGroup: strobeModeGroup
                         activeFocusOnPress: true
+                        tooltip: "Strobe Mode – ON :
+    The transition of high to low and low to high of strobe pulses will directly
+indicate the start and stop of the sensor exposure respectively.
+Refer product datasheet for more information"
+
                         onClicked: {
                             imx900USBCAM.setStrobeMode(IMX900USBCAM.STROBE_ON)
                         }
@@ -1347,6 +1534,8 @@ indicate the start and stop of the sensor exposure respectively."
                         text: qsTr("Strobe OFF")
                         exclusiveGroup: strobeModeGroup
                         activeFocusOnPress: true
+                        tooltip: "Strobe Mode – OFF :
+                            The strobe mode will be disabled"
                         onClicked: {
                             imx900USBCAM.setStrobeMode(IMX900USBCAM.STROBE_OFF)
                         }
@@ -1401,7 +1590,7 @@ indicate the start and stop of the sensor exposure respectively."
                     }
                 }
 
-                /*Text
+                Text
                 {
                     id: brightnessTitle
                     text: "--- Target Brightness ---"
@@ -1412,8 +1601,8 @@ indicate the start and stop of the sensor exposure respectively."
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                     ToolButton{
-                        tooltip: "This Control is used to calculate the maximum brightness for internal ISP
-purpose."
+                        tooltip: "This control allows the user to set the brightness of the video preview which
+should be maintained in auto exposure mode."
                         opacity: 0
                         width: 200
                     }
@@ -1426,6 +1615,8 @@ purpose."
                         updateValueWhileDragging: false
                         width: 150
                         style:econSliderStyle
+                        enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                        opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                         onValueChanged:  {
                             targetBrightnessTextField.text = targetBrightness.value
                             if(skipUpdateTargetBrightness){
@@ -1442,6 +1633,8 @@ purpose."
                         smooth: true
                         horizontalAlignment: TextInput.AlignHCenter
                         style: econTextFieldStyle
+                        enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                        opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                         validator: IntValidator {bottom: targetBrightness.minimumValue; top: targetBrightness.maximumValue}
                         onTextChanged: {
                             if(text.length > 0){
@@ -1449,9 +1642,234 @@ purpose."
                             }
                         }
                     }
-                }*/
+                }
 
-                /*Text {
+
+                Text
+                {
+                    id: exposureCompensation
+                    text: "Exposure Compensation :"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    ToolButton{
+                        tooltip: "This control lets users adjust the automatically calculated exposure value in
+auto exposure mode. For instance, as the scene's lux value decreases,
+exposure increases, causing a drop in frame rate. To maintain a constant frame
+rate, user can reduce exposure compensation value, with gain automatically
+applied over the adjusted exposure compensation value to achieve the target
+brightness."
+                        opacity: 0
+                        width: 200
+                    }
+                    enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                    opacity: (autoExposure.enabled && autoExposure.checked) ? 0.8 : 0.1
+                }
+
+                ColumnLayout{
+                    spacing: 1
+                    Layout.alignment: Qt.AlignCenter
+
+                    Row
+                    {
+                        Layout.alignment: Qt.AlignCenter
+                        spacing: 20
+                        TextField
+                        {
+                            id: exposureCompensationSeconds
+                            font.pixelSize: 10
+                            font.family: "Ubuntu"
+                            smooth: true
+                            horizontalAlignment: TextInput.AlignHCenter
+                            style: econTextFieldStyle
+                            enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                            opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                            // Unit Name
+                            Text {
+                                text: "   sec"
+                                anchors.top: exposureCompensationSeconds.bottom
+                                font.pixelSize: 14
+                                font.family: "Ubuntu"
+                                color: "#ffffff"
+                                smooth: true
+                                opacity: 1
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                            validator: IntValidator {bottom: minExpCompInSec; top: maxExpCompInSec}
+                        }
+
+                        TextField
+                        {
+                            id: exposureCompensationMilliSec
+                            font.pixelSize: 10
+                            font.family: "Ubuntu"
+                            smooth: true
+                            horizontalAlignment: TextInput.AlignHCenter
+                            style: econTextFieldStyle
+                            enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                            opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                            // Unit Name
+                            Text {
+                                text: "    ms"
+                                anchors.top: exposureCompensationMilliSec.bottom
+                                font.pixelSize: 14
+                                font.family: "Ubuntu"
+                                color: "#ffffff"
+                                smooth: true
+                                opacity: 1
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                            validator: IntValidator {bottom: minExpCompInMilliSeconds; top: maxExpCompInMilliSeconds}
+                        }
+
+                        TextField
+                        {
+                            id: exposureCompensationMicroSec
+                            font.pixelSize: 10
+                            font.family: "Ubuntu"
+                            smooth: true
+                            horizontalAlignment: TextInput.AlignHCenter
+                            style: econTextFieldStyle
+                            enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                            opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                            // Unit Name
+                            Text {
+                                text: "    us"
+                                anchors.top: exposureCompensationMicroSec.bottom
+                                font.pixelSize: 14
+                                font.family: "Ubuntu"
+                                color: "#ffffff"
+                                smooth: true
+                                opacity: 1
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                            validator: IntValidator {bottom: minExpCompInMicroSeconds ; top: maxExpCompInMicroSeconds}
+                        }
+                    }
+                }
+
+                Row{
+                    Layout.alignment: Qt.AlignCenter
+                    Button {
+                        id: limitSetBtn
+                        activeFocusOnPress : true
+                        text: "Set"
+                        style: econButtonStyle
+                        enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                        opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                        implicitHeight: 25
+                        implicitWidth: 80
+                        onClicked: {
+                            if(imx900USBCAM.setExposureCompensation(exposureCompensationSeconds.text, exposureCompensationMilliSec.text, exposureCompensationMicroSec.text) == false){
+                                imx900USBCAM.getExposureCompensation()
+                            }
+                        }
+                        Keys.onReturnPressed: {
+                            if(imx900USBCAM.setExposureCompensation(exposureCompensationSeconds.text, exposureCompensationMilliSec.text, exposureCompensationMicroSec.text) == false){
+                                imx900USBCAM.getExposureCompensation()
+                            }
+                        }
+                    }
+                }
+
+                Text
+                {
+                    id: roiAutoExpMode
+                    text: "--- Auto Exposure ROI ---"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignCenter
+                    opacity: 0.50196078431373
+                }
+
+                Row{
+                      spacing:60
+                      Layout.alignment: Qt.AlignCenter
+                      ExclusiveGroup { id: roiExpogroup }
+                      RadioButton {
+                          exclusiveGroup: roiExpogroup
+                          id: roiAutoExpFull
+                          text: "Full"
+                          activeFocusOnPress: true
+                          style: econRadioButtonStyle
+                          tooltip: "Auto Exposure ROI – Full:
+    Full-Region based exposure value will be applied to the frame."
+                          enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                          opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                          // setROIAutoExposure() args:  mode, videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord, WinSize]
+                          // videoresolnWidth, videoresolnHeight, mouseXCord, mouseYCord - these parameters are required only when click in preview]
+                          // winSize is required only for manual mode
+                          onClicked: {
+                              imx900USBCAM.setROIAutoExposure(IMX900USBCAM.AE_FULL_ROI, vidResW ,vidResH , xCoord, yCoord, 0);
+                          }
+                          Keys.onReturnPressed: {
+                              imx900USBCAM.setROIAutoExposure(IMX900USBCAM.AE_FULL_ROI, vidResW ,vidResH , xCoord, yCoord, 0);
+                          }
+                      }
+                      RadioButton {
+                          exclusiveGroup: roiExpogroup
+                          id: roiAutoExpManual
+                          text: "Manual"
+                          activeFocusOnPress: true
+                          style: econRadioButtonStyle
+                          tooltip: "Auto Exposure ROI – Manual
+User can select the region of interest to calculate the exposure value for that
+particular area. This value will then be applied to the entire frame. The mouse
+right click button can be used to select the auto exposure area in the preview."
+                          enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                          opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
+                          onClicked: {
+                              imx900USBCAM.setROIAutoExposure(IMX900USBCAM.AE_MANUAL_ROI, vidResW ,vidResH , xCoord, yCoord, autoExpoWinSizeCombo.currentText);
+                          }
+                          Keys.onReturnPressed: {
+                              imx900USBCAM.setROIAutoExposure(IMX900USBCAM.AE_MANUAL_ROI, vidResW ,vidResH , xCoord, yCoord, autoExpoWinSizeCombo.currentText);
+                          }
+                      }
+                }
+                Text {
+                    id: windowSizeText
+                    text: "Window Size :"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    ToolButton{
+                        tooltip: "Auto Exposure ROI – Window size
+    The window size determines the exposure region's dimensions. For a window
+size of 8, the entire frame becomes the focus region. If the exposure region
+extends beyond or falls short of the frame boundary, the ROI is automatically
+clipped."
+                        opacity: 0
+                        width: 200
+                    }
+                    opacity: (roiAutoExpManual.enabled && roiAutoExpManual.checked) ? 1 : 0.1
+                }
+                ComboBox
+                {
+                    id: autoExpoWinSizeCombo
+                    enabled: (roiAutoExpManual.enabled && roiAutoExpManual.checked) ? true : false
+                    opacity: (roiAutoExpManual.enabled && roiAutoExpManual.checked) ? 1 : 0.1
+                    model: ListModel {
+                        ListElement { text: "1" }
+                        ListElement { text: "2" }
+                        ListElement { text: "3" }
+                        ListElement { text: "4" }
+                        ListElement { text: "5" }
+                        ListElement { text: "6" }
+                        ListElement { text: "7" }
+                        ListElement { text: "8" }
+                    }
+                    activeFocusOnPress: true
+                    style: econComboBoxStyle
+                    onCurrentIndexChanged: {
+                            imx900USBCAM.setROIAutoExposure(IMX900USBCAM.AE_MANUAL_ROI, vidResW ,vidResH, xCoord, yCoord, autoExpoWinSizeCombo.currentText)
+                    }
+                }
+
+                Text {
                     id: readStatistics
                     text: "--- Read Statistics ---"
                     font.pixelSize: 14
@@ -1460,14 +1878,6 @@ purpose."
                     smooth: true
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
-
-                    ToolButton{
-                        tooltip: "This controls reads the current exposure and current gain values and displays
-them in corresponding text boxes when auto exposure mode (or) Auto gain
-mode is enabled."
-                        opacity: 0
-                        width: 200
-                    }
                 }
 
                 ColumnLayout{
@@ -1495,6 +1905,13 @@ mode is enabled."
                             enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
                             opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                             readOnly: true
+
+                            ToolButton{
+                                tooltip: "Read Statistics – Exposure:
+This control displays the current exposure value in auto exposure mode"
+                                opacity: 0
+                                width: 200
+                            }
                             Text {
                                 text: "   sec"
                                 anchors.top: secondsExpStat.bottom
@@ -1506,6 +1923,7 @@ mode is enabled."
                                 opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                                 horizontalAlignment: Text.AlignHCenter
                             }
+                            validator: IntValidator {bottom: minExpCompInSec; top: maxExpCompInSec}
                         }
 
                         TextField
@@ -1516,6 +1934,12 @@ mode is enabled."
                             smooth: true
                             horizontalAlignment: TextInput.AlignHCenter
                             style: econTextFieldStyle
+                            ToolButton{
+                                tooltip: "Read Statistics – Exposure:
+This control displays the current exposure value in auto exposure mode"
+                                opacity: 0
+                                width: 200
+                            }
                             enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
                             opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                             readOnly: true
@@ -1530,6 +1954,7 @@ mode is enabled."
                                 opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                                 horizontalAlignment: Text.AlignHCenter
                             }
+                            validator: IntValidator {bottom: minExpCompInMilliSeconds; top: maxExpCompInMilliSeconds}
                         }
 
                         TextField
@@ -1543,6 +1968,12 @@ mode is enabled."
                             enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
                             opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                             readOnly: true
+                            ToolButton{
+                                tooltip: "Read Statistics – Exposure:
+This control displays the current exposure value in auto exposure mode"
+                                opacity: 0
+                                width: 200
+                            }
                             Text {
                                 text: "    us"
                                 anchors.top: microSecExpStat.bottom
@@ -1554,6 +1985,7 @@ mode is enabled."
                                 opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                                 horizontalAlignment: Text.AlignHCenter
                             }
+                            validator: IntValidator {bottom: minExpCompInMicroSeconds ; top: maxExpCompInMicroSeconds}
                         }
                     }
                 }
@@ -1578,8 +2010,14 @@ mode is enabled."
                         smooth: true
                         horizontalAlignment: TextInput.AlignHCenter
                         style: econTextFieldStyle
-                        enabled: (autoGain.enabled && autoGain.checked) ? true : false
-                        opacity: (autoGain.enabled && autoGain.checked) ? 1 : 0.1
+                        ToolButton{
+                            tooltip: "Read Statistics – Gain:
+This control displays the current gain value in auto exposure mode"
+                            opacity: 0
+                            width: 200
+                        }
+                        enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                        opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                         Text {
                             text: "    db"
                             anchors.top: gainStatTextField.bottom
@@ -1587,10 +2025,11 @@ mode is enabled."
                             font.family: "Ubuntu"
                             color: "#ffffff"
                             smooth: true
-                            enabled: (autoGain.enabled && autoGain.checked) ? true : false
-                            opacity: (autoGain.enabled && autoGain.checked) ? 1 : 0.1
+                            enabled: (autoExposure.enabled && autoExposure.checked) ? true : false
+                            opacity: (autoExposure.enabled && autoExposure.checked) ? 1 : 0.1
                             horizontalAlignment: Text.AlignHCenter
                         }
+                        validator: IntValidator {bottom: gainMinVal; top: gainMaxVal}
                     }
                 }
                 Row{
@@ -1606,9 +2045,6 @@ mode is enabled."
                         opacity: (gainStatTextField.enabled || milliSecExpStat.enabled) ? 1 : 0.1
                         implicitHeight: 25
                         implicitWidth: 90
-                        onClicked: {
-                            imx900USBCAM.readStatistics()
-                        }
                         Keys.onReturnPressed: {
                             imx900USBCAM.readStatistics()
                         }
@@ -1625,8 +2061,8 @@ mode is enabled."
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                     ToolButton{
-                        tooltip: "This Control reads the sensor temperature and displays it in the text box
-provided."
+                        tooltip: "Read Sensor Temperature:
+This control displays the current sensor temperature value in degrees Celsius."
                         width: 200
                         opacity: 0
                     }
@@ -1679,47 +2115,58 @@ provided."
                         smooth: true
                         opacity: 0.50196078431373
                         ToolButton{
-                            tooltip: "Before enabling the High Dynamic range, switch to 1024x768 Resolution.
-
-Refer Product datasheet before enabling this HDR feature"
+                            tooltip: "To enable HDR, switch to 1024x768 resolution in Y8 Format."
                             width: 200
                             opacity: 0
                         }
                     }
                 }
-                RowLayout {
-                    spacing: 45
-                    Layout.alignment: Qt.AlignCenter
+                ColumnLayout {
+                    spacing: 15
                     ExclusiveGroup { id: hdrModeGroup }
                     RadioButton {
-                        id: enableHDR
+                        id: autoExpHDR
                         style:  econRadioButtonStyle
-                        text:   qsTr("Enable")
+                        text:   qsTr("Adaptive Exposure Mode")
                         exclusiveGroup: hdrModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            imx900USBCAM.setHighDynamicRange(enable)
+                            imx900USBCAM.setHighDynamicRange(IMX900USBCAM.AUTO_EXP_HDR)
                         }
                         Keys.onReturnPressed:  {
-                            imx900USBCAM.setHighDynamicRange(enable)
+                            imx900USBCAM.setHighDynamicRange(IMX900USBCAM.AUTO_EXP_HDR)
                         }
                     }
                     RadioButton {
-                        id: disableHDR
+                        id: outdoorHdr
                         style:  econRadioButtonStyle
-                        text: qsTr("Disable")
+                        text: qsTr("Day HDR Mode")
                         exclusiveGroup: hdrModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            imx900USBCAM.setHighDynamicRange(disable)
+                            imx900USBCAM.setHighDynamicRange(IMX900USBCAM.OUTDOOR_HDR)
                         }
                         Keys.onReturnPressed: {
-                            imx900USBCAM.setHighDynamicRange(disable)
+                            imx900USBCAM.setHighDynamicRange(IMX900USBCAM.OUTDOOR_HDR)
+
+                        }
+                    }
+                    RadioButton {
+                        id: indoorHdr
+                        style:  econRadioButtonStyle
+                        text: qsTr("Night HDR Mode")
+                        exclusiveGroup: hdrModeGroup
+                        activeFocusOnPress: true
+                        onClicked: {
+                            imx900USBCAM.setHighDynamicRange(IMX900USBCAM.INDOOR_HDR)
+                        }
+                        Keys.onReturnPressed: {
+                            imx900USBCAM.setHighDynamicRange(IMX900USBCAM.INDOOR_HDR)
                         }
                     }
                 }
 
-                Row{
+                /*Row{
                     Layout.alignment: Qt.AlignCenter
                     Text {
                         id: quadShutterMode
@@ -2036,8 +2483,8 @@ Refer Product datasheet before enabling this Dual Trigger feature"
                         smooth: true
                         opacity: 0.50196078431373
                         ToolButton{
-                            tooltip: "Before enabling Self Trigger, switch to 2064x1552 Resolution.
-Refer Product datasheet before enabling this Self Trigger Feature."
+                            tooltip: "Before enabling Self Trigger, switch to 2064x1552 Resolution either in Y12 or
+Y8. Refer Product datasheet for more information."
                             width: 200
                             opacity: 0
                         }
@@ -2214,8 +2661,21 @@ Refer Product datasheet before enabling this Self Trigger Feature."
 
                 Text
                 {
+                    id: brightObjTitle
+                    text: "Bright Object :"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignLeft
+                    enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
+                    opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 0.8 : 0.1
+                }
+
+                Text
+                {
                     id: levelThresholdTitle
-                    text: "Level Threshold :"
+                    text: "     Level Threshold :"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -2259,45 +2719,10 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                     }
                 }
 
-                Row
-                {
-                    spacing: 9
-                    Layout.alignment: Qt.AlignCenter
-
-                    Text
-                    {
-                        id: levelThresholdText2
-                        text: "L Side \n[0 - 4095]"
-                        font.pixelSize: 14
-                        font.family: "Ubuntu"
-                        color: "#ffffff"
-                        smooth: true
-                        width: 70
-                        wrapMode: Text.WordWrap
-                        enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
-                        opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 0.6 : 0.1
-                    }
-                    TextField
-                    {
-                        id: lSideTextField
-                        font.pixelSize: 10
-                        font.family: "Ubuntu"
-                        smooth: true
-                        horizontalAlignment: TextInput.AlignHCenter
-                        style: econTextFieldStyle
-                        enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
-                        opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 1 : 0.1
-                        implicitHeight: 25
-                        implicitWidth: 80
-                        validator: IntValidator {bottom: levelThresholdMin; top: levelThresholdMax}
-                    }
-                }
-
-
                 Text
                 {
                     id: countThresholdTitle
-                    text: "Count Threshold :"
+                    text: "     Count Threshold :"
                     font.pixelSize: 14
                     font.family: "Ubuntu"
                     color: "#ffffff"
@@ -2341,6 +2766,80 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                     }
                 }
 
+                Text
+                {
+                    id: darkObjTitle
+                    text: "Dark Object :"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignLeft
+                    enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
+                    opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 0.8 : 0.1
+                 }
+
+                 Text
+                 {
+                    id: levelThresholdTitle1
+                    text: "     Level Threshold :"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignLeft
+                    enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
+                    opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 0.8 : 0.1
+                 }
+
+                  Row
+                  {
+                    spacing: 9
+                    Layout.alignment: Qt.AlignCenter
+
+                    Text
+                    {
+                        id: levelThresholdText2
+                        text: "L Side \n[0 - 4095]"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        width: 70
+                        wrapMode: Text.WordWrap
+                        enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
+                        opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 0.6 : 0.1
+                    }
+                    TextField
+                    {
+                        id: lSideTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
+                        opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 1 : 0.1
+                        implicitHeight: 25
+                        implicitWidth: 80
+                        validator: IntValidator {bottom: levelThresholdMin; top: levelThresholdMax}
+                    }
+                }
+
+
+                Text
+                {
+                    id: countThresholdTitle1
+                    text: "     Count Threshold :"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    Layout.alignment: Qt.AlignLeft
+                    enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
+                    opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 0.8 : 0.1
+                }
+
                 Row
                 {
                     spacing: 9
@@ -2358,9 +2857,9 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                         wrapMode: Text.WordWrap
                         enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
                         opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 0.6 : 0.1
-                    }
-                    TextField
-                    {
+                     }
+                     TextField
+                     {
                         id: lSideCountTextField
                         font.pixelSize: 10
                         font.family: "Ubuntu"
@@ -2372,8 +2871,8 @@ Refer Product datasheet before enabling this Self Trigger Feature."
                         implicitHeight: 25
                         implicitWidth: 80
                         validator: IntValidator {bottom: pixelMin; top: pixelMax}
-                    }
-                }
+                     }
+                 }
 
                 /*Text
                 {
@@ -3355,6 +3854,25 @@ firmware version."
 
                Row{
                    Layout.alignment: Qt.AlignCenter
+
+                   Button {
+                       id: ispFirmwareVersion
+                       opacity: 1
+                       text: "ISP Version"
+                       activeFocusOnPress : true
+                       tooltip: "Click th epush button to read the ISP firmware version"
+                       style: econButtonStyle
+                       onClicked: {
+                           imx900USBCAM.readISPFirmwareVersion()
+                       }
+                       Keys.onReturnPressed: {
+                           imx900USBCAM.readISPFirmwareVersion()
+                       }
+                   }
+               }
+
+               Row{
+                   Layout.alignment: Qt.AlignCenter
                    Button {
                        id: saveConfig
                        opacity: 1
@@ -3382,7 +3900,7 @@ following power cycles."
      id:imx900USBCAM
 
      onCurrentCameraMode: {
-        //getCameraControls(mode)
+        getCameraControls(mode)
      }
 
      onCurrentFlipMode: {
@@ -3417,14 +3935,14 @@ following power cycles."
      }
 
      onCurrentTargetBrightness:{
-         /*skipUpdateTargetBrightness = false
+         skipUpdateTargetBrightness = false
 
          targetBrightness.minimumValue = min
          targetBrightness.maximumValue = max
          targetBrightness.stepSize = step
          targetBrightness.value = value
 
-         skipUpdateTargetBrightness = true*/
+         skipUpdateTargetBrightness = true
      }
 
      onCurrentGainLimit:{
@@ -3492,19 +4010,23 @@ following power cycles."
      }
 
      onCurrentAntiFlickerMode: {
-         //getAntiFlickerModes(mode)
+         getAntiFlickerModes(mode)
      }
 
      onCurrentTemperature: {
-         //readTempTextField.text = temperature
+         temperature = parseFloat((temperature).toFixed(2));
+         readTempTextField.text = temperature.toFixed(2);
      }
 
      onCurrentHDRStatus: {
-         /*if(status === enable){
-             enableHDR.checked = true
-         } else if(status === disable){
-             disableHDR.checked = true
-         }*/
+         if(hdr === IMX900USBCAM.AUTO_EXP_HDR){
+             autoExpHDR.checked = true
+         } else if(hdr === IMX900USBCAM.OUTDOOR_HDR){
+             outdoorHdr.checked = true
+         }
+         else if (hdr === IMX900USBCAM.INDOOR_HDR){
+             indoorHdr.checked = true
+         }
      }
 
      onCurrentQuadShutterControlStatus: {
@@ -3543,11 +4065,11 @@ following power cycles."
          shortExpSlider.value = current*/
      }
      onCurrentStatistics: {
-        //secondsExpStat.text = seconds
-        //milliSecExpStat.text = milliSeconds
-        //microSecExpStat.text = microSeconds
+        secondsExpStat.text = seconds
+        milliSecExpStat.text = milliSeconds
+        microSecExpStat.text = microSeconds
 
-        //gainStatTextField.text = gain
+        gainStatTextField.text = gain
      }
 
      onCurrentDualModeProperties: {
@@ -3642,10 +4164,36 @@ following power cycles."
      }
 
      onIndicateExposureLimitsInvalidInput:{
-         imx900USBCAM.getAutoExposureLowerLimit()
-         imx900USBCAM.getAutoExposureUpperLimit()
+         //imx900USBCAM.getAutoExposureLowerLimit()
+         //imx900USBCAM.getAutoExposureUpperLimit()
      }
 
+     onTitleTextChanged: {
+         messageDialog.title = _title.toString()
+         messageDialog.text = _text.toString()
+         messageDialog.open()
+     }
+
+     onIndicateCommandStatus:{
+         messageDialog.title = title
+         messageDialog.text = text
+         messageDialog.open()
+     }
+
+     onCurrentExposureCompensation: {
+         exposureCompensationSeconds.text  = seconds
+         exposureCompensationMilliSec.text = milliSeconds
+         exposureCompensationMicroSec.text = microSeconds
+
+     }
+     onRoiAutoExpModeValueReceived: {
+         if(roiMode === IMX900USBCAM.AE_FULL_ROI){
+             roiAutoExpFull.checked = true
+         }else if(roiMode === IMX900USBCAM.AE_MANUAL_ROI){
+             roiAutoExpManual.checked = true
+         }
+         autoExpoWinSizeCombo.currentIndex = winSize - 1
+     }
    }
 
 
@@ -3833,17 +4381,17 @@ following power cycles."
         }
     }
 
-    /*function getCameraControls(mode){
+    function getCameraControls(mode){
         if(mode === IMX900USBCAM.MASTER){
             master.checked = true
         } else if(mode === IMX900USBCAM.TRIGGER_EXP){
             triggerExposure.checked = true
-        } else if(mode === IMX900USBCAM.TRIGGER_ACQ){
+        } /*else if(mode === IMX900USBCAM.TRIGGER_ACQ){
             triggerAcquisition.checked = true
         } else if(mode === IMX900USBCAM.TRIGGER_SOFTWARE){
             triggerSoftware.checked = true
-        }
-    }*/
+        }*/
+    }
 
     function sendConvertedExpToUVC()
     {
@@ -3856,7 +4404,7 @@ following power cycles."
             convertedExposure = (secondInt*1000000) + (milliSecondInt*1000) + microSecondInt
             convertedExposure = convertedExposure/100
 
-            root.sendExposureToUVC(convertedExposure)
+            root.sendExposureStatusToUVC(false, convertedExposure)
         }
         else{
             root.sendExposureToUVC(10000)
@@ -3883,17 +4431,17 @@ following power cycles."
         root.videoRecordBtnEnable(false)
     }
 
-    /*function setCameraControls(){
+    function setCameraControls(){
         if(master.checked == true){
             imx900USBCAM.setCameraMode(IMX900USBCAM.MASTER)
         } else if(triggerExposure.checked == true){
             imx900USBCAM.setCameraMode(IMX900USBCAM.TRIGGER_EXP)
-        } else if(triggerAcquisition.checked == true) {
+        } /*else if(triggerAcquisition.checked == true) {
             imx900USBCAM.setCameraMode(IMX900USBCAM.TRIGGER_ACQ)
         } else if(triggerSoftware.checked == true) {
             imx900USBCAM.setCameraMode(IMX900USBCAM.TRIGGER_SOFTWARE)
-        }
-    }*/
+        }*/
+    }
 
     /*function getDualTriggerProperties(mode, switchingDivision, min, max, step, min1, max1, step1, gain, gain1)
     {
@@ -3926,34 +4474,34 @@ following power cycles."
         skipUpdateGainDiv2Slider = true
     }*/
 
-    /*function getAntiFlickerModes(mode) {
+    function getAntiFlickerModes(mode) {
         switch(mode) {
             case IMX900USBCAM.MODE_50Hz:
                 skipUpdateUIOnAntiFlickerMode = false
-                antiFlickerCombo.currentIndex = 0
+                flicker50hz.checked = true
                 skipUpdateUIOnAntiFlickerMode = true
                 break
             case IMX900USBCAM.MODE_60Hz:
                 skipUpdateUIOnAntiFlickerMode = false
-                antiFlickerCombo.currentIndex = 1
+                flicker60Hz.checked = true
                 skipUpdateUIOnAntiFlickerMode = true
                 break
             case IMX900USBCAM.MODE_DISABLE:
                 skipUpdateUIOnAntiFlickerMode = false
-                antiFlickerCombo.currentIndex = 2
+                flickerDisable.checked = true
                 skipUpdateUIOnAntiFlickerMode = true
                 break
          }
     }
 
     function setAntiFlicker() {
-        if(antiFlickerCombo.currentIndex === 0)
+        if(flicker50hz.checked)
             imx900USBCAM.setAntiFlickerMode(IMX900USBCAM.MODE_50Hz)
-        else if(antiFlickerCombo.currentIndex === 1)
+        else if(flicker60Hz.checked)
             imx900USBCAM.setAntiFlickerMode(IMX900USBCAM.MODE_60Hz)
-        else if(antiFlickerCombo.currentIndex === 2)
+        else if(flickerDisable.checked)
             imx900USBCAM.setAntiFlickerMode(IMX900USBCAM.MODE_DISABLE)
-    }*/
+    }
 
     function currentFlipMirrorMode(mode)
     {
@@ -4016,26 +4564,33 @@ following power cycles."
 
 
     function currentExposureMode(mode, feature, seconds, milliSeconds, microSeconds) {
-
-        /*if(mode === IMX900USBCAM.AUTO_EXPOSURE){
-            autoExposure.checked   = true
-        }else if(mode === IMX900USBCAM.MANUAL_EXPOSURE){
+        if(mode === IMX900USBCAM.AUTO_EXPOSURE){
+            autoExposure.checked   = true//Auto Exposure Features
+            if(feature === IMX900USBCAM.CONTINIOUS_EXP){
+                exposureContinious.checked = true
+                exposureSingleShot.checked = false
+                expSingleShotBtnClicked    = false
+            }
+            else if(feature === IMX900USBCAM.SINGLE_EXP_TRIGGER){
+                exposureSingleShot.checked = true
+                exposureContinious.checked = false
+                expSingleShotBtnClicked    = true
+            }
+            root.sendExposureStatusToUVC(true, 0);
+        }else if(mode === IMX900USBCAM.MANUAL_EXPOSURE){     
             manualExposure.checked = true
         }
-
-        //Auto Exposure Features
-        if(feature === IMX900USBCAM.CONTINIOUS_EXP){
-            exposureContinious.checked = true
-        }
-        else if(feature === IMX900USBCAM.SINGLE_EXP){
-            exposureSingleShot.checked = true
-            expSingleShotBtnClicked    = true
-        }*/
-
         //Manual Exposure Values
         expInSecondsTextField.text  = seconds
         expInMilliSecTextField.text = milliSeconds
         expInMicroSecTextField.text = microSeconds
+
+        convertedExposure = (seconds*1000000) + (milliSeconds*1000) + microSeconds
+        convertedExposure = convertedExposure/100
+
+        if(mode === IMX900USBCAM.MANUAL_EXPOSURE){
+            root.sendExposureStatusToUVC(false, convertedExposure);
+        }
     }
 
     /*function setMultipleFrameSetValues()
@@ -4055,16 +4610,18 @@ following power cycles."
         }
     }*/
 
-    /*function enableDisableAutoExposureControls(autoExposureSelect){
+    function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
             uvcAutoExposureSelected = true
-            if(autoExposureHold.checked == true){
+            autoExposure.checked = true
+            /*if(autoExposureHold.checked == true){
                 displayMessageBox("Message", "AE hold is active")
-            }
+            }*/
         }else{
             uvcAutoExposureSelected = false
+            manualExposure.checked = true
         }
-    }*/
+    }
 
 
     function setToDefaultValues(){
@@ -4073,8 +4630,7 @@ following power cycles."
         root.videoRecordBtnEnable(true)
         root.startUpdatePreviewInMasterMode()
         imx900USBCAM.setToDefaultValues()
-        getValuesFromCamera()     
-        imx900USBCAM.getExposureMode()
+        getValuesFromCamera()
 
         //To send Exposure properties when set default is clicked
         sendConvertedExpToUVC()
@@ -4095,7 +4651,7 @@ following power cycles."
     }
 
     function getValuesFromCamera(){
-        //imx900USBCAM.getCameraMode()
+        imx900USBCAM.getCameraMode()
         imx900USBCAM.getOrientation()
 
         imx900USBCAM.getGainMode()
@@ -4104,19 +4660,24 @@ following power cycles."
         //imx900USBCAM.getAutoExposureLowerLimit()
         //imx900USBCAM.getAutoExposureUpperLimit()
         imx900USBCAM.getStrobeMode()
-        //imx900USBCAM.getTargetBrightness()
+        imx900USBCAM.getTargetBrightness()
+        imx900USBCAM.getAntiFlickerMode()
         //imx900USBCAM.getBlackLevelAdjustment()
         imx900USBCAM.getBurstLength()
-        //imx900USBCAM.calculateTemperature()
-        //imx900USBCAM.readStatistics()
+        imx900USBCAM.readStatistics()
 
-        //imx900USBCAM.getHighDynamicRange()
+        imx900USBCAM.getHighDynamicRange()
         //imx900USBCAM.getQuadShutterControl()
 
         imx900USBCAM.getFastAutoExposure()
 
         //imx900USBCAM.getDualTrigger()
         imx900USBCAM.getSelfTrigger()
+
+        readTempTextField.text = 0.0
+
+        imx900USBCAM.getExposureCompensation()
+        imx900USBCAM.getAutoExpROIModeAndWindowSize()
 
         //imx900USBCAM.getMultiFrameSet()
         //imx900USBCAM.getToneControl()

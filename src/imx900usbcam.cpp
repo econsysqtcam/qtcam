@@ -515,7 +515,7 @@ bool IMX900USBCAM::getExposureMode()
         } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
             g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
             g_in_packet_buf[2] == GET_EXPOSURE_IMX900 &&
-            g_in_packet_buf[10] == SET_SUCCESS) {
+            g_in_packet_buf[10] == GET_SUCCESS) {
 
             milliSeconds  = (g_in_packet_buf[6] << 8) | (g_in_packet_buf[7] << 0);
             microSeconds  = (g_in_packet_buf[8] << 8) | (g_in_packet_buf[9] << 0);
@@ -570,12 +570,12 @@ bool IMX900USBCAM::setExposureMode(EXPOSURE_MODE mode, AUTO_EXPOSURE_FEATURES au
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[10] == SET_FAIL) {
+            emit indicateCommandStatus("Failure", "Given exposure value is invalid");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
             g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
             g_in_packet_buf[2] == SET_EXPOSURE_IMX900 &&
             g_in_packet_buf[10] == SET_SUCCESS) {
-
             return true;
         }
     }
@@ -614,9 +614,9 @@ bool IMX900USBCAM::getTargetBrightness()
                  g_in_packet_buf[2] == GET_TARGET_BRIGHTNESS_IMX900  &&
                  g_in_packet_buf[10] == GET_SUCCESS) {
 
-           min     = (g_in_packet_buf[3] << 8) | (g_in_packet_buf[4] << 0);
-           max     = (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
-           current = (g_in_packet_buf[7] << 8) | (g_in_packet_buf[8] << 0);
+           current   = (g_in_packet_buf[3] << 8) | (g_in_packet_buf[4] << 0);
+           min       = (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
+           max       = (g_in_packet_buf[7] << 8) | (g_in_packet_buf[8] << 0);
 
            emit currentTargetBrightness(min, max, g_in_packet_buf[9], current);
 
@@ -647,17 +647,17 @@ bool IMX900USBCAM::setTargetBrightness(uint targetBrightness)
     g_out_packet_buf[1] = CAMERA_ID_1_IMX900;
     g_out_packet_buf[2] = CAMERA_ID_2_IMX900;
     g_out_packet_buf[3] = SET_TARGET_BRIGHTNESS_IMX900;
-    g_out_packet_buf[8] = ((targetBrightness & 0xFF00) >> 8);
-    g_out_packet_buf[9] = ((targetBrightness & 0x00FF) >> 0);
+    g_out_packet_buf[4] = ((targetBrightness & 0xFF00) >> 8);
+    g_out_packet_buf[5] = ((targetBrightness & 0x00FF) >> 0);
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[10] == GET_FAIL) {
+        if (g_in_packet_buf[10] == SET_FAIL) {
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
                   g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
                   g_in_packet_buf[2] == SET_TARGET_BRIGHTNESS_IMX900  &&
-                  g_in_packet_buf[10] == GET_SUCCESS) {
+                  g_in_packet_buf[10] == SET_SUCCESS) {
             return true;
         }
     }
@@ -895,7 +895,7 @@ bool IMX900USBCAM::getAutoExposureUpperLimit()
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_ID_1_IMX900;
     g_out_packet_buf[2] = CAMERA_ID_2_IMX900;
-    g_out_packet_buf[3] = GET_EXPOSURE_UPPER_LIMIT_IMX900; /* get anti flicker command  */
+    g_out_packet_buf[3] = GET_EXPOSURE_UPPER_LIMIT_IMX900; /* get AE_UPPER_LIMIT command  */
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -1047,7 +1047,7 @@ bool IMX900USBCAM::setAntiFlickerMode(ANTI_FLICKER_DETECTION antiFlickerMode){
         } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
                   g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
                   g_in_packet_buf[2] == SET_ANTI_FLICKER_DETECTION_IMX900  &&
-                  g_in_packet_buf[6] == GET_SUCCESS) {
+                  g_in_packet_buf[6] == SET_SUCCESS) {
             return true;
         }
     }
@@ -1084,7 +1084,7 @@ bool IMX900USBCAM::readStatistics(){
         } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
             g_in_packet_buf[1]  == CAMERA_ID_2_IMX900 &&
             g_in_packet_buf[2]  == READ_STATISTICS_IMX900 &&
-            g_in_packet_buf[10] == SET_SUCCESS) {
+            g_in_packet_buf[10] == GET_SUCCESS) {
 
             uint milliSeconds, microSeconds, gain;
 
@@ -1113,6 +1113,8 @@ bool IMX900USBCAM::calculateTemperature(){
         return false;
     }
 
+    float temperature;
+
     //Initialize buffers
     initializeBuffers();
 
@@ -1129,10 +1131,12 @@ bool IMX900USBCAM::calculateTemperature(){
         } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
             g_in_packet_buf[1]  == CAMERA_ID_2_IMX900 &&
             g_in_packet_buf[2]  == READ_TEMPERATURE_IMX900 &&
-            g_in_packet_buf[7]  == SET_SUCCESS) {
+            g_in_packet_buf[7]  == GET_SUCCESS) {
 
-            uint temperature;
-            temperature = (g_in_packet_buf[3] << 24) | (g_in_packet_buf[4] << 16) | (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
+            uint32_t combinedValue;
+            combinedValue = (g_in_packet_buf[3] << 24) | (g_in_packet_buf[4] << 16) | (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
+
+            temperature = *reinterpret_cast<float*>(&combinedValue);
 
             emit currentTemperature(temperature);
 
@@ -1185,7 +1189,7 @@ bool IMX900USBCAM::getHighDynamicRange()
  * @param - status - To switch between Enable / Disable mode
  * return true/false
 */
-bool IMX900USBCAM::setHighDynamicRange(uint status)
+bool IMX900USBCAM::setHighDynamicRange(HDR hdr)
 {
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -1200,7 +1204,7 @@ bool IMX900USBCAM::setHighDynamicRange(uint status)
     g_out_packet_buf[1] = CAMERA_ID_1_IMX900;
     g_out_packet_buf[2] = CAMERA_ID_2_IMX900;
     g_out_packet_buf[3] = SET_HDR_IMX900;
-    g_out_packet_buf[4] = status;
+    g_out_packet_buf[4] = hdr;
 
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
@@ -1209,7 +1213,7 @@ bool IMX900USBCAM::setHighDynamicRange(uint status)
         } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
                   g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
                   g_in_packet_buf[2] == SET_HDR_IMX900 &&
-                  g_in_packet_buf[6] == GET_SUCCESS) {
+                  g_in_packet_buf[6] == SET_SUCCESS) {
             return true;
         }
     }
@@ -1477,7 +1481,7 @@ bool IMX900USBCAM::getShortExposureMode()
 }
 
 /**
- * @brief IMX900USBCAM::setShortExpousreMode - setting anti flicker mode
+ * @brief IMX900USBCAM::setShortExpousreMode - setting setShortExpousreMode
  * @param - status - To switch between Enable / Disable mode
  * @param - value  - The manual Value to be set
  * @return true/false
@@ -1959,6 +1963,40 @@ bool IMX900USBCAM::setToDefaultValues()
     return false;
 }
 
+/**
+ * @brief IMX900USBCAM::readISPFirmwareVersion - To read the firmware version of ISP
+ * @return true/false
+ */
+bool IMX900USBCAM::readISPFirmwareVersion(){
+    _title = tr("ISP Version");
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    g_out_packet_buf[1] = CAMERA_ID_1_IMX900; 	/* control_id_1 */
+    g_out_packet_buf[2] = CAMERA_ID_2_IMX900; 	/* control_id_2 */
+    g_out_packet_buf[3] = ISP_FIRMWARE_VERSION_IMX900USBCAM;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == GET_SUCCESS) {
+            _text.clear();
+            _text.append("Version: ");
+            _text.append(QString::number(g_in_packet_buf[3]).append(".").append(QString::number(g_in_packet_buf[4])).append(".").append(QString::number(g_in_packet_buf[5])).append(".").append(QString::number(g_in_packet_buf[6])));
+            emit titleTextChanged(_title,_text);
+        } else if(g_in_packet_buf[7] == GET_FAIL) {
+            return false;
+        }
+    }
+    return false;
+}
+
 
 /**
  * @brief IMX900USBCAM::saveConfiguration
@@ -1997,6 +2035,163 @@ bool IMX900USBCAM::saveConfiguration()
     return false;
 }
 
+/**
+ * @brief See3CAM_130::setExposureCompensation - setting exposure compensation
+ * @param exposureCompValue - exposure compensation value
+ * @return true/false
+ */
+bool IMX900USBCAM::setExposureCompensation(uint seconds, uint milliSeconds, uint microSeconds){
+
+   // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_ID_1_IMX900; 	/* control_id_1 */
+    g_out_packet_buf[2] = CAMERA_ID_2_IMX900; 	/* control_id_2 */
+    g_out_packet_buf[3] = SET_EXPOSURE_COMPENSATION_IMX900;
+
+    g_out_packet_buf[4] = seconds;
+    g_out_packet_buf[5] = ((milliSeconds & 0xFF00) >> 8);
+    g_out_packet_buf[6] = ((milliSeconds & 0x00FF) >> 0);
+    g_out_packet_buf[7] = ((microSeconds & 0xFF00) >> 8);
+    g_out_packet_buf[8] = ((microSeconds & 0x00FF) >> 0);
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[8]==SET_FAIL) {
+            emit indicateCommandStatus("Failure", "Given exposure compensation value is invalid");
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 && g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
+                  g_in_packet_buf[2]==SET_EXPOSURE_COMPENSATION_IMX900 && g_in_packet_buf[8]==SET_SUCCESS) {
+            emit indicateCommandStatus("Success", "Exposure compensation value is set successfully");
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief See3CAM_130::getExposureCompensation - getting exposure compensation
+ * @return true/false
+ */
+bool IMX900USBCAM::getExposureCompensation(){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_ID_1_IMX900; 	/* control_id_1 */
+    g_out_packet_buf[2] = CAMERA_ID_2_IMX900; 	/* control_id_2 */
+    g_out_packet_buf[3] = GET_EXPOSURE_COMPENSATION_IMX900;
+
+    uint milliSeconds, microSeconds;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[8]==GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 && g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
+            g_in_packet_buf[2]==GET_EXPOSURE_COMPENSATION_IMX900 &&   g_in_packet_buf[8]==GET_SUCCESS) {
+
+            milliSeconds = (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
+            microSeconds = (g_in_packet_buf[6] << 8) | (g_in_packet_buf[7] << 0);
+
+            emit currentExposureCompensation(g_in_packet_buf[3], milliSeconds, microSeconds);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool IMX900USBCAM::setROIAutoExposure(AUTO_EXPOSURE_ROI roiMode, uint vidResolnWidth, uint vidResolnHeight, uint xCoord, uint yCoord, QString winSize){
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    double outputLow = 0;
+    double outputHigh = 255;
+    double inputXLow = 0;
+    double inputXHigh = vidResolnWidth-1;
+    double inputXCord = xCoord;
+    int outputXCord = ((inputXCord - inputXLow) / (inputXHigh - inputXLow)) * (outputHigh - outputLow) + outputLow;
+
+    double inputYLow = 0;
+    double inputYHigh = vidResolnHeight-1;
+    double inputYCord = yCoord;
+    int outputYCord = ((inputYCord - inputYLow) / (inputYHigh - inputYLow)) * (outputHigh - outputLow) + outputLow;
+
+    //Initialize buffers
+    initializeBuffers();
+
+    g_out_packet_buf[1] = CAMERA_ID_1_IMX900; 	/* control_id_1 */
+    g_out_packet_buf[2] = CAMERA_ID_2_IMX900; 	/* control_id_2 */
+    g_out_packet_buf[3] = SET_AUTO_EXPOSURE_ROI; /* ROI mode which is need to set */
+    g_out_packet_buf[4] = roiMode;
+
+    if(roiMode == AE_MANUAL_ROI){
+        g_out_packet_buf[5] = outputXCord;
+        g_out_packet_buf[6] = outputYCord;
+        g_out_packet_buf[7] = winSize.toUInt();
+    }
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&  g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
+                  g_in_packet_buf[2] == SET_AUTO_EXPOSURE_ROI && g_in_packet_buf[7] == SET_SUCCESS){
+           return true;
+        }
+    }
+    return false;
+}
+
+bool IMX900USBCAM::getAutoExpROIModeAndWindowSize(){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_ID_1_IMX900; 	/* control_id_1 */
+    g_out_packet_buf[2] = CAMERA_ID_2_IMX900; 	/* control_id_2 */
+    g_out_packet_buf[3] = GET_AUTO_EXPOSURE_ROI;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[7] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&  g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
+            g_in_packet_buf[2] == GET_AUTO_EXPOSURE_ROI && g_in_packet_buf[7] == GET_SUCCESS) {
+                emit roiAutoExpModeValueReceived(g_in_packet_buf[3], g_in_packet_buf[6]);
+                return true;
+        }
+    }
+    return false;
+}
 
 
 /*

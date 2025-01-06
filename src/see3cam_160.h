@@ -58,6 +58,9 @@
 
 #define READ_FIRMWARE_VERSION_160   0x19
 
+#define GET_64BIT_UNIQUE_ID_1      0x41
+#define GET_64BIT_UNIQUE_ID_2      0x01
+
 #define SET_TO_DEFAULT_160          0xFF
 
 class See3CAM_160 : public QObject
@@ -222,6 +225,7 @@ public slots:
     bool setBurstLength(uint burstLength);
     bool getBurstLength();
 
+    bool get64BitSerialNumber();
 };
 
 #endif // SEE3CAM_160_H

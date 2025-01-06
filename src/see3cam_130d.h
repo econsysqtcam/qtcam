@@ -65,11 +65,6 @@
 #define ENABLE_OVERLAY_RECT             0x01
 #define DISABLE_OVERLAY_RECT            0x00
 
-#define GET_SMILE_DETECTION                  0x20
-#define SET_SMILE_DETECTION                  0x21
-#define ENABLE_SMILE_DETECT             0x01
-#define DISABLE_SMILE_DETECT            0x00
-
 #define GET_EXPOSURE_COMPENSATION            0x22
 #define SET_EXPOSURE_COMPENSATION            0x23
 
@@ -79,7 +74,31 @@
 #define GET_ANTIFLICKER_130D                0x26
 #define SET_ANTIFLICKER_130D                0x27
 
+#define SAVE_CONFIGURATION_130D       0x42
+#define SAVE_130D                     0x01
+
+#define GET_64BIT_UNIQUE_ID_1      0x41
+#define GET_64BIT_UNIQUE_ID_2      0x01
+
+#define GET_AWB_130D                     0x1A
+
+#define GET_AUTO_EXPOSURE               0x1B
+
 #define ENABLE_DISABLE_AF_RECT               0x30
+
+#define GET_FLASH_MODE_130              0x1C
+#define SET_FLASH_MODE_130              0x1D
+
+#define GET_AF_POSITION                 0x28
+
+#define GET_RED_GAIN                    0x31
+#define SET_RED_GAIN                    0x32
+
+#define GET_BLUE_GAIN                   0x2B
+#define SET_BLUE_GAIN                   0x2C
+
+#define GET_GREEN_GAIN                  0x2D
+#define SET_GREEN_GAIN                  0x2E
 
 class See3CAM_130D : public QObject
 {
@@ -94,6 +113,8 @@ private:
 
 public:
     explicit See3CAM_130D(QObject *parent = 0);
+    QString _title;
+    QString _text;
 
     enum sceneModes
     {
@@ -120,6 +141,13 @@ public:
     };
     Q_ENUMS(camAfMode)
 
+    enum FLASH_MODE {
+            DISABLE  = 0x00,
+            STROBE   = 0x01,
+            TORCH    = 0x02
+     };
+     Q_ENUMS(FLASH_MODE)
+
     enum camROIAfMode
     {
         AFCentered = 0x01,
@@ -145,20 +173,20 @@ public:
     };
     Q_ENUMS(camiHDRMode)
 
+    enum FLICKER_MODE {
+         MODE_AUTO    = 0x00,
+         MODE_50Hz    = 0x01,
+         MODE_60Hz    = 0x02,
+         MODE_DISABLE = 0x03
+    };
+    Q_ENUMS(FLICKER_MODE)
+
     enum camStreamMode
     {
         STREAM_MASTER = 0x00,
         STREAM_TRIGGER = 0x01
     };
     Q_ENUMS(camStreamMode)
-
-    enum camAntiFlickerMode {
-        AntiFlickerAuto = 0x00,
-        AntiFlicker50Hz = 0x01,
-        AntiFlicker60Hz = 0x02
-    };
-    Q_ENUMS(camAntiFlickerMode)
-
 
     enum camFaceRectMode {
         FaceRectEnable = 0x01,
@@ -177,12 +205,6 @@ public:
         FaceDetectOverlayRectDisable = 0x00
     };
     Q_ENUMS(camFaceDetectOverlayRect)
-
-    enum camSmileDetectMode {
-        SmileDetectEnable = 0x01,
-        SmileDetectDisable = 0x00
-    };
-    Q_ENUMS(camSmileDetectMode)
 
     enum camAFRectMode {
         AFRectEnable = 0x01,
@@ -208,17 +230,33 @@ signals:
     void afModeValue(uint afMode);
     void roiAfModeValue(uint roiMode, uint winSize);
     void roiAutoExpModeValue(uint roiMode, uint winSize);
+    void autoExposureReceived(uint autoExposure);
     void afRectModeValue(uint afRectMode);
     void streamModeValue(uint streamMode);
     void faceDetectModeValue(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
-    void smileDetectModeValue(uint smileDetectMode, uint smileDetectEmbedDataValue);
     void exposureCompValueReceived(uint exposureCompensation);
     void frameRateCtrlValueReceived(uint frameRateCtrlValue);
     void indicateCommandStatus(QString title, QString text);
+    void titleTextChanged(QString _title,QString _text);
     void flipMirrorModeChanged(uint flipMirrorMode);
     void indicateExposureValueRangeFailure(QString title, QString text);
     void antiFlickerModeChanged(uint flickerMode);
-public slots:
+    void autoWhiteBalanceReceived(uint autoWhiteBalance);
+    void flashModeReceived(uint flashMode);
+    void autoFocusPositionReceived(uint afPosition);
+
+    void redGainMinReceived(uint minRed);
+    void redGainMaxReceived(uint maxRed);
+    void redGainCurrentReceived(uint currentRed);
+
+    void blueGainMinReceived(uint minBlue);
+    void blueGainMaxReceived(uint maxBlue);
+    void blueGainCurrentReceived(uint currentBlue);
+
+    void greenGainMinReceived(uint minGreen);
+    void greenGainMaxReceived(uint maxGreen);
+    void greenGainCurrentReceived(uint currentGreen);
+    public slots:
     bool getSceneMode();
     bool setSceneMode(const sceneModes& sceneMode);
 
@@ -252,6 +290,15 @@ public slots:
     bool getStreamMode();
     bool setStreamMode(camStreamMode streamMode);
 
+    bool getAutoWhiteBalance();
+
+    bool getAutoExposure();
+
+    bool getFlashMode();
+    bool setFlashMode(FLASH_MODE mode);
+
+    bool getAutoFocusPosition();
+
     bool setToDefault();
 
     bool getFlipMode();
@@ -260,8 +307,14 @@ public slots:
     bool getFaceDetectMode();
     bool setFaceDetectionRect(bool enableFaceDetectRect, bool embedData, bool overlayRect);
 
-    bool getSmileDetectMode();
-    bool setSmileDetection(bool enableSmileDetect, bool embedData);
+    bool getRedGain();
+    bool setRedGain(uint redGain);
+
+    bool getBlueGain();
+    bool setBlueGain(uint blueGain);
+
+    bool getGreenGain();
+    bool setGreenGain(uint greenGain);
 
     bool getExposureCompensation();
     bool setExposureCompensation(unsigned int exposureCompValue);
@@ -272,7 +325,10 @@ public slots:
     bool enableDisableFaceRectangle(bool enableFaceRect);
 
     bool getAntiFlickerMode();
-    bool setAntiFlickerMode(camAntiFlickerMode antiFlickerMode);
+    bool setAntiFlickerMode(FLICKER_MODE flickerMode);
+
+    bool saveConfiguration();
+    bool get64BitSerialNumber();
 
     bool enable_disablerect(bool value);
 };

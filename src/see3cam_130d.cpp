@@ -999,78 +999,6 @@ bool See3CAM_130D::setFaceDetectionRect(bool enableFaceDetectRect, bool embedDat
 }
 
 /**
- * @brief See3CAM_130D::getSmileDetectMode - get smile detect mode[ disable/enable ] from camera
- * return true - success /false - failure
- */
-bool See3CAM_130D::getSmileDetectMode()
-{
-    // hid validation
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    //Initialize buffers
-    initializeBuffers();
-
-    // fill buffer values
-    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* Camera control id */
-    g_out_packet_buf[2] = GET_SMILE_DETECTION; /* Get smile detection */
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6]==GET_FAIL) {
-            return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
-            g_in_packet_buf[1]==GET_SMILE_DETECTION &&
-            g_in_packet_buf[6]==GET_SUCCESS) {
-            emit smileDetectModeValue(g_in_packet_buf[2], g_in_packet_buf[4]);
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
- * @brief See3CAM_130D::setSmileDetection - setting smile detection rectangle
- * @param enableSmileDetect - enable / disable smile detect
- * @param embedData - Enable / Disable embed data
- * @return true/false
- */
-bool See3CAM_130D::setSmileDetection(bool enableSmileDetect, bool embedData){
-
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
-
-    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* camera id */
-    g_out_packet_buf[2] = SET_SMILE_DETECTION; /* set smile detect command */
-
-    if(enableSmileDetect)
-        g_out_packet_buf[3] = ENABLE_SMILE_DETECT; /* enable smile detect */
-    else
-        g_out_packet_buf[3] = DISABLE_SMILE_DETECT; /* disable smile detect */
-
-    if(embedData)
-        g_out_packet_buf[5] = ENABLE_EMBED_DATA; /* enable embed data */
-    else
-        g_out_packet_buf[5] = DISABLE_EMBED_DATA; /* disable embed data */
-
-    // send request and get reply from camera
-    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
-        if (g_in_packet_buf[6]==SET_FAIL) {
-            return false;
-        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
-            g_in_packet_buf[1]==SET_SMILE_DETECTION &&
-            g_in_packet_buf[6]==SET_SUCCESS) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
  * @brief See3CAM_130D::getExposureCompensation - getting exposure compensation
  * @return true/false
  */
@@ -1287,7 +1215,7 @@ bool See3CAM_130D::getAntiFlickerMode()
 
 }
 
-bool See3CAM_130D::setAntiFlickerMode(See3CAM_130D::camAntiFlickerMode antiFlickerMode)
+bool See3CAM_130D::setAntiFlickerMode(FLICKER_MODE flickerMode)
 {
 
     // hid validation
@@ -1302,7 +1230,7 @@ bool See3CAM_130D::setAntiFlickerMode(See3CAM_130D::camAntiFlickerMode antiFlick
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* camera id */
     g_out_packet_buf[2] = SET_ANTIFLICKER_130D; /* set anti flicker command  */
-    g_out_packet_buf[3] = antiFlickerMode; /* anti flicker mode to set */
+    g_out_packet_buf[3] = flickerMode; /* anti flicker mode to set */
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]==SET_FAIL) {
@@ -1342,4 +1270,524 @@ bool See3CAM_130D::enable_disablerect(bool value)
         }
     }
 }
+
+bool See3CAM_130D::saveConfiguration(){
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = SAVE_CONFIGURATION_130D;
+    g_out_packet_buf[2] = SAVE_130D;
+
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH))
+    {
+        if (g_in_packet_buf[6] == SET_FAIL)
+        {
+            emit indicateCommandStatus("Failure", "Saving Configurations Failed");
+            return false;
+        }
+        else if(g_in_packet_buf[0] == SAVE_CONFIGURATION_130D  &&
+            g_in_packet_buf[1] == SAVE_130D &&
+            g_in_packet_buf[6] == SET_SUCCESS){
+            emit indicateCommandStatus("Success", "Configurations saved successfully");
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_130D::get64BitSerialNumber - To get 64-bit Serial number
+ * @return true/false
+ */
+bool See3CAM_130D::get64BitSerialNumber()
+{
+    QString lsb = "";
+    QString msb = "";
+
+    bool timeout = true;
+    int ret = 0;
+    unsigned int start, end = 0;
+
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize the buffer
+    memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+
+    //Set the Report Number
+    g_out_packet_buf[1] = GET_64BIT_UNIQUE_ID_1; 	/* Report Number */
+
+    ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
+    if (ret < 0) {
+        _text = tr("Device not available");
+        return false;
+    }
+    /* Read the Unique id from the device */
+    start = uvc.getTickCount();
+    while(timeout)
+    {
+        /* Get a report from the device */
+        ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
+        if (ret < 0)
+        {
+        }
+        else
+        {
+            if(g_in_packet_buf[0] == GET_64BIT_UNIQUE_ID_1)
+            {
+                lsb.sprintf("%02x%02x%02x%02x",g_in_packet_buf[1],g_in_packet_buf[2],g_in_packet_buf[3],g_in_packet_buf[4]);
+
+                //Initialize the buffer
+                memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
+
+                //Set the Report Number
+                g_out_packet_buf[1] = GET_64BIT_UNIQUE_ID_1;
+                g_out_packet_buf[2] = GET_64BIT_UNIQUE_ID_2;
+
+                ret = write(uvccamera::hid_fd, g_out_packet_buf, BUFFER_LENGTH);
+                if (ret < 0) {
+                    _text = tr("Device not available");
+                    return false;
+                }
+                start = uvc.getTickCount();
+
+                while(timeout)
+                {
+                    /* Get a report from the device */
+                    ret = read(uvccamera::hid_fd, g_in_packet_buf, BUFFER_LENGTH);
+                    if (ret < 0)
+                    {
+                    }
+                    else
+                    {
+                        if((g_in_packet_buf[0] == GET_64BIT_UNIQUE_ID_1))
+                        {
+                            msb.sprintf("%02x%02x%02x%02x",g_in_packet_buf[2],g_in_packet_buf[3],g_in_packet_buf[4],g_in_packet_buf[5]);
+                            timeout = false;
+                        }
+                    }
+                }
+            }
+        }
+        end = uvc.getTickCount();
+        if(end - start > TIMEOUT)
+        {
+            timeout = false;
+            return false;
+        }
+    }
+    _text.clear();
+    _text.append(lsb+msb);
+    _title.clear();
+    _title = tr("Serial Number");
+    emit titleTextChanged(_title,_text);
+    return true;
+}
+
+/**
+ * @brief See3CAM_130D::getAutoWhiteBalance - getting auto white balance value
+ * @return true/false
+ */
+bool See3CAM_130D::getAutoWhiteBalance(){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* set camera control code */
+    g_out_packet_buf[2] = GET_AWB_130D; /* get auto exposure code */
+
+    unsigned int autoWhiteBalance;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
+            g_in_packet_buf[1] == GET_AWB_130D &&
+            g_in_packet_buf[6] == GET_SUCCESS) {
+
+            autoWhiteBalance = (g_in_packet_buf[2] << 8) | (g_in_packet_buf[3] << 0);
+
+            emit autoWhiteBalanceReceived(autoWhiteBalance);
+
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_130D::getAutoExposure - getting auto exposure value
+ * @return true/false
+ */
+bool See3CAM_130D::getAutoExposure(){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* set camera control code */
+    g_out_packet_buf[2] = GET_AUTO_EXPOSURE; /* get auto exposure code */
+
+    unsigned int autoExposure;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
+            g_in_packet_buf[1] == GET_AUTO_EXPOSURE &&
+            g_in_packet_buf[6] == GET_SUCCESS) {
+
+            autoExposure = (g_in_packet_buf[2] << 24) | (g_in_packet_buf[3] << 16) | (g_in_packet_buf[4] << 8) | (g_in_packet_buf[5] << 0);
+            emit autoExposureReceived(autoExposure);
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_130D::setFlashMode - setting flash mode to the camera
+ * @param flashMode - Flash mode to be set
+ * @return true/false
+ */
+bool See3CAM_130D::setFlashMode(FLASH_MODE flashMode){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* camera id */
+    g_out_packet_buf[2] = SET_FLASH_MODE_130; /* Set flash mode command */
+    g_out_packet_buf[3] = flashMode; /* Flash mode to be set */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
+            g_in_packet_buf[1] == SET_FLASH_MODE_130 &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_130D::getFlashMode - getting flash mode from the camera.
+ * @return true/false
+ */
+bool See3CAM_130D::getFlashMode()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* camera id */
+    g_out_packet_buf[2] = GET_FLASH_MODE_130; /* get flash mode command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
+            g_in_packet_buf[1] == GET_FLASH_MODE_130 &&
+            g_in_packet_buf[6] == GET_SUCCESS) {
+
+            emit flashModeReceived(g_in_packet_buf[2]);
+
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_130D::getAutoFocusPosition - getting Auto Focus Position
+ * @return true/false
+ */
+bool See3CAM_130D::getAutoFocusPosition(){
+
+    //HID validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* set camera control code */
+    g_out_packet_buf[2] = GET_AF_POSITION; /* get auto focus position command */
+    uint afPos;
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
+            g_in_packet_buf[1] == GET_AF_POSITION &&
+            g_in_packet_buf[6] == GET_SUCCESS) {
+
+            afPos = (g_in_packet_buf[2] << 8) | (g_in_packet_buf[3] << 0);
+            emit autoFocusPositionReceived(afPos);
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_130D::setRedGain - setting red gain value
+ * @param redGain - Value to be set
+ * @return true/false
+ */
+bool See3CAM_130D::setRedGain(uint redGain){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* camera id */
+    g_out_packet_buf[2] = SET_RED_GAIN; /* set Red Gain command */
+    g_out_packet_buf[3] = redGain; /* Red gain value to set */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
+            g_in_packet_buf[1] == SET_RED_GAIN &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_130D::getRedGain - getting the red gain value from the camera.
+ * @return true/false
+ */
+bool See3CAM_130D::getRedGain()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* camera id */
+    g_out_packet_buf[2] = GET_RED_GAIN; /* get Red Gain command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
+            g_in_packet_buf[1] == GET_RED_GAIN &&
+            g_in_packet_buf[6] == GET_SUCCESS) {
+            emit redGainMinReceived(g_in_packet_buf[2]);
+            emit redGainMaxReceived(g_in_packet_buf[3]);
+            emit redGainCurrentReceived(g_in_packet_buf[4]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+/**
+ * @brief See3CAM_130D::setBlueGain - setting blue gain value
+ * @param blueGain - Value to be set
+ * @return true/false
+ */
+bool See3CAM_130D::setBlueGain(uint blueGain){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* camera id */
+    g_out_packet_buf[2] = SET_BLUE_GAIN; /* set Blue Gain command */
+    g_out_packet_buf[3] = blueGain; /* Blue gain value to set */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
+            g_in_packet_buf[1] == SET_BLUE_GAIN &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief See3CAM_130D::getBlueGain - getting the blue gain value from the camera.
+ * @return true/false
+ */
+bool See3CAM_130D::getBlueGain()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* camera id */
+    g_out_packet_buf[2] = GET_BLUE_GAIN; /* get Blue Gain command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
+            g_in_packet_buf[1] == GET_BLUE_GAIN &&
+            g_in_packet_buf[6] == GET_SUCCESS) {
+
+            emit blueGainMinReceived(g_in_packet_buf[2]);
+            emit blueGainMaxReceived(g_in_packet_buf[3]);
+            emit blueGainCurrentReceived(g_in_packet_buf[4]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief See3CAM_130D::setGreenGain - setting green gain value
+ * @param greenGain - Value to be set
+ * @return true/false
+ */
+bool See3CAM_130D::setGreenGain(uint greenGain){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* camera id */
+    g_out_packet_buf[2] = SET_GREEN_GAIN; /* Set Green Gain command */
+    g_out_packet_buf[3] = greenGain; /* Green gain value to set */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
+            g_in_packet_buf[1] == SET_GREEN_GAIN &&
+            g_in_packet_buf[6] == SET_SUCCESS) {
+
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief See3CAM_130D::getGreenGain - getting the green gain value from the camera.
+ * @return true/false
+ */
+bool See3CAM_130D::getGreenGain()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* camera id */
+    g_out_packet_buf[2] = GET_GREEN_GAIN; /* get Green Gain command */
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
+            g_in_packet_buf[1] == GET_GREEN_GAIN &&
+            g_in_packet_buf[6] == GET_SUCCESS) {
+
+            emit greenGainMinReceived(g_in_packet_buf[2]);
+            emit greenGainMaxReceived(g_in_packet_buf[3]);
+            emit greenGainCurrentReceived(g_in_packet_buf[4]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
 

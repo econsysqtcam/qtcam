@@ -31,6 +31,12 @@ Item {
     property bool skipUpdateUIiHDR: false
     property bool setButtonClicked: false
     property bool skipUpdateUIOnAntiFlickerMode:false
+    property int  flickerCtrl
+
+    property bool skipUpdateUIOnRedGain: false
+    property bool skipUpdateUIOnBlueGain: false
+    property bool skipUpdateUIOnGreenGain: false
+
     Connections
     {
         target: root
@@ -916,6 +922,201 @@ value in the text box and click the Set button"
             }
 
             Text {
+                id: autoWhiteBalanceTitle
+                text: "--- Auto White Balance ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                    spacing: 9
+
+                    Text {
+                        id: autoWBText
+                        text: "(in Kelvin)"
+                        font.pixelSize: 13
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        width: 80
+                        wrapMode: Text.WordWrap
+                        opacity: 1
+                    }
+                    TextField {
+                        id: autoWBTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        readOnly: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        opacity: 1
+                        style: econTextFieldStyle
+                        implicitHeight: 25
+                        implicitWidth: 80
+                    }
+                    Button
+                    {
+                        id: getAutoWBBtn
+                        activeFocusOnPress : true
+                        text: "Get"
+                        tooltip: "You can get the Current Auto White Balance value by clicking the Get button"
+                        style: econButtonStyle
+                        enabled: true
+                        opacity: 1
+                        implicitHeight: 25
+                        implicitWidth: 60
+                        onClicked:
+                        {
+                            getAutoWBBtn.enabled = false
+                            setButtonClicked = true
+                            seecam130D.getAutoWhiteBalance()
+                            getAutoWBBtn.enabled = true
+                        }
+                        Keys.onReturnPressed:
+                        {
+                            getAutoWBBtn.enabled = false
+                            setButtonClicked = true
+                            seecam130D.getAutoWhiteBalance()
+                            getAutoWBBtn.enabled = true
+                        }
+                    }
+            }
+
+            Text {
+                id: autoExposureTitle
+                text: "--- Current Auto Exposure ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                    spacing: 9
+                    Text {
+                        id: autoExpText
+                        text: "(In MicroSeconds)"
+                        font.pixelSize: 13
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        width: 80
+                        wrapMode: Text.WordWrap
+                        opacity: 1
+                    }
+                    TextField {
+                        id: autoExpTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        readOnly: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        opacity: 1
+                        style: econTextFieldStyle
+                        implicitHeight: 25
+                        implicitWidth: 80
+                    }
+                    Button
+                    {
+                        id: getAutoExpBtn
+                        activeFocusOnPress : true
+                        text: "Get"
+                        tooltip: "You can get the Current Auto Exposure value by clicking the Get button"
+                        style: econButtonStyle
+                        enabled: true
+                        opacity: 1
+                        implicitHeight: 25
+                        implicitWidth: 60
+                        onClicked:
+                        {
+                            getAutoExpBtn.enabled = false
+                            setButtonClicked = true
+                            seecam130D.getAutoExposure()
+                            getAutoExpBtn.enabled = true
+                        }
+                        Keys.onReturnPressed:
+                        {
+                            getAutoExpBtn.enabled = false
+                            setButtonClicked = true
+                            seecam130D.getAutoExposure()
+                            getAutoExpBtn.enabled = true
+                        }
+                    }
+            }
+
+            Text{
+                id: flashModeText
+                x: 85
+                y: 200
+                text: "--- Flash Mode ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+
+            RowLayout{
+                x:25
+                y:230
+                spacing: 25
+                ExclusiveGroup { id: flashGrp }
+                Column{
+                    RadioButton {
+                        id: flashModeOff
+                        exclusiveGroup: flashGrp
+                        checked: false
+                        text: "Disable"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        onClicked: {
+                            seecam130D.setFlashMode(See3Cam130D.DISABLE)
+                        }
+                        Keys.onReturnPressed: {
+                            seecam130D.setFlashMode(See3Cam130D.DISABLE)
+                        }
+                    }
+                }
+                Column{
+                    RadioButton {
+                        id: flashModeStrobe
+                        exclusiveGroup: flashGrp
+                        checked: false
+                        text: "Strobe"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        onClicked: {
+                            seecam130D.setFlashMode(See3Cam130D.STROBE)
+                        }
+                        Keys.onReturnPressed: {
+                            seecam130D.setFlashMode(See3Cam130D.STROBE)
+                        }
+                    }
+                }
+                Column{
+                    RadioButton {
+                        id: flashModeTorch
+                        exclusiveGroup: flashGrp
+                        checked: false
+                        text: "Torch"
+                        activeFocusOnPress: true
+                        style: econRadioButtonStyle
+                        onClicked: {
+                            seecam130D.setFlashMode(See3Cam130D.TORCH)
+                        }
+                        Keys.onReturnPressed: {
+                            seecam130D.setFlashMode(See3Cam130D.TORCH)
+                        }
+                    }
+                }
+            }
+
+            Text {
                 id: faceDetectionText
                 text: "--- Face Detection ---"
                 font.pixelSize: 14
@@ -989,8 +1190,8 @@ value in the text box and click the Set button"
             }
 
             Text {
-                id: smileDetectionText
-                text: "--- Smile Detection ---"
+                id: autoFocusPositionTitle
+                text: "--- Current Auto Focus Position ---"
                 font.pixelSize: 14
                 font.family: "Ubuntu"
                 color: "#ffffff"
@@ -999,54 +1200,56 @@ value in the text box and click the Set button"
                 opacity: 0.50196078431373
             }
             Row{
-                spacing: 62
-                ExclusiveGroup { id: smileDetectGroup }
-                RadioButton {
-                    exclusiveGroup: smileDetectGroup
-                    id: smileDetectEnable
-                    text: "Enable"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    onClicked:{
-                        seecam130D.setSmileDetection(true, smileDetectEmbedData.checked)
+                    spacing: 9
+                    Text {
+                        id: autoFocusPositionText
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        width: 80
+                        wrapMode: Text.WordWrap
+                        opacity: 1
                     }
-                    Keys.onReturnPressed: {
-                        seecam130D.setSmileDetection(true, smileDetectEmbedData.checked)
+                    TextField {
+                        id: autoFocusPositionTextField
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        readOnly: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        opacity: 1
+                        style: econTextFieldStyle
+                        implicitHeight: 25
+                        implicitWidth: 80
                     }
-                }
-                RadioButton {
-                    exclusiveGroup: smileDetectGroup
-                    id:smileDetectDisable
-                    text: "Disable"
-                    activeFocusOnPress: true
-                    style: econRadioButtonStyle
-                    onClicked: {
-                        seecam130D.setSmileDetection(false, smileDetectEmbedData.checked)
+                    Button
+                    {
+                        id: getFocusPosition
+                        activeFocusOnPress : true
+                        text: "Get"
+                        tooltip: "You can get the Focus Position by clicking the Get button"
+                        style: econButtonStyle
+                        enabled: true
+                        opacity: 1
+                        implicitHeight: 25
+                        implicitWidth: 60
+                        onClicked:
+                        {
+                            getFocusPosition.enabled = false
+                            setButtonClicked = true
+                            seecam130D.getAutoFocusPosition()
+                            getFocusPosition.enabled = true
+                        }
+                        Keys.onReturnPressed:
+                        {
+                            getFocusPosition.enabled = false
+                            setButtonClicked = true
+                            seecam130D.getAutoFocusPosition()
+                            getFocusPosition.enabled = true
+                        }
                     }
-                    Keys.onReturnPressed: {
-                        seecam130D.setSmileDetection(false, smileDetectEmbedData.checked)
-                    }
-                }
             }
-
-            Row{
-                spacing: 5
-                CheckBox {
-                    id: smileDetectEmbedData
-                    activeFocusOnPress : true
-                    text: "Embed Data"
-                    style: econCheckBoxStyle
-                    enabled: smileDetectEnable.checked ? true : false
-                    opacity: enabled ? 1 : 0.1
-                    onClicked:{
-                        enableSmileDetectEmbedData()
-                    }
-                    Keys.onReturnPressed: {
-                        enableSmileDetectEmbedData()
-                    }
-                }
-            }
-
 
             Text {
                 id: frameRateText
@@ -1105,41 +1308,64 @@ value in the text box and click the Set button"
                 Layout.alignment: Qt.AlignCenter
                 opacity: 0.50196078431373
             }
-            Row
-            {
-                  spacing:90
-                  ExclusiveGroup { id: antiFlickerModegroup }
-                  RadioButton {
-                      exclusiveGroup: antiFlickerModegroup
-                      id: antiFlickerModeAuto
-                      text: "Auto"
-                      activeFocusOnPress: true
-                      style: econRadioButtonStyle
-                      opacity: enabled ? 1 : 0.1
-                      onClicked: {
-                          seecam130D.setAntiFlickerMode(See3Cam130D.AntiFlickerAuto);
-                      }
-                      Keys.onReturnPressed: {
-                          seecam130D.setAntiFlickerMode(See3Cam130D.AntiFlickerAuto);
-                      }
-                  }
-                  RadioButton {
-                      exclusiveGroup: antiFlickerModegroup
-                      id: antiFlickerModeManual
-                      text: "Manual"
-                      activeFocusOnPress: true
-                      style: econRadioButtonStyle
-                      opacity: enabled ? 1 : 0.1
-                      onClicked: {
-                          setAntiFlickerMode()
-                      }
-                      Keys.onReturnPressed: {
-                          setAntiFlickerMode()
-                      }
-                  }
-            }
+            RowLayout{
+                spacing: 15
+                Layout.alignment: Qt.AlignCenter
 
-            Text {
+                ExclusiveGroup { id: antiFlickerGroup }
+
+                RadioButton
+                {
+                    exclusiveGroup: antiFlickerGroup
+                    id: antiFlickerModeOff
+                    text: "Off"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    opacity: enabled ? 1 : 0.1
+                    tooltip: "It disables Anti Flicker Mode."
+                    width : 70
+                    onClicked: {
+                        seecam130D.setAntiFlickerMode(See3Cam130D.MODE_DISABLE)
+                    }
+                    Keys.onReturnPressed: {
+                        seecam130D.setAntiFlickerMode(See3Cam130D.MODE_DISABLE)
+                    }
+                }
+                RadioButton {
+                    id: antiFlickerModeAuto
+                    style:  econRadioButtonStyle
+                    text:   qsTr("Auto")
+                    exclusiveGroup: antiFlickerGroup
+                    tooltip: "The device will automatically switch between the flicker frequencies, if the flicker is detected in preview."
+                    activeFocusOnPress: true
+                    width : 70
+                    onClicked: {
+                        seecam130D.setAntiFlickerMode(See3Cam130D.MODE_AUTO)
+                    }
+                    Keys.onReturnPressed: {
+                        seecam130D.setAntiFlickerMode(See3Cam130D.MODE_AUTO)
+                    }
+                }
+                RadioButton
+                {
+                    id: antiFlickerModeManual
+                    text: "Manual"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    exclusiveGroup: antiFlickerGroup
+                    tooltip: "The flicker frequency has to be choosed manually to avoid the flickering in the preview."
+                    //implicitWidth: 70
+                    width : 70
+                    onClicked: {
+                        setAntiFlickerMode()
+                    }
+                    Keys.onReturnPressed: {
+                         setAntiFlickerMode()
+                    }
+                }
+            }
+            Text
+            {
                 id: frequency
                 text: "Frequency :"
                 font.pixelSize: 14
@@ -1153,7 +1379,8 @@ value in the text box and click the Set button"
                 id: antiFlickerCombo
                 enabled: (antiFlickerModeManual.enabled && antiFlickerModeManual.checked) ? true : false
                 opacity: (antiFlickerModeManual.enabled && antiFlickerModeManual.checked) ? 1 : 0.1
-                model: ListModel {
+                model: ListModel
+                {
                     ListElement { text: "50 Hz" }
                     ListElement { text: "60 Hz" }
                 }
@@ -1166,6 +1393,151 @@ value in the text box and click the Set button"
                     skipUpdateUIOnAntiFlickerMode = true
                 }
             }
+
+            //Red Gain
+            Text
+            {
+                id: redGainTitle
+                text: "--- Red Gain ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                spacing: 35
+                Slider {
+                    id: redGainSlider
+                    activeFocusOnPress: true
+                    updateValueWhileDragging: false
+                    width: 150
+                    style:econSliderStyle
+                    stepSize: 1
+                    minimumValue: redGainSlider.minimumValue
+                    maximumValue: redGainSlider.maximumValue
+                    onValueChanged:  {
+                        redGainTextField.text = redGainSlider.value
+                        if(skipUpdateUIOnRedGain){
+                            seecam130D.setRedGain(redGainSlider.value)
+                        }
+                        skipUpdateUIOnRedGain = true
+                    }
+                }
+                TextField {
+                    id: redGainTextField
+                    text: redGainSlider.value
+                    font.pixelSize: 10
+                    font.family: "Ubuntu"
+                    smooth: true
+                    horizontalAlignment: TextInput.AlignHCenter
+                    style: econTextFieldStyle
+                    validator: IntValidator {bottom: redGainSlider.minimumValue; top: redGainSlider.maximumValue}
+                    onTextChanged: {
+                        if(text.length > 0){
+                            redGainSlider.value = redGainTextField.text
+                        }
+                    }
+                }
+            }
+
+            //Blue Gain
+            Text
+            {
+                id: blueGainTitle
+                text: "--- Blue Gain ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                spacing: 35
+                Slider {
+                    id: blueGainSlider
+                    activeFocusOnPress: true
+                    updateValueWhileDragging: false
+                    width: 150
+                    style:econSliderStyle
+                    stepSize: 1
+                    minimumValue: blueGainSlider.minimumValue
+                    maximumValue: blueGainSlider.maximumValue
+                    onValueChanged:  {
+                        blueGainTextField.text = blueGainSlider.value
+                        if(skipUpdateUIOnBlueGain){
+                            seecam130D.setBlueGain(blueGainSlider.value)
+                        }
+                        skipUpdateUIOnBlueGain = true
+                    }
+                }
+                TextField {
+                    id: blueGainTextField
+                    text: blueGainSlider.value
+                    font.pixelSize: 10
+                    font.family: "Ubuntu"
+                    smooth: true
+                    horizontalAlignment: TextInput.AlignHCenter
+                    style: econTextFieldStyle
+                    validator: IntValidator {bottom: blueGainSlider.minimumValue; top: blueGainSlider.maximumValue}
+                    onTextChanged: {
+                        if(text.length > 0){
+                            blueGainSlider.value = blueGainTextField.text
+                        }
+                    }
+                }
+            }
+
+            //Green Gain
+            Text
+            {
+                id: greenGainTitle
+                text: "--- Green Gain ---"
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                Layout.alignment: Qt.AlignCenter
+                opacity: 0.50196078431373
+            }
+            Row{
+                spacing: 35
+                Slider {
+                    id: greenGainSlider
+                    activeFocusOnPress: true
+                    updateValueWhileDragging: false
+                    width: 150
+                    style:econSliderStyle
+                    stepSize: 1
+                    minimumValue: greenGainSlider.minimumValue
+                    maximumValue: greenGainSlider.maximumValue
+                    onValueChanged:  {
+                        greenGainTextField.text = greenGainSlider.value
+                        if(skipUpdateUIOnGreenGain){
+                            seecam130D.setGreenGain(greenGainSlider.value)
+                        }
+                        skipUpdateUIOnGreenGain = true
+                    }
+                }
+                TextField {
+                    id: greenGainTextField
+                    text: greenGainSlider.value
+                    font.pixelSize: 10
+                    font.family: "Ubuntu"
+                    smooth: true
+                    horizontalAlignment: TextInput.AlignHCenter
+                    style: econTextFieldStyle
+                    validator: IntValidator {bottom: greenGainSlider.minimumValue; top: greenGainSlider.maximumValue}
+                    onTextChanged: {
+                        if(text.length > 0){
+                            greenGainSlider.value = greenGainTextField.text
+                        }
+                    }
+                }
+            }
+
             Row{
                 Layout.alignment: Qt.AlignCenter
                 Button {
@@ -1228,9 +1600,23 @@ value in the text box and click the Set button"
                 }
             }
             Row{
+                Layout.alignment: Qt.AlignCenter
                 Button {
-                    id: dummy
-                    opacity: 0
+                    id: saveConfig
+                    opacity: 1
+                    activeFocusOnPress : true
+                    text: "Save Configuration"
+                    style: econButtonStyle
+                    tooltip: "This feature will save the current configurations and are retained after the
+following power cycles."
+                    onClicked:{
+                        setButtonClicked = true
+                        seecam130D.saveConfiguration()
+                    }
+                    Keys.onReturnPressed: {
+                        setButtonClicked = true
+                        seecam130D.saveConfiguration()
+                    }
                 }
             }
         }
@@ -1279,21 +1665,6 @@ value in the text box and click the Set button"
                     overlayRect.checked = true
                 }else{
                     overlayRect.checked = false
-                }
-            }
-        }
-        onSmileDetectModeValue:{
-            if(smileDetectMode == See3Cam130D.SmileDetectEnable){
-                smileDetectEnable.checked = true
-                if(smileDetectEmbedDataValue == See3Cam130D.SmileDetectEmbedDataEnable){
-                    smileDetectEmbedData.checked = true
-                }
-            }else if(smileDetectMode == See3Cam130D.SmileDetectDisable){
-                smileDetectDisable.checked = true
-                if(smileDetectEmbedDataValue == See3Cam130D.SmileDetectEmbedDataEnable){
-                    smileDetectEmbedData.checked = true
-                }else{
-                    smileDetectEmbedData.checked = false
                 }
             }
         }
@@ -1383,7 +1754,56 @@ value in the text box and click the Set button"
         onAntiFlickerModeChanged:{
             currentAntiFlickerMode(flickerMode)
         }
-
+        onTitleTextChanged: {
+            messageDialog.title = _title.toString()
+            messageDialog.text = _text.toString()
+            messageDialog.open()
+        }
+        onAutoWhiteBalanceReceived:{
+            autoWBTextField.text = autoWhiteBalance
+        }
+        onAutoExposureReceived:{
+            autoExpTextField.text = autoExposure
+        }
+        onFlashModeReceived:{
+            currentFlashMode(flashMode)
+        }
+        onAutoFocusPositionReceived:{
+            autoFocusPositionTextField.text = afPosition
+        }
+        onRedGainCurrentReceived: {
+            skipUpdateUIOnRedGain      = false
+            redGainSlider.value        = currentRed
+            skipUpdateUIOnRedGain      = true
+        }
+        onRedGainMinReceived: {
+            redGainSlider.minimumValue = minRed
+        }
+        onRedGainMaxReceived: {
+            redGainSlider.maximumValue = maxRed
+        }
+        onBlueGainCurrentReceived: {
+            skipUpdateUIOnBlueGain      = false
+            blueGainSlider.value        = currentBlue
+            skipUpdateUIOnBlueGain      = true
+        }
+        onBlueGainMinReceived: {
+            blueGainSlider.minimumValue = minBlue
+        }
+        onBlueGainMaxReceived: {
+            blueGainSlider.maximumValue = maxBlue
+        }
+        onGreenGainCurrentReceived: {
+            skipUpdateUIOnGreenGain      = false
+            greenGainSlider.value        = currentGreen
+            skipUpdateUIOnGreenGain      = true
+        }
+        onGreenGainMinReceived: {
+            greenGainSlider.minimumValue = minGreen
+        }
+        onGreenGainMaxReceived: {
+            greenGainSlider.maximumValue = maxGreen
+        }
     }
 
     Component {
@@ -1553,12 +1973,16 @@ value in the text box and click the Set button"
         seecam130D.getAutoExpROIModeAndWindowSize()
         seecam130D.getAFRectMode()
         seecam130D.getFlipMode()
+        seecam130D.getAutoWhiteBalance()
+        seecam130D.getAutoExposure()
         seecam130D.getStreamMode()
         seecam130D.getFaceDetectMode()
-        seecam130D.getSmileDetectMode()
-
+        seecam130D.getFlashMode()
         seecam130D.getAntiFlickerMode()
-
+        seecam130D.getAutoFocusPosition()
+        seecam130D.getRedGain()
+        seecam130D.getBlueGain()
+        seecam130D.getGreenGain()
     }
 
     function displayMessageBox(title, text){
@@ -1619,6 +2043,17 @@ value in the text box and click the Set button"
 
     }
 
+    function currentFlashMode(flashMode)
+    {
+        if(flashMode == See3Cam130D.DISABLE){
+            flashModeOff.checked = true
+        }else if(flashMode == See3Cam130D.STROBE){
+            flashModeStrobe.checked = true
+        }else if(flashMode == See3Cam130D.TORCH){
+            flashModeTorch.checked = true
+        }
+     }
+
     // current ROI auto exposure mode
     function currentROIAutoExposureMode(roiMode, winSize){
         switch(roiMode){
@@ -1661,7 +2096,7 @@ value in the text box and click the Set button"
     }
 
     function getSerialNumber() {
-        uvccamera.getSerialNumber()
+        seecam130D.get64BitSerialNumber()
         messageDialog.open()
     }
 
@@ -1683,14 +2118,19 @@ value in the text box and click the Set button"
         seecam130D.getAutoExpROIModeAndWindowSize()
         seecam130D.getAFRectMode()
         seecam130D.getFlipMode()
+        seecam130D.getAutoWhiteBalance()
+        seecam130D.getAutoExposure()
         seecam130D.getStreamMode()
         root.startUpdatePreviewInMasterMode()
         seecam130D.getFaceDetectMode()
-        seecam130D.getSmileDetectMode()
         seecam130D.getExposureCompensation()
         seecam130D.getFrameRateCtrlValue()
         seecam130D.getAntiFlickerMode()
-
+        seecam130D.getFlashMode()
+        seecam130D.getAutoFocusPosition()
+        seecam130D.getRedGain()
+        seecam130D.getBlueGain()
+        seecam130D.getGreenGain()
     }
 
     function defaultSceneMode(mode)
@@ -1801,24 +2241,30 @@ value in the text box and click the Set button"
     function enableFaceDetectEmbedData(){
         if(seecam130D.setFaceDetectionRect(faceRectEnable.checked, faceDetectEmbedData.checked, overlayRect.checked)){
             if(faceDetectEmbedData.checked){
-                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_130D_Face_and_Smile_Detection for more details"))
-            }
-        }
-    }
-
-    function enableSmileDetectEmbedData(){
-        setButtonClicked = false
-        if(seecam130D.setSmileDetection(true, smileDetectEmbedData.checked)){
-            if(smileDetectEmbedData.checked){
-                messageDialog.title = qsTr("Status")
-                messageDialog.text = qsTr("The last part of the frame will be replaced by smile data.Refer document See3CAM_130D_Face_and_Smile_Detection for more details")
-                messageDialog.open()
+                displayMessageBox(qsTr("Status"),qsTr("The last part of the frame will be replaced by face data.Refer document See3CAM_130D_Face_Detection for more details"))
             }
         }
     }
 
     function enableDisableAutoExposureControls(autoExposureSelect){
         if(autoExposureSelect){
+
+            //Disabling RGB Gain in Auto exposure mode
+            redGainSlider.enabled    = false
+            redGainSlider.opacity    = 0.1
+            redGainTextField.enabled = false
+            redGainTextField.opacity = 0.1
+
+            blueGainSlider.enabled    = false
+            blueGainSlider.opacity    = 0.1
+            blueGainTextField.enabled = false
+            blueGainTextField.opacity = 0.1
+
+            greenGainSlider.enabled    = false
+            greenGainSlider.opacity    = 0.1
+            greenGainTextField.enabled = false
+            greenGainTextField.opacity = 0.1
+
             autoexpManual.enabled = true
             autoexpFull.enabled = true
             if(autoexpManual.checked)
@@ -1833,6 +2279,23 @@ value in the text box and click the Set button"
             exposureCompSet.opacity = 1
             exposureCompText.opacity = 1
         }else{
+
+            //Enabling RGB Gain in manual exposure mode
+            redGainSlider.enabled    = true
+            redGainSlider.opacity    = 1
+            redGainTextField.enabled = true
+            redGainTextField.opacity = 1
+
+            blueGainSlider.enabled    = true
+            blueGainSlider.opacity    = 1
+            blueGainTextField.enabled = true
+            blueGainTextField.opacity = 1
+
+            greenGainSlider.enabled    = true
+            greenGainSlider.opacity    = 1
+            greenGainTextField.enabled = true
+            greenGainTextField.opacity = 1
+
             autoexpManual.enabled = false
             autoexpFull.enabled = false
             autoExpoWinSizeCombo.enabled = false
@@ -1848,30 +2311,39 @@ value in the text box and click the Set button"
     }
 
     function currentAntiFlickerMode(flickerMode){
-        switch(flickerMode){
-            case See3Cam130D.AntiFlickerAuto:
+        switch(flickerMode)
+        {
+            case See3Cam130D.MODE_AUTO:
                 antiFlickerModeAuto.checked = true
                 break
-            case See3Cam130D.AntiFlicker50Hz:
+            case See3Cam130D.MODE_50Hz:
                 antiFlickerModeManual.checked = true
                 skipUpdateUIOnAntiFlickerMode = false
                 antiFlickerCombo.currentIndex = 0
                 skipUpdateUIOnAntiFlickerMode = true
                 break
-            case See3Cam130D.AntiFlicker60Hz:
+            case See3Cam130D.MODE_60Hz:
                 antiFlickerModeManual.checked = true
                 skipUpdateUIOnAntiFlickerMode = false
                 antiFlickerCombo.currentIndex = 1
                 skipUpdateUIOnAntiFlickerMode = true
                 break
+             case See3Cam130D.MODE_DISABLE:
+                antiFlickerModeOff.checked = true
+                break
          }
     }
 
     function setAntiFlickerMode(){
-        if(antiFlickerCombo.currentIndex == 0)
-          seecam130D.setAntiFlickerMode(See3Cam130D.AntiFlicker50Hz)
-        else
-          seecam130D.setAntiFlickerMode(See3Cam130D.AntiFlicker60Hz)
+        switch(antiFlickerCombo.currentIndex){
+        case 0:
+            flickerCtrl= See3Cam130D.MODE_50Hz
+            break
+        case 1:
+            flickerCtrl = See3Cam130D.MODE_60Hz
+            break
+        }
+        seecam130D.setAntiFlickerMode(flickerCtrl)
     }
 
     Connections{

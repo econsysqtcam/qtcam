@@ -72,7 +72,15 @@
 #define GET_SHORT_EXPOUSRE_IMX900           0x29
 #define SET_SHORT_EXPOUSRE_IMX900           0x2A
 
+#define GET_EXPOSURE_COMPENSATION_IMX900    0x13
+#define SET_EXPOSURE_COMPENSATION_IMX900    0x14
+
+#define GET_AUTO_EXPOSURE_ROI               0x15
+#define SET_AUTO_EXPOSURE_ROI               0x16
+
 #define SET_TO_DEFAULT_IMX900               0xFF
+
+#define ISP_FIRMWARE_VERSION_IMX900USBCAM   0x2B
 
 #define SAVE_CONFIGURATION_IMX900USBCAM     0x42
 #define SAVE_IMX900USBCAM                   0x01
@@ -102,6 +110,9 @@ public:
 
     uint lowerLimitSec, lowerLimitMilliSec, lowerLimitMicroSec;
     uint upperLimitSec, upperLimitMilliSec, upperLimitMicroSec;
+
+    QString _title;
+    QString _text;
 
     enum CAMERA_MODE{
         MASTER           = 0x01,
@@ -143,8 +154,8 @@ public:
 
     enum AUTO_EXPOSURE_FEATURES{
         CONTINIOUS_EXP     = 0x00,
-        SINGLE_EXP         = 0x01,
-        SINGLE_EXP_TRIGGER = 0x02
+        //SINGLE_EXP         = 0x01,
+        SINGLE_EXP_TRIGGER = 0x01
     };Q_ENUMS(AUTO_EXPOSURE_FEATURES)
 
     enum ANTI_FLICKER_DETECTION{
@@ -160,6 +171,18 @@ public:
         FRAME_SET_4   = 0x02
     };Q_ENUMS(MULTI_FRAME_SET)
 
+    enum HDR{
+        AUTO_EXP_HDR    = 0x00,
+        OUTDOOR_HDR     = 0x01,
+        INDOOR_HDR      = 0x02
+    };
+    Q_ENUMS(HDR)
+
+    enum AUTO_EXPOSURE_ROI{
+        AE_FULL_ROI   = 0x00,
+        AE_MANUAL_ROI     = 0x01
+    };Q_ENUMS(AUTO_EXPOSURE_ROI)
+
 signals:
     void currentCameraMode(uint mode);
     void currentFlipMode(uint flipMirrorModeValues);
@@ -174,12 +197,14 @@ signals:
     void currentExposureUpperLimit(uint seconds, uint milliSeconds, uint microSeconds);
     void currentAntiFlickerMode(uint mode);
     void currentStatistics(uint seconds, uint milliSeconds, uint microSeconds, uint gain);
-    void currentTemperature(uint temperature);
-    void currentHDRStatus(uint status);
+    void currentTemperature(float temperature);
+    void currentHDRStatus(uint hdr);
     void currentQuadShutterControlStatus(uint status);
     void currentFastAutoExposureStatus(uint status);
     void currentToneControlStatus(uint status);
     void currentShortExposureStatus(uint status, uint min, uint max, uint current);
+    void currentExposureCompensation(uint seconds, uint milliSeconds, uint microSeconds);
+    void roiAutoExpModeValueReceived(uint roiMode, uint winSize);
 
     void multiFrameSetModeReceived(uint mode);
     void frameSet1Received(uint gain1, uint exposure1);
@@ -252,7 +277,7 @@ public slots:
     bool calculateTemperature();
 
     bool getHighDynamicRange();
-    bool setHighDynamicRange(uint status);
+    bool setHighDynamicRange(HDR hdr);
 
     bool getQuadShutterControl();
     bool setQuadShutterControl(uint status);
@@ -269,6 +294,12 @@ public slots:
     bool getShortExposureMode();
     bool setShortExposureMode(uint status, uint value);
 
+    bool setExposureCompensation(uint seconds, uint milliSeconds, uint microSeconds);
+    bool getExposureCompensation();
+
+    bool setROIAutoExposure(AUTO_EXPOSURE_ROI roiMode, uint vidResolnWidth, uint vidResolnHeight, uint xCoord, uint yCoord, QString winSize);
+    bool getAutoExpROIModeAndWindowSize();
+
     bool getDualTrigger();
     bool setDualTrigger(uint mode, uint division, uint gain, uint gain1);
 
@@ -276,6 +307,8 @@ public slots:
     bool setSelfTrigger(uint mode, uint vidResolnWidth, uint vidResolnHeight, uint hCropPos, uint vCropPos, uint hCropSize, uint vCropSize, uint exposure, uint hLevel, uint lLevel, uint hCount, uint lCount, uint sensingMode, uint forceMode, uint hDetPixels, uint vDetPixels, uint sensingGain, uint capturingGain);
 
     bool setToDefaultValues();
+
+    bool readISPFirmwareVersion();
 
     bool saveConfiguration();
 };

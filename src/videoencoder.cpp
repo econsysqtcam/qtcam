@@ -169,11 +169,7 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
         pCodecCtx->width = getWidth();
         pCodecCtx->height = getHeight();
 
-        if(fpsDenominator >= 5){
-            pCodecCtx->time_base = (AVRational){int(fpsNumerator),int(fpsDenominator)};
-        }else{
-            pCodecCtx->time_base = (AVRational){1, 15};
-        }
+        pCodecCtx->time_base = (AVRational){int(fpsNumerator),int(fpsDenominator)};
 
         pCodecCtx->gop_size = 12; // mjpg - group of pictures
 

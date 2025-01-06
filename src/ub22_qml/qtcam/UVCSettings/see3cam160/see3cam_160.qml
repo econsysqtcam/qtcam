@@ -812,7 +812,7 @@ Item {
     }
 
     function getSerialNumber() {
-        uvccamera.getUniqueId()
+        see3cam160.get64BitSerialNumber()
         messageDialog.open()
     }
 
