@@ -1,4 +1,6 @@
-qtcam (26.0.36-0ubuntu1) jammy; urgency=medium
+qtcam (26.0.37-0ubuntu1) jammy; urgency=medium
+ *Added and changed some HID controls in See3CAM_130D, See3CAM_37CUG and See3CAM_160.
+ *Bug fix-Set actual fps to the file header on video recording.
  *Added Auto mode in Antiflicker for See3cam_130.
  *Bug fixes- FPS drop issue in see3cam_27cug and see3cam_cu83 in Ubuntu 22.04, Shuttering in preview when switching to MJPG format, correctly writing duration to the video file on closing it, and avoided preview corruption for higher resolution while video recording with H264 encoder format. Capture issue fixed- On connecting 2 cameras and switching from master to trigger mode disables the capture in other camera.
  *Improvement in SEE3CAM_37CUGM- To grey out and disable the Fast auto exposure and self trigger for other resolutions than 2064x1552. To stop showing fps when Trigger mode is set.
@@ -19,4 +21,4 @@ qtcam (26.0.36-0ubuntu1) jammy; urgency=medium
  *Fix for Mipi Camera streaming issue & Manual white balance in UVC.
  *Added support for ubuntu 22.04.
  *Initial release.  
- -- econsysqtcam <qtcam@e-consystems.com> Wed Jan 01 19:24:45 2025 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Mon Jan 06 19:45:45 2025 +0530
