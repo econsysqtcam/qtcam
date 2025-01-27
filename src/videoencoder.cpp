@@ -70,19 +70,20 @@ VideoEncoder::~VideoEncoder()
  * Initializes the required video and audio codecs.
  * Sets the output format.
  * Opens the file for writing.
+ *
+ * Note that CodecID was renamed to AVCodecID in 2012: https://ffmpeg.org/pipermail/ffmpeg-cvslog/2012-August/053381.html
 */
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
-bool VideoEncoder::createFile(QString fileName,AVCodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitrate, int audioDeviceIndex, int sampleRate, int channels)
+bool VideoEncoder::createFile(QString fileName, AVCodecID encodeType, unsigned width, unsigned height, unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitrate, int audioDeviceIndex, int sampleRate, int channels)
 #else
-bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned width,unsigned height,unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitrate, int audioDeviceIndex, int sampleRate, int channels)
+bool VideoEncoder::createFile(QString fileName, CodecID encodeType, unsigned width, unsigned height, unsigned fpsDenominator, unsigned fpsNumerator, unsigned bitrate, int audioDeviceIndex, int sampleRate, int channels)
 #endif
 {
 
-    if (isUbuntu2204()) {
-
-    } else {
-        av_register_all(); //Deprecated in Ubuntu 22.04 but needed for former versions
-    }
+    #if (LIBAVCODEC_VERSION_MAJOR < 54)
+        // FFmpeg used to require a call to av_register_all() but it was deprecated in v4 and has since been removed
+        av_register_all();
+    #endif
 
     // If we had an open video, close it.
     closeFile();
@@ -98,10 +99,11 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
         return false;
     }
 #endif
-    pOutputFormat = av_guess_format(NULL, fileName.toStdString().c_str(), NULL);
-    if (!pOutputFormat) {
-        pOutputFormat = av_guess_format("mpeg", NULL, NULL);
+    const AVOutputFormat * format = av_guess_format(NULL, fileName.toStdString().c_str(), NULL);
+    if (!format) {
+        format = av_guess_format("mpeg", NULL, NULL);
     }
+    pFormatCtx = (AVFormatContext *) format;
 #if LIBAVCODEC_VER_AT_LEAST(54,25)
     pOutputFormat->video_codec = (AVCodecID)encodeType;
 #else
@@ -149,7 +151,12 @@ bool VideoEncoder::createFile(QString fileName,CodecID encodeType, unsigned widt
 
         // Allocate codec context
         pCodecCtx = avcodec_alloc_context3(pCodec);
+
+        #if (LIBAVCODEC_VERSION_MAJOR < 59)
+        // avcodec_get_context_defaults3 has been removed, see:
+        // https://patchwork.ffmpeg.org/project/ffmpeg/patch/20210419141024.8174-23-jamrial@gmail.com/
         avcodec_get_context_defaults3 (pCodecCtx, pCodec);
+        #endif
 
         if (!pCodecCtx) {
             fprintf(stderr, "Error allocating codec context\n");
@@ -359,23 +366,6 @@ int VideoEncoder::encodeImage(uint8_t *buffer,uint8_t bufferType)
     int ret = -1;
     ret = encodePacket(buffer, bufferType);
     return ret;
-}
-
-bool VideoEncoder::isUbuntu2204() {
-    std::ifstream file("/etc/os-release");
-    std::string line;
-
-    while (std::getline(file, line)) {
-        if (line.find("ID=ubuntu") != std::string::npos) {
-            // Found Ubuntu
-            while (std::getline(file, line)) {
-                if (line.find("VERSION_ID=\"22.04\"") != std::string::npos) {
-                    return true; // Found Ubuntu 22.04
-                }
-            }
-        }
-    }
-    return false; // Not Ubuntu 22.04
 }
 
 /**
@@ -851,7 +841,7 @@ int VideoEncoder::encodeH264Packet(void *buffer, int bytesused){
     return out_size;
 }
 
-int VideoEncoder::check_sample_fmt(AVCodec *codec, enum AVSampleFormat sample_fmt)
+int VideoEncoder::check_sample_fmt(const AVCodec *codec, enum AVSampleFormat sample_fmt)
 {
     const enum AVSampleFormat *p = codec->sample_fmts;
 
@@ -884,7 +874,12 @@ AVStream* VideoEncoder::add_audio_stream(AVFormatContext *oc, CodecID codec_id, 
     }
 
     c = avcodec_alloc_context3(paudioCodec);
-    avcodec_get_context_defaults3 (c, paudioCodec);
+
+    #if (LIBAVCODEC_VERSION_MAJOR < 59)
+        // avcodec_get_context_defaults3 has been removed, see:
+        // https://patchwork.ffmpeg.org/project/ffmpeg/patch/20210419141024.8174-23-jamrial@gmail.com/
+        avcodec_get_context_defaults3 (c, paudioCodec);
+    #endif
 
     if (!c) {
         return NULL;
@@ -935,7 +930,12 @@ AVStream* VideoEncoder::add_audio_stream(AVFormatContext *oc, CodecID codec_id, 
 int VideoEncoder::open_audio(AVStream *st)
 {
     pAudioCodecCtx = avcodec_alloc_context3(paudioCodec);
-    avcodec_get_context_defaults3 (pAudioCodecCtx, paudioCodec);
+
+    #if (LIBAVCODEC_VERSION_MAJOR < 59)
+        // avcodec_get_context_defaults3 has been removed, see:
+        // https://patchwork.ffmpeg.org/project/ffmpeg/patch/20210419141024.8174-23-jamrial@gmail.com/
+        avcodec_get_context_defaults3 (pAudioCodecCtx, paudioCodec);
+    #endif
 
     if (!pAudioCodecCtx) {
         fprintf(stderr, "Error allocating audio codec context\n");
