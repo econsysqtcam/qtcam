@@ -554,7 +554,7 @@ bool IMX900USBCAM::setExposureMode(EXPOSURE_MODE mode, AUTO_EXPOSURE_FEATURES au
     g_out_packet_buf[4] = mode;
     if(g_out_packet_buf[4] == 0x00)
     {
-        g_out_packet_buf[5] = autoFeature;
+        //g_out_packet_buf[5] = autoFeature;
     }
     else if(g_out_packet_buf[4] == 0x01)
     {

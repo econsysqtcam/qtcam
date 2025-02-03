@@ -188,7 +188,6 @@ Item {
                                root.checkForTriggerMode(true)
                                root.captureBtnEnable(false)
                                root.videoRecordBtnEnable(false)
-                               root.stopUpdatePreviewInTriggerMode()
                            }
                        }
                        Keys.onReturnPressed: {
@@ -199,7 +198,6 @@ Item {
                                root.checkForTriggerMode(true)
                                root.captureBtnEnable(false)
                                root.videoRecordBtnEnable(false)
-                               root.stopUpdatePreviewInTriggerMode()
                            }
                        }
                    }
@@ -217,7 +215,6 @@ Item {
                                root.checkForTriggerMode(true)
                                root.captureBtnEnable(false)
                                root.videoRecordBtnEnable(false)
-                               root.stopUpdatePreviewInTriggerMode()
                            }
                        }
                        Keys.onReturnPressed: {
@@ -228,7 +225,6 @@ Item {
                                root.checkForTriggerMode(true)
                                root.captureBtnEnable(false)
                                root.videoRecordBtnEnable(false)
-                               root.stopUpdatePreviewInTriggerMode()
                            }
                        }
                    }
@@ -250,7 +246,6 @@ Item {
                                root.checkForTriggerMode(true)
                                root.captureBtnEnable(false)
                                root.videoRecordBtnEnable(false)
-                               root.stopUpdatePreviewInTriggerMode()
                            }
                        }
                        Keys.onReturnPressed: {
@@ -264,7 +259,6 @@ Item {
                                root.checkForTriggerMode(true)
                                root.captureBtnEnable(false)
                                root.videoRecordBtnEnable(false)
-                               root.stopUpdatePreviewInTriggerMode()
                            }
                        }
                    }
@@ -856,7 +850,6 @@ Item {
                 root.videoRecordBtnEnable(false)
                 root.captureBtnEnable(false)
                 root.checkForTriggerMode(true)
-                root.stopUpdatePreviewInTriggerMode()
             }
         }
 
@@ -1003,13 +996,9 @@ Item {
     function setTriggerMode(){
         defaultValue.enabled = true
         see3cam27cug.setStreamMode(See3CAM_27CUG.TRIGGER)
-        root.stopUpdatePreviewInTriggerMode()
         root.checkForTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
-
-        //Clear last frame when device is in trigger mode
-        root.clearBufferInTriggerMode(true)
     }
 
     function setRgbMode(){
@@ -1117,7 +1106,6 @@ Item {
             root.checkForTriggerMode(true)
             root.captureBtnEnable(false)
             root.videoRecordBtnEnable(false)
-            root.stopUpdatePreviewInTriggerMode()
         }
 
         if(rgbMode.checked == true)

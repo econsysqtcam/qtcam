@@ -1557,7 +1557,6 @@ bool See3CAM_130D::getAutoFocusPosition(){
     // fill buffer values
     g_out_packet_buf[1] = CAMERA_CONTROL_130D; /* set camera control code */
     g_out_packet_buf[2] = GET_AF_POSITION; /* get auto focus position command */
-    uint afPos;
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == GET_FAIL) {
@@ -1565,9 +1564,7 @@ bool See3CAM_130D::getAutoFocusPosition(){
         } else if(g_in_packet_buf[0] == CAMERA_CONTROL_130D &&
             g_in_packet_buf[1] == GET_AF_POSITION &&
             g_in_packet_buf[6] == GET_SUCCESS) {
-
-            afPos = (g_in_packet_buf[2] << 8) | (g_in_packet_buf[3] << 0);
-            emit autoFocusPositionReceived(afPos);
+            emit autoFocusPositionReceived(g_in_packet_buf[2]);
             return true;
         }
     }

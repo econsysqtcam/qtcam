@@ -72,10 +72,10 @@ Item {
     property int gainMinVal: 0
     property int gainMaxVal: 24
 
-    property int minRoiXCoord: 0
+   /* property int minRoiXCoord: 0
     property int maxRoiXCoord: 255
     property int minRoiYCoord: 0
-    property int maxRoiYCoord: 255
+    property int maxRoiYCoord: 255*/
 
     property int blackLevelMin: 0
     property int blackLevelMax: 4095
@@ -208,15 +208,14 @@ Item {
                 vCropPos = y;
                 imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
             }
-            if(roiAutoExpManual.checked && roiAutoExpManual.enabled){
+            /*if(roiAutoExpManual.checked && roiAutoExpManual.enabled){
                 vidResW = width;
                 vidResH = height;
                 xCoord = x;
                 yCoord = y;
                 imx900USBCAM.setROIAutoExposure(IMX900USBCAM.AE_MANUAL_ROI, vidResW, vidResH, xCoord, yCoord, autoExpoWinSizeCombo.currentText)
 
-            }
-
+            }*/
         }
 
         //Signals getting values from UVC & set its values to the HID controls
@@ -260,7 +259,7 @@ Item {
                 disableFastAutoExp.opacity = 0.1
             }
 
-            if(width === 1024  && height === 768){
+            /*if(width === 1024  && height === 768){
                 autoExpHDR.enabled = true
                 outdoorHdr.enabled = true
                 indoorHdr.enabled  = true
@@ -275,7 +274,7 @@ Item {
                 autoExpHDR.opacity = 0.1
                 outdoorHdr.opacity = 0.1
                 indoorHdr.opacity  = 0.1
-            }
+            }*/
         }
 
         function onAutoExposureSelected(autoExposureSelect){
@@ -436,7 +435,8 @@ with the exposure configured in the exposure slider."
                     Layout.alignment: Qt.AlignCenter
                     opacity: 0.50196078431373
                     ToolButton{
-                        tooltip: "This control is used to vary gain value from 0dB to 24dB (analog
+                        tooltip: "Gain – Manual :
+This control is used to vary gain value from 0dB to 24dB (analog
 gain)"
                         width: 200
                         opacity: 0
@@ -568,6 +568,13 @@ gain)"
                     font.family: "Ubuntu"
                     color: "#ffffff"
                     smooth: true
+                    ToolButton{
+                        tooltip: "Gain – Manual :
+This control is used to vary gain value from 0dB to 24dB (analog
+gain)"
+                        width: 200
+                        opacity: 0
+                    }
                     //enabled: (manualGain.enabled && manualGain.checked) ? true : false
                     //opacity: (manualGain.enabled && manualGain.checked) ? 0.8 : 0.1
                 }
@@ -787,7 +794,7 @@ Auto gain function."
     This control enables user to set exposure in automatic mode"
                        activeFocusOnPress: true
                        onClicked: {
-                           if(!exposureContinious.checked && !exposureSingleShot.checked ){
+                           /*if(!exposureContinious.checked && !exposureSingleShot.checked ){
                                imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.CONTINIOUS_EXP, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                                exposureContinious.checked = true
                            }
@@ -796,11 +803,12 @@ Auto gain function."
                            }
                            else if(exposureSingleShot.checked == true) {
                                imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
-                           }
+                           }*/
+                           imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, 0, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                            root.sendExposureStatusToUVC(true, 0);
                        }
                        Keys.onReturnPressed: {
-                           if(!exposureContinious.checked && !exposureSingleShot.checked){
+                           /*if(!exposureContinious.checked && !exposureSingleShot.checked){
                                exposureContinious.checked = true
                                imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.CONTINIOUS_EXP, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                            }
@@ -809,7 +817,8 @@ Auto gain function."
                            }
                            else if(exposureSingleShot.checked == true) {
                                imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, IMX900USBCAM.SINGLE_EXP_TRIGGER, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
-                           }
+                           }*/
+                           imx900USBCAM.setExposureMode(IMX900USBCAM.AUTO_EXPOSURE, 0, expInSecondsTextField.text, expInMilliSecTextField.text, expInMicroSecTextField.text)
                            root.sendExposureStatusToUVC(true, 0);
                        }
                    }
@@ -834,7 +843,7 @@ Auto gain function."
                    }
                }
 
-                Text
+                /*Text
                 {
                     id: autoExpModeTitle
                     text: "Auto Exposure Features :"
@@ -931,7 +940,7 @@ until next request."
                             }
                         }
                     }
-                }
+                }*/
 
                 Text
                 {
@@ -943,6 +952,14 @@ until next request."
                     smooth: true
                     enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
                     opacity: (manualExposure.enabled && manualExposure.checked) ? 0.8 : 0.1
+                    ToolButton{
+                        tooltip: "Exposure – Manual:
+This control enables the user to manually enter the integration time of the
+sensor. For example, 15.6ms should be entered as 15ms and 600us."
+                        width: 15
+                        height: 20
+                        opacity: 0
+                    }
                 }
 
                 ColumnLayout{
@@ -964,7 +981,7 @@ until next request."
                             ToolButton{
                                 tooltip: "Exposure – Manual:
 This control enables the user to manually enter the integration time of the
-sensor. For example, 15.6ms should be entered as 15ms and 600ms."
+sensor. For example, 15.6ms should be entered as 15ms and 600us."
                                 width: 15
                                 height: 20
                                 opacity: 0
@@ -999,7 +1016,7 @@ sensor. For example, 15.6ms should be entered as 15ms and 600ms."
                             ToolButton{
                                 tooltip: "Exposure – Manual:
 This control enables the user to manually enter the integration time of the
-sensor. For example, 15.6ms should be entered as 15ms and 600ms."
+sensor. For example, 15.6ms should be entered as 15ms and 600us."
                                 width: 15
                                 height: 20
                                 opacity: 0
@@ -1031,7 +1048,7 @@ sensor. For example, 15.6ms should be entered as 15ms and 600ms."
                             ToolButton{
                                 tooltip: "Exposure – Manual:
 This control enables the user to manually enter the integration time of the
-sensor. For example, 15.6ms should be entered as 15ms and 600ms."
+sensor. For example, 15.6ms should be entered as 15ms and 600us."
                                 width: 15
                                 height: 20
                                 opacity: 0
@@ -1773,7 +1790,7 @@ brightness."
                     }
                 }
 
-                Text
+               /* Text
                 {
                     id: roiAutoExpMode
                     text: "--- Auto Exposure ROI ---"
@@ -1867,7 +1884,7 @@ clipped."
                     onCurrentIndexChanged: {
                             imx900USBCAM.setROIAutoExposure(IMX900USBCAM.AE_MANUAL_ROI, vidResW ,vidResH, xCoord, yCoord, autoExpoWinSizeCombo.currentText)
                     }
-                }
+                }*/
 
                 Text {
                     id: readStatistics
@@ -2104,7 +2121,7 @@ This control displays the current sensor temperature value in degrees Celsius."
                     }
                 }
 
-                Row{
+               /* Row{
                     Layout.alignment: Qt.AlignCenter
                     Text {
                         id: hdrMode
@@ -2164,8 +2181,7 @@ This control displays the current sensor temperature value in degrees Celsius."
                             imx900USBCAM.setHighDynamicRange(IMX900USBCAM.INDOOR_HDR)
                         }
                     }
-                }
-
+                }*/
                 /*Row{
                     Layout.alignment: Qt.AlignCenter
                     Text {
@@ -2227,8 +2243,8 @@ Refer Product datasheet before enabling this Quad Shutter Control feature."
                         smooth: true
                         opacity: 0.50196078431373
                         ToolButton{
-                            tooltip: "Before enabling fast auto exposure, switch to 2064x1552 Resolution.
-Refer Product datasheet before enabling this Fast Auto Exposure feature"
+                            tooltip: "Before enabling fast auto exposure, switch to 2064x1552 Resolution in either
+Y12 or Y8 format. Refer Product datasheet before enabling this Fast Auto Exposure feature"
                             width: 200
                             opacity: 0
                         }
@@ -2717,6 +2733,19 @@ Y8. Refer Product datasheet for more information."
                         implicitWidth: 80
                         validator: IntValidator {bottom: levelThresholdMin; top: levelThresholdMax}
                     }
+                    Text
+                    {
+                        id: levelThresholdText1Unit
+                        text: "Pixel Value"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        width: 70
+                        wrapMode: Text.WordWrap
+                        enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
+                        opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 1 : 0.1
+                    }
                 }
 
                 Text
@@ -2763,6 +2792,19 @@ Y8. Refer Product datasheet for more information."
                         implicitHeight: 25
                         implicitWidth: 80
                         validator: IntValidator {bottom: pixelMin; top: pixelMax}
+                    }
+                    Text
+                    {
+                        id: countThresholdText1Unit
+                        text: "Number of \nPixels"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        width: 70
+                        wrapMode: Text.WordWrap
+                        enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
+                        opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 1 : 0.1
                     }
                 }
 
@@ -2824,6 +2866,19 @@ Y8. Refer Product datasheet for more information."
                         implicitWidth: 80
                         validator: IntValidator {bottom: levelThresholdMin; top: levelThresholdMax}
                     }
+                    Text
+                    {
+                        id: levelThresholdText2Unit
+                        text: "Pixel value"
+                        font.pixelSize: 14
+                        font.family: "Ubuntu"
+                        color: "#ffffff"
+                        smooth: true
+                        width: 70
+                        wrapMode: Text.WordWrap
+                        enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
+                        opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 1 : 0.1
+                    }
                 }
 
 
@@ -2872,6 +2927,19 @@ Y8. Refer Product datasheet for more information."
                         implicitWidth: 80
                         validator: IntValidator {bottom: pixelMin; top: pixelMax}
                      }
+                     Text
+                     {
+                         id: countThresholdText2Unit
+                         text: "Number of\n Pixels"
+                         font.pixelSize: 14
+                         font.family: "Ubuntu"
+                         color: "#ffffff"
+                         smooth: true
+                         width: 70
+                         wrapMode: Text.WordWrap
+                         enabled: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? true : false
+                         opacity: (enableSelfTrigger.enabled && enableSelfTrigger.checked) ? 1 : 0.1
+                      }
                  }
 
                 /*Text
@@ -4019,14 +4087,14 @@ following power cycles."
      }
 
      onCurrentHDRStatus: {
-         if(hdr === IMX900USBCAM.AUTO_EXP_HDR){
+         /*if(hdr === IMX900USBCAM.AUTO_EXP_HDR){
              autoExpHDR.checked = true
          } else if(hdr === IMX900USBCAM.OUTDOOR_HDR){
              outdoorHdr.checked = true
          }
          else if (hdr === IMX900USBCAM.INDOOR_HDR){
              indoorHdr.checked = true
-         }
+         }*/
      }
 
      onCurrentQuadShutterControlStatus: {
@@ -4187,12 +4255,12 @@ following power cycles."
 
      }
      onRoiAutoExpModeValueReceived: {
-         if(roiMode === IMX900USBCAM.AE_FULL_ROI){
+         /*if(roiMode === IMX900USBCAM.AE_FULL_ROI){
              roiAutoExpFull.checked = true
          }else if(roiMode === IMX900USBCAM.AE_MANUAL_ROI){
              roiAutoExpManual.checked = true
          }
-         autoExpoWinSizeCombo.currentIndex = winSize - 1
+         autoExpoWinSizeCombo.currentIndex = winSize - 1*/
      }
    }
 
@@ -4566,7 +4634,7 @@ following power cycles."
     function currentExposureMode(mode, feature, seconds, milliSeconds, microSeconds) {
         if(mode === IMX900USBCAM.AUTO_EXPOSURE){
             autoExposure.checked   = true//Auto Exposure Features
-            if(feature === IMX900USBCAM.CONTINIOUS_EXP){
+            /*if(feature === IMX900USBCAM.CONTINIOUS_EXP){
                 exposureContinious.checked = true
                 exposureSingleShot.checked = false
                 expSingleShotBtnClicked    = false
@@ -4575,7 +4643,7 @@ following power cycles."
                 exposureSingleShot.checked = true
                 exposureContinious.checked = false
                 expSingleShotBtnClicked    = true
-            }
+            }*/
             root.sendExposureStatusToUVC(true, 0);
         }else if(mode === IMX900USBCAM.MANUAL_EXPOSURE){     
             manualExposure.checked = true
@@ -4665,19 +4733,17 @@ following power cycles."
         //imx900USBCAM.getBlackLevelAdjustment()
         imx900USBCAM.getBurstLength()
         imx900USBCAM.readStatistics()
+        imx900USBCAM.calculateTemperature()
 
-        imx900USBCAM.getHighDynamicRange()
+        //imx900USBCAM.getHighDynamicRange()
         //imx900USBCAM.getQuadShutterControl()
 
         imx900USBCAM.getFastAutoExposure()
 
         //imx900USBCAM.getDualTrigger()
         imx900USBCAM.getSelfTrigger()
-
-        readTempTextField.text = 0.0
-
         imx900USBCAM.getExposureCompensation()
-        imx900USBCAM.getAutoExpROIModeAndWindowSize()
+        //imx900USBCAM.getAutoExpROIModeAndWindowSize()
 
         //imx900USBCAM.getMultiFrameSet()
         //imx900USBCAM.getToneControl()
