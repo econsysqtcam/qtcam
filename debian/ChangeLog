@@ -1,4 +1,5 @@
-qtcam (26.0.38-0ubuntu1) xenial; urgency=medium
+qtcam (26.0.39-0ubuntu1) xenial; urgency=medium
+ *Bug fix - Enabled manual gain only when manual exposure is enabled. Preview in self-trigger on setting the values. Initially getting values  for Exposure Compensation, Statistics and Temperature in See3CAM_37CUG.
  *Removed some HID controls - HDR, Auto ROI and Auto exposure mode features in See3CAM_37CUG from UI and tooltip changes in  See3CAM_37CUG. Changed the autofocus position to 8-bit from 16-bit in See3CAM_130D. Bug fix- To set the last received frame in display on trigger mode in RGB window in See3CAM_27CUG.
  *Added and changed some HID controls in See3CAM_130D, See3CAM_37CUG and See3CAM_160.
  *Bug fix-Set actual fps to the file header on video recording.
@@ -206,4 +207,4 @@ qtcam (26.0.38-0ubuntu1) xenial; urgency=medium
   * Added ARM support.
   * Initial release.  
 
- -- econsysqtcam <qtcam@e-consystems.com> Mon Feb 03 15:14:27 2025 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Thurs Feb 05 18:04:27 2025 +0530
