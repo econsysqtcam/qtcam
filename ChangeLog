@@ -1,3 +1,7 @@
+Qtcam Application - 26.0.39
+---------------------------
+*Bug fix: Enabled manual gain only when manual exposure is enabled. Preview in self-trigger on setting the values. Initially getting values  for Exposure Compensation, Statistics and Temperature in See3CAM_37CUG.
+
 Qtcam Application - 26.0.38
 ---------------------------
 *Removed some HID controls : HDR, Auto ROI and Auto exposure mode features in See3CAM_37CUG from UI and tooltip changes in  See3CAM_37CUG.

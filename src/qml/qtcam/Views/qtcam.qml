@@ -1370,7 +1370,7 @@ Rectangle {
     function stopUpdatePreviewInTriggerMode(){
         isTriggerMode = true
         statusText = " Preview Resolution: "+ vidstreamproperty.width +"x"+vidstreamproperty.height + " " + stillSettingsRootObject.captureTime + " " + "Color Format: " + videoSettingsRootObject.videoColorComboText
-        vidstreamproperty.triggerModeEnabled()
+        //vidstreamproperty.triggerModeEnabled()
     }
 
     function startUpdatePreviewInMasterMode(){

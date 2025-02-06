@@ -154,6 +154,9 @@ Item {
         interval: 1000
         onTriggered: {
             imx900USBCAM.getExposureMode()
+            imx900USBCAM.calculateTemperature()
+            imx900USBCAM.getExposureCompensation()
+            imx900USBCAM.readStatistics()
             stop()
         }
     }
@@ -576,6 +579,8 @@ gain)"
                         width: 200
                         opacity: 0
                     }
+                    enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                    opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                     //enabled: (manualGain.enabled && manualGain.checked) ? true : false
                     //opacity: (manualGain.enabled && manualGain.checked) ? 0.8 : 0.1
                 }
@@ -590,6 +595,8 @@ gain)"
                         width: 150
                         stepSize: 1
                         style:econSliderStyle
+                        enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                        opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                         //enabled: (manualGain.enabled && manualGain.checked) ? true : false
                         //opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
                         onValueChanged:  {
@@ -609,6 +616,8 @@ gain)"
                         smooth: true
                         horizontalAlignment: TextInput.AlignHCenter
                         style: econTextFieldStyle
+                        enabled: (manualExposure.enabled && manualExposure.checked) ? true : false
+                        opacity: (manualExposure.enabled && manualExposure.checked) ? 1 : 0.1
                         //enabled: (manualGain.enabled && manualGain.checked) ? true : false
                         //opacity: (manualGain.enabled && manualGain.checked) ? 1 : 0.1
                         validator: IntValidator {bottom: gainSlider.minimumValue; top: gainSlider.maximumValue}
@@ -4153,6 +4162,7 @@ following power cycles."
              root.captureBtnEnable(false)
              root.videoRecordBtnEnable(false)
              root.checkForTriggerMode(true)
+             root.clearBufferInTriggerMode(true)
          } else if(mode === selfTrigDisable){
              disableSelfTrigger.checked = true
              root.captureBtnEnable(true)
@@ -4497,6 +4507,7 @@ following power cycles."
 
         root.stopUpdatePreviewInTriggerMode()
         root.checkForTriggerMode(true)
+        root.clearBufferInTriggerMode(true)
         root.captureBtnEnable(false)
         root.videoRecordBtnEnable(false)
     }
@@ -4701,9 +4712,6 @@ following power cycles."
         root.startUpdatePreviewInMasterMode()
         imx900USBCAM.setToDefaultValues()
         getValuesFromCamera()
-
-        //To send Exposure properties when set default is clicked
-        sendConvertedExpToUVC()
     }
 
     function getSerialNumber() {
@@ -4734,7 +4742,6 @@ following power cycles."
         imx900USBCAM.getAntiFlickerMode()
         //imx900USBCAM.getBlackLevelAdjustment()
         imx900USBCAM.getBurstLength()
-        imx900USBCAM.readStatistics()
 
        // imx900USBCAM.getHighDynamicRange()
         //imx900USBCAM.getQuadShutterControl()
@@ -4743,9 +4750,6 @@ following power cycles."
 
         //imx900USBCAM.getDualTrigger()
         imx900USBCAM.getSelfTrigger()
-        imx900USBCAM.calculateTemperature()
-
-        imx900USBCAM.getExposureCompensation()
         //imx900USBCAM.getAutoExpROIModeAndWindowSize()
 
         //imx900USBCAM.getMultiFrameSet()
