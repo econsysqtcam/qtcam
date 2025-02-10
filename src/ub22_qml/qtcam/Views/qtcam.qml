@@ -315,6 +315,8 @@ Rectangle {
     signal setFpsZeroOnTriggerMode();
     signal getFlipMode();
 
+    signal formatSwitched();
+
     width:Screen.width
     height:Screen.height
     focus: true
@@ -750,6 +752,10 @@ Rectangle {
             {
                 stopRecording = false
             }
+        }
+
+        onFormatChanged: {
+            formatSwitched();
         }
 
         /*

@@ -1,6 +1,7 @@
 Qtcam Application - 26.0.39
 ---------------------------
 *Bug fix: Enabled manual gain only when manual exposure is enabled. Preview in self-trigger on setting the values. Initially getting values  for Exposure Compensation, Statistics and Temperature in See3CAM_37CUG.
+*Set the range of target brigtness after format change, validation on self trigger and Get values for exposure compensation on resolution, format or fps change.
 
 Qtcam Application - 26.0.38
 ---------------------------

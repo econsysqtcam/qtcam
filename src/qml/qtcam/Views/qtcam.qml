@@ -315,6 +315,8 @@ Rectangle {
     signal setFpsZeroOnTriggerMode();
     signal getFlipMode();
 
+    signal formatSwitched();
+
     width:Screen.width
     height:Screen.height
     focus: true
@@ -501,6 +503,10 @@ Rectangle {
             previewBgrndArea.width = win_width * 0.85
             previewBgrndArea.height = win_height - statusBarRootObject.statusBarHeight+5
             setpreviewWindowSize();
+        }
+
+        onFormatChanged: {
+            formatSwitched();
         }
 
         onDeviceUnplugged: {

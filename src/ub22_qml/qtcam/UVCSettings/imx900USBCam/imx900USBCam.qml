@@ -163,8 +163,9 @@ Item {
 
     Timer {
         id: getCameraValuesTimer
-        interval: 2000
+        interval: 1000
         onTriggered: {
+            imx900USBCAM.getExposureCompensation()
             imx900USBCAM.getFastAutoExposure()
             imx900USBCAM.getSelfTrigger()
             stop()
@@ -209,7 +210,9 @@ Item {
                 vidResH = height;
                 hCropPos = x;
                 vCropPos = y;
-                imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+                if(imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value) === false){
+                    imx900USBCAM.getSelfTrigger()
+                }
             }
             /*if(roiAutoExpManual.checked && roiAutoExpManual.enabled){
                 vidResW = width;
@@ -287,6 +290,15 @@ Item {
             expInSecondsTextField.text  = seconds
             expInMilliSecTextField.text = milliSeconds
             expInMicroSecTextField.text = microSeconds
+        }
+
+        function onFormatSwitched(){
+            imx900USBCAM.getTargetBrightness()
+            getCameraValuesTimer.start()
+        }
+
+        function onPreviewFPSChanged() {
+            getCameraValuesTimer.start()
         }
 
     }
@@ -3176,11 +3188,15 @@ Y8. Refer Product datasheet for more information."
                         implicitWidth: 60
                         onClicked:
                         {
-                            imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+                            if(imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value) === false){
+                                imx900USBCAM.getSelfTrigger()
+                            }
                         }
                         Keys.onReturnPressed:
                         {
-                            imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+                            if(imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value) === false){
+                                imx900USBCAM.getSelfTrigger()
+                            }
                         }
                     }
                 }
