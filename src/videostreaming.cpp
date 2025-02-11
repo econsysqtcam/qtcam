@@ -1982,6 +1982,8 @@ void Videostreaming::capFrame()
                 err = 0;
                 if(formatType == "raw")
                 {
+                    m_renderer->updateStop = true;
+                    m_renderer->gotFrame = false;
                     void *inputBuffer = m_buffers[buf.index].start[0] ;
                     onY12Format = true;
                     uint8_t *pfmb = yuyvBuffer_Y12;
@@ -5053,6 +5055,9 @@ void Videostreaming::vidCapFormatChanged(QString idx)
 
     //to disable videoRecording for See3CAM_CU83 (4440x2160)
     emit emitResolution(m_width,m_height);
+
+    //to change the range of target brightness in IMX900 after format switch
+    emit formatChanged();
 }
 
 void Videostreaming::updateVidOutFormat()

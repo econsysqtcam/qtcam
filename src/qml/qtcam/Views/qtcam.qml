@@ -505,10 +505,6 @@ Rectangle {
             setpreviewWindowSize();
         }
 
-        onFormatChanged: {
-            formatSwitched();
-        }
-
         onDeviceUnplugged: {
             // Added by Sankari:12 Feb 2018 - Get the Pci bus info for selected camera
             keyEvent.stopGetKeyFromCamera()
@@ -756,6 +752,10 @@ Rectangle {
             {
                 stopRecording = false
             }
+        }   
+
+        onFormatChanged: {
+            formatSwitched();
         }
 
         /*

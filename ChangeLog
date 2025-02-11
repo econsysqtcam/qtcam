@@ -1,6 +1,7 @@
 Qtcam Application - 26.0.40
 ---------------------------
 *Set the range of target brigtness after format change, validation on self trigger and Get values for exposure compensation on resolution, format or fps change.
+*Bug fix - Green frame issue fixed while capturing image in Y12 format of resolution 2064x1552 with burstLength of 5.
 
 Qtcam Application - 26.0.39
 ---------------------------

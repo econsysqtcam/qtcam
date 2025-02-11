@@ -918,6 +918,8 @@ signals:
      void ecam83USBformatChanged(bool isH264);
      void update83USBstreamingState();
 
+     //To indicate on format changed
+     void formatChanged();
 };
 
 #endif // VIDEOSTREAMING_H
