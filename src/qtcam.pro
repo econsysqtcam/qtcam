@@ -33,6 +33,7 @@ QML_IMPORT_PATH =
 
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
+    ecam514_usb.cpp \
     logger.cpp \
     about.cpp \
     cameraproperty.cpp \
@@ -110,6 +111,7 @@ qtcAddDeployment()
 
 
 HEADERS += \
+    ecam514_usb.h \
     logger.h \
     about.h \
     cameraproperty.h \
@@ -311,6 +313,7 @@ contains(DEFINES, UBUNTU_22_04) {
         ub22_qml/qtcam/UVCSettings/see3camcu84/see3camcu84.qml \
         ub22_qml/qtcam/UVCSettings/see3camcu31/seecamcu31.qml \
         ub22_qml/qtcam/UVCSettings/imx900USBCam/imx900USBCam.qml \
+        ub22_qml/qtcam/UVCSettings/ecam514_USB/ecam514_usb.qml \
         ub22_qml/qtcam/UVCSettings/others/others.qml \
 }
 else:{
@@ -370,5 +373,6 @@ else:{
         qml/qtcam/UVCSettings/see3camcu31/seecamcu31.qml \
         qml/qtcam/UVCSettings/see3camcu200m/see3camcu200m.qml \
         qml/qtcam/UVCSettings/imx900USBCam/imx900USBCam.qml \
+        qml/qtcam/UVCSettings/ecam514_USB/ecam514_usb.qml \
         qml/qtcam/UVCSettings/others/others.qml \
 }

@@ -556,6 +556,7 @@ public slots:
     void setChannelCount(uint index);
     void setSampleRate(uint index);
     void stopUpdatePreview();
+    void clearIrShader();
     void doCaptureFrameTimeout();
     void stopFrameTimeoutTimer();
     void enableTimer(bool timerstatus);

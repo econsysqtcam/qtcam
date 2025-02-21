@@ -896,6 +896,9 @@ Rectangle {
             onCurrentIndexChanged: {
                 if(currentIndex.toString() != "-1" && currentIndex.toString() != "0") {
                     if(oldIndex!=currentIndex) {
+
+                        vidstreamproperty.stopUpdatePreview()
+                        vidstreamproperty.clearIrShader()
                         disableUVCSettings()
                         seqAni.restart
                         // when switching camera make "exposureAutoAvailable" as false
@@ -1321,6 +1324,7 @@ Rectangle {
     function updateStillPreview(str, format) {
         m_Snap = false
         stillPreview = true
+        vidstreamproperty.stopUpdatePreview()
         vidstreamproperty.stopCapture()
         vidstreamproperty.vidCapFormatChanged(format)
         vidstreamproperty.displayStillResolution()
@@ -1654,6 +1658,10 @@ Rectangle {
         else if(selectedDeviceEnumValue == CommonEnums.IMX900USBCAM) {
             see3cam = Qt.createComponent("../UVCSettings/imx900USBCam/imx900USBCam.qml").createObject(root)
         }
+        else if(selectedDeviceEnumValue === CommonEnums.ECAM514_USB){
+            see3cam = Qt.createComponent("../UVCSettings/ecam514_USB/ecam514_usb.qml").createObject(root)
+        }
+
         else {
             see3cam = Qt.createComponent("../UVCSettings/others/others.qml").createObject(root)
         }
@@ -1729,6 +1737,7 @@ Rectangle {
         case CommonEnums.SEE3CAM_CU31:   //Added By Sushanth.S
         case CommonEnums.IMX900USBCAM: //Added By Sushanth
         case CommonEnums.See3CAM_CU83_H03R1:  // Added By Geethalakshmi
+        case CommonEnums.ECAM514_USB: // Added by Geethalakshmi
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
             break;

@@ -270,6 +270,9 @@ signals:
      void flipModeValue(uint flipMode, uint flipEnableDisableMode);
      void autoWhiteBalanceReceived(uint autoWhiteBalance);
      void autoExposureReceived(uint autoExposure);
+
+     void afRectModeValue(uint afRectMode);
+
      void flashModeReceived(uint flashMode);
      void faceDetectModeValueReceived(uint faceDetectMode, uint faceDetectEmbedDataValue, uint faceDetectOverlayRect);
      void autoFocusPositionReceived(uint afPosition);
@@ -322,6 +325,7 @@ public slots:
     bool setQFactor(uint qFactor);
 
     bool enableDisableAFRectangle(bool enableRFRect);
+    bool getAFRectMode();
 
     bool getStreamMode();
     bool setStreamMode(STREAM_MODE streamMode);

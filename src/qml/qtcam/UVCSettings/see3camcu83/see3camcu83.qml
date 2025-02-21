@@ -132,15 +132,12 @@ Item{
             }
         }
         onVideoResolutionChanged:{
-            getexposureCompTimer.start()
             getCamValuesTimer.start()
         }
         onPreviewFPSChanged:{
-            getexposureCompTimer.start()
             getCamValuesTimer.start()
         }
         onVideoColorSpaceChanged:{
-            getexposureCompTimer.start()
             getCamValuesTimer.start()
         }
         onWakeOnMotionSettings:{

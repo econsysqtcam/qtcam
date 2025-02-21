@@ -17,12 +17,14 @@ class Helper : public QObject, public QQuickFramebufferObject::Renderer, public 
 public:
     Helper(QQuickItem *parent = NULL);
     void setImage(const uchar *data, int width, int height, int isCu83);
+    void setUpdateStop(bool updateStp);
     void shaderY8();
     void shaderUYVY();
     void clearBufAndShader();
     void clearShader();
     static int irWidth;
     static int irHeight;
+    static bool updateStop;
     static bool isFrameReceived;
     void render() override;
 
@@ -36,8 +38,7 @@ signals:
     void framesAvailable();
 
 private:
-
-    QOpenGLShaderProgram *mShaderProgram = nullptr;
+    static QOpenGLShaderProgram *mShaderProgram;
     static GLfloat vertices[];
     static unsigned short mIndicesData[];
     int mPositionLoc;

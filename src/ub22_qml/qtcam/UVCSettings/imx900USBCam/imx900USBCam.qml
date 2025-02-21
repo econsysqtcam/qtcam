@@ -4476,8 +4476,18 @@ following power cycles."
     function getCameraControls(mode){
         if(mode === IMX900USBCAM.MASTER){
             master.checked = true
+            root.startUpdatePreviewInMasterMode()
+            root.checkForTriggerMode(false)
+            root.videoRecordBtnEnable(true)
+            root.captureBtnEnable(true)
         } else if(mode === IMX900USBCAM.TRIGGER_EXP){
             triggerExposure.checked = true
+            root.stopUpdatePreviewInTriggerMode()
+            root.checkForTriggerMode(true)
+            root.clearBufferInTriggerMode(true)
+            root.captureBtnEnable(false)
+            root.videoRecordBtnEnable(false)
+
         } /*else if(mode === IMX900USBCAM.TRIGGER_ACQ){
             triggerAcquisition.checked = true
         } else if(mode === IMX900USBCAM.TRIGGER_SOFTWARE){
@@ -4505,11 +4515,13 @@ following power cycles."
 
     function disableSelfTriggerMode() {
         imx900USBCAM.setSelfTrigger(selfTrigDisable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+        if(!triggerExposure.checked){
+            root.startUpdatePreviewInMasterMode()
+            root.checkForTriggerMode(false)
+            root.videoRecordBtnEnable(true)
+            root.captureBtnEnable(true)
+        }
 
-        root.startUpdatePreviewInMasterMode()
-        root.checkForTriggerMode(false)
-        root.videoRecordBtnEnable(true)
-        root.captureBtnEnable(true)
     }
 
     function enableSelfTriggerMode() {
@@ -4526,8 +4538,17 @@ following power cycles."
 
     function setCameraControls(){
         if(master.checked == true){
+            root.startUpdatePreviewInMasterMode()
+            root.checkForTriggerMode(false)
+            root.videoRecordBtnEnable(true)
+            root.captureBtnEnable(true)
             imx900USBCAM.setCameraMode(IMX900USBCAM.MASTER)
         } else if(triggerExposure.checked == true){
+            root.stopUpdatePreviewInTriggerMode()
+            root.checkForTriggerMode(true)
+            root.clearBufferInTriggerMode(true)
+            root.captureBtnEnable(false)
+            root.videoRecordBtnEnable(false)
             imx900USBCAM.setCameraMode(IMX900USBCAM.TRIGGER_EXP)
         } /*else if(triggerAcquisition.checked == true) {
             imx900USBCAM.setCameraMode(IMX900USBCAM.TRIGGER_ACQ)

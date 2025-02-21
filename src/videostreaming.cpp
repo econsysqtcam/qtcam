@@ -542,6 +542,7 @@ skip:
  * @brief FrameRenderer::drawBufferFor360p - Rendering y,u,v textures individually since there is an aliasing effect in preview due to yuvtexture for 640x480 resolution alone.
  */
 void FrameRenderer::drawBufferFor360p(){
+    int skipFrames = frame;
     if (!m_programYUYV) {
         initializeOpenGLFunctions();
         m_programYUYV = new QOpenGLShaderProgram();
@@ -662,7 +663,15 @@ void FrameRenderer::drawBufferFor360p(){
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+            if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG )
+             {
+                if(skipFrameCount < skipFrames){
+                    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+                }
+             }
+            else{
+                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+            }
         }
     }
 skip:
@@ -779,6 +788,7 @@ skip:
  * @brief FrameRenderer::drawUYVYBUffer - draw uyvy buffer
  */
 void FrameRenderer::drawUYVYBUffer(){
+    int skipFrames = frame;
     m_shaderProgram->bind();
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
     glVertexAttribPointer(mTexCoordLoc, 2, GL_FLOAT, false, 8, mVerticesDataTextCord);
@@ -820,7 +830,7 @@ void FrameRenderer::drawUYVYBUffer(){
                     }
               }
         }
-        else if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG)
+        else if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG && skipFrameCount < skipFrames)
         {
             if(cameraMode == 1) //To render cameraMode 1 (IR-RGB)
             {
@@ -841,7 +851,14 @@ void FrameRenderer::drawUYVYBUffer(){
         }
 
         if(gotFrame && !updateStop ){
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+            if(currentlySelectedEnumValue == CommonEnums::SEE3CAM_27CUG){
+                if(skipFrameCount < skipFrames){
+                    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+                }
+            }
+            else{
+                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, mIndicesData);
+            }
         }
         renderyuyvMutex.unlock();
     }
@@ -1778,18 +1795,6 @@ void Videostreaming::capFrame()
         m_renderer->rawY10Format = false;
     }
 
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode){ //Added by M.VishnuMurali: For capturing trigger mode images.
-        m_renderer->gotFrame = false;
-        m_renderer->updateStop = true;
-        if(triggermode_skipframes)
-                    triggermode_skipframes--;
-        else
-            emit triggerShotCap();
-    } else if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG) && !trigger_mode && gotTriggerKey){ //Added By Sushanth : For Capturing master mode images using external trigger board
-        emit triggerShotCap();
-    } else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode){
-        m_renderer->gotFrame = true;
-    }
     if (again) {
         return;
     }
@@ -1920,6 +1925,7 @@ void Videostreaming::capFrame()
 
     if(!m_snapShot && !retrieveShot && !frameMjpeg){  // Checking for retrieveshot flag inorder to avoid, updating still frame to UI
         m_renderer->gotFrame = true;
+        helperObj.setUpdateStop(false);
     }
 
     if(m_snapShot || m_burstShot)
@@ -2396,11 +2402,6 @@ void Videostreaming::capFrame()
 
             if(m_burstNumber == m_burstLength)
             {
-                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode) //Added by M.Vishnu Murali:for 24CUG in trigger mode consider the preview settings while
-                {                                                                             //saving image.
-                    stillSize=lastPreviewSize;
-                    stillOutFormat = lastFormat;
-                }
 
                 //For the Cross Resolution Still Capture
                 if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
@@ -3551,6 +3552,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
     }
 
     m_renderer->gotFrame = true;
+    helperObj.setUpdateStop(false);
     m_renderer->render27CugMutex.unlock();
     return true;
 }
@@ -3586,6 +3588,8 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
         helperObj.setImage(inputBuffer, width, height, 0);
     }
     m_renderer->render27CugMutex.unlock();
+    m_renderer->gotFrame = true;
+    helperObj.setUpdateStop(false);
     return true;
 }
 
@@ -4275,9 +4279,6 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
     changeFpsAndShot = false;
     m_displayCaptureDialog = true;
 
-    if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG) && (trigger_mode  || (!trigger_mode && gotTriggerKey)))
-        return;
-
     //Added by Sushanth - Capturing frame only if the filePath is valid
     if(!validFilePath)
     {
@@ -4617,8 +4618,6 @@ void Videostreaming::displayFrame() {
         }
         return void();
     }
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && (trigger_mode  || (!trigger_mode && gotTriggerKey)))
-        triggerModeSkipframes();            //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when format changed in trigger mode.
 
     if (getInterval(interval))
         set_interval(buftype, interval);
@@ -4756,8 +4755,6 @@ void Videostreaming::stopCapture() {
         free(m_renderer->vBuffer);
         m_renderer->vBuffer = NULL;
     }
-    m_renderer->gotFrame = false;
-    m_renderer->updateStop = true;
     m_renderer->y16BayerFormat = false; // BY default this will be false, If cu40 [ y16 bayer format ] is selected ,
     //this will be enabled.
 
@@ -4938,10 +4935,7 @@ void Videostreaming::setResolution(QString resolution)
     m_height = height;
     try_fmt(fmt);
     s_fmt(fmt);
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && (trigger_mode  || (!trigger_mode && gotTriggerKey)))
-    {
-        triggerModeSkipframes();            //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when format changed in trigger mode.
-    }
+
     m_renderer->m_videoResolnChange = true;
     m_renderer->gotFrame = false;
     helperObj.clearBufAndShader();
@@ -5047,8 +5041,6 @@ void Videostreaming::vidCapFormatChanged(QString idx)
     fmt.fmt.pix.pixelformat = desc.pixelformat;
     try_fmt(fmt);
     s_fmt(fmt);
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && (trigger_mode  || (!trigger_mode && gotTriggerKey)))
-        triggerModeSkipframes();             //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when format changed in trigger mode.
     if(!makeSnapShot){
         updateVidOutFormat();
     }
@@ -5062,6 +5054,8 @@ void Videostreaming::vidCapFormatChanged(QString idx)
 
 void Videostreaming::updateVidOutFormat()
 {
+    m_renderer->m_formatChange = true;
+    m_renderer->gotFrame = false;
     v4l2_fmtdesc desc;
     v4l2_format fmt;
     g_fmt_cap(m_buftype, fmt);
@@ -5074,13 +5068,12 @@ void Videostreaming::updateVidOutFormat()
                 break;
         } while (enum_fmt_cap(desc, m_buftype));
     }
-    if (desc.pixelformat != fmt.fmt.pix.pixelformat)
+    if (desc.pixelformat != fmt.fmt.pix.pixelformat){
         return;
+    }
     emit defaultOutputFormat(desc.index);
     emit logDebugHandle("Color Space set to: "+pixfmt2s(m_pixelformat));
-    m_renderer->m_formatChange = true;
-    m_renderer->gotFrame = false;
-    helperObj.clearBufAndShader();
+
     m_renderer->m_pixelformat = m_pixelformat;
 }
 
@@ -5510,6 +5503,11 @@ void Videostreaming::doEncodeAudio(){
 
 void Videostreaming::stopUpdatePreview() {
     m_renderer->updateStop = true;
+    helperObj.setUpdateStop(true);
+}
+
+void Videostreaming::clearIrShader(){
+    helperObj.clearBufAndShader();
 }
 
 void Videostreaming::triggerModeSkipframes() {
@@ -5558,10 +5556,7 @@ void Videostreaming::irWindowCheckboxStatus(bool status)
 }
 
 void Videostreaming::triggerModeEnabled() {
-    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG)
-    {
-        triggerModeSkipframes();                //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when trigger mode is enabled.
-    }
+
     m_renderer->triggermodeFlag = true;
     trigger_mode = true;
 
@@ -5769,7 +5764,11 @@ void Videostreaming::enableStillTimeOutTimer()
 
 void Videostreaming::resolnSwitch()
 {
-    usleep(1000000);    // inorder to avoid ioctl block,while switching to higher resolutions
+    helperObj.setUpdateStop(true);
+
+    m_renderer->gotFrame = false;
+    m_renderer->updateStop = true;
+
     stopCapture();
 }
 

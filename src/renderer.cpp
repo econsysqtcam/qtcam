@@ -39,6 +39,9 @@ int Helper::irWidth = 0;
 int Helper::irHeight = 0;
 int Helper::isIrCu83 = 0;
 bool Helper::isFrameReceived = false;
+bool Helper::updateStop = false;
+QOpenGLShaderProgram *Helper::mShaderProgram = nullptr;
+
 
 void Helper::setImage(const uchar* image, int width, int height, int isCu83)
 {
@@ -60,6 +63,10 @@ void Helper::setImage(const uchar* image, int width, int height, int isCu83)
     }
 }
 
+void Helper::setUpdateStop(bool updateStp){
+    updateStop = updateStp;
+}
+
 void Helper::render()
 {
     if(irFrame != nullptr){
@@ -71,10 +78,10 @@ void Helper::render()
                 shaderUYVY();
             }
         }
-        if(isIrCu83 == 1){ // To render cu83 frames in fbo
+        if(isIrCu83 == 1 && !updateStop){ // To render cu83 frames in fbo
             renderY8();
         }
-        else if(isIrCu83 == 0){// To render 27cug frames in fbo
+        else if(isIrCu83 == 0  && !updateStop){// To render 27cug frames in fbo
             renderUYVY();
         }
     }

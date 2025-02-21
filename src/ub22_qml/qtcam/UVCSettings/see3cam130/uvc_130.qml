@@ -1892,6 +1892,14 @@ Item {
             messageDialog.text = _text.toString()
             messageDialog.open()
         }
+
+        onAfRectModeValue: {
+            if(afRectMode === See3Cam130.AF_RECT_DISABLE){
+                rectDisable.checked = true
+            } else if ( afRectMode === See3Cam130.AF_RECT_ENABLE){
+                rectEnable.checked = true
+            }
+        }
     }
 
     Component {
@@ -2215,6 +2223,7 @@ Item {
         seecam130.getRedGain()
         seecam130.getBlueGain()
         seecam130.getGreenGain()
+        seecam130.getAFRectMode()
 
         //To get preview in master mode
         root.startUpdatePreviewInMasterMode()
@@ -2436,6 +2445,7 @@ Item {
         seecam130.getRedGain()
         seecam130.getBlueGain()
         seecam130.getGreenGain()
+        seecam130.getAFRectMode()
 
         root.disablePowerLineFreq()   //Added by Navya-4th June 2019 - call to disable Power Line Frequency.
     }
