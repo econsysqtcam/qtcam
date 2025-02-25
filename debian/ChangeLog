@@ -1,6 +1,7 @@
 qtcam (27.0.0-0ubuntu1) focal; urgency=medium
  *Added hid controls for ecam514_usb camera.
- *Bug fix - Capture in trigger mode disables all the camera control settings in imx900, Auto focus rectangle not checked initially in see3cam_130, Crash issue in see3cam_27cug and see3cam_cu83 on switching resolutions and format in Ubuntu 20.04, Preview corruption issue in 24cug.
+ *Bug fix - Capture in trigger mode disables all the camera control settings in imx900, Auto focus rectangle not checked initially in see3cam_130, Crash issue in see3cam_27cug and see3cam_cu83 on switching resolutions and format in Ubuntu 20.04, Preview corruption issue in 24cug, Crash issue in see3cam_27cug and see3cam_cu83 while enabling and disabling of irWindow. Preventing frame corruption in cross-resolution still capture in IMX900.
+ *Radio button checked at disable for self-trigger and fast-auto exposure controls in imx900 when connected at USB 2.0.
  *Bug fix - Green frame issue fixed while capturing image in Y12 format of resolution 2064x1552 with burstLength of 5.
  *Set the range of target brigtness after format change, validation on self trigger and Get values for exposure compensation on resolution, format or fps change.
  *Bug fix - Enabled manual gain only when manual exposure is enabled. Preview in self-trigger on setting the values. Initially getting values  for Exposure Compensation, Statistics and Temperature in See3CAM_37CUG. 
@@ -175,5 +176,5 @@ qtcam (27.0.0-0ubuntu1) focal; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Fri Feb 21 12:38:15 2025 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Tue Feb 25 16:38:15 2025 +0530
 
