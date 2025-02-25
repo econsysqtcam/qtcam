@@ -1923,6 +1923,11 @@ Rectangle {
     function camModeEnabled(Mode)
     {
         cameraMode = Mode
+        if(Mode === 2 || Mode === 3){
+            vidstreamproperty.stopUpdatePreview()
+            vidstreamproperty.clearIrShader()
+        }
+
         vidstreamproperty.cameraModeEnabled(cameraMode)
     }
 
@@ -1944,6 +1949,8 @@ Rectangle {
     //function to create & destroy IR window via CheckBox
     function closeIrWindow()
     {
+        vidstreamproperty.stopUpdatePreview()
+        vidstreamproperty.clearIrShader()
         destroyIrWindow();
     }
 
@@ -2132,6 +2139,7 @@ Rectangle {
     //for taking snap shot
     function imageCapture(shotType)
     {
+        vidstreamproperty.stopUpdatePreview()
         seqAni.stop()
         vidstreamproperty.setFpsOnCheckingFormat(stillSettingsRootObject.stillClorComboValue)
         vidstreamproperty.setStillVideoSize(stillSettingsRootObject.stillOutputTextValue, stillSettingsRootObject.stillColorComboIndexValue)

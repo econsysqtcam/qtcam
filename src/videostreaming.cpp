@@ -1923,7 +1923,7 @@ void Videostreaming::capFrame()
         return;
     }
 
-    if(!m_snapShot && !retrieveShot && !frameMjpeg){  // Checking for retrieveshot flag inorder to avoid, updating still frame to UI
+    if(!m_snapShot && !retrieveShot && !frameMjpeg && !m_burstShot){  // Checking for retrieveshot flag inorder to avoid, updating still frame to UI
         m_renderer->gotFrame = true;
         helperObj.setUpdateStop(false);
     }
@@ -4504,6 +4504,8 @@ bool Videostreaming::check_jpeg_header(void *inputbuffer, __u32 bytesUsed)
 
 void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint burstLength)
 {
+
+    m_renderer->updateStop = true;
     captureTime.start();
     m_burstShot = true;
     m_snapShot = false;
@@ -4527,7 +4529,6 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
     triggerShot = false;
     m_displayCaptureDialog = true;
     m_saveImage = true;
-    m_renderer->updateStop = true;
 
     //Added by Sushanth - Capturing frame only if the filePath is valid
     if(!validFilePath)

@@ -235,7 +235,8 @@ Item {
             expInMicroSecTextField.text = microSeconds
         }
 
-        function onVideoResolutionChanged(){
+        function onVideoResolutionChanged(){           
+            imx900USBCAM.getTargetBrightness()
             getCameraValuesTimer.start()
         }
         function onSkipFrameCount(){
@@ -2280,11 +2281,16 @@ Y12 or Y8 format. Refer Product datasheet before enabling this Fast Auto Exposur
                         exclusiveGroup: fastAutoModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            imx900USBCAM.setFastAutoExposure(enable)
+                            if(imx900USBCAM.setFastAutoExposure(enable) === false){
+                                imx900USBCAM.getFastAutoExposure()
+                            }
+
                             imx900USBCAM.getSelfTrigger()
                         }
                         Keys.onReturnPressed:  {
-                            imx900USBCAM.setFastAutoExposure(enable)
+                            if(imx900USBCAM.setFastAutoExposure(enable) === false){
+                                imx900USBCAM.getFastAutoExposure()
+                            }
                             imx900USBCAM.getSelfTrigger()
                         }
                     }
@@ -2295,10 +2301,14 @@ Y12 or Y8 format. Refer Product datasheet before enabling this Fast Auto Exposur
                         exclusiveGroup: fastAutoModeGroup
                         activeFocusOnPress: true
                         onClicked: {
-                            imx900USBCAM.setFastAutoExposure(disable)
+                            if(imx900USBCAM.setFastAutoExposure(disable) === false){
+                                imx900USBCAM.getFastAutoExposure()
+                            }
                         }
                         Keys.onReturnPressed: {
-                            imx900USBCAM.setFastAutoExposure(disable)
+                            if(imx900USBCAM.setFastAutoExposure(disable) === false){
+                                imx900USBCAM.getFastAutoExposure()
+                            }
                         }
                     }
                 }
@@ -4514,7 +4524,10 @@ following power cycles."
     }
 
     function disableSelfTriggerMode() {
-        imx900USBCAM.setSelfTrigger(selfTrigDisable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
+        if(imx900USBCAM.setSelfTrigger(selfTrigDisable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value) === false){
+            imx900USBCAM.getSelfTrigger()
+        }
+
         if(!triggerExposure.checked){
             root.startUpdatePreviewInMasterMode()
             root.checkForTriggerMode(false)
@@ -4525,8 +4538,10 @@ following power cycles."
     }
 
     function enableSelfTriggerMode() {
-        imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value)
-        //imx900USBCAM.getSelfTrigger()
+        if(imx900USBCAM.setSelfTrigger(selfTrigEnable, vidResW ,vidResH ,hCropPos ,vCropPos, hCroppingSizeSlider.value, vCroppingSizeSlider.value, 0, hSideTextField.text, lSideTextField.text, hSideCountTextField.text, lSideCountTextField.text, 0, 0, 0, 0, gainSlider1.value, gainSlider2.value) === false){
+            imx900USBCAM.getSelfTrigger()
+        }
+
         imx900USBCAM.getFastAutoExposure()
 
         root.stopUpdatePreviewInTriggerMode()
@@ -4783,6 +4798,7 @@ following power cycles."
 
         //imx900USBCAM.getDualTrigger()
         imx900USBCAM.getSelfTrigger()
+
         //imx900USBCAM.getAutoExpROIModeAndWindowSize()
 
         //imx900USBCAM.getMultiFrameSet()

@@ -1357,6 +1357,7 @@ bool IMX900USBCAM::setFastAutoExposure(uint status)
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6] == SET_FAIL) {
+            emit indicateCommandStatus("Failure","Set Fast Auto Exposure Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
                   g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
@@ -1912,7 +1913,7 @@ bool IMX900USBCAM::setSelfTrigger(uint mode, uint vidResolnWidth, uint vidResoln
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[58] == SET_FAIL) {
-            emit indicateFailureStatus("Failure","Set Self Trigger Properties Failed. Retry!");
+            emit indicateCommandStatus("Failure","Set Self Trigger Properties Failed. Retry!");
             return false;
         } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
             g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
