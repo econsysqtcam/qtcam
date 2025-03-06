@@ -1,4 +1,5 @@
-qtcam (27.0.0-0ubuntu1) xenial; urgency=medium
+qtcam (27.0.1-0ubuntu1) xenial; urgency=medium
+ *Added FAE target brightness and FAE execution frame control for see3cam_37cugm.
  *Added hid controls for ecam514_usb camera.
  *Bug fix - Capture in trigger mode disables all the camera control settings in imx900, Auto focus rectangle not checked initially in see3cam_130, Crash issue in see3cam_27cug and see3cam_cu83 on switching resolutions and format in Ubuntu 20.04, Preview corruption issue in 24cug , Crash issue in see3cam_27cug and see3cam_cu83 while enabling and disabling of irWindow. Preventing frame corruption in cross-resolution still capture in IMX900.
  *Radio button checked at disable for self-trigger and fast-auto exposure controls in imx900 when connected at USB 2.0.
@@ -212,4 +213,4 @@ qtcam (27.0.0-0ubuntu1) xenial; urgency=medium
   * Added ARM support.
   * Initial release.  
 
- -- econsysqtcam <qtcam@e-consystems.com> Tue Feb 25 16:40:27 2025 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Thu Mar 6 16:40:27 2025 +0530
