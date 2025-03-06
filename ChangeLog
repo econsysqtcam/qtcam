@@ -1,3 +1,7 @@
+Qtcam Application - 27.0.1
+---------------------------
+*Added FAE target brightness and FAE execution frame control for see3cam_37cugm.
+
 Qtcam Application - 27.0.0
 ---------------------------
 *Added hid controls for ecam514_usb camera.

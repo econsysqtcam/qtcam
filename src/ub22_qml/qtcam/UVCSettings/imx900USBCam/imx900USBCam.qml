@@ -237,6 +237,7 @@ Item {
 
         function onVideoResolutionChanged(){           
             imx900USBCAM.getTargetBrightness()
+            imx900USBCAM.getFAETargetBrightness()
             getCameraValuesTimer.start()
         }
         function onSkipFrameCount(){
@@ -295,6 +296,7 @@ Item {
 
         function onFormatSwitched(){
             imx900USBCAM.getTargetBrightness()
+            imx900USBCAM.getFAETargetBrightness()
             getCameraValuesTimer.start()
         }
 
@@ -2283,6 +2285,9 @@ Y12 or Y8 format. Refer Product datasheet before enabling this Fast Auto Exposur
                         onClicked: {
                             if(imx900USBCAM.setFastAutoExposure(enable) === false){
                                 imx900USBCAM.getFastAutoExposure()
+                            }else{
+                                imx900USBCAM.getFAEExecutionFrames()
+                                imx900USBCAM.getFAETargetBrightness()
                             }
 
                             imx900USBCAM.getSelfTrigger()
@@ -2290,6 +2295,9 @@ Y12 or Y8 format. Refer Product datasheet before enabling this Fast Auto Exposur
                         Keys.onReturnPressed:  {
                             if(imx900USBCAM.setFastAutoExposure(enable) === false){
                                 imx900USBCAM.getFastAutoExposure()
+                            }else{
+                                imx900USBCAM.getFAEExecutionFrames()
+                                imx900USBCAM.getFAETargetBrightness()
                             }
                             imx900USBCAM.getSelfTrigger()
                         }
@@ -2310,6 +2318,100 @@ Y12 or Y8 format. Refer Product datasheet before enabling this Fast Auto Exposur
                                 imx900USBCAM.getFastAutoExposure()
                             }
                         }
+                    }
+                }
+
+                Text
+                {
+                    id: faeTargetBrightnessTxt
+                    text: "FAE Target Brightness :"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    enabled: (enableFastAutoExp.enabled && enableFastAutoExp.checked) ? true : false
+                    opacity: (enableFastAutoExp.enabled && enableFastAutoExp.checked) ? 0.8 : 0.1
+                    ToolButton{
+                        tooltip: "FAE Target brightness control, enables the user to set the target brightness
+value of Fast Auto Exposure mode"
+                        width: 200
+                        opacity: 0
+                    }
+                }
+
+                Row
+                {
+                    spacing: 35
+                    Slider
+                    {
+                        id: faeTargetBrightnessSlider
+                        activeFocusOnPress: true
+                        updateValueWhileDragging: false
+                        width: 150
+                        style:econSliderStyle
+                        enabled: (enableFastAutoExp.enabled && enableFastAutoExp.checked) ? true : false
+                        opacity: (enableFastAutoExp.enabled && enableFastAutoExp.checked) ? 1 : 0.1
+                        onValueChanged:  {
+                            faeTargetBrightnessTxtField.text = faeTargetBrightnessSlider.value
+                            imx900USBCAM.setFAETargetBrightness(faeTargetBrightnessSlider.value)
+                        }
+                    }
+                    TextField
+                    {
+                        id: faeTargetBrightnessTxtField
+                        text: faeTargetBrightnessSlider.value
+                        font.pixelSize: 10
+                        font.family: "Ubuntu"
+                        smooth: true
+                        horizontalAlignment: TextInput.AlignHCenter
+                        style: econTextFieldStyle
+                        enabled: (enableFastAutoExp.enabled && enableFastAutoExp.checked) ? true : false
+                        opacity: (enableFastAutoExp.enabled && enableFastAutoExp.checked) ? 1 : 0.1
+                        validator: IntValidator {bottom: faeTargetBrightnessSlider.minimumValue; top: faeTargetBrightnessSlider.maximumValue}
+                        onTextChanged: {
+                            if(text.length > 0){
+                                faeTargetBrightnessSlider.value = faeTargetBrightnessTxtField.text
+                            }
+                        }
+                    }
+                }
+
+                Text
+                {
+                    id: faeExecutionFrameTxt
+                    text: "FAE Execution Frames :"
+                    font.pixelSize: 14
+                    font.family: "Ubuntu"
+                    color: "#ffffff"
+                    smooth: true
+                    enabled: (enableFastAutoExp.enabled && enableFastAutoExp.checked) ? true : false
+                    opacity: (enableFastAutoExp.enabled && enableFastAutoExp.checked) ? 0.8 : 0.1
+                    ToolButton{
+                        tooltip: "User can select the Number of V/10 frame/s which must be taken into
+account for Auto Exposure Execution."
+                        width: 200
+                        opacity: 0
+                    }
+                }
+
+                ComboBox
+                {
+                    id: faeExecutionFrameCombo
+                    enabled: (enableFastAutoExp.enabled && enableFastAutoExp.checked) ? true : false
+                    opacity: (enableFastAutoExp.enabled && enableFastAutoExp.checked) ? 0.8 : 0.1
+                    model: ListModel
+                           {
+                                ListElement { text: "1" }
+                                ListElement { text: "2" }
+                                ListElement { text: "3" }
+                                ListElement { text: "4" }
+                                ListElement { text: "5" }
+                                ListElement { text: "6" }
+                            }
+                    activeFocusOnPress: true
+                    style: econComboBoxStyle
+                    onCurrentIndexChanged: {
+                            imx900USBCAM.setFAEExecutionFrames(faeExecutionFrameCombo.currentText)
                     }
                 }
 
@@ -4141,9 +4243,22 @@ following power cycles."
      onCurrentFastAutoExposureStatus: {
          if(status === enable){
              enableFastAutoExp.checked = true
+             imx900USBCAM.getFAEExecutionFrames()
+             imx900USBCAM.getFAETargetBrightness()
          } else if(status === disable){
              disableFastAutoExp.checked = true
          }
+     }
+
+     onCurrentFaeExecutionFrame: {
+        faeExecutionFrameCombo.currentIndex = value- 1
+     }
+
+     onCurrentFaeTargetBrightness: {
+         faeTargetBrightnessSlider.minimumValue = min
+         faeTargetBrightnessSlider.maximumValue = max
+         faeTargetBrightnessSlider.stepSize = step
+         faeTargetBrightnessSlider.value = faeTargetBrightness
      }
 
      onCurrentToneControlStatus: {

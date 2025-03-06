@@ -78,6 +78,12 @@
 #define GET_AUTO_EXPOSURE_ROI               0x15
 #define SET_AUTO_EXPOSURE_ROI               0x16
 
+#define GET_FAE_TARGET_BRIGHTNESS           0x2C
+#define SET_FAE_TARGET_BRIGHTNESS           0x2D
+
+#define GET_FAE_EXECUTION_FRAME              0x2E
+#define SET_FAE_EXECUTION_FRAME              0x2F
+
 #define SET_TO_DEFAULT_IMX900               0xFF
 
 #define ISP_FIRMWARE_VERSION_IMX900USBCAM   0x2B
@@ -225,6 +231,8 @@ signals:
     void currentDetectedPixels(uint hPixels, uint vPixels);
     void currentGainForSensingFrame(uint min, uint max, uint step, uint gain);
     void currentGainForCapturingFrame(uint min, uint max, uint step, uint gain);
+    void currentFaeTargetBrightness(uint faeTargetBrightness, uint min, uint max, uint step);
+    void currentFaeExecutionFrame(uint value);
 
     void indicateFailureStatus(QString title, QString text);
     void indicateCommandStatus(QString title, QString text);
@@ -305,6 +313,12 @@ public slots:
 
     bool getSelfTrigger();
     bool setSelfTrigger(uint mode, uint vidResolnWidth, uint vidResolnHeight, uint hCropPos, uint vCropPos, uint hCropSize, uint vCropSize, uint exposure, uint hLevel, uint lLevel, uint hCount, uint lCount, uint sensingMode, uint forceMode, uint hDetPixels, uint vDetPixels, uint sensingGain, uint capturingGain);
+
+    bool getFAETargetBrightness();
+    bool setFAETargetBrightness(uint faeTargetBrightness);
+
+    bool getFAEExecutionFrames();
+    bool setFAEExecutionFrames(uint value);
 
     bool setToDefaultValues();
 

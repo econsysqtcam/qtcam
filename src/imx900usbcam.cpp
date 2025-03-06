@@ -1919,13 +1919,161 @@ bool IMX900USBCAM::setSelfTrigger(uint mode, uint vidResolnWidth, uint vidResoln
             g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
             g_in_packet_buf[2] == SET_SELF_TRIGGER_IMX900 &&
             g_in_packet_buf[58] == SET_SUCCESS) {
-
             return true;
         }
     }
     return false;
 }
 
+
+/**
+ * @brief IMX900USBCAM::getFAETargetBrightness - To Get FAE Target Brightness value from the camera
+ * @return - true/false
+ */
+bool IMX900USBCAM::getFAETargetBrightness(){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_ID_1_IMX900;
+    g_out_packet_buf[2] = CAMERA_ID_2_IMX900;
+    g_out_packet_buf[3] = GET_FAE_TARGET_BRIGHTNESS;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[10] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
+            g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
+            g_in_packet_buf[2] == GET_FAE_TARGET_BRIGHTNESS &&
+            g_in_packet_buf[10] == GET_SUCCESS) {
+            uint faeTargetBrightness,min, max;
+            faeTargetBrightness =  (g_in_packet_buf[3] << 8) | (g_in_packet_buf[4] << 0);
+            min = (g_in_packet_buf[5] << 8) | (g_in_packet_buf[6] << 0);
+            max  = (g_in_packet_buf[7] << 8) | (g_in_packet_buf[8] << 0);
+            emit currentFaeTargetBrightness(faeTargetBrightness, min, max, g_in_packet_buf[9]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief IMX900USBCAM::setFAETargetBrightness - To Set FAE Target Brightness to the camera
+ * @return true/false
+ */
+bool IMX900USBCAM::setFAETargetBrightness(uint faeTargetBrightness){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_ID_1_IMX900;
+    g_out_packet_buf[2] = CAMERA_ID_2_IMX900;
+    g_out_packet_buf[3] = SET_FAE_TARGET_BRIGHTNESS;
+    g_out_packet_buf[4] = ((faeTargetBrightness & 0xFF00) >> 8);
+    g_out_packet_buf[5] = ((faeTargetBrightness & 0x00FF) >> 0);
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[10] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
+                  g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
+                  g_in_packet_buf[2] == SET_FAE_TARGET_BRIGHTNESS  &&
+                  g_in_packet_buf[10] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief IMX900USBCAM::getFAEExecutionFrames - To Get FAE Execution Frames from the camera
+ * @return - true/false
+ */
+bool IMX900USBCAM::getFAEExecutionFrames(){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_ID_1_IMX900;
+    g_out_packet_buf[2] = CAMERA_ID_2_IMX900;
+    g_out_packet_buf[3] = GET_FAE_EXECUTION_FRAME;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == GET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
+            g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
+            g_in_packet_buf[2] == GET_FAE_EXECUTION_FRAME &&
+            g_in_packet_buf[6] == GET_SUCCESS) {
+            emit currentFaeExecutionFrame(g_in_packet_buf[3]);
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief IMX900USBCAM::setFAEExecutionFrames - To Set FAE Execution frame value to the camera
+ * @return true/false
+ */
+bool IMX900USBCAM::setFAEExecutionFrames(uint value){
+
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_ID_1_IMX900;
+    g_out_packet_buf[2] = CAMERA_ID_2_IMX900;
+    g_out_packet_buf[3] = SET_FAE_EXECUTION_FRAME;
+    g_out_packet_buf[4] = value;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[6] == SET_FAIL) {
+            return false;
+        } else if(g_in_packet_buf[0] == CAMERA_ID_1_IMX900 &&
+                  g_in_packet_buf[1] == CAMERA_ID_2_IMX900 &&
+                  g_in_packet_buf[2] == SET_FAE_EXECUTION_FRAME  &&
+                  g_in_packet_buf[6] == SET_SUCCESS) {
+            return true;
+        }
+    }
+    return false;
+
+}
 
 
 /**
