@@ -76,6 +76,8 @@
 #define GET_EMBEDDED_DATA_SEE3CAM_CU31           0x24
 #define SET_EMBEDDED_DATA_SEE3CAM_CU31           0x25
 
+#define GET_UVC_CONTROL_VALUE_SEE3CAM_CU31       0x26
+
 #define ISP_FIRMWARE_VERSION_SEE3CAM_CU31        0x45
 
 
@@ -152,7 +154,8 @@ public:
 
     enum PRESET_BUTTON{
         PRESET_SAVE   = 0x01,
-        PRESET_SELECT = 0x00
+        PRESET_SELECT = 0x00,
+        PRESET_DEFAULT = 0x02
     };Q_ENUMS(PRESET_BUTTON)
 
 signals:
@@ -180,6 +183,8 @@ signals:
 
     void currentPresetProperties(uint presetMode, uint presetType);
     void currentEmbedDataStatus(uint status);
+
+    void currentUVCControlValues(int brightness, uint contrast, uint saturation, uint sharpness, uint gain, uint exp_mode, uint exp_time);
 
     void indicateWindowDimensionError(uint minWidth, uint maxWidth, uint minHeight, uint maxHeight, uint minXStart, uint maxXStart, uint minYStart, uint maxYStart);
     void indicateMaskDimensionError(uint minWidth, uint maxWidth, uint minHeight, uint maxHeight, uint minXStart, uint maxXStart, uint minYStart, uint maxYStart);
@@ -248,6 +253,8 @@ public slots:
     bool getPresetMode();
     bool setPresetMode(PRESET_MODE mode, PRESET_BUTTON button);
 
+    bool getUVCControls();
+
     bool setPropertiesForCrossStill();
 
     bool setToDefaultValues();
@@ -255,6 +262,7 @@ public slots:
     bool get64BitSerialNumber();
 
     bool readISPFirmwareVersion();
+    int uint8bitToIntValue(uint brightness);
 
 };
 

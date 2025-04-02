@@ -52,6 +52,8 @@ Rectangle {
     signal captureFrameTimeout();
     signal autoFocusSelected(bool autoFocusSelect)
     signal autoExposureSelected(bool autoExposureSelect)
+    signal uiUpdate(var brightness, var contrast, var saturation, var sharpness, var gain, var exp_mode, var exp_time)
+
 
     // Added by Sankari : Mar 7 - disable audio settings
     signal disableAudioSettings(bool disableSettings)
@@ -1215,6 +1217,10 @@ Rectangle {
         {
             vidstreamproperty.openMessageDialogBox()
         }
+    }
+
+    function changeUVCValues(brightness, contrast, saturation, sharpness, gain, exp_mode, exp_time){
+        uiUpdate(brightness, contrast, saturation, sharpness, gain, exp_mode, exp_time);
     }
 
     function read83USBstreamingState(){

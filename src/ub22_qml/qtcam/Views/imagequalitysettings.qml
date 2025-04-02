@@ -271,7 +271,6 @@ Item {
                             if(contrastValueChangeProperty) {
                                 //Sending UVC value to HID
                                 root.getContrast(contrast_Slider.value)
-
                                 root.changeCameraSettings(contrastControlId,value.toString())
                             }
                         }
@@ -1381,6 +1380,16 @@ Item {
 
             //To store the Enable/Disable status of color temperature
             colorTempEnabled = isColorTempEnabled
+        }
+        function onUiUpdate(brightness, contrast, saturation, sharpness, gain, exp_mode, exp_time){
+            brightness_Slider.value = brightness;
+            contrast_Slider.value = contrast;
+            sharpness_Slider.value = sharpness;
+            saturation_Slider.value = saturation;
+            gain_Slider.value = gain;
+            exposure_Slider.value = exp_time;
+            exposureCombo.currentIndex = exp_mode;
+
         }
     }
 

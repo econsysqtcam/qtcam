@@ -1565,6 +1565,60 @@ bool SEE3CAM_CU31::setPresetMode(PRESET_MODE mode, PRESET_BUTTON button)
     return false;
 }
 
+/**
+ * @brief SEE3CAM_CU31::getUVCControls - To get UVC Control values from the camera
+ * @return true/false
+ */
+bool SEE3CAM_CU31::getUVCControls()
+{
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    // fill buffer values
+    g_out_packet_buf[1] = CAMERA_CONTROL_ID_1;
+    g_out_packet_buf[2] = CAMERA_CONTROL_ID_2;
+    g_out_packet_buf[3] = GET_UVC_CONTROL_VALUE_SEE3CAM_CU31;
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
+        if (g_in_packet_buf[63] == GET_FAIL){
+            emit indicateFailureStatus("Failure","Get UVC Control Values Failed. Retry!");
+            return false;
+        }
+        else if((g_in_packet_buf[0] == CAMERA_CONTROL_ID_1) &&
+            (g_in_packet_buf[1] == CAMERA_CONTROL_ID_2) &&
+            (g_in_packet_buf[2] == GET_UVC_CONTROL_VALUE_SEE3CAM_CU31) &&
+            (g_in_packet_buf[63] == GET_SUCCESS)){
+            uint brightness = (g_in_packet_buf[3] << 8) | g_in_packet_buf[4];
+            uint contrast   = (g_in_packet_buf[5] << 8) | g_in_packet_buf[6];
+            uint saturation  = (g_in_packet_buf[7] << 8) | g_in_packet_buf[8];
+            uint sharpness = (g_in_packet_buf[9] << 8) | g_in_packet_buf[10];
+            uint gain = (g_in_packet_buf[11] << 8) | g_in_packet_buf[12];
+            uint exp_mode =(g_in_packet_buf[13] << 8) | g_in_packet_buf[14];
+            uint exp_time = (g_in_packet_buf[15] << 8) | g_in_packet_buf[16];
+            int brightnessVal = uint8bitToIntValue(brightness);
+            emit currentUVCControlValues(brightnessVal, contrast, saturation, sharpness, gain, exp_mode, exp_time);
+            return true;
+        }
+    }
+    return false;
+}
+
+int SEE3CAM_CU31::uint8bitToIntValue(uint brightness){
+    int  brightnessVal;
+    if (brightness > 32767) {
+        brightnessVal = brightness - 65536; // Convert to signed by subtracting 65536 if greater than 32767
+        return brightnessVal;
+    }
+    return brightness;
+}
+
 
 /**
  * @brief SEE3CAM_CU31::getEmbeddedData - To get Embedded data from the camera

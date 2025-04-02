@@ -975,10 +975,10 @@ Mask State – Change the state of the AE mask for the selected mask ID.
 
 Disable – When selected, no AE masking will be applied to the preview."
                         onClicked: {
-                            see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, disable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+                            //see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, disable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
                         }
                         Keys.onReturnPressed:  {
-                            see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, disable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+                            //see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, disable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
                         }
                     }
                     RadioButton {
@@ -997,10 +997,10 @@ Mask State – Change the state of the AE mask for the selected mask ID.
 Enable – When selected, AE masking will be applied to the preview, excluding that region
 from calculation of AE evaluation value."
                         onClicked: {
-                            see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, enable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+                            //see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, enable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
                         }
                         Keys.onReturnPressed: {
-                            see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, enable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+                            //see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, enable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
                         }
                     }
                 }
@@ -1579,10 +1579,10 @@ Mask State - Change the state of the AWB mask for the selected mask ID.
 
 Disable – When selected, no AWB masking will be applied to the preview."
                         onClicked: {
-                            see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, disable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+                            //see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, disable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
                         }
                         Keys.onReturnPressed:  {
-                            see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, disable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+                            //see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, disable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
                         }
                     }
                     RadioButton {
@@ -1599,10 +1599,10 @@ Mask State - Change the state of the AWB mask for the selected mask ID.
 Enable – When selected, AWB masking will be applied to the preview, excluding that
 region from calculation of white balance value."
                         onClicked: {
-                            see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, enable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+                            //see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, enable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
                         }
                         Keys.onReturnPressed: {
-                            see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, enable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+                            //see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, enable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
                         }
                     }
                 }
@@ -1785,6 +1785,7 @@ Note: This control is functional only when the exposure mode is configured to Au
                     x: 23
                     y: 235
                     spacing: 15
+                    Layout.alignment: Qt.AlignCenter
                     ExclusiveGroup { id: presetModeGroup }
 
                     RadioButton {
@@ -1793,8 +1794,8 @@ Note: This control is functional only when the exposure mode is configured to Au
                         text: qsTr("User Preset 1")
                         exclusiveGroup: presetModeGroup
                         activeFocusOnPress: true
-                        enabled: (uvcAutoExposureSelected) ? true : false
-                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        enabled: true
+                        opacity: 1
                         tooltip: "The User Preset block allows user to customize controls according to their preferences
 and save them for subsequent use.
 
@@ -1816,8 +1817,8 @@ Preset 1"
                         text: qsTr("User Preset 2")
                         exclusiveGroup: presetModeGroup
                         activeFocusOnPress: true
-                        enabled: (uvcAutoExposureSelected) ? true : false
-                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
+                        enabled: true
+                        opacity: 1
                         tooltip: "The User Preset block allows user to customize controls according to their preferences
 and save them for subsequent use.
 
@@ -1833,51 +1834,73 @@ Preset 2"
                         }
                     }
 
-                    Row
-                    {
-                        Layout.alignment: Qt.AlignCenter
-                        spacing: 30
-                        RadioButton {
-                            id: manualPreset
-                            style:  econRadioButtonStyle
-                            text:   qsTr("Manual")
-                            exclusiveGroup: presetModeGroup
-                            activeFocusOnPress: true
-                            enabled: (uvcAutoExposureSelected) ? true : false
-                            opacity: (uvcAutoExposureSelected) ? 1 : 0.1
-                            tooltip: "The User Preset block allows user to customize controls according to their preferences
+                    RadioButton {
+                       id: manualPreset
+                       style:  econRadioButtonStyle
+                       text:   qsTr("Manual")
+                       exclusiveGroup: presetModeGroup
+                       activeFocusOnPress: true
+                       enabled: true
+                       opacity: 1
+                       tooltip: "The User Preset block allows user to customize controls according to their preferences
 and save them for subsequent use.
 
 Manual – The current settings will be applied."
-                            onClicked: {
-                                see3camcu31.setPresetMode(SEE3CAM_CU31.MANUAL_PRESET, SEE3CAM_CU31.PRESET_SELECT)
-                                getValuesFromCamera()
-                            }
-                            Keys.onReturnPressed:  {
-                                see3camcu31.setPresetMode(SEE3CAM_CU31.MANUAL_PRESET, SEE3CAM_CU31.PRESET_SELECT)
-                                getValuesFromCamera()
-                            }
-                        }
-
-                        Button {
-                            id: savePreset
-                            activeFocusOnPress : true
-                            text: "Save"
-                            style: econButtonStyle
-                            implicitHeight: 20
-                            implicitWidth: 40
-                            enabled: (!manualPreset.checked && uvcAutoExposureSelected) ? true : false
-                            opacity: (!manualPreset.checked && uvcAutoExposureSelected) ? 1 : 0.1
-                            tooltip: "The User Preset block allows user to customize controls according to their preferences
+                       onClicked: {
+                            see3camcu31.setPresetMode(SEE3CAM_CU31.MANUAL_PRESET, SEE3CAM_CU31.PRESET_SELECT)
+                            see3camcu31.getUVCControls()
+                       }
+                       Keys.onReturnPressed:  {
+                            see3camcu31.setPresetMode(SEE3CAM_CU31.MANUAL_PRESET, SEE3CAM_CU31.PRESET_SELECT)
+                            see3camcu31.getUVCControls()
+                       }
+                    }
+                }
+                Row
+                {
+                    Layout.alignment: Qt.AlignCenter
+                    spacing: 50
+                    Button {
+                        id: savePreset
+                        activeFocusOnPress : true
+                        text: "Save Preset"
+                        style: econButtonStyle
+                        implicitHeight: 20
+                        implicitWidth: 80
+                        enabled: (!manualPreset.checked) ? true : false
+                        opacity: (!manualPreset.checked) ? 1 : 0.1
+                        tooltip: "The User Preset block allows user to customize controls according to their preferences
 and save them for subsequent use.
 
-Save – Allows you to save the specific user-defined settings of the selected preset."
-                            onClicked: {
-                                savingPresetMode()
-                            }
-                            Keys.onReturnPressed: {
-                                savingPresetMode()
-                            }
+Save Preset – Enables you to store user-defined settings for the selected preset. Ensure all
+controls are finalized before each save. The settings are written to Flash memory, which has
+limited write cycles."
+                         onClicked: {
+                            savingPresetMode()
+                         }
+                         Keys.onReturnPressed: {
+                            savingPresetMode()
+                         }
+                    }
+                    Button {
+                        id: setDefaultPreset
+                        activeFocusOnPress : true
+                        text: "Set as Default"
+                        style: econButtonStyle
+                        implicitHeight: 20
+                        implicitWidth: 90
+                        enabled: true
+                        opacity: 1
+                        tooltip: "The User Preset block allows user to customize controls according to their preferences
+and save them for subsequent use.
+
+Set as Default – Allows you to designate the selected preset mode as the default, ensuring the
+device uses it automatically upon restart."
+                        onClicked: {
+                            setDefaultPresetMode()
+                        }
+                        Keys.onReturnPressed: {
+                            setDefaultPresetMode()
                         }
                     }
                 }
@@ -2204,6 +2227,9 @@ Note : Ensure the values entered are all even numbers." )
          aeMaskIDCombo.currentIndex = aeMaskIDValue - 1
      }
 
+     onCurrentUVCControlValues: {
+         root.changeUVCValues(brightness, contrast, saturation, sharpness, gain, exp_mode, exp_time)
+     }
 
    }
 
@@ -2254,7 +2280,16 @@ Note : Ensure the values entered are all even numbers." )
         } else if(userPreset2.checked == true) {
             see3camcu31.setPresetMode(SEE3CAM_CU31.USER_PRESET_2, SEE3CAM_CU31.PRESET_SAVE)
         }
-        getValuesFromCamera()
+   }
+
+   function setDefaultPresetMode(){
+       if(manualPreset.checked == true){
+           see3camcu31.setPresetMode(SEE3CAM_CU31.MANUAL_PRESET, SEE3CAM_CU31.PRESET_DEFAULT)
+       } else if(userPreset1.checked == true){
+           see3camcu31.setPresetMode(SEE3CAM_CU31.USER_PRESET_1, SEE3CAM_CU31.PRESET_DEFAULT)
+       } else if(userPreset2.checked == true) {
+           see3camcu31.setPresetMode(SEE3CAM_CU31.USER_PRESET_2, SEE3CAM_CU31.PRESET_DEFAULT)
+       }
    }
 
    function currentAEWindowOverlayStatusReceived(status){
@@ -2574,6 +2609,8 @@ Note : Ensure the values entered are all even numbers." )
         see3camcu31.getAWBWindowDimensions()
 
         see3camcu31.getPresetMode()
+
+        see3camcu31.getUVCControls()
     }
 
     Component.onCompleted: {

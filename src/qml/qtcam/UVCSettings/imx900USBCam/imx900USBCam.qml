@@ -161,17 +161,6 @@ Item {
         }
     }
 
-    Timer {
-        id: getCameraValuesTimer
-        interval: 1000
-        onTriggered: {
-            imx900USBCAM.getExposureCompensation()
-            imx900USBCAM.getFastAutoExposure()
-            imx900USBCAM.getSelfTrigger()
-            stop()
-        }
-    }
-
     Connections
     {
         target: root
@@ -248,7 +237,9 @@ Item {
         onVideoResolutionChanged :{
             imx900USBCAM.getTargetBrightness()
             imx900USBCAM.getFAETargetBrightness()
-            getCameraValuesTimer.start()
+            imx900USBCAM.getExposureCompensation()
+            imx900USBCAM.getFastAutoExposure()
+            imx900USBCAM.getSelfTrigger()
         }
         onSendResolution : {
             if(width === 2064 && height === 1552)
@@ -298,10 +289,14 @@ Item {
         onFormatSwitched: {
             imx900USBCAM.getTargetBrightness()
             imx900USBCAM.getFAETargetBrightness()
-            getCameraValuesTimer.start()
+            imx900USBCAM.getExposureCompensation()
+            imx900USBCAM.getFastAutoExposure()
+            imx900USBCAM.getSelfTrigger()
         }
         onPreviewFPSChanged: {
-            getCameraValuesTimer.start()
+            imx900USBCAM.getExposureCompensation()
+            imx900USBCAM.getFastAutoExposure()
+            imx900USBCAM.getSelfTrigger()
         }
 
     }

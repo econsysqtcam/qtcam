@@ -1382,6 +1382,15 @@ Item {
             //To store the Enable/Disable status of color temperature
             colorTempEnabled = isColorTempEnabled
         }
+        onUiUpdate:{
+            brightness_Slider.value = brightness;
+            contrast_Slider.value = contrast;
+            saturation_Slider.value = saturation;
+            sharpness_Slider.value = sharpness;
+            gain_Slider.value = gain;
+            exposureCombo.currentIndex = exp_mode;
+            exposure_Slider.value = exp_time;
+        }
     }
 
     Connections

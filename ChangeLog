@@ -1,3 +1,8 @@
+Qtcam Application - 27.0.2
+---------------------------
+*Changes in the user preset control handling in see3cam_cu31.
+*Bug fix: IMX900 preview flickers on resolution, format or fps switch.
+
 Qtcam Application - 27.0.1
 ---------------------------
 *Added FAE target brightness and FAE execution frame control for see3cam_37cugm.
