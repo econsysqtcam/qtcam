@@ -1,4 +1,6 @@
-qtcam (27.0.0-1ubuntu1) jammy; urgency=medium
+qtcam (27.0.2-1ubuntu1) jammy; urgency=medium
+ *Changes in the user preset control handling in see3cam_cu31.
+ *Bug fix - IMX900 preview flickers on resolution, format or fps switch. 
  *Added FAE target brightness and FAE execution frame control for see3cam_37cugm.
  *Added hid controls for ecam514_usb camera.
  *Bug fix - Capture in trigger mode disables all the camera control settings in imx900, Auto focus rectangle not checked initially in see3cam_130, Crash issue in see3cam_27cug and see3cam_cu83 on switching resolutions and format in Ubuntu 20.04, Preview corruption issue in 24cug , Crash issue in see3cam_27cug and see3cam_cu83 while enabling and disabling of irWindow. Preventing frame corruption in cross-resolution still capture in IMX900.
@@ -29,4 +31,4 @@ qtcam (27.0.0-1ubuntu1) jammy; urgency=medium
  *Fix for Mipi Camera streaming issue & Manual white balance in UVC.
  *Added support for ubuntu 22.04.
  *Initial release.  
- -- econsysqtcam <qtcam@e-consystems.com> Thu Mar 6 16:39:17 2025 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Wed Apr 2 19:10:45 2025 +0530
