@@ -1,4 +1,5 @@
-qtcam (27.0.2-1ubuntu1) jammy; urgency=medium
+qtcam (27.0.3-1ubuntu1) jammy; urgency=medium
+ *Bug fix-Red frame issue IMX900 on format switch. Preview corruption in ir window in see3cam_27cug.
  *Changes in the user preset control handling in see3cam_cu31.
  *Bug fix - IMX900 preview flickers on resolution, format or fps switch. 
  *Added FAE target brightness and FAE execution frame control for see3cam_37cugm.
@@ -31,4 +32,4 @@ qtcam (27.0.2-1ubuntu1) jammy; urgency=medium
  *Fix for Mipi Camera streaming issue & Manual white balance in UVC.
  *Added support for ubuntu 22.04.
  *Initial release.  
- -- econsysqtcam <qtcam@e-consystems.com> Wed Apr 2 19:10:45 2025 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Thu Apr 10 18:30:45 2025 +0530
