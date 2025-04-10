@@ -1006,7 +1006,10 @@ void FrameRenderer::changeShader(){
                         shaderY8();
                         drawY8BUffer();
                     }
-                }else{
+                }else if(currentlySelectedEnumValue == CommonEnums::IMX900USBCAM){
+                    shaderY8();
+                    drawY8BUffer();
+                 } else{
                     shaderYUYV();
                     drawYUYVBUffer();  // To fix white color corruption drawing intially
                 }
@@ -3559,7 +3562,7 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 
 //Added By Sushanth.S - Preparing Buffer for rendering IR & RGB for See3CAM_27CUG
 bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
-    m_renderer->render27CugMutex.lock();
+    m_renderer->renderyuyvMutex.lock();
 
     if(width == 640 && height == 482){
         m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
@@ -3587,9 +3590,9 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
         //converting IR frame into QImage, inorder to render in another window
         helperObj.setImage(inputBuffer, width, height, 0);
     }
-    m_renderer->render27CugMutex.unlock();
     m_renderer->gotFrame = true;
     helperObj.setUpdateStop(false);
+    m_renderer->renderyuyvMutex.unlock();
     return true;
 }
 

@@ -1,3 +1,7 @@
+Qtcam Application - 27.0.3
+---------------------------
+*Bug fix: Red frame issue IMX900 on format switch. Preview corruption in ir window in see3cam_27cug.
+
 Qtcam Application - 27.0.2
 ---------------------------
 *Changes in the user preset control handling in see3cam_cu31.

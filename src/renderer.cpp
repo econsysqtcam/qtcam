@@ -45,6 +45,7 @@ QOpenGLShaderProgram *Helper::mShaderProgram = nullptr;
 
 void Helper::setImage(const uchar* image, int width, int height, int isCu83)
 {
+    renderMutex.lock();
     irFrame = image;
     if(width != irWidth){
         irWidth = width;
@@ -61,6 +62,7 @@ void Helper::setImage(const uchar* image, int width, int height, int isCu83)
         isFrameReceived = true;
         emit framesAvailable();
     }
+    renderMutex.unlock();
 }
 
 void Helper::setUpdateStop(bool updateStp){
@@ -227,10 +229,8 @@ void Helper::renderUYVY()
             {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, irWidth / 2, irHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, irFrame);
             }
-            renderMutex.unlock();
         }
     }
-
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glEnableVertexAttribArray(mPositionLoc);
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
@@ -242,6 +242,8 @@ void Helper::renderUYVY()
 
     // Draw
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    renderMutex.unlock();
 
     // Clean up
     glDisableVertexAttribArray(mPositionLoc);
@@ -324,7 +326,7 @@ void Helper::renderY8() {
 
     if ( irFrame != NULL)
     {
-        if (renderMutex.try_lock())
+       if (renderMutex.try_lock())
         {
             if (irFrame != nullptr)
             {
