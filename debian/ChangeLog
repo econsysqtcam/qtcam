@@ -1,4 +1,7 @@
-qtcam (27.0.1-0ubuntu1) xenial; urgency=medium
+qtcam (27.0.3-0ubuntu1) xenial; urgency=medium 
+ *Bug fix-Red frame issue IMX900 on format switch. Preview corruption in ir window in see3cam_27cug.
+ *Changes in the user preset control handling in see3cam_cu31.
+ *Bug fix - IMX900 preview flickers on resolution, format or fps switch. 
  *Added FAE target brightness and FAE execution frame control for see3cam_37cugm.
  *Added hid controls for ecam514_usb camera.
  *Bug fix - Capture in trigger mode disables all the camera control settings in imx900, Auto focus rectangle not checked initially in see3cam_130, Crash issue in see3cam_27cug and see3cam_cu83 on switching resolutions and format in Ubuntu 20.04, Preview corruption issue in 24cug , Crash issue in see3cam_27cug and see3cam_cu83 while enabling and disabling of irWindow. Preventing frame corruption in cross-resolution still capture in IMX900.
@@ -213,4 +216,4 @@ qtcam (27.0.1-0ubuntu1) xenial; urgency=medium
   * Added ARM support.
   * Initial release.  
 
- -- econsysqtcam <qtcam@e-consystems.com> Thu Mar 6 16:40:27 2025 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Thu Apr 10 18:30:27 2025 +0530
