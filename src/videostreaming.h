@@ -165,6 +165,8 @@ public:
     uint8_t *ir675pBuffer;
     uint8_t *rgbFromY16Buffer;
 
+    uint8_t *irBuff_27cug;
+
     uint8_t *inputIrBuffer;
     uint8_t *outputIrBuffer;
 

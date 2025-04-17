@@ -331,6 +331,7 @@ FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
     greyBuffer = NULL;
     recordingBuffer = NULL;
     rgbaDestBuffer = NULL;
+    irBuff_27cug = NULL;
     gotFrame = false;
     flipModeChanged = false;
     triggermodeFlag = false;
@@ -3588,7 +3589,8 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
     }
     else if((cameraMode == 1) && (inputBuffer[7] == IR_FRAME)){
         //converting IR frame into QImage, inorder to render in another window
-        helperObj.setImage(inputBuffer, width, height, 0);
+        memcpy(m_renderer->irBuff_27cug, inputBuffer, (width*height*BYTES_PER_PIXEL_UYVY));
+        helperObj.setImage(m_renderer->irBuff_27cug, width, height, 0);
     }
     m_renderer->gotFrame = true;
     helperObj.setUpdateStop(false);
@@ -4056,6 +4058,8 @@ void Videostreaming::allocBuffers()
 
     //To Render IR data
     m_renderer->outputIrBuffer = (uint8_t*)realloc(m_renderer->outputIrBuffer ,Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
+
+    m_renderer->irBuff_27cug = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
 
     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_160)
         tempSrcBuffer = (unsigned char *)realloc(tempSrcBuffer,SEE3CAM160_MJPEG_MAXBYTESUSED);
@@ -4811,6 +4815,11 @@ void Videostreaming::stopCapture() {
     if(m_renderer->rgbaDestBuffer != NULL){
         free(m_renderer->rgbaDestBuffer);
         m_renderer->rgbaDestBuffer = NULL;
+    }
+
+    if(m_renderer->irBuff_27cug != NULL){
+        free(m_renderer->irBuff_27cug);
+        m_renderer->irBuff_27cug = NULL;
     }
 
     if(m_renderer->yuvBuffer != NULL){
