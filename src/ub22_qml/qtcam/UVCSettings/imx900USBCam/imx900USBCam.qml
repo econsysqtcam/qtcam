@@ -258,6 +258,38 @@ Item {
                 disableFastAutoExp.opacity = 0.1
             }
 
+            if(width === 1024  && height === 768){
+                master.enabled = false
+                triggerExposure.enabled = false
+                flipCtrlHorizotal.enabled = false
+                flipCtrlVertical.enabled = false
+                flicker50hz.enabled = false
+                flicker60Hz.enabled = false
+                flickerDisable.enabled = false
+                master.opacity = 0.1
+                triggerExposure.opacity = 0.1
+                flipCtrlHorizotal.opacity = 0.1
+                flipCtrlVertical.opacity = 0.1
+                flicker50hz.opacity = 0.1
+                flicker60Hz.opacity = 0.1
+                flickerDisable.opacity = 0.1
+            }
+            else{
+                master.enabled = true
+                triggerExposure.enabled = true
+                flipCtrlHorizotal.enabled = true
+                flipCtrlVertical.enabled = true
+                flicker50hz.enabled = true
+                flicker60Hz.enabled = true
+                flickerDisable.enabled = true
+                master.opacity = 1
+                triggerExposure.opacity = 1
+                flipCtrlHorizotal.opacity = 1
+                flipCtrlVertical.opacity = 1
+                flicker50hz.opacity = 1
+                flicker60Hz.opacity = 1
+                flickerDisable.opacity = 1
+            }
             /*if(width === 1024  && height === 768){
                 autoExpHDR.enabled = true
                 outdoorHdr.enabled = true

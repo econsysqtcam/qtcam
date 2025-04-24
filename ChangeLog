@@ -1,3 +1,7 @@
+Qtcam Application - 27.0.4
+---------------------------
+*Disabled some hid controls(Orientation mode, Camera mode and Anti-flicker mode) in HDR mode of see3cam_37cugm
+
 Qtcam Application - 27.0.3
 ---------------------------
 *Bug fix: Red frame issue IMX900 on format switch. Preview corruption in ir window in see3cam_27cug.
