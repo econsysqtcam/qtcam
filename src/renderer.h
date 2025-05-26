@@ -16,7 +16,7 @@ class Helper : public QObject, public QQuickFramebufferObject::Renderer, public 
     Q_PROPERTY(int isFrameReceived READ isFramesAvailable NOTIFY framesAvailable)
 public:
     Helper(QQuickItem *parent = NULL);
-    void setImage(const uchar *data, int width, int height, int isCu83);
+    void setImage(uchar *data, int width, int height, int totalSize, int isCu83);
     void setUpdateStop(bool updateStp);
     void shaderY8();
     void shaderUYVY();
@@ -25,7 +25,8 @@ public:
     static int irWidth;
     static int irHeight;
     static bool updateStop;
-    static bool isFrameReceived;
+    static bool isFrameReceived;   
+    static uchar* irFrame ;
     void render() override;
 
 public slots:
@@ -48,7 +49,6 @@ private:
     GLuint greyTextureId;
     GLuint uyvyTextureId;
     QMutex renderMutex;
-    static const uchar* irFrame ;
     static int isIrCu83;
     int getIrWidth() const { return irWidth; }
     int getIrHeight() const { return irHeight; }

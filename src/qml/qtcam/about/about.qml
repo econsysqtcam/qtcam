@@ -54,27 +54,35 @@ Window {
         y: 226.5
         opacity: 1
     }
-    Rectangle {
-        id: linkRect
-        x: 344
-        y: 363.5
-        width: 110
-        height: 20
-        color: "#222021"
-        Text {
-            id: linkText
-            text: "<a href=\"http://e-consystems.com/\">e-consystems</a>"
-            font.pixelSize: 18
-            font.family: "Ubuntu"
-            color: "#ffffff"
-            smooth: true
-            opacity: 1
-        }
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: (containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor)
-            onClicked: Qt.openUrlExternally("http://e-consystems.com")
+    Row{
+        Rectangle {
+            id: linkRect
+            x: 344
+            y: 363.5
+            width: 110
+            height: 20
+            color: "#222021"
+            Text {
+                id: linkTextCont
+                text: "For more info, visit our website - "
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                color: "#ffffff"
+                smooth: true
+                x: 238
+                opacity: 1
+            }
+            Text{
+                id: linkText
+                text: "http://e-consystems.com"
+                anchors.left: linkTextCont.right
+                font.pixelSize: 14
+                font.family: "Ubuntu"
+                font.bold : true
+                color: "#ffffff"
+                smooth: true
+                opacity: 1
+            }
         }
     }
     Text {
@@ -90,7 +98,7 @@ Window {
 
     Text {
         id: copyrights
-        text: "Copyright © 2024  e-con Systems India Pvt. Limited"
+        text: "Copyright © 2025  e-con Systems India Pvt. Limited"
         font.pixelSize: 15
         font.family: "Ubuntu Light"
         color: "#ffffff"

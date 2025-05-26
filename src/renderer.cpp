@@ -34,7 +34,7 @@ GLfloat Helper::vertices[] = {
 
 unsigned short Helper::mIndicesData[] = { 0, 1, 2, 0, 2, 3 };
 
-const uchar* Helper::irFrame = nullptr;
+uchar* Helper::irFrame = nullptr;
 int Helper::irWidth = 0;
 int Helper::irHeight = 0;
 int Helper::isIrCu83 = 0;
@@ -43,10 +43,9 @@ bool Helper::updateStop = false;
 QOpenGLShaderProgram *Helper::mShaderProgram = nullptr;
 
 
-void Helper::setImage(const uchar* image, int width, int height, int isCu83)
+void Helper::setImage(uchar* image, int width, int height, int totalSize, int isCu83)
 {
     renderMutex.lock();
-    irFrame = image;
     if(width != irWidth){
         irWidth = width;
         emit irWidthChanged();
@@ -61,6 +60,9 @@ void Helper::setImage(const uchar* image, int width, int height, int isCu83)
     if(!isFrameReceived){
         isFrameReceived = true;
         emit framesAvailable();
+    }
+    if(image != nullptr){
+        memcpy(irFrame, image, totalSize);
     }
     renderMutex.unlock();
 }

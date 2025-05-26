@@ -1,3 +1,8 @@
+Qtcam Application - 27.0.5
+---------------------------
+*Changed the website link to information in About window.
+*Bug fix: Preview corruption in ir window in see3cam_27cug after few hours of run.
+
 Qtcam Application - 27.0.4
 ---------------------------
 *Disabled some hid controls(Orientation mode, Camera mode and Anti-flicker mode) in HDR mode of see3cam_37cugm
@@ -8,7 +13,7 @@ Qtcam Application - 27.0.3
 
 Qtcam Application - 27.0.2
 ---------------------------
-*Changes in the user preset control handling in see3cam_cu31.
+*Changes in the User Preset control handling in see3cam_cu31.
 *Bug fix: IMX900 preview flickers on resolution, format or fps switch.
 
 Qtcam Application - 27.0.1

@@ -308,7 +308,7 @@ FrameRenderer::~FrameRenderer()
     if(greyBuffer){free(greyBuffer); greyBuffer = NULL;}
     if(recordingBuffer){free(recordingBuffer); recordingBuffer = NULL;}
     if(rgbaDestBuffer){free(rgbaDestBuffer); rgbaDestBuffer = NULL;}
-
+    if(irBuff_27cug){free(irBuff_27cug); irBuff_27cug = NULL;}
 
     if(uyvyBuffer){free(uyvyBuffer); uyvyBuffer = NULL;}
     if(rgbFromY16Buffer){free(rgbFromY16Buffer); rgbFromY16Buffer = NULL;}
@@ -3462,7 +3462,10 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         memcpy(cu83IRWindow->bits(),(m_renderer->outputIrBuffer),Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
 
         //passing QImage to the setImage() defined in renderer class
-        helperObj.setImage(cu83IRWindow->bits(), Y16_1080p_WIDTH, Y16_1080p_HEIGHT, 1);
+        if(helperObj.irFrame == nullptr){
+            helperObj.irFrame = (uchar*)malloc(Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
+        }
+        helperObj.setImage(cu83IRWindow->bits(), Y16_1080p_WIDTH, Y16_1080p_HEIGHT, Y16_1080p_WIDTH*Y16_1080p_HEIGHT, 1);
     }
     else if((width == Y16_NEW_WIDTH)&&(height == Y16_NEW_HEIGHT))
     {
@@ -3520,7 +3523,10 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
         memcpy(cu83IRWindow->bits(),(m_renderer->outputIrBuffer),Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
 
         //passing QImage to the setImage() defined in renderer class
-        helperObj.setImage(cu83IRWindow->bits(), Y16_1080p_WIDTH, Y16_1080p_HEIGHT,1);
+        if(helperObj.irFrame == nullptr){
+            helperObj.irFrame = (uchar*)malloc(Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
+        }
+        helperObj.setImage(cu83IRWindow->bits(), Y16_1080p_WIDTH, Y16_1080p_HEIGHT, Y16_1080p_WIDTH*Y16_1080p_HEIGHT, 1);
     }
     else if((width == Y16_1350p_WIDTH)&&(height == Y16_1350p_HEIGHT))//3840x1350 => 3840x1080
     {
@@ -3590,7 +3596,10 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
     else if((cameraMode == 1) && (inputBuffer[7] == IR_FRAME)){
         //converting IR frame into QImage, inorder to render in another window
         memcpy(m_renderer->irBuff_27cug, inputBuffer, (width*height*BYTES_PER_PIXEL_UYVY));
-        helperObj.setImage(m_renderer->irBuff_27cug, width, height, 0);
+        if(helperObj.irFrame == nullptr){
+            helperObj.irFrame = (uchar*)malloc(width*height*BYTES_PER_PIXEL_UYVY);
+        }
+        helperObj.setImage(m_renderer->irBuff_27cug, width, height, width*height*BYTES_PER_PIXEL_UYVY, 0);
     }
     m_renderer->gotFrame = true;
     helperObj.setUpdateStop(false);
@@ -4869,6 +4878,11 @@ void Videostreaming::stopCapture() {
     if(m_renderer->outputIrBuffer != NULL){
         free(m_renderer->outputIrBuffer);
         m_renderer->outputIrBuffer = NULL;
+    }
+
+    if(helperObj.irFrame != NULL){
+        free(helperObj.irFrame);
+        helperObj.irFrame = NULL;
     }
 
     m_renderer->renderyuyvMutex.unlock();
