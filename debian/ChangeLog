@@ -1,4 +1,6 @@
-qtcam (27.0.4-1ubuntu1) jammy; urgency=medium
+qtcam (27.0.5-1ubuntu1) jammy; urgency=medium
+ *Changed the website link to information in About window.
+ *Bug fix - Preview corruption in ir window in see3cam_27cug after few hours of run.
  *Disabled some hid controls(Orientation mode, Camera mode and Anti-flicker mode) in HDR mode of see3cam_37cugm.
  *Bug fix-Red frame issue IMX900 on format switch. Preview corruption in ir window in see3cam_27cug.
  *Changes in the user preset control handling in see3cam_cu31.
@@ -33,4 +35,4 @@ qtcam (27.0.4-1ubuntu1) jammy; urgency=medium
  *Fix for Mipi Camera streaming issue & Manual white balance in UVC.
  *Added support for ubuntu 22.04.
  *Initial release.  
- -- econsysqtcam <qtcam@e-consystems.com> Thu Apr 24 18:30:45 2025 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Mon May 26 18:30:45 2025 +0530
