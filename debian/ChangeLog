@@ -1,4 +1,6 @@
-qtcam (27.0.4-0ubuntu1) bionic; urgency=medium
+qtcam (27.0.5-0ubuntu1) bionic; urgency=medium
+ *Changed the website link to information in About window.
+ *Bug fix: Preview corruption in ir window in see3cam_27cug after few hours of run.
  *Disabled some hid controls(Orientation mode, Camera mode and Anti-flicker mode) in HDR mode of see3cam_37cugm.
  *Bug fix-Red frame issue IMX900 on format switch. Preview corruption in ir window in see3cam_27cug.
  *Changes in the user preset control handling in see3cam_cu31.
@@ -182,6 +184,6 @@ qtcam (27.0.4-0ubuntu1) bionic; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Thu Apr 24 18:30:45 2025 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Mon May 26 18:30:45 2025 +0530
 
 
