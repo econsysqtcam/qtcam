@@ -3575,7 +3575,7 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
         return false;
     }
 
-    m_renderer->renderyuyvMutex.lock();
+    m_renderer->render27CugMutex.lock();
 
     if(width == 640 && height == 482){
         m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
@@ -3599,12 +3599,11 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
             helperObj.irFrame = (uchar*)malloc(width*height*BYTES_PER_PIXEL_UYVY);
         }
         helperObj.setImage(m_renderer->irBuff_27cug, width, height, width*height*BYTES_PER_PIXEL_UYVY, 0);
-    } else{
-        return false;
     }
+
     m_renderer->gotFrame = true;
     helperObj.setUpdateStop(false);
-    m_renderer->renderyuyvMutex.unlock();
+    m_renderer->render27CugMutex.unlock();
     return true;
 }
 
