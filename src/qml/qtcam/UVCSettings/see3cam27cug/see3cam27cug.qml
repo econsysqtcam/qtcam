@@ -841,7 +841,9 @@ Item {
                 masterMode.checked = true            
                 root.checkForTriggerMode(false)
                 root.captureBtnEnable(true)
-                root.videoRecordBtnEnable(true)
+                if(irrgbMode.checked == false){
+                    root.videoRecordBtnEnable(true)
+                }
                 root.startUpdatePreviewInMasterMode()
             }
             else if(streamModeValues == See3CAM_27CUG.TRIGGER)

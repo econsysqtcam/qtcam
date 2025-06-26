@@ -813,14 +813,13 @@ int VideoEncoder::encodeH264Packet(void *buffer, int bytesused){
         return -1;
 
     int out_size = 0;
-    pkt->data = (u_int8_t *) buffer;
-    pkt->size = bytesused;
-
     pkt = av_packet_alloc();
-
+    if(buffer != nullptr){
+        pkt->data = (u_int8_t *) buffer;
+    }
+    pkt->size = bytesused;
     pkt->stream_index = pVideoStream->index;
-
-    if(pCodecCtx->rc_override->quality_factor)
+    if(pCodecCtx->rc_override && pCodecCtx->rc_override->quality_factor)
         pkt->flags |= AV_PKT_FLAG_KEY;
 
     pkt->pts  = (frameCount*(pCodecCtx->time_base.den/fps)) / pCodecCtx->time_base.num;

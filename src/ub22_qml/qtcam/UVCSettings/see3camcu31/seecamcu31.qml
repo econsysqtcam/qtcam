@@ -821,10 +821,20 @@ Y Start – Set the starting position of the AE window in vertical direction."
                        enabled: (uvcAutoExposureSelected) ? true : false
                        opacity: (uvcAutoExposureSelected) ? 1 : 0.1
                        onClicked: {
-                           see3camcu31.setAEWindowDimensions(aeWidthTextField.text, aeHeightTextField.text, aeXStartTextField.text, aeYStartTextField.text)
+                           if(Number.isInteger(Number(aeXStartTextField.text)) && Number.isInteger(Number(aeYStartTextField.text))){
+                               see3camcu31.setAEWindowDimensions(aeWidthTextField.text, aeHeightTextField.text, aeXStartTextField.text, aeYStartTextField.text)
+                           } else{
+                               displayErrorMessage()
+                               see3camcu31.getAEWindowDimensions()
+                           }
                        }
                        Keys.onReturnPressed: {
-                           see3camcu31.setAEWindowDimensions(aeWidthTextField.text, aeHeightTextField.text, aeXStartTextField.text, aeYStartTextField.text)
+                           if(Number.isInteger(Number(aeXStartTextField.text)) && Number.isInteger(Number(aeYStartTextField.text))){
+                               see3camcu31.setAEWindowDimensions(aeWidthTextField.text, aeHeightTextField.text, aeXStartTextField.text, aeYStartTextField.text)
+                           } else{
+                               displayErrorMessage()
+                               see3camcu31.getAEWindowDimensions()
+                           }
                        }
                    }
                }
@@ -1432,10 +1442,20 @@ Y Start – Set the starting position of the AWB window in vertical direction."
                         implicitHeight: 23
                         implicitWidth: 45
                         onClicked: {
-                            see3camcu31.setAWBWindowDimensions(awbWidthTextField.text, awbHeightTextField.text, awbXStartTextField.text, awbYStartTextField.text)
+                            if(Number.isInteger(Number(awbXStartTextField.text)) && Number.isInteger(Number(awbYStartTextField.text))){
+                                see3camcu31.setAWBWindowDimensions(awbWidthTextField.text, awbHeightTextField.text, awbXStartTextField.text, awbYStartTextField.text)
+                            } else{
+                                displayErrorMessage()
+                                see3camcu31.getAWBWindowDimensions()
+                            }
                         }
                         Keys.onReturnPressed: {
-                            see3camcu31.setAWBWindowDimensions(awbWidthTextField.text, awbHeightTextField.text, awbXStartTextField.text, awbYStartTextField.text)
+                            if(Number.isInteger(Number(awbXStartTextField.text)) && Number.isInteger(Number(awbYStartTextField.text))){
+                                see3camcu31.setAWBWindowDimensions(awbWidthTextField.text, awbHeightTextField.text, awbXStartTextField.text, awbYStartTextField.text)
+                            } else{
+                                displayErrorMessage()
+                                see3camcu31.getAWBWindowDimensions()
+                            }
                         }
                     }
                 }
@@ -2254,19 +2274,49 @@ Note : Ensure the values entered are all even numbers." )
    function setAWBMaskDimensionsControl()
    {
        if(disableAWBMaskStatus.checked == true) {
-           see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, disable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+           if(Number.isInteger(Number(awbMaskXStartTextField.text)) && Number.isInteger(Number(awbMaskYStartTextField.text))){
+               see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, disable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+           } else{
+               displayErrorMessage()
+               awbMaskIDValue = awbMaskIDCombo.currentText
+               see3camcu31.getAWBMaskDimensions(true, awbMaskIDValue)
+            }
        } else if(enableAWBMaskStatus.checked == true) {
-           see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, enable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+           if(Number.isInteger(Number(awbMaskXStartTextField.text)) && Number.isInteger(Number(awbMaskYStartTextField.text))){
+               see3camcu31.setAWBMaskDimensions(awbMaskIDCombo.currentText, enable, awbMaskWidthTextField.text, awbMaskHeightTextField.text, awbMaskXStartTextField.text, awbMaskYStartTextField.text)
+           } else{
+               displayErrorMessage()
+               awbMaskIDValue = awbMaskIDCombo.currentText
+               see3camcu31.getAWBMaskDimensions(true, awbMaskIDValue)
+           }
        }
    }
 
    function setAEMaskDimensionsControl()
    {
        if(disableAEMaskStatus.checked == true) {
-           see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, disable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+           if(Number.isInteger(Number(aeMaskXStartTextField.text)) && Number.isInteger(Number(aeMaskYStartTextField.text))){
+               see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, disable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+           } else{
+               displayErrorMessage()
+               aeMaskIDValue  = aeMaskIDCombo.currentText
+               see3camcu31.getAEMaskDimensions(true, aeMaskIDValue)
+           }
        } else if(enableAEMaskStatus.checked == true) {
-           see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, enable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+           if(Number.isInteger(Number(aeMaskXStartTextField.text)) && Number.isInteger(Number(aeMaskYStartTextField.text))){
+                see3camcu31.setAEMaskDimensions(aeMaskIDCombo.currentText, enable, aeMaskWidthTextField.text, aeMaskHeightTextField.text, aeMaskXStartTextField.text, aeMaskYStartTextField.text)
+           } else{
+               displayErrorMessage()
+               aeMaskIDValue  = aeMaskIDCombo.currentText
+               see3camcu31.getAEMaskDimensions(true, aeMaskIDValue)
+           }
        }
+   }
+
+   function displayErrorMessage(){
+       messageDialog.title = "Error"
+       messageDialog.text = "Error: Please enter valid numeric values for X Start and Y Start."
+       messageDialog.open()
    }
 
    function savingPresetMode() {

@@ -713,7 +713,9 @@ void FrameRenderer::drawRGBBUffer(){
 
       glViewport(glViewPortX, glViewPortY, glViewPortWidth, glViewPortHeight);
     if(renderyuyvMutex.tryLock()){
-        if(rgbaDestBuffer && skipFrames > skipFrameCount && !decompFailed){
+        if(currentlySelectedEnumValue == CommonEnums::ECAM83_USB  && rgbaDestBuffer && skipFrames > skipFrameCount){
+            glTexImage2D(GL_TEXTURE_2D, 0,  GL_RGBA, videoResolutionwidth, videoResolutionHeight, 0,GL_RGBA , GL_UNSIGNED_BYTE, rgbaDestBuffer);
+        }else if(rgbaDestBuffer && skipFrames > skipFrameCount && !decompFailed){
             glTexImage2D(GL_TEXTURE_2D, 0,  GL_RGBA, videoResolutionwidth, videoResolutionHeight, 0,GL_RGBA , GL_UNSIGNED_BYTE, rgbaDestBuffer);
         }
         if(gotFrame && !updateStop && skipFrames > skipFrameCount){
@@ -2632,7 +2634,7 @@ int Videostreaming::jpegDecode(Videostreaming *obj, unsigned char **pic, unsigne
             if(decomp(obj, jpegbuf, jpegsize, NULL, _w, _h, 0,
                       _tilew, _tileh, pic)==-1){
                 obj->m_renderer->decompFailed = true;
-                goto bailout;
+                //goto bailout;
             }
             obj->m_renderer->decompFailed = false;
         }
@@ -3568,25 +3570,22 @@ bool Videostreaming::prepareCu83Buffer(uint8_t *inputbuffer)
 }
 
 //Added By Sushanth.S - Preparing Buffer for rendering IR & RGB for See3CAM_27CUG
-bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
+bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){  
+    if(!inputBuffer){
+        return false;
+    }
+
     m_renderer->renderyuyvMutex.lock();
 
     if(width == 640 && height == 482){
         m_renderer->renderBufferFormat = CommonEnums::BUFFER_RENDER_360P;
     }
-    else{
+    else {
         m_renderer->renderBufferFormat = CommonEnums::UYVY_BUFFER_RENDER;
     }
-    if(!inputBuffer){
-        m_renderer->render27CugMutex.unlock();
-        return false;
-    }
 
-    //CameraMode 3 - IR mode
-    if((inputBuffer[7] == IR_FRAME) && (cameraMode == 3)){
-        memcpy(m_renderer->yuvBuffer, inputBuffer, (width*height*BYTES_PER_PIXEL_UYVY));
-    }//CameraMode 2 - RGB mode
-    else if((inputBuffer[7] == RGB_FRAME) && (cameraMode == 2)){
+    //CameraMode 3 - IR mode && CameraMode 2 - RGB mode
+    if(((inputBuffer[7] == IR_FRAME) && (cameraMode == 3)) || ((inputBuffer[7] == RGB_FRAME) && (cameraMode == 2))){
         memcpy(m_renderer->yuvBuffer, inputBuffer, (width*height*BYTES_PER_PIXEL_UYVY));
     }
     //IR-RGB Mode -> Buffer for RGB(MainWindow)
@@ -3600,6 +3599,8 @@ bool Videostreaming::prepare27cugBuffer(uint8_t* inputBuffer){
             helperObj.irFrame = (uchar*)malloc(width*height*BYTES_PER_PIXEL_UYVY);
         }
         helperObj.setImage(m_renderer->irBuff_27cug, width, height, width*height*BYTES_PER_PIXEL_UYVY, 0);
+    } else{
+        return false;
     }
     m_renderer->gotFrame = true;
     helperObj.setUpdateStop(false);
@@ -4069,6 +4070,12 @@ void Videostreaming::allocBuffers()
     m_renderer->outputIrBuffer = (uint8_t*)realloc(m_renderer->outputIrBuffer ,Y16_1080p_WIDTH*Y16_1080p_HEIGHT);
 
     m_renderer->irBuff_27cug = (uint8_t *)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
+
+    if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_27CUG){
+        helperObj.irFrame = (uchar*)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight * 2);
+    }else if(currentlySelectedCameraEnum == CommonEnums::See3CAM_CU83_H03R1 || currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU83){
+        helperObj.irFrame = (uchar*)malloc(m_renderer->videoResolutionwidth * m_renderer->videoResolutionHeight);
+    }
 
     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_160)
         tempSrcBuffer = (unsigned char *)realloc(tempSrcBuffer,SEE3CAM160_MJPEG_MAXBYTESUSED);

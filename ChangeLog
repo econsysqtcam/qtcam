@@ -1,3 +1,7 @@
+Qtcam Application - 27.0.6
+---------------------------
+*Bug fix: Input validation for XStart and YStart field in see3cam_cu31. Disabled video recording in rgb-ir mode initially on see3cam_27cug. Crash while recording video in H264 of e-cam83_usb. Streaming and video recording issue in MJPG of e-cam83_usb. Fixed preview corruption in Ir mode only or RGB  mode only of see3am_27cug.
+
 Qtcam Application - 27.0.5
 ---------------------------
 *Changed the website link to information in About window.
