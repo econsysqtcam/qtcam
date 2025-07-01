@@ -155,6 +155,12 @@ $ sudo apt-add-repository ppa:qtcam/focal
 $ sudo apt-get update
 $ sudo apt-get install qtcam
 
+
+4.1.5 Ubuntu 22.04
+$ sudo apt-add-repository ppa:qtcam/jammy
+$ sudo apt-get update
+$ sudo apt-get install qtcam
+
 5. How to run the application
    * By clicking Qtcam icon from Dash home
    or 
