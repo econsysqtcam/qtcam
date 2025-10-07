@@ -80,10 +80,28 @@ Window {
                 anchors.left: linkTextCont.right
                 font.pixelSize: 14
                 font.family: "Ubuntu"
-                font.bold : true
+                font.bold: true
                 color: "#ffffff"
                 smooth: true
                 opacity: 1
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor  // Changes cursor to hand pointer
+                    hoverEnabled: true
+
+                    onClicked: {
+                        systemHelper.openUrl("http://e-consystems.com")
+                    }
+
+                    onEntered: {
+                        linkText.color = "#00aaff"  // Change color on hover (optional)
+                    }
+
+                    onExited: {
+                        linkText.color = "#ffffff"  // Restore original color
+                    }
+                }
             }
         }
     }

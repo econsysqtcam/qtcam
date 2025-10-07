@@ -37,7 +37,7 @@ unsigned short Helper::mIndicesData[] = { 0, 1, 2, 0, 2, 3 };
 uchar* Helper::irFrame = nullptr;
 int Helper::irWidth = 0;
 int Helper::irHeight = 0;
-int Helper::isIrCu83 = 0;
+int Helper::isIrCu83 = -1;
 bool Helper::isFrameReceived = false;
 bool Helper::updateStop = false;
 QOpenGLShaderProgram *Helper::mShaderProgram = nullptr;
@@ -69,6 +69,9 @@ void Helper::setImage(uchar* image, int width, int height, int totalSize, int is
 
 void Helper::setUpdateStop(bool updateStp){
     updateStop = updateStp;
+    if(updateStop){
+        isIrCu83 = -1;
+    }
 }
 
 void Helper::render()

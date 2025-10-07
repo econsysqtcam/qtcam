@@ -91,6 +91,7 @@
 #include "imx900usbcam.h"
 #include "ecam514_usb.h"
 
+#include "systemHelper.h"
 
 //*! \mainpage Qtcam - A econ's camera product
 // *
@@ -251,6 +252,9 @@ int main(int argc, char *argv[])
          audio.is22_04 = false;
     }
 
+
+    SystemHelper systemHelper;
+    viewer.rootContext()->setContextProperty("systemHelper", &systemHelper);
     viewer.rootContext()->setContextProperty("resolutionModel", &vs.resolution);
     viewer.rootContext()->setContextProperty("stillOutputFormatModel", &vs.stillOutputFormat);
     viewer.rootContext()->setContextProperty("videoOutputFormatModel", &vs.videoOutputFormat);

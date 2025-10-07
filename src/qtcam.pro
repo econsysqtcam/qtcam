@@ -37,6 +37,7 @@ SOURCES += main.cpp \
     logger.cpp \
     about.cpp \
     cameraproperty.cpp \
+    systemHelper.cpp \
     videostreaming.cpp \
     uvccamera.cpp \
     v4l2-api.cpp \
@@ -115,6 +116,7 @@ HEADERS += \
     logger.h \
     about.h \
     cameraproperty.h \
+    systemHelper.h \
     videostreaming.h \
     uvccamera.h \
     v4l2-api.h \

@@ -62,6 +62,7 @@ Window {
             width: 110
             height: 20
             color: "#222021"
+
             Text {
                 id: linkTextCont
                 text: "For more info, visit our website - "
@@ -72,16 +73,35 @@ Window {
                 x: 238
                 opacity: 1
             }
-            Text{
+
+            Text {
                 id: linkText
                 text: "http://e-consystems.com"
                 anchors.left: linkTextCont.right
                 font.pixelSize: 14
                 font.family: "Ubuntu"
-                font.bold : true
+                font.bold: true
                 color: "#ffffff"
                 smooth: true
                 opacity: 1
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor  // Changes cursor to hand pointer
+                    hoverEnabled: true
+
+                    onClicked: {
+                        systemHelper.openUrl("http://e-consystems.com")
+                    }
+
+                    onEntered: {
+                        linkText.color = "#00aaff"  // Change color on hover (optional)
+                    }
+
+                    onExited: {
+                        linkText.color = "#ffffff"  // Restore original color
+                    }
+                }
             }
         }
     }
