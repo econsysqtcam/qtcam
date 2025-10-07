@@ -1,4 +1,5 @@
-qtcam (27.0.6-0ubuntu1) bionic; urgency=medium
+qtcam (27.0.7-0ubuntu1) bionic; urgency=medium
+ *Bug fix - Fixed green frame issue occuring initially on opening see3cam_cu83. And enabled link to navigate to website page in About window.
  *Bug fix - Input validation for XStart and YStart field in see3cam_cu31. Disabled video recording in rgb-ir mode initially on see3cam_27cug. Crash while recording video in H264 of e-cam83_usb. Streaming and video recording issue in MJPG of e-cam83_usb. Fixed preview corruption in Ir mode only or RGB  mode only of see3am_27cug.
  *Changed the website link to information in About window.
  *Bug fix - Preview corruption in ir window in see3cam_27cug after few hours of run.
@@ -185,6 +186,6 @@ qtcam (27.0.6-0ubuntu1) bionic; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Thu Jun 26 12:30:45 2025 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Tue Oct 07 20:07:45 2025 +0530
 
 
