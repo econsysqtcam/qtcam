@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <QDebug>
 #include <unistd.h>
+#include <stdlib.h>  // Add this for getenv()
 
 SystemHelper::SystemHelper(QObject *parent)
     : QObject(parent)
@@ -14,7 +15,8 @@ SystemHelper::SystemHelper(QObject *parent)
 bool SystemHelper::openUrl(const QString &urlString)
 {
     // Get original user if running as root
-    QString originalUser = qEnvironmentVariable("SUDO_USER");
+    // Use qgetenv() instead of qEnvironmentVariable()
+    QString originalUser = QString::fromLocal8Bit(qgetenv("SUDO_USER"));
 
     if (geteuid() == 0 && !originalUser.isEmpty()) {
         // Running as root, open URL as original user
@@ -28,12 +30,12 @@ bool SystemHelper::openUrl(const QString &urlString)
 void SystemHelper::setupEnvironment()
 {
     if (geteuid() == 0) {
-        qDebug() << "Running as root, setting up environment...";
 
         // Enable X11 access
         QProcess::execute("xhost", QStringList() << "+local:root");
 
-        QString originalUser = qEnvironmentVariable("SUDO_USER");
+        // Use qgetenv() instead of qEnvironmentVariable()
+        QString originalUser = QString::fromLocal8Bit(qgetenv("SUDO_USER"));
         if (!originalUser.isEmpty()) {
             QString userHome = QString("/home/%1").arg(originalUser);
             qputenv("XAUTHORITY", QString("%1/.Xauthority").arg(userHome).toLocal8Bit());
@@ -51,12 +53,16 @@ bool SystemHelper::openUrlAsUser(const QString &url, const QString &user)
 
     bool success = QProcess::startDetached("sudo", args);
     if (success) {
-        qDebug() << "Opened URL as user:" << user;
         return true;
     }
 
     // Fallback: try DISPLAY passthrough
-    QString display = qEnvironmentVariable("DISPLAY", ":0");
+    // Use qgetenv() with default value handling
+    QString display = QString::fromLocal8Bit(qgetenv("DISPLAY"));
+    if (display.isEmpty()) {
+        display = ":0";  // Default value
+    }
+
     args.clear();
     args << "-u" << user;
     args << "env" << QString("DISPLAY=%1").arg(display);
@@ -94,3 +100,4 @@ bool SystemHelper::openUrlNormal(const QString &urlString)
     qWarning() << "Failed to open URL:" << urlString;
     return false;
 }
+
