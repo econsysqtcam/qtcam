@@ -2140,6 +2140,8 @@ Rectangle {
     function irWindowCloseBtn()
     {
         irWindowCloseBtnSignal()
+        vidstreamproperty.stopUpdatePreview()
+        vidstreamproperty.clearIrShader()
     }
 
     //for taking snap shot

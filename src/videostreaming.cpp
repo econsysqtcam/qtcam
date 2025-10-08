@@ -5799,6 +5799,8 @@ void Videostreaming::resolnSwitch()
 {
     helperObj.setUpdateStop(true);
 
+    clearIrShader();
+
     m_renderer->gotFrame = false;
     m_renderer->updateStop = true;
 
