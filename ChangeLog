@@ -1,3 +1,7 @@
+Qtcam Application - 27.0.8
+---------------------------
+*Added new pid for See3CAM_130E and fixed still capture issue in See3cam_130E and See3cam_130D.
+
 Qtcam Application - 27.0.7
 ---------------------------
 *Bug fix: Fixed green frame issue occuring initially on opening see3cam_cu83. And enabled link to navigate to website page in About window.

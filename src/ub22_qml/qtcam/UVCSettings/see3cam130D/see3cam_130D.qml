@@ -40,7 +40,7 @@ Item {
     Connections
     {
         target: root
-        function onVideoColorSpaceChanged(){
+        function onTakeScreenShot(){
             if(seecam130D.enableDisableFaceRectangle(false)){
                 seecam130D.enable_disablerect(false)
                 burstShotTimer.start()
