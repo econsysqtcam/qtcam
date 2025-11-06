@@ -274,24 +274,20 @@ DENOISE_LIB_HEADERS = \
     $$DENOISE_LIB_DIR/Type.hpp
 
 # Define build and install paths
-
+DENOISE_BUILD_PATH = $$OUT_PWD/libDenoise.so
 DENOISE_INSTALL_PATH = /usr/lib
-DENOISE_BUILD_PATH = $$DENOISE_INSTALL_PATH/libDenoise.so
 
-# Create the build directory if it doesn't exist
-QMAKE_PRE_LINK += test -d $$DENOISE_INSTALL_PATH || mkdir -p $$DENOISE_INSTALL_PATH;
-
-# Build libDenoise.so before linking the main application
+# Build libDenoise.so in the build directory before linking the main application
 QMAKE_PRE_LINK += g++ -shared -fPIC -O3 -std=c++17 -fopenmp\
     $$DENOISE_LIB_DIR/Denoise.cpp \
     $$DENOISE_LIB_DIR/DenoiseCls.cpp \
     $$DENOISE_LIB_DIR/Denoise_LUT.cpp \
-    -I$DENOISE_LIB_DIR \
+    -I$$DENOISE_LIB_DIR \
     -lfftw3f -lm -march=native\
     -o $$DENOISE_BUILD_PATH;
 
 # Link the Denoise library to the main application
-LIBS += -L$OUT_PWD -lDenoise -lfftw3f
+LIBS += -L$$OUT_PWD -lDenoise -lfftw3f
 
 # Add Denoise headers to include path
 INCLUDEPATH += $$DENOISE_LIB_DIR
@@ -304,15 +300,6 @@ INSTALLS += denoise_install
 # Add clean target for Denoise library
 QMAKE_CLEAN += $$DENOISE_BUILD_PATH
 
-# Add message to indicate Denoise library will be built
-message("Denoise library configuration:")
-message("  Source directory: $$DENOISE_LIB_DIR")
-message("  Build path: $$DENOISE_BUILD_PATH")
-message("  Install path: $$DENOISE_INSTALL_PATH")
-message("  Sources:")
-message("    - Denoise.cpp")
-message("    - DenoiseCls.cpp")
-message("    - Denoise_LUT.cpp")
 
 #==============================================================================
 # END DENOISE LIBRARY BUILD SECTION
