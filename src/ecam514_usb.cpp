@@ -217,7 +217,6 @@ bool ECAM514_USB::saveConfiguration()
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH))
     {
-        qDebug() << "HID command success: " << g_in_packet_buf[6];
         if (g_in_packet_buf[6] == SET_FAIL)
         {
             emit indicateCommandStatus("Failure", "Saving Configurations Failed");

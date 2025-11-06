@@ -28,6 +28,9 @@ TARGET = Qtcam
 
 CONFIG += release
 
+QMAKE_CXXFLAGS_RELEASE += -O3 -march=native -flto
+QMAKE_LFLAGS_RELEASE += -flto
+
 # Additional import path used to resolve QML modules in Creator's code model
 QML_IMPORT_PATH =
 
@@ -249,6 +252,71 @@ QMAKE_CXXFLAGS_THREAD = -D__STDC_CONSTANT_MACROS    #For Ubuntu 12.04 compilatio
 QMAKE_CFLAGS_ISYSTEM = -I                           #For Ubuntu 20.04
 
 
+
+#==============================================================================
+# DENOISE LIBRARY BUILD SECTION
+#==============================================================================
+
+# Define Denoise library source and header files
+DENOISE_LIB_DIR = $$PWD/denoiseAlgorithm
+DENOISE_LIB_SOURCES = \
+    $$DENOISE_LIB_DIR/Denoise.cpp \
+    $$DENOISE_LIB_DIR/DenoiseCls.cpp \
+    $$DENOISE_LIB_DIR/Denoise_LUT.cpp
+
+DENOISE_LIB_HEADERS = \
+    $$DENOISE_LIB_DIR/Denoise.hpp \
+    $$DENOISE_LIB_DIR/DenoiseCls.hpp \
+    $$DENOISE_LIB_DIR/Denoise_LUT.h \
+    $$DENOISE_LIB_DIR/AlignedMemory.hpp \
+    $$DENOISE_LIB_DIR/Block.hpp \
+    $$DENOISE_LIB_DIR/BM3D.hpp \
+    $$DENOISE_LIB_DIR/Type.hpp
+
+# Define build and install paths
+
+DENOISE_INSTALL_PATH = /usr/lib
+DENOISE_BUILD_PATH = $$DENOISE_INSTALL_PATH/libDenoise.so
+
+# Create the build directory if it doesn't exist
+QMAKE_PRE_LINK += test -d $$DENOISE_INSTALL_PATH || mkdir -p $$DENOISE_INSTALL_PATH;
+
+# Build libDenoise.so before linking the main application
+QMAKE_PRE_LINK += g++ -shared -fPIC -O3 -std=c++17 -fopenmp\
+    $$DENOISE_LIB_DIR/Denoise.cpp \
+    $$DENOISE_LIB_DIR/DenoiseCls.cpp \
+    $$DENOISE_LIB_DIR/Denoise_LUT.cpp \
+    -I$DENOISE_LIB_DIR \
+    -lfftw3f -lm -march=native\
+    -o $$DENOISE_BUILD_PATH;
+
+# Link the Denoise library to the main application
+LIBS += -L$OUT_PWD -lDenoise -lfftw3f
+
+# Add Denoise headers to include path
+INCLUDEPATH += $$DENOISE_LIB_DIR
+
+# Install the Denoise library
+denoise_install.path = $$DENOISE_INSTALL_PATH
+denoise_install.files = $$DENOISE_BUILD_PATH
+INSTALLS += denoise_install
+
+# Add clean target for Denoise library
+QMAKE_CLEAN += $$DENOISE_BUILD_PATH
+
+# Add message to indicate Denoise library will be built
+message("Denoise library configuration:")
+message("  Source directory: $$DENOISE_LIB_DIR")
+message("  Build path: $$DENOISE_BUILD_PATH")
+message("  Install path: $$DENOISE_INSTALL_PATH")
+message("  Sources:")
+message("    - Denoise.cpp")
+message("    - DenoiseCls.cpp")
+message("    - Denoise_LUT.cpp")
+
+#==============================================================================
+# END DENOISE LIBRARY BUILD SECTION
+#==============================================================================
 
 #Conditionally including additional source files depends upon OS type
 contains(DEFINES, UBUNTU_22_04) {

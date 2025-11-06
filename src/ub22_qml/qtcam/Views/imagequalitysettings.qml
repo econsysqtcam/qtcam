@@ -659,6 +659,7 @@ Item {
                             if(gainValueChangeProperty) {
                                 //Signal to send UVC gain value to HID
                                 root.getGainValueFromUVC(gain_Slider.value)
+                                root.getGainFromUvc(gain_Slider.value)
                                 root.logInfo("Gain settings changed to: "+ value.toString())
                                 root.changeCameraSettings(gainControlId,value.toString())
                             }
@@ -1389,6 +1390,7 @@ Item {
             gain_Slider.value = gain;
             exposure_Slider.value = exp_time;
             exposureCombo.currentIndex = exp_mode;
+            root.getGainFromUvc(gain);
 
         }
     }
@@ -1839,6 +1841,8 @@ Item {
         gain_Slider.maximumValue = controlMaxValue
         gain_Slider.value = controlDefaultValue
         gain_Slider.stepSize = controlStepSize
+
+        root.getGainFromUvc(gain_Slider.value);
     }
 
     function sharpnessUIUpdate(controlID,controlMinValue,controlMaxValue,controlStepSize,controlDefaultValue)

@@ -71,12 +71,25 @@
 
 #define RAW_Y10_PIX_FMT   540029273
 
+#define MAJORVERSION 1
+#define MINORVERSION 0
+
+
+#define GAUSSKERNEL (int[5][5]){\
+    {1,  4,  6,  4, 1},\
+    {4, 16, 24, 16, 4},\
+    {6, 24, 36, 24, 6},\
+    {4, 16, 24, 16, 4},\
+    {1,  4,  6,  4, 1}\
+}
+
+
 #include <QTimer>
 #include <QDateTime>
 #include <QSocketNotifier>
 #include <QStringList>
 #include <QMetaObject>
-
+#include "Denoise.hpp"
 #include <QStringListModel>
 #include <QDir>
 #include <sys/mman.h>
@@ -104,6 +117,8 @@
 #include "qtquick2applicationviewer.h"
 #include <QtQuick/QQuickView>
 #include <QQmlContext>
+
+#include <fftw3.h>
 
 class FrameRenderer : public QObject, protected QOpenGLFunctions
 {
@@ -289,6 +304,10 @@ public:
     unsigned char *stillBuffer;
 
     uint16_t *rawY16Buffer;
+
+    int gain = 0;
+    int sharpnessStrength = 0;
+    float denoiseStrength = 0.0;
 
     // prepare target buffer for rendering from input buffer.
     bool prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 bytesUsed);
@@ -541,6 +560,13 @@ private:
     bool windowResized;
     uint resizedWidth,resizedHeight,changeFPSForHyperyon;
     bool check_jpeg_header(void *inputbuffer, __u32 bytesUsed);
+    int performDenoising(void* frameData,int bytesUsed, float gain_val, float denoising_strength, float sharpness_strength, std::vector<uint8_t>& outputBuffer) ;
+    int applyGaussianBlur(uint16_t* output_buffer,uint16_t* input_buffer,int width, int height,int bpp);
+    int compLocalContrast(uint16_t* output_buffer,uint16_t* max_buffer,uint16_t* input_buffer,int width, int height,int radius,int bpp);
+    int sharpness(float* input_buffer,int width, int height,float sharpness, int radius, int bpp);
+    int YUV422toYUV444(uint8_t* outputBuffer, const uint8_t* inputBuffer, int width, int height);
+    double getTimeInSeconds();
+    void convertYUV444FloatToUYVY(const std::vector<float>& yuv444Float, int width, int height, std::vector<uint8_t>& uyvyOut);
 
 private slots:
     void handleWindowChanged(QQuickWindow *win);
@@ -810,6 +836,8 @@ public slots:
     void getecam83USBStreamingState(int streamingState);
 
     void setSkipFrameCount(int count);
+
+    int setDenoisingParameters(int sharpness, int uvcGain, float denoiseValue);
 
 signals:
     void triggerShotCap();

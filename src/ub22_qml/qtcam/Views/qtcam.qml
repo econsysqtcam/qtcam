@@ -220,6 +220,10 @@ Rectangle {
 
     property var irPreview: undefined
 
+    property var denoiseStrength: 0.0;
+    property var sharpnessStrength : 0;
+    property var gain : 0;
+
     //Skip Frame count to prevent green frame
     signal skipFrameCount()
 
@@ -1229,6 +1233,22 @@ Rectangle {
             ecam83USBstate = ecam83usbObj.readStreamingState()
         }
         disableStillCapCombo(ecam83USBstate)
+    }
+
+   //To apply denoise algorithm
+    function getGainFromUvc(uvcGain){
+        gain = uvcGain;
+        vidstreamproperty.setDenoisingParameters(sharpnessStrength, gain, denoiseStrength)
+    }
+
+    function getDenoiseStrength(denoisingStrength){
+        denoiseStrength = denoisingStrength;
+        vidstreamproperty.setDenoisingParameters(sharpnessStrength, gain, denoiseStrength)
+    }
+
+    function getSharpnessStrength(sharpness){
+        sharpnessStrength = sharpness;
+        vidstreamproperty.setDenoisingParameters(sharpnessStrength, gain, denoiseStrength)
     }
 
     function disableStillCapCombo(deviceState){

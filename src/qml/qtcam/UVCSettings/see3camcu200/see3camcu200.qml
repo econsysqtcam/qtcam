@@ -193,6 +193,8 @@ Item{
     property real adjustedBGain: 0.0
     property real adjustedBrightness: 0.0
     property real adjustedSaturation: 0.0
+    property real adjustedDenoiseStrength: 0.0
+    property real adjustedSharpnessStrength: 0.0
     property real adjustedGammaCorrection: 0.0
     property real spinBoxMin: -3.99
     property real spinBoxMax: 3.99
@@ -205,6 +207,8 @@ Item{
     property bool skipUpdateBrightness          : false
     property bool skipUpdateContrast            : false
     property bool skipUpdateSaturation          : false
+    property bool skipUpdateDenoiseStrength     : false
+    property bool skipUpdateSharpnessStrength   : false
     property bool skipUpdateColorTemperature    : false
     property bool skipUpdateGammaCorrection     : false
     property bool setButtonClicked              : false
@@ -231,6 +235,8 @@ Item{
     property int brightnessInt: 0
     property int saturationInt: 0
     property int gammaInt: 0
+    property int denoiseStrengthInt : 0
+    property int sharpnessStrengthInt : 0
     property int exposureInt: 0
     property int exposureText: 0
 
@@ -2403,6 +2409,126 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                }
 
                Text {
+                   id: denoiseTitle
+                   text: "--- Denoise Strength---"
+                   font.pixelSize: 14
+                   font.family: "Ubuntu"
+                   color: "#ffffff"
+                   smooth: true
+                   Layout.alignment: Qt.AlignCenter
+                   opacity: 0.50196078431373
+                   ToolButton{
+                       tooltip: "This control provides the functionality to store the denoise and sharpness strength."
+                       width: 200
+                       opacity: 0
+                   }
+               }
+
+               Row{
+                   spacing: 35
+                   Slider {
+                       id: denoiseSlider
+                       activeFocusOnPress: true
+                       updateValueWhileDragging: false
+                       width: 150
+                       style:econSliderStyle
+
+                       onValueChanged:  {
+                           denoiseTextField.text = denoiseSlider.value.toFixed(1)
+                           if(skipUpdateDenoiseStrength){
+                               // Round the slider and TextField to three decimal places
+                               adjustedDenoiseStrength = parseFloat((denoiseSlider.value).toFixed(1));
+
+                               //Sending HID value to UVC
+                               denoiseStrengthInt = adjustedDenoiseStrength
+
+                               denoiseTextField.text = adjustedDenoiseStrength.toFixed(1)
+                               see3camcu200.setDenoiseStrength(adjustedDenoiseStrength.toFixed(1))
+                           }
+                           skipUpdateDenoiseStrength = true
+                       }
+                   }
+                   TextField {
+                       id: denoiseTextField
+                       font.pixelSize: 10
+                       font.family: "Ubuntu"
+                       smooth: true
+                       horizontalAlignment: TextInput.AlignHCenter
+                       style: econTextFieldStyle
+                       validator: IntValidator {bottom: denoiseSlider.minimumValue; top: denoiseSlider.maximumValue}
+                       onTextChanged: {
+                           const match = denoiseTextField.text.match(/^(-?\d+(\.\d{0,3})?).*/);
+                           if(match){
+                               denoiseTextField.text = match[1];
+                               denoiseSlider.value = denoiseTextField.text
+                               root.getDenoiseStrength(denoiseSlider.value)
+                           }
+                       }
+                   }
+               }
+
+               Text {
+                   id: sharpnessTitle
+                   text: "--- Sharpness Strength---"
+                   font.pixelSize: 14
+                   font.family: "Ubuntu"
+                   color: "#ffffff"
+                   smooth: true
+                   Layout.alignment: Qt.AlignCenter
+                   opacity: 0.50196078431373
+                   ToolButton{
+                       tooltip: "This control provides the functionality to store the denoise and sharpness strength."
+                       width: 200
+                       opacity: 0
+                   }
+               }
+
+               Row{
+                   spacing: 35
+                   Slider {
+                       id: sharpnessSlider
+                       activeFocusOnPress: true
+                       updateValueWhileDragging: false
+                       width: 150
+                       style:econSliderStyle
+
+                       onValueChanged:  {
+                           sharpnessTextField.text = sharpnessSlider.value.toFixed(1)
+                           if(skipUpdateSharpnessStrength){
+                               // Round the slider and TextField to three decimal places
+                               adjustedSharpnessStrength = parseFloat((sharpnessSlider.value).toFixed(1));
+
+                               //Sending HID value to UVC
+                               sharpnessStrengthInt = adjustedSharpnessStrength
+
+                               sharpnessTextField.text = adjustedSharpnessStrength.toFixed(1)
+                               see3camcu200.setSharpnessStrength(adjustedSharpnessStrength.toFixed(1))
+                           }
+                           skipUpdateSharpnessStrength = true
+                       }
+                   }
+                   TextField {
+                       id: sharpnessTextField
+                       font.pixelSize: 10
+                       font.family: "Ubuntu"
+                       smooth: true
+                       horizontalAlignment: TextInput.AlignHCenter
+                       style: econTextFieldStyle
+                       validator: IntValidator {bottom: sharpnessSlider.minimumValue; top: sharpnessSlider.maximumValue}
+                       onTextChanged: {
+                           const match = sharpnessTextField.text.match(/^(-?\d+(\.\d{0,1})?).*/);
+                           if(match){
+                               sharpnessTextField.text = match[1];
+                               sharpnessSlider.value = sharpnessTextField.text
+                               root.getSharpnessStrength(sharpnessSlider.value)
+                           }
+                       }
+                   }
+               }
+
+
+
+               Text {
                    id: userDefinedTitle
                    text: "--- User Defined Configuration ---"
                    font.pixelSize: 14
@@ -2821,6 +2947,41 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
 
             skipUpdateBrightness = true
         }
+
+        onDenoiseStrengthValuesReceived: {
+            skipUpdateDenoiseStrength = false
+
+            denoiseSlider.minimumValue = min
+            denoiseSlider.maximumValue = max
+            denoiseSlider.stepSize = step
+
+            current = parseFloat((current).toFixed(1));
+            denoiseSlider.value = current
+            denoiseTextField.text = current
+            root.getDenoiseStrength(denoiseSlider.value)
+
+            adjustedDenoiseStrength = parseFloat((denoiseSlider.value).toFixed(1));
+
+            skipUpdateDenoiseStrength = true
+        }
+
+        onSharpnessStrengthValuesReceived: {
+            skipUpdateSharpnessStrength = false
+
+            sharpnessSlider.minimumValue = min
+            sharpnessSlider.maximumValue = max
+            sharpnessSlider.stepSize = step
+
+            current = parseFloat((current).toFixed(1));
+            sharpnessSlider.value = current
+            sharpnessTextField.text = current
+
+            root.getSharpnessStrength(sharpnessSlider.value)
+            adjustedSharpnessStrength = parseFloat((sharpnessSlider.value).toFixed(1));
+
+            skipUpdateSharpnessStrength = true
+        }
+
 
         onCurrentContrastReceived: {
             skipUpdateContrast = false
@@ -3497,6 +3658,8 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         see3camcu200.getAntiFlickerMode()
         see3camcu200.getWhiteBalanceMode()
         see3camcu200.getAutoGainUpperLimit()
+        see3camcu200.getDenoiseStrength()
+        see3camcu200.getSharpnessStrength()
     }
     Component.onCompleted: {
         getCurrentValuesFromCamera()

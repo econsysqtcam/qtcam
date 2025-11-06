@@ -24,6 +24,10 @@
 #include <iostream>
 #include <iomanip> //Header for std::setprecision
 
+// Define static Range members
+Range SEE3CAM_CU200::denoiseStrength = { -1.0f, 0.0f, 0.0f, 1.0f, 0.0f };
+Range SEE3CAM_CU200::sharpnessStrength = { -1.0f, 0.0f, 0.0f, 1.0f, 0.0f };
+
 SEE3CAM_CU200::SEE3CAM_CU200()
 {
 
@@ -1490,7 +1494,50 @@ bool SEE3CAM_CU200::getAntiFlickerMode()
 }
 
 
+bool SEE3CAM_CU200::getDenoiseStrength(){
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+    denoiseStrength.min = 0.1 ;
+    denoiseStrength.max = 2.0;
+    denoiseStrength.defaultValue = 1.0;
+    denoiseStrength.step = 0.1;
+    if (denoiseStrength.current < 0.0f) {
+        denoiseStrength.current = denoiseStrength.defaultValue;
+    }
+    emit denoiseStrengthValuesReceived(denoiseStrength.min, denoiseStrength.max, denoiseStrength.step, denoiseStrength.current);
+    return true;
+}
 
+bool SEE3CAM_CU200::setDenoiseStrength(float value){
+    denoiseStrength.current = value;
+    return true;
+}
+
+bool SEE3CAM_CU200::getSharpnessStrength(){
+    // hid validation
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+    sharpnessStrength.min = 0 ;
+    sharpnessStrength.max = 20;
+    sharpnessStrength.defaultValue = 10;
+    sharpnessStrength.step = 1;
+    // If current value not initialized yet
+    if (sharpnessStrength.current < 0.0f) {
+        sharpnessStrength.current = sharpnessStrength.defaultValue;
+    }
+    emit sharpnessStrengthValuesReceived(sharpnessStrength.min, sharpnessStrength.max, sharpnessStrength.step, sharpnessStrength.current);
+    return true;
+}
+
+bool SEE3CAM_CU200::setSharpnessStrength(float value){
+    sharpnessStrength.current = value;
+    return true;
+}
 
 /**
  * @brief SEE3CAM_CU200::setPropertiesForCrossStill - To set still properties while taking still in cross resolution

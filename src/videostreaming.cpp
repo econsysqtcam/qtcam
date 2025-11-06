@@ -2156,8 +2156,21 @@ void Videostreaming::capFrame()
                     onY12Format = false;
                 }
             }
-            else if(saveRawFile(m_buffers[buf.index].start[0], buf.bytesused)){
-                imgSaveSuccessCount++;
+            else {
+                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
+                    std::vector<uint8_t> processedBuffer;
+
+                    performDenoising(m_buffers[buf.index].start[0], buf.bytesused,
+                                     gain, denoiseStrength, sharpnessStrength,
+                                     processedBuffer);
+                    saveRawFile(processedBuffer.data(), static_cast<int>(processedBuffer.size()));
+
+                    imgSaveSuccessCount++;
+                } else{
+                    if(saveRawFile(m_buffers[buf.index].start[0], buf.bytesused)){
+                        imgSaveSuccessCount++;
+                    }
+                }
             }
         }
         // save IR data
@@ -2172,7 +2185,7 @@ void Videostreaming::capFrame()
             if(m_renderer->y16BayerFormat || m_renderer->rawY10Format){
                 if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
                     bufferToSave = y16BayerDestBuffer;
-                } else if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M) || (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M_H01R1)){//No Debayering for Monochrome camera
+                } else if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M) ||  (currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200M_H01R1)){//No Debayering for Monochrome camera
                     //Converting YUYV to RGB for saving image using QImage
                     convertYUYVToRGB(m_renderer->yuvBuffer, (width*height*2), m_capImage->bits());
 
@@ -2345,6 +2358,18 @@ void Videostreaming::capFrame()
                         convertUYVYToRGB(inputBuffer, inputSize, m_capImage->bits());
 
                         bufferToSave = m_capImage->bits();
+                    } else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
+                        std::vector<uint8_t> processedBuffer;
+                        performDenoising(m_buffers[buf.index].start[0], buf.bytesused,
+                                         gain, denoiseStrength, sharpnessStrength,
+                                         processedBuffer);
+
+                        double uyvyToRgb_start = getTimeInSeconds();
+                        convertUYVYToRGB(processedBuffer.data(), processedBuffer.size(), m_capImage->bits());
+                        double uyvyToRgb_end = getTimeInSeconds();
+
+                        bufferToSave = m_capImage->bits();
+
                     }
 
                     QImage qImage3(bufferToSave, width, height, QImage::Format_RGB888);
@@ -5857,4 +5882,268 @@ void Videostreaming :: setFpsOnCheckingFormat(QString stillFmt){
     }
     else
         changeFPSForHyperyon = FPS_DEFAULT;
+}
+
+int Videostreaming::setDenoisingParameters(int sharpness, int uvcGain, float denoiseValue){
+    sharpnessStrength = sharpness;
+    gain = uvcGain;
+    denoiseStrength = denoiseValue;
+    return 1;
+}
+
+int Videostreaming::applyGaussianBlur(uint16_t* output_buffer,uint16_t* input_buffer,int width, int height,int bpp)
+   {
+
+    int RPMAX = ((1 << bpp)-1);
+    int temp = 0;
+    #pragma omp parallel for simd
+    for (int y = 2; y < height - 2; y++) {
+        for (int x = 2; x < width - 2; x++) {
+            float sum = 0;
+            float kernelSum = 0;
+            // Apply the 5x5 Gaussian kernel
+            for (int ky = -2; ky <= 2; ky++) {
+                for (int kx = -2; kx <= 2; kx++) {
+                    int pixel = input_buffer[(y + ky) * width + (x + kx)];
+                    sum += pixel * GAUSSKERNEL[ky + 2][kx + 2];
+                    kernelSum += GAUSSKERNEL[ky + 2][kx + 2];
+                }
+            }
+            temp = (int)(sum / kernelSum);
+            output_buffer[y * width + x] = (temp > RPMAX)? RPMAX : (temp < 0)? 0 : (uint16_t)temp;
+        }
+    }
+
+  return 1;
+}
+
+int Videostreaming::compLocalContrast(uint16_t* output_buffer,uint16_t* max_buffer,uint16_t* input_buffer,int width, int height,int radius,int bpp)
+   {
+
+    int RPMAX = ((1 << bpp)-1);
+
+    #pragma omp parallel for simd
+    for (int y = radius; y < height - radius; y++) {
+        for (int x = radius; x < width - radius; x++) {
+            int min_val = RPMAX, max_val = 0;
+            for (int ky = -radius; ky <= radius; ky++) {
+                for (int kx = -radius; kx <= radius; kx++) {
+                    int pixel = input_buffer[(y + ky) * width + (x + kx)];
+                    if (pixel < min_val) min_val = pixel;
+                    if (pixel > max_val) max_val = pixel;
+                   }
+                 }
+            output_buffer[y * width + x] = (uint16_t)(max_val - min_val);
+            max_buffer[y * width + x] = (uint16_t)(max_val);
+           }
+       }
+
+       return 1;
+   }
+
+int Videostreaming::sharpness(float* input_buffer,int width, int height,float sharpness, int radius, int bpp)
+   {
+
+    if (!input_buffer) {
+        return -1;
+    }
+
+
+    int RPMAX = ((1 << bpp)-1);
+
+    uint16_t *Y_buffer   = (uint16_t *)calloc((width*height),sizeof(uint16_t));
+    uint16_t *Contrast_buffer = (uint16_t *)calloc((width*height),sizeof(uint16_t));
+    uint16_t *Max_buffer = (uint16_t *)calloc((width*height),sizeof(uint16_t));
+    uint16_t *Y_buffer_f = (uint16_t *)calloc((width*height),sizeof(uint16_t));
+    uint16_t *Y_buffer_o = (uint16_t *)calloc((width*height),sizeof(uint16_t));
+
+    if (!Y_buffer || !Y_buffer_f || !Y_buffer_o || !Contrast_buffer || !Max_buffer) {
+        free(Y_buffer_f);
+        free(Y_buffer_o);
+        free(Y_buffer);
+        free(Contrast_buffer);
+        free(Max_buffer);
+        return -1;
+    }
+
+    // Separate Y channel
+    #pragma omp parallel for simd
+    for (size_t i = 0; i < (size_t)width * height * 3; i += 3) {
+        Y_buffer[i / 3] = static_cast<uint16_t>(input_buffer[i] + 0.5);
+    }
+
+
+    // Initialize Y_buffer_f
+    memcpy(Y_buffer_f, Y_buffer, (size_t)width * height * sizeof(uint16_t));
+    applyGaussianBlur(Y_buffer_f,Y_buffer,width,height,bpp);
+
+
+    memset(Contrast_buffer, 0, (size_t)width * height * sizeof(uint16_t));
+    memset(Max_buffer, 0, (size_t)width * height * sizeof(uint16_t));
+
+    compLocalContrast(Contrast_buffer,Max_buffer,Y_buffer,width,height,radius,bpp);
+
+
+
+    #pragma omp parallel for simd
+    for(int i = 0; i < width * height; i++)
+        {
+         int weight_norm  = Contrast_buffer[i];
+         int sharpness_int = (int)(sharpness);
+         int temp = (sharpness_int * (Y_buffer[i] - Y_buffer_f[i]));
+         temp = weight_norm * temp;
+         int sharpenedPixel = (int)Y_buffer[i] + (temp/RPMAX);
+         sharpenedPixel     = (sharpenedPixel > RPMAX)? RPMAX : (sharpenedPixel < 0)? 0 : sharpenedPixel;
+         Y_buffer_o[i]      = (uint16_t)sharpenedPixel;
+       }
+
+    //Copy the output Y image to the input image
+    size_t total_pixels = (size_t)width * height;
+    if (total_pixels * 3 > SIZE_MAX / sizeof(uint16_t)) {
+        free(Y_buffer_f);
+        free(Y_buffer_o);
+        free(Y_buffer);
+        free(Contrast_buffer);
+        free(Max_buffer);
+        return -1;
+    }
+
+    #pragma omp parallel for simd
+    for (size_t i = 0; i < total_pixels; ++i) {
+        input_buffer[3 * i + 0] = static_cast<float>(Y_buffer_o[i]);
+    }
+
+
+    free(Y_buffer_f);
+    free(Y_buffer_o);
+    free(Y_buffer);
+    free(Contrast_buffer);
+    free(Max_buffer);
+    return 0;
+}
+
+int Videostreaming::YUV422toYUV444(uint8_t* outputBuffer, const uint8_t* inputBuffer, int width, int height) {
+  const int numPixels = width * height;
+  for (int i = 0, index = 0; i < numPixels; i += 2, index += 6) {
+    // Ensure we don't go beyond the buffer
+    if ((i + 1) * 2 > width * height * 2) {
+      break;  // 2 bytes per pixel in YUV422 (UYVY or YUYV)
+    }
+
+#if SUB_TYPE == 0                                                          // U Y V Y (aka UYVY)
+    outputBuffer[index] = inputBuffer[(i * 2) + 1];                        // Y0
+    outputBuffer[index + 1] = inputBuffer[static_cast<ptrdiff_t>(i) * 2];  // U
+    outputBuffer[index + 2] = inputBuffer[(i * 2) + 2];                    // V
+    outputBuffer[index + 3] = inputBuffer[(i * 2) + 3];                    // Y1
+    outputBuffer[index + 4] = inputBuffer[static_cast<ptrdiff_t>(i) * 2];  // U
+    outputBuffer[index + 5] = inputBuffer[(i * 2) + 2];                    // V
+#else                                                                      // Y U Y V (aka YUYV)
+    outputBuffer[index] = inputBuffer[i * 2];          // Y0
+    outputBuffer[index + 1] = inputBuffer[i * 2 + 1];  // U
+    outputBuffer[index + 2] = inputBuffer[i * 2 + 3];  // V
+    outputBuffer[index + 3] = inputBuffer[i * 2 + 2];  // Y1
+    outputBuffer[index + 4] = inputBuffer[i * 2 + 1];  // U
+    outputBuffer[index + 5] = inputBuffer[i * 2 + 3];  // V
+#endif
+  }
+  return 0;
+}
+
+double Videostreaming::getTimeInSeconds() {
+  struct timeval time = {};
+  gettimeofday(&time, nullptr);
+  return static_cast<double>(time.tv_sec) + (static_cast<double>(time.tv_usec) / 1e6);  // convert to seconds
+}
+
+
+int Videostreaming::performDenoising(void* frameData,int bytesUsed, float gain_val, float denoising_strength, float sharpness_strength, std::vector<uint8_t>& outputBuffer) {
+  int width = 0;
+  int height = 0;
+  const int bpp = 8;
+  int flag = 0;
+  int inputSize = 0;
+
+
+  std::vector<uint8_t> inputBuffer = {};
+  std::vector<uint8_t> yuv444Buffer = {};
+  std::vector<float> yuv444Buffer16b = {};
+  std::vector<float> denoise16b = {};
+
+
+  std::unique_ptr<Denoise> denoiseInstance = std::make_unique<Denoise>();
+
+    width = m_renderer->videoResolutionwidth;
+    height = m_renderer->videoResolutionHeight;
+
+    inputSize = bytesUsed;
+
+    try {
+      inputBuffer.resize(inputSize);
+      yuv444Buffer.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * 3);
+      yuv444Buffer16b.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * 3);
+      denoise16b.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * 3);
+
+      // Copy frame data into inputBuffer
+      memcpy(inputBuffer.data(), frameData, bytesUsed);
+
+      // Memory allocation successful if no exception was thrown
+    } catch (const std::bad_alloc& e) {
+      return -2;
+    }
+
+    YUV422toYUV444(yuv444Buffer.data(), inputBuffer.data(), width, height);
+
+    #pragma omp parallel for simd
+    for (int i = 0; i < (width * height * 3); i++) {
+      yuv444Buffer16b[i] = static_cast<float>(yuv444Buffer[i]);
+    }
+
+    // DenoiseYUV
+    flag = denoiseInstance->DenoiseYUV(denoise16b.data(), yuv444Buffer16b.data(), width, height, gain_val, denoising_strength);
+
+    // Sharpness
+    flag = sharpness(denoise16b.data(), width, height, sharpness_strength, 2, bpp);
+
+    // Copy to output buffer
+    convertYUV444FloatToUYVY(denoise16b, width, height, outputBuffer);
+
+  fftwf_cleanup();
+  return 1;
+}
+
+void Videostreaming::convertYUV444FloatToUYVY(const std::vector<float>& yuv444Float, int width, int height, std::vector<uint8_t>& uyvyOut)
+{
+    uyvyOut.resize(width * height * 2);  // YUV422 (2 bytes per pixel)
+
+    size_t idx422 = 0;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x += 2) {
+            int i1 = (y * width + x) * 3;
+            int i2 = (y * width + x + 1) * 3;
+
+            float Y0f = yuv444Float[i1 + 0];
+            float U0f = yuv444Float[i1 + 1];
+            float V0f = yuv444Float[i1 + 2];
+
+            float Y1f = yuv444Float[i2 + 0];
+            float U1f = yuv444Float[i2 + 1];
+            float V1f = yuv444Float[i2 + 2];
+
+            // Average U and V for subsampling
+            float Uavg = (U0f + U1f) * 0.5f;
+            float Vavg = (V0f + V1f) * 0.5f;
+
+            // Clamp and convert to uint8_t
+            uint8_t U = static_cast<uint8_t>(std::clamp(Uavg, 0.0f, 255.0f));
+            uint8_t V = static_cast<uint8_t>(std::clamp(Vavg, 0.0f, 255.0f));
+            uint8_t Y0 = static_cast<uint8_t>(std::clamp(Y0f, 0.0f, 255.0f));
+            uint8_t Y1 = static_cast<uint8_t>(std::clamp(Y1f, 0.0f, 255.0f));
+
+            // UYVY order
+            uyvyOut[idx422++] = U;
+            uyvyOut[idx422++] = Y0;
+            uyvyOut[idx422++] = V;
+            uyvyOut[idx422++] = Y1;
+        }
+    }
 }

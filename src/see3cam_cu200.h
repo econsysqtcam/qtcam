@@ -98,6 +98,14 @@ union
 }fCurrentRGain, fRGainMin, fRGainMax, fRGainStepValue , fCurrentBGain , fBGainMin, fBGainMax, fBGainStepValue, fCurrentBrightness, fMinBrightness, fMaxBrightness, fBrightnessStepValue, fCurrentSaturation, fMinSaturation, fMaxSaturation, fSaturationStepValue , fCurrentGamma, fMinGamma, fMaxGamma, fGammaStepValue, fCurrentRr, fCurrentRg, fCurrentRb, fCurrentGr, fCurrentGg, fCurrentGb, fCurrentBr, fCurrentBg, fCurrentBb;
 
 
+struct Range{
+    float current;
+    float min;
+    float max;
+    float step;
+    float defaultValue;
+};
+
 class SEE3CAM_CU200 : public QObject
 {
     Q_OBJECT
@@ -105,6 +113,8 @@ class SEE3CAM_CU200 : public QObject
 private:
     unsigned char g_out_packet_buf[BUFFER_LENGTH];
     unsigned char g_in_packet_buf[BUFFER_LENGTH];
+    static Range denoiseStrength;
+    static Range sharpnessStrength;
     uvccamera uvc;
 
     void initializeBuffers();
@@ -257,6 +267,9 @@ signals:
 
     void targetBrightnessPropertiesReceived(float min, float max, float stepValue, float current);
 
+    void denoiseStrengthValuesReceived(float min, float max, float step, float current);
+    void sharpnessStrengthValuesReceived(float min, float max, float step, float current);
+
     void antiFlickerModeReceived(uint antiFlicker);
 
     void autoGainUpperLimitReceived(uint min, uint max, uint step, uint current);
@@ -321,6 +334,12 @@ public slots:
 
     bool setAntiFlickerMode(ANTI_FLICKER_DETECTION antiFlickerMode);
     bool getAntiFlickerMode();
+
+    bool getDenoiseStrength();
+    bool setDenoiseStrength(float denoiseStrength);
+
+    bool getSharpnessStrength();
+    bool setSharpnessStrength(float sharpnessStrength);
 
     bool setPropertiesForCrossStill(bool isEnable);
 
