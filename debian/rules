@@ -38,7 +38,12 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/your_appname
-	cd builddir && cp -f -R ${CURDIR}/src/qml/ ${CURDIR}/debian/qtcam/usr/share/qml/ && cp ${CURDIR}/src/Qtcam_16.04.desktop ${CURDIR}/debian/qtcam/usr/share/applications/ && install -m 755 -p "Qtcam" "${CURDIR}/debian/qtcam/usr/bin/qtcam" && install -m 755 -p "libDenoise.so" "${CURDIR}/debian/qtcam/usr/lib/libDenoise.so"
+	cd builddir && cp -f -R ${CURDIR}/src/ub22_qml/ ${CURDIR}/debian/qtcam/usr/share/qml/ && cp ${CURDIR}/src/Qtcam_16.04.desktop ${CURDIR}/debian/qtcam/usr/share/applications/ && install -m 755 -p "Qtcam" "${CURDIR}/debian/qtcam/usr/bin/qtcam" && \
+if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
+    install -m 755 -p "libDenoise.so" "${CURDIR}/debian/qtcam/usr/lib/libDenoise.so"; \
+else \
+    echo "Skipping libDenoise.so install (unsupported architecture: $(dpkg --print-architecture))"; \
+fi
 	
 # Build architecture-independent files here.
 binary-indep: build install
