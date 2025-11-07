@@ -89,7 +89,6 @@
 #include <QSocketNotifier>
 #include <QStringList>
 #include <QMetaObject>
-#include "Denoise.hpp"
 #include <QStringListModel>
 #include <QDir>
 #include <sys/mman.h>
@@ -118,7 +117,17 @@
 #include <QtQuick/QQuickView>
 #include <QQmlContext>
 
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+#include "Denoise.hpp"
 #include <fftw3.h>
+#endif
+
+template<typename T>
+constexpr const T& clamp(const T& value, const T& low, const T& high)
+{
+    return (value < low) ? low : (high < value) ? high : value;
+}
+
 
 class FrameRenderer : public QObject, protected QOpenGLFunctions
 {
@@ -560,6 +569,7 @@ private:
     bool windowResized;
     uint resizedWidth,resizedHeight,changeFPSForHyperyon;
     bool check_jpeg_header(void *inputbuffer, __u32 bytesUsed);
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
     int performDenoising(void* frameData,int bytesUsed, float gain_val, float denoising_strength, float sharpness_strength, std::vector<uint8_t>& outputBuffer) ;
     int applyGaussianBlur(uint16_t* output_buffer,uint16_t* input_buffer,int width, int height,int bpp);
     int compLocalContrast(uint16_t* output_buffer,uint16_t* max_buffer,uint16_t* input_buffer,int width, int height,int radius,int bpp);
@@ -567,7 +577,7 @@ private:
     int YUV422toYUV444(uint8_t* outputBuffer, const uint8_t* inputBuffer, int width, int height);
     double getTimeInSeconds();
     void convertYUV444FloatToUYVY(const std::vector<float>& yuv444Float, int width, int height, std::vector<uint8_t>& uyvyOut);
-
+#endif
 private slots:
     void handleWindowChanged(QQuickWindow *win);
 

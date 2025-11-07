@@ -28,8 +28,7 @@ TARGET = Qtcam
 
 CONFIG += release
 
-QMAKE_CXXFLAGS_RELEASE += -O3 -march=native -flto
-QMAKE_LFLAGS_RELEASE += -flto
+QMAKE_CXXFLAGS_RELEASE += -O3 -march=native
 
 # Additional import path used to resolve QML modules in Creator's code model
 QML_IMPORT_PATH =
@@ -256,7 +255,7 @@ QMAKE_CFLAGS_ISYSTEM = -I                           #For Ubuntu 20.04
 #==============================================================================
 # DENOISE LIBRARY BUILD SECTION
 #==============================================================================
-
+contains(QMAKE_HOST.arch, x86_64) | contains(QMAKE_HOST.arch, i386){
 # Define Denoise library source and header files
 DENOISE_LIB_DIR = $$PWD/denoiseAlgorithm
 DENOISE_LIB_SOURCES = \
@@ -300,7 +299,7 @@ INSTALLS += denoise_install
 # Add clean target for Denoise library
 QMAKE_CLEAN += $$DENOISE_BUILD_PATH
 
-
+}
 #==============================================================================
 # END DENOISE LIBRARY BUILD SECTION
 #==============================================================================

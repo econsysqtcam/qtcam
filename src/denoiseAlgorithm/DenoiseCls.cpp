@@ -1004,8 +1004,11 @@ int DenoiseProcessor::WaveletDenoise(float* outputBuffer, const float* inputBuff
 
   // Perform DWT denoising on the temp buffer
   dwtDenoise(this->paddedImage.data(), paddedWidth, paddedHeight);
-
+#if __GNUC__ >= 10
 #pragma omp parallel for simd collapse(2)
+#else
+#pragma omp parallel for collapse(2)
+#endif
   for (int row = 0; row <= paddedHeight - blockSize; row += 1) {
     for (int col = 0; col <= paddedWidth - blockSize; col += 1) {
       int sum = 0;

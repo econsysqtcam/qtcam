@@ -2157,6 +2157,8 @@ void Videostreaming::capFrame()
                 }
             }
             else {
+
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
                 if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
                     std::vector<uint8_t> processedBuffer;
 
@@ -2171,6 +2173,11 @@ void Videostreaming::capFrame()
                         imgSaveSuccessCount++;
                     }
                 }
+#else
+                if(saveRawFile(m_buffers[buf.index].start[0], buf.bytesused)){
+                    imgSaveSuccessCount++;
+                }
+#endif
             }
         }
         // save IR data
@@ -2358,20 +2365,20 @@ void Videostreaming::capFrame()
                         convertUYVYToRGB(inputBuffer, inputSize, m_capImage->bits());
 
                         bufferToSave = m_capImage->bits();
-                    } else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
+                    }
+
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+                    else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
                         std::vector<uint8_t> processedBuffer;
                         performDenoising(m_buffers[buf.index].start[0], buf.bytesused,
                                          gain, denoiseStrength, sharpnessStrength,
                                          processedBuffer);
 
-                        double uyvyToRgb_start = getTimeInSeconds();
                         convertUYVYToRGB(processedBuffer.data(), processedBuffer.size(), m_capImage->bits());
-                        double uyvyToRgb_end = getTimeInSeconds();
-
                         bufferToSave = m_capImage->bits();
 
                     }
-
+#endif
                     QImage qImage3(bufferToSave, width, height, QImage::Format_RGB888);
 
                     QImageWriter writer(filename);
@@ -5891,6 +5898,8 @@ int Videostreaming::setDenoisingParameters(int sharpness, int uvcGain, float den
     return 1;
 }
 
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+
 int Videostreaming::applyGaussianBlur(uint16_t* output_buffer,uint16_t* input_buffer,int width, int height,int bpp)
    {
 
@@ -6056,21 +6065,20 @@ double Videostreaming::getTimeInSeconds() {
 }
 
 
-int Videostreaming::performDenoising(void* frameData,int bytesUsed, float gain_val, float denoising_strength, float sharpness_strength, std::vector<uint8_t>& outputBuffer) {
-  int width = 0;
-  int height = 0;
-  const int bpp = 8;
-  int flag = 0;
-  int inputSize = 0;
+int Videostreaming::performDenoising(void* frameData, int bytesUsed, float gain_val, float denoising_strength, float sharpness_strength, std::vector<uint8_t>& outputBuffer)
+{
+    int width = 0;
+    int height = 0;
+    const int bpp = 8;
+    int flag = 0;
+    int inputSize = 0;
 
+    std::vector<uint8_t> inputBuffer = {};
+    std::vector<uint8_t> yuv444Buffer = {};
+    std::vector<float> yuv444Buffer16b = {};
+    std::vector<float> denoise16b = {};
 
-  std::vector<uint8_t> inputBuffer = {};
-  std::vector<uint8_t> yuv444Buffer = {};
-  std::vector<float> yuv444Buffer16b = {};
-  std::vector<float> denoise16b = {};
-
-
-  std::unique_ptr<Denoise> denoiseInstance = std::make_unique<Denoise>();
+    Denoise* denoiseInstance = new Denoise();
 
     width = m_renderer->videoResolutionwidth;
     height = m_renderer->videoResolutionHeight;
@@ -6078,24 +6086,22 @@ int Videostreaming::performDenoising(void* frameData,int bytesUsed, float gain_v
     inputSize = bytesUsed;
 
     try {
-      inputBuffer.resize(inputSize);
-      yuv444Buffer.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * 3);
-      yuv444Buffer16b.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * 3);
-      denoise16b.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * 3);
+        inputBuffer.resize(inputSize);
+        yuv444Buffer.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * 3);
+        yuv444Buffer16b.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * 3);
+        denoise16b.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * 3);
 
-      // Copy frame data into inputBuffer
-      memcpy(inputBuffer.data(), frameData, bytesUsed);
-
-      // Memory allocation successful if no exception was thrown
+        memcpy(inputBuffer.data(), frameData, bytesUsed);
     } catch (const std::bad_alloc& e) {
-      return -2;
+        delete denoiseInstance; 
+        return -2;
     }
 
     YUV422toYUV444(yuv444Buffer.data(), inputBuffer.data(), width, height);
 
     #pragma omp parallel for simd
     for (int i = 0; i < (width * height * 3); i++) {
-      yuv444Buffer16b[i] = static_cast<float>(yuv444Buffer[i]);
+        yuv444Buffer16b[i] = static_cast<float>(yuv444Buffer[i]);
     }
 
     // DenoiseYUV
@@ -6107,8 +6113,10 @@ int Videostreaming::performDenoising(void* frameData,int bytesUsed, float gain_v
     // Copy to output buffer
     convertYUV444FloatToUYVY(denoise16b, width, height, outputBuffer);
 
-  fftwf_cleanup();
-  return 1;
+    fftwf_cleanup();
+
+    delete denoiseInstance;
+    return 1;
 }
 
 void Videostreaming::convertYUV444FloatToUYVY(const std::vector<float>& yuv444Float, int width, int height, std::vector<uint8_t>& uyvyOut)
@@ -6134,10 +6142,10 @@ void Videostreaming::convertYUV444FloatToUYVY(const std::vector<float>& yuv444Fl
             float Vavg = (V0f + V1f) * 0.5f;
 
             // Clamp and convert to uint8_t
-            uint8_t U = static_cast<uint8_t>(std::clamp(Uavg, 0.0f, 255.0f));
-            uint8_t V = static_cast<uint8_t>(std::clamp(Vavg, 0.0f, 255.0f));
-            uint8_t Y0 = static_cast<uint8_t>(std::clamp(Y0f, 0.0f, 255.0f));
-            uint8_t Y1 = static_cast<uint8_t>(std::clamp(Y1f, 0.0f, 255.0f));
+            uint8_t U = static_cast<uint8_t>(clamp(Uavg, 0.0f, 255.0f));
+            uint8_t V = static_cast<uint8_t>(clamp(Vavg, 0.0f, 255.0f));
+            uint8_t Y0 = static_cast<uint8_t>(clamp(Y0f, 0.0f, 255.0f));
+            uint8_t Y1 = static_cast<uint8_t>(clamp(Y1f, 0.0f, 255.0f));
 
             // UYVY order
             uyvyOut[idx422++] = U;
@@ -6147,3 +6155,4 @@ void Videostreaming::convertYUV444FloatToUYVY(const std::vector<float>& yuv444Fl
         }
     }
 }
+#endif
