@@ -255,7 +255,7 @@ QMAKE_CFLAGS_ISYSTEM = -I                           #For Ubuntu 20.04
 #==============================================================================
 # DENOISE LIBRARY BUILD SECTION
 #==============================================================================
-contains(QMAKE_HOST.arch, x86_64) | contains(QMAKE_HOST.arch, i386){
+contains(QMAKE_HOST.arch, x86_64){
 # Define Denoise library source and header files
 DENOISE_LIB_DIR = $$PWD/denoiseAlgorithm
 DENOISE_LIB_SOURCES = \
@@ -298,7 +298,6 @@ INSTALLS += denoise_install
 
 # Add clean target for Denoise library
 QMAKE_CLEAN += $$DENOISE_BUILD_PATH
-
 }
 #==============================================================================
 # END DENOISE LIBRARY BUILD SECTION

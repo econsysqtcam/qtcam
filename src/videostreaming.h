@@ -117,7 +117,7 @@
 #include <QtQuick/QQuickView>
 #include <QQmlContext>
 
-#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+#if defined(__x86_64__) || defined(_M_X64)
 #include "Denoise.hpp"
 #include <fftw3.h>
 #endif
@@ -569,7 +569,7 @@ private:
     bool windowResized;
     uint resizedWidth,resizedHeight,changeFPSForHyperyon;
     bool check_jpeg_header(void *inputbuffer, __u32 bytesUsed);
-#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+#if defined(__x86_64__) || defined(_M_X64)
     int performDenoising(void* frameData,int bytesUsed, float gain_val, float denoising_strength, float sharpness_strength, std::vector<uint8_t>& outputBuffer) ;
     int applyGaussianBlur(uint16_t* output_buffer,uint16_t* input_buffer,int width, int height,int bpp);
     int compLocalContrast(uint16_t* output_buffer,uint16_t* max_buffer,uint16_t* input_buffer,int width, int height,int radius,int bpp);

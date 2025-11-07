@@ -2158,7 +2158,7 @@ void Videostreaming::capFrame()
             }
             else {
 
-#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+#if defined(__x86_64__) || defined(_M_X64) 
                 if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
                     std::vector<uint8_t> processedBuffer;
 
@@ -2367,7 +2367,7 @@ void Videostreaming::capFrame()
                         bufferToSave = m_capImage->bits();
                     }
 
-#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+#if defined(__x86_64__) || defined(_M_X64)
                     else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
                         std::vector<uint8_t> processedBuffer;
                         performDenoising(m_buffers[buf.index].start[0], buf.bytesused,
@@ -5898,7 +5898,7 @@ int Videostreaming::setDenoisingParameters(int sharpness, int uvcGain, float den
     return 1;
 }
 
-#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+#if defined(__x86_64__) || defined(_M_X64)
 
 int Videostreaming::applyGaussianBlur(uint16_t* output_buffer,uint16_t* input_buffer,int width, int height,int bpp)
    {
