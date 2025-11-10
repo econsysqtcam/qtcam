@@ -31,6 +31,9 @@ clean:
 	# Add here commands to clean up after the build process.
 	rm -rf builddir
 	dh_clean
+	
+DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
 install: build
 	dh_testdir
 	dh_testroot
@@ -38,12 +41,12 @@ install: build
 	dh_installdirs
 
 	#Commands to install the package into debian/QtCAM
-	cd builddir && cp -f -R ${CURDIR}/src/ub22_qml/ ${CURDIR}/debian/qtcam/usr/share/qml/ && cp ${CURDIR}/src/Qtcam_16.04.desktop ${CURDIR}/debian/qtcam/usr/share/applications/ && install -m 755 -p "Qtcam" "${CURDIR}/debian/qtcam/usr/bin/qtcam" && \
-if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
-    install -m 755 -p "libDenoise.so" "${CURDIR}/debian/qtcam/usr/lib/libDenoise.so"; \
-else \
-    echo "Skipping libDenoise.so install (unsupported architecture: $(dpkg --print-architecture))"; \
-fi
+	cd builddir && cp -f -R ${CURDIR}/src/ub22_qml/ ${CURDIR}/debian/qtcam/usr/share/qml/ && cp ${CURDIR}/src/Qtcam_16.04.desktop ${CURDIR}/debian/qtcam/usr/share/applications/ && install -m 755 -p "Qtcam" "${CURDIR}/debian/qtcam/usr/bin/qtcam" 
+ifeq ($(DEB_HOST_ARCH),amd64)
+	install -m 755 libDenoise.so debian/qtcam/usr/lib/libDenoise.so
+else
+	echo "Skipping libDenoise.so for $(DEB_HOST_ARCH)"
+endif
 
 # Build architecture-independent files here.
 binary-indep: build install
