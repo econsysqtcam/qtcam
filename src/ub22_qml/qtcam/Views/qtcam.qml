@@ -223,6 +223,7 @@ Rectangle {
     property var denoiseStrength: 0.0;
     property var sharpnessStrength : 0;
     property var gain : 0;
+    property bool denoiseFlag : false;
 
     //Skip Frame count to prevent green frame
     signal skipFrameCount()
@@ -1239,6 +1240,11 @@ Rectangle {
     function getGainFromUvc(uvcGain){
         gain = uvcGain;
         vidstreamproperty.setDenoisingParameters(sharpnessStrength, gain, denoiseStrength)
+    }
+
+    function setDenoiseFlag(flag){
+        denoiseFlag = flag
+        vidstreamproperty.setDenoiseFlag(flag)
     }
 
     function getDenoiseStrength(denoisingStrength){

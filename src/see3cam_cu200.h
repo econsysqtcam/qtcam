@@ -115,6 +115,7 @@ private:
     unsigned char g_in_packet_buf[BUFFER_LENGTH];
     static Range denoiseStrength;
     static Range sharpnessStrength;
+    static bool denoiseFlag;
     uvccamera uvc;
 
     void initializeBuffers();
@@ -267,6 +268,7 @@ signals:
 
     void targetBrightnessPropertiesReceived(float min, float max, float stepValue, float current);
 
+    void denoiseFlagValue(bool flag);
     void denoiseStrengthValuesReceived(float min, float max, float step, float current);
     void sharpnessStrengthValuesReceived(float min, float max, float step, float current);
 
@@ -334,6 +336,9 @@ public slots:
 
     bool setAntiFlickerMode(ANTI_FLICKER_DETECTION antiFlickerMode);
     bool getAntiFlickerMode();
+
+    bool getDenoiseFlag();
+    bool enableDisableDenoising(bool flag);
 
     bool getDenoiseStrength();
     bool setDenoiseStrength(float denoiseStrength);

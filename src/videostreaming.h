@@ -317,6 +317,7 @@ public:
     int gain = 0;
     int sharpnessStrength = 0;
     float denoiseStrength = 0.0;
+    bool denoiseFlag = false;
 
     // prepare target buffer for rendering from input buffer.
     bool prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 bytesUsed);
@@ -847,6 +848,7 @@ public slots:
 
     void setSkipFrameCount(int count);
 
+    int setDenoiseFlag(bool flag);
     int setDenoisingParameters(int sharpness, int uvcGain, float denoiseValue);
 
 signals:

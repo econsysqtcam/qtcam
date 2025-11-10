@@ -2158,8 +2158,8 @@ void Videostreaming::capFrame()
             }
             else {
 
-#if defined(__x86_64__) || defined(_M_X64) 
-                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
+#if defined(__x86_64__) || defined(_M_X64)
+                if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200 && denoiseFlag){
                     std::vector<uint8_t> processedBuffer;
 
                     performDenoising(m_buffers[buf.index].start[0], buf.bytesused,
@@ -2368,7 +2368,7 @@ void Videostreaming::capFrame()
                     }
 
 #if defined(__x86_64__) || defined(_M_X64)
-                    else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200){
+                    else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_CU200 && denoiseFlag){
                         std::vector<uint8_t> processedBuffer;
                         performDenoising(m_buffers[buf.index].start[0], buf.bytesused,
                                          gain, denoiseStrength, sharpnessStrength,
@@ -5889,6 +5889,11 @@ void Videostreaming :: setFpsOnCheckingFormat(QString stillFmt){
     }
     else
         changeFPSForHyperyon = FPS_DEFAULT;
+}
+
+int Videostreaming::setDenoiseFlag(bool flag){
+    denoiseFlag = flag;
+    return 1;
 }
 
 int Videostreaming::setDenoisingParameters(int sharpness, int uvcGain, float denoiseValue){

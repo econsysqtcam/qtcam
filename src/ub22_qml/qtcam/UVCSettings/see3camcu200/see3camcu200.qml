@@ -2409,6 +2409,52 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
                }
 
                Text {
+                       id: enableDisableDenoise
+                       text: "--- Enable/Disable Denoising ---"
+                       font.pixelSize: 14
+                       font.family: "Ubuntu"
+                       color: "#ffffff"
+                       smooth: true
+                       Layout.alignment: Qt.AlignCenter
+                       opacity: 0.50196078431373
+              }
+
+              Row{
+                spacing:75
+                ExclusiveGroup { id: denoiseRectGroup }
+                RadioButton {
+                    exclusiveGroup: denoiseRectGroup
+                    id: rectEnable
+                    text: "Enable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked:{
+                        see3camcu200.enableDisableDenoising(true)
+                        root.setDenoiseFlag(true)
+                    }
+                    Keys.onReturnPressed: {
+                        see3camcu200.enableDisableDenoising(true)
+                        root.setDenoiseFlag(true)
+                    }
+                }
+                RadioButton {
+                    exclusiveGroup: denoiseRectGroup
+                    id:rectDisable
+                    text: "Disable"
+                    activeFocusOnPress: true
+                    style: econRadioButtonStyle
+                    onClicked: {
+                        see3camcu200.enableDisableDenoising(false)
+                        root.setDenoiseFlag(false)
+                    }
+                    Keys.onReturnPressed: {
+                        see3camcu200.enableDisableDenoising(false)
+                        root.setDenoiseFlag(false)
+                   }
+                }
+              }
+
+               Text {
                    id: denoiseTitle
                    text: "--- Denoise Strength---"
                    font.pixelSize: 14
@@ -2426,6 +2472,8 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
 
                Row{
                    spacing: 35
+                   enabled : rectEnable.checked? true : false
+                   opacity : rectEnable.checked ? 1 : 0.1
                    Slider {
                        id: denoiseSlider
                        activeFocusOnPress: true
@@ -2485,6 +2533,8 @@ If the exposure region exceeds the frame boundary, the ROI will be clipped autom
 
                Row{
                    spacing: 35
+                   enabled : rectEnable.checked? true : false
+                   opacity : rectEnable.checked ? 1 : 0.1
                    Slider {
                        id: sharpnessSlider
                        activeFocusOnPress: true
@@ -2946,6 +2996,15 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
             root.sendBrightnessToUVC(brightnessInt)
 
             skipUpdateBrightness = true
+        }
+
+        onDenoiseFlagValue :{
+            if(flag){
+                rectEnable.checked = true
+            } else{
+                rectDisable.checked = true
+            }
+            root.setDenoiseFlag(flag)
         }
 
         onDenoiseStrengthValuesReceived: {
@@ -3658,6 +3717,7 @@ Upon activation, the device will undergo an automatic reset to seamlessly load a
         see3camcu200.getAntiFlickerMode()
         see3camcu200.getWhiteBalanceMode()
         see3camcu200.getAutoGainUpperLimit()
+        see3camcu200.getDenoiseFlag()
         see3camcu200.getDenoiseStrength()
         see3camcu200.getSharpnessStrength()
     }

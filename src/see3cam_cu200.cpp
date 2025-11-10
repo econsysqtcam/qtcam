@@ -27,6 +27,7 @@
 // Define static Range members
 Range SEE3CAM_CU200::denoiseStrength = { -1.0f, 0.0f, 0.0f, 1.0f, 0.0f };
 Range SEE3CAM_CU200::sharpnessStrength = { -1.0f, 0.0f, 0.0f, 1.0f, 0.0f };
+bool SEE3CAM_CU200::denoiseFlag = false;
 
 SEE3CAM_CU200::SEE3CAM_CU200()
 {
@@ -1493,13 +1494,18 @@ bool SEE3CAM_CU200::getAntiFlickerMode()
     return false;
 }
 
+bool SEE3CAM_CU200::getDenoiseFlag(){
+    emit denoiseFlagValue(denoiseFlag);
+    return true;
+}
+
+bool SEE3CAM_CU200::enableDisableDenoising(bool flag){
+    denoiseFlag = flag;
+    return true;
+}
 
 bool SEE3CAM_CU200::getDenoiseStrength(){
-    // hid validation
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
+
     denoiseStrength.min = 0.1 ;
     denoiseStrength.max = 2.0;
     denoiseStrength.defaultValue = 1.0;
@@ -1517,11 +1523,6 @@ bool SEE3CAM_CU200::setDenoiseStrength(float value){
 }
 
 bool SEE3CAM_CU200::getSharpnessStrength(){
-    // hid validation
-    if(uvccamera::hid_fd < 0)
-    {
-        return false;
-    }
     sharpnessStrength.min = 0 ;
     sharpnessStrength.max = 20;
     sharpnessStrength.defaultValue = 10;
