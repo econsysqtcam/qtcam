@@ -28,7 +28,7 @@ TARGET = Qtcam
 
 CONFIG += release
 
-QMAKE_CXXFLAGS_RELEASE += -O3 -march=native
+QMAKE_CXXFLAGS_RELEASE += -O3 -mtune=generic
 
 # Additional import path used to resolve QML modules in Creator's code model
 QML_IMPORT_PATH =
@@ -282,7 +282,7 @@ QMAKE_PRE_LINK += g++ -shared -fPIC -O3 -std=c++17 -fopenmp\
     $$DENOISE_LIB_DIR/DenoiseCls.cpp \
     $$DENOISE_LIB_DIR/Denoise_LUT.cpp \
     -I$$DENOISE_LIB_DIR \
-    -lfftw3f -lm -march=native\
+    -lfftw3f -lm -mtune=generic \
     -o $$DENOISE_BUILD_PATH;
 
 # Link the Denoise library to the main application

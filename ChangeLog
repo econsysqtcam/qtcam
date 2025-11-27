@@ -1,3 +1,7 @@
+Qtcam Application - 27.0.10
+---------------------------
+*Bug fix: Fixed illegal instruction crash on older CPUs by removing -march=native
+
 Qtcam Application - 27.0.9
 ---------------------------
 *Added denoise algorithm for still capture in See3cam_cu200.
