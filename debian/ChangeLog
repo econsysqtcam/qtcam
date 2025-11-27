@@ -1,4 +1,5 @@
-qtcam (27.0.9-1ubuntu1) jammy; urgency=medium
+qtcam (27.0.10-1ubuntu1) jammy; urgency=medium
+ *Fixed illegal instruction crash on older CPUs by removing -march=native.
  *Added denoise algorithm for still capture in See3cam_cu200.
  *Added new pid for See3CAM_130E and fixed still capture issue in See3cam_130E and See3cam_130D.
  *Bug fix - Fixed green frame issue occuring initially on opening see3cam_cu83. And enabled link to navigate to website page in About window.
@@ -39,4 +40,4 @@ qtcam (27.0.9-1ubuntu1) jammy; urgency=medium
  *Fix for Mipi Camera streaming issue & Manual white balance in UVC.
  *Added support for ubuntu 22.04.
  *Initial release.  
- -- econsysqtcam <qtcam@e-consystems.com> Thu Nov 06 15:37:45 2025 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Thu Nov 27 21:37:45 2025 +0530
