@@ -47,9 +47,9 @@ install: build
 	# Debug: show builddir contents
 	ls -al ${CURDIR}/builddir
 	
-	cd builddir && cp -f -R ${CURDIR}/src/ub22_qml/ ${CURDIR}/debian/qtcam/usr/share/qml/ && cp ${CURDIR}/src/Qtcam_16.04.desktop ${CURDIR}/debian/qtcam/usr/share/applications/ && install -m 755 -p "Qtcam" "${CURDIR}/debian/qtcam/usr/bin/qtcam" 
+	cd builddir && cp -f -R ${CURDIR}/src/qml/ ${CURDIR}/debian/qtcam/usr/share/qml/ && cp ${CURDIR}/src/Qtcam_16.04.desktop ${CURDIR}/debian/qtcam/usr/share/applications/ && install -m 755 -p "Qtcam" "${CURDIR}/debian/qtcam/usr/bin/qtcam" 
 ifeq ($(DEB_HOST_ARCH),amd64)
-	install -m 755 "${CURDIR}/builddir/libDenoise.so" "${CURDIR}/debian/qtcam/usr/lib/libDenoise.so"
+	cd builddir && install -m 755 "libDenoise.so" "${CURDIR}/debian/qtcam/usr/lib/libDenoise.so"
 else
 	echo "Skipping libDenoise.so for $(DEB_HOST_ARCH)"
 endif
