@@ -1,4 +1,5 @@
-qtcam (27.0.9-0ubuntu1) focal; urgency=medium
+qtcam (27.0.10-0ubuntu1) focal; urgency=medium
+ *Fixed illegal instruction crash on older CPUs by removing -march=native and fixed overlapping UI changes.
  *Added denoise algorithm for still capture in See3cam_cu200.
  *Added new pid for See3CAM_130E and fixed still capture issue in See3cam_130E and See3cam_130D.
  *Bug fix - Fixed green frame issue occuring initially on opening see3cam_cu83. And enabled link to navigate to website page in About window.
@@ -187,6 +188,6 @@ qtcam (27.0.9-0ubuntu1) focal; urgency=medium
  * Fixed issue of enabling camerasettings on pressing spacebar for all See3CAM cameras.
  * Initial release. 
 
- -- econsysqtcam <qtcam@e-consystems.com> Thu Nov 06 15:40:45 2025 +0530
+ -- econsysqtcam <qtcam@e-consystems.com> Thu Nov 27 21:40:45 2025 +0530
 
 
