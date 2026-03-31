@@ -1609,7 +1609,8 @@ Rectangle {
             see3cam = Qt.createComponent("../UVCSettings/see3cam20cug/see3cam_20cug.qml").createObject(root)
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_CU22) { // Added By Navya : 11 Dec 2019
             see3cam = Qt.createComponent("../UVCSettings/see3camcu22/see3camcu22.qml").createObject(root)
-        }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130D || selectedDeviceEnumValue == CommonEnums.SEE3CAM_130E) { // Modified on 16 Oct 2025
+        }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_130D || selectedDeviceEnumValue == CommonEnums.SEE3CAM_130E ||
+                 selectedDeviceEnumValue == CommonEnums.SEE3CAM_130E_H02R1 || selectedDeviceEnumValue == CommonEnums.SEE3CAM_130E_H03R1) { // Modified on 31 Mar 2026
             see3cam = Qt.createComponent("../UVCSettings/see3cam130D/see3cam_130D.qml").createObject(root)//Added by M Vishnu Murali
         }else if(selectedDeviceEnumValue == CommonEnums.SEE3CAM_1332) { // Added By Navya : 11 Dec 2019
             see3cam = Qt.createComponent("../UVCSettings/see3cam1332/see3cam_1332.qml").createObject(root)//Added by M Vishnu Murali
@@ -1771,7 +1772,9 @@ Rectangle {
         case CommonEnums.IMX900USBCAM: //Added By Sushanth
         case CommonEnums.See3CAM_CU83_H03R1:  // Added By Geethalakshmi
         case CommonEnums.ECAM514_USB: // Added by Geethalakshmi
-        case CommonEnums.SEE3CAM_130E: // Added by Geethalakshmi
+        case CommonEnums.SEE3CAM_130E:  // Added by Geethalakshmi
+        case CommonEnums.SEE3CAM_130E_H02R1:  // Added by Geethalakshmi
+        case CommonEnums.SEE3CAM_130E_H03R1:  // Added by Geethalakshmi
         case CommonEnums.SEE3CAM_160:
             camproperty.openHIDDevice(device_box.currentText);
             break;

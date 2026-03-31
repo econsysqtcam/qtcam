@@ -89,7 +89,8 @@ public:
         See3CAM_CU83_H03R1,        //Added By Geethalakshmi
         ECAM514_USB,  // Added by Geethalakshmi
         SEE3CAM_130E,
-
+        SEE3CAM_130E_H02R1,
+        SEE3CAM_130E_H03R1,
         SEE3CAM_20CUG
     }ECameraNames;
     //Enum for capture shot type
